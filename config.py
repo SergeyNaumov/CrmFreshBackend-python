@@ -1,0 +1,30 @@
+config={
+  'title':'CRM Digital',
+  'copyright':'copyright 2005 - {{cur_year}}',
+  'encrypt_methon':'mysql_encrypt',
+  'system_email':'svcomplex@gmail.com',
+  'connects':{
+    'crm_read':{
+      'user':'crm',
+      'password':'',
+      'host':'localhost',
+      'dbname':'crm',
+    },
+    'crm_write':{
+      'user':'crm',
+      'password':'',
+      'host':'localhost',
+      'dbname':'crm',
+    },
+  },
+  'docpack':{
+    'user_table':'user',
+    'docpack_foreign_key':'user_id'
+  },
+  'const':{
+    'project_id':''
+  },
+  'events':[
+    'quiz'
+  ]
+}
