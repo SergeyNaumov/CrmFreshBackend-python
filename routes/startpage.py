@@ -1,4 +1,4 @@
-from lib.core import cur_year,cur_date
+from lib.core import cur_year,cur_date, success
 from fastapi import FastAPI, APIRouter
 from config import config
 #from db import db,db_read,db_write
@@ -61,11 +61,12 @@ async def startpage():
         values=[s.login],
         onerow=1
       )
-      manager['permissions']=s.db.query(
-        query='SELECT permissions_id from manager_permissions where manager_id=%s',
-        values=[manager['id']],
-        massive=1
-      )
+      manager['permissions']=['1','3','5','6']
+      # manager['permissions']=s.db.query(
+      #   query='SELECT permissions_id from manager_permissions where manager_id=%s',
+      #   values=[manager['id']],
+      #   massive=1
+      # )
       #print('manager:',manager)
       perm_str='0'
       if(len(manager['permissions'])):
@@ -103,7 +104,7 @@ async def startpage():
     'copyright':config['copyright'],
     'left_menu':left_menu,
     'errors':errors,
-    'success':len(errors)>0,
+    'success':success(errors),
     'manager':manager
   }
 

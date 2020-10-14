@@ -19,3 +19,8 @@ def cur_date(delta=0,format="%Y-%m-%d"):
   dat = datetime.date.today()
   dat = dat + datetime.timedelta(days=delta)
   return dat.strftime(format)
+
+def success(errors):
+  if(len(errors)):
+    return 0
+  return 1
