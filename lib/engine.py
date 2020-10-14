@@ -1,7 +1,7 @@
 from lib.core import exists_arg
 from fastapi import Response
 import socket # только для определения hostname
-
+import json
 from db import db,db_read,db_write
 from .session import *
 
@@ -17,19 +17,29 @@ class Engine():
     self.headers=[]
     self.cookies={}
     self.cookies_for_delete=[]
+    self._end=False
+    self._content_type='application/json'
+    self._content=''
+    self.project=None
     
-
-    
+    self.env={'HTTP_X_REAL_IP':''}
+    #print('request_url:',self.request.url.path)
+    #for k in self.request['headers']:
+    #  print(str(k[0]),'=>',str(k[1]) )
     
     #self.cookies['User-Agent']=''
 
     hostname=socket.gethostname()
-    if hostname=='sv-home':
-      self.manager={'id':'1','login':'admin'}
-    else:
-      self.manager={'id':'1','login':'admin'}
+    # Если мы не логинимся -- проверяем сессию
+    if self.request.url.path != '/login':
+        if 0 and hostname=='sv-home':
+          self.manager={'id':'1','login':'admin'}
+          print('hostname',hostname)
+        else:
+          session_start(self,encrypt_method='mysql_sha2');
 
-    print('hostname',hostname)
+
+    
 
     #if not(exists_arg('login',))
 
@@ -38,7 +48,7 @@ class Engine():
       arg['name']=par[0]
       arg['value']=par[1]
     
-    print('arg',arg)
+    #print('arg',arg)
     if arg['value'] or str(arg['value'])=='0' or arg['value']=='':
       self.cookies[arg['name']]=arg['value']
     else:
@@ -47,5 +57,10 @@ class Engine():
 
   def get_cookie(self,cookie_name):
     return self.request.cookies.get(cookie_name)
+  def end(self):
+    self._end=True
+
+  def to_json(self,data):
+      return json.dumps(data, sort_keys=False,indent=4,ensure_ascii=False,separators=(',', ': '))
 
 s=Engine()

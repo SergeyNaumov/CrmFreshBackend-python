@@ -1,7 +1,8 @@
 config={
   'title':'CRM Digital',
   'copyright':'copyright 2005 - {{cur_year}}',
-  'encrypt_methon':'mysql_encrypt',
+  'encrypt_methon':'mysql_sha2',
+  'use_project':False,
   'system_email':'svcomplex@gmail.com',
   'connects':{
     'crm_read':{
