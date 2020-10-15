@@ -1,10 +1,14 @@
 import pymysql
 import json
+from .transform import tree_use_transform, massive_transform
 
 def exists_arg(key,dict):
   if (key in dict) and dict[key]:
     return True
   return False
+
+
+
 
 def out_error(self,error,arg):
   self.err_str=error
@@ -235,7 +239,7 @@ class FreshDB():
         rez=cur.fetchall()
       return self.prepare_result(rez,arg)
 
-      
+
 
     def query(self, **arg):
       self.error_str=''
@@ -259,8 +263,16 @@ class FreshDB():
           if exists_arg('onerow',arg):
             rez=cur.fetchone()
             #print('onerow!',rez)
+
           else:
             rez=cur.fetchall()
+            if exists_arg('massive',arg):
+              rez=massive_transform(rez)
+
+
+            else:
+              
+              if exists_arg('tree_use',arg): rez=tree_use_transform(rez)
       
       if exists_arg('to_json',arg): rez=to_json(rez)
 

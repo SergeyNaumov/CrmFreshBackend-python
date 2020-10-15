@@ -24,3 +24,14 @@ def success(errors):
   if(len(errors)):
     return 0
   return 1
+
+def is_errors(form):
+  #print('errors:',hasattr(form,'errors'))
+  if hasattr(form,'errors') and len(form.errors):
+    return True
+  return False
+
+def create_fields_hash(form):
+  form.fields_hash={}
+  for f in form.fields:
+    form.fields_hash[f['name']]=f

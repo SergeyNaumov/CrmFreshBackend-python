@@ -99,6 +99,7 @@ def session_start(s,**arg):
   session_table='session'
   manager_table='manager'
   errors=[]
+  s.use_project=config['use_project']
   if config['use_project']:
     session_table='project_session'
     manager_table='project_manager'
@@ -134,18 +135,115 @@ def session_start(s,**arg):
     s._content['success']=0
     s.end()
 
-def session_logout(s,**arg):
+def session_logout(s):
   user_id=s.get_cookie('auth_user_id')
   key=s.get_cookie('auth_key')
   if user_id.isdigit() and int(user_id) and key :
-      s.db.query(
-        query='DELETE FROM project_session WHERE auth_id=%s and session_key=%s',
-        values=[user_id,key]
-      )
-  else:
-      s.db.query(
-        query='DELETE FROM session WHERE auth_id=%s and session_key=%s',
-        values=[user_id,key]
-      )
+      if config['use_project']:
+        s.db.query(
+          query='DELETE FROM project_session WHERE auth_id=%s and session_key=%s',
+          values=[user_id,key]
+        )
+      else:
+          s.db.query(
+            query='DELETE FROM session WHERE auth_id=%s and session_key=%s',
+            values=[user_id,key]
+          )
 
 
+
+def project_get_permissions_for(form,login):
+  manager=form.db.query(
+      query="""
+        SELECT 
+          m.*,
+          if(m.id = ow.id,1,0) is_owner,
+          mg.path group_path,
+          concat_ws('/',mg.path,mg.id) full_group_path
+        FROM
+          project_manager m
+          LEFT JOIN project_manager_group mg ON (m.group_id = mg.id)
+          LEFT JOIN project_manager ow ON (mg.owner_id = ow.id) 
+        WHERE m.login = %s and m.project_id=%s
+      """,
+      values=[login,s.project.id],
+      onerow=1,
+      log=form.log
+    
+  )
+  del manager['password']
+
+def child_groups(db,group_id):
+  if not len(group_id):
+    return []
+
+
+  group_table='manager_group'
+  if 0: # s.use_project
+    group_table='project_manager_group'
+
+  g_list=db.query(
+    query="SELECT id from "+group_table+" where parent_id IN (" + ','.join(group_id) + ')'
+  )
+  for g1 in g_list:
+    for g2 in child_groups(db,[g1['id']]):
+      group_id.append(g2)
+
+  return group_id
+  
+
+
+
+def get_permissions_for(form,login):
+  
+  manager=form.db.query(
+    query="""
+        SELECT 
+          m.*,
+          if(m.id = ow.id,1,0) is_owner,
+          mg.path group_path,
+          concat_ws('/',mg.path,mg.id) full_group_path
+        FROM
+          manager m
+          LEFT JOIN manager_group mg ON (m.group_id = mg.id)
+          LEFT JOIN manager ow ON (mg.owner_id = ow.id) 
+        WHERE m.login = %s
+    """,
+    values=[login],onerow=1,log=form.log
+  )
+
+  del manager['password']
+  
+  permissions_list=form.db.query(
+    query='SELECT p.id, p.pname from permissions p, manager_permissions mp where p.id = mp.permissions_id and mp.manager_id = %s',
+    values=[manager['id']]
+  );
+  manager['permissions']={};
+  for p in permissions_list:
+      manager['permissions'][p['pname']]=p['id']
+
+  if manager['group_id']:
+    group_id=manager['group_id']
+    gr_perm_list=form.db.query(
+      query="""
+        SELECT
+          p.id, p.pname
+        from
+          permissions p, manager_group_permissions mgp
+        where
+          p.id = mgp.permissions_id and mgp.group_id = %s
+      """,
+      values=[group_id]
+    )
+    for p in gr_perm_list:
+        manager['permissions'][p['pname']]=p['id']
+
+    manager['CHILD_GROUPS']=child_groups(form.db,[group_id])
+    manager['CHILD_GROUPS_HASH']={}
+    for g_id in manager['CHILD_GROUPS']:
+        manager['CHILD_GROUPS_HASH'][g_id]=1
+    
+  manager['files_dir']='./files'
+  manager['files_dir_web']='/files'
+  return manager
+  #print('permissions_list:',permissions_list)

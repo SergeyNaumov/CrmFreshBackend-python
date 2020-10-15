@@ -3,6 +3,7 @@ from fastapi import FastAPI, APIRouter
 from config import config
 #from db import db,db_read,db_write
 from lib.engine import s
+from lib.session import *
 
 router = APIRouter()
 # Главная
@@ -50,7 +51,7 @@ async def startpage():
       )
       manager_menu_table='project_manager_menu'
       left_menu=s.db(
-        query='SELECT * from '+manager_menu_table+' where parent_id is null order by sort',
+        query='SELECT * from '+manager_menu_table+'  order by sort',
         errors=errors,
         tree_use=1
       )
@@ -61,13 +62,13 @@ async def startpage():
         values=[s.login],
         onerow=1
       )
-      manager['permissions']=['1','3','5','6']
-      # manager['permissions']=s.db.query(
-      #   query='SELECT permissions_id from manager_permissions where manager_id=%s',
-      #   values=[manager['id']],
-      #   massive=1
-      # )
-      #print('manager:',manager)
+      
+      manager['permissions']=s.db.query(
+        query='SELECT permissions_id from manager_permissions where manager_id=%s',
+        values=[manager['id']],
+        massive=1
+      )
+      
       perm_str='0'
       if(len(manager['permissions'])):
         perm_str=','.join(manager['permissions'])
@@ -80,7 +81,7 @@ async def startpage():
             manager_menu mm
             LEFT JOIN manager_menu_permissions mmp ON mmp.menu_id=mm.id
           where
-            mm.parent_id is null AND  
+            
             (
               mmp.id is null
                 OR 
@@ -117,3 +118,41 @@ async def startpage():
 @router.get('/get-events')
 async def get_events():
   return {'success':1,'message':''}
+
+# Авторизация
+@router.post('/login')
+async def login(R: dict):
+  response={'success':0}
+  if R:
+    if config['use_project']:
+      response=session_project_create(
+        s,
+        login=R['login'],
+        password=R['password'],
+        ip=s.env['x-real-ip'],
+        encrypt_method=config['encrypt_methon'],
+        max_fails_login=3,
+        max_fails_login_interval=3600,
+        max_fails_ip=20,
+        max_fails_ip_interval=3600
+
+      )
+    else:
+      response=session_create(
+        s,
+        login=R['login'],
+        password=R['password'],
+        ip=s.env['x-real-ip'],
+        encrypt_method=config['encrypt_methon'],
+        max_fails_login=3,
+        max_fails_login_interval=3600,
+        max_fails_ip=20,
+        max_fails_ip_interval=3600
+      )
+
+  return response
+
+@router.get('/logout')
+async def logout():
+  session_logout(s)
+  return {"success":1}

@@ -22,10 +22,13 @@ class Engine():
     self._content=''
     self.project=None
     
-    self.env={'HTTP_X_REAL_IP':''}
+    self.env={}
     #print('request_url:',self.request.url.path)
-    #for k in self.request['headers']:
-    #  print(str(k[0]),'=>',str(k[1]) )
+    # x-real-ip
+
+    for k in self.request['headers']:
+      self.env[str(k[0].decode("utf-8"))]=str(k[1].decode("utf-8"))
+      #print(str( k[0].decode("utf-8") ),'=>',str(k[1].decode("utf-8")) )
     
     #self.cookies['User-Agent']=''
 
