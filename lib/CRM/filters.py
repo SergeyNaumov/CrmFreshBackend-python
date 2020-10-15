@@ -1,5 +1,8 @@
 from lib.core import is_errors, create_fields_hash, exists_arg,success
 from lib.all_configs import read_config
+def get_values_for_select_from_table(f,form):
+  return []
+
 def get_filters(**arg):
   response={}
   form=read_config(
@@ -18,15 +21,44 @@ def get_filters(**arg):
     # if(ref($f->{before_code}) eq 'CODE'){
     #   run_event(event=>$f->{before_code},description=>'before_code for '.$f->{name},form=>$form,arg=>$f);
     # }
-    #if f['not_filter']: next
-    #if f['type'] in ('password','code','1_to_m','hidden'): next
+    if exists_arg('filter_type',f): continue
+    if f['type'] in ('password','code','1_to_m','hidden'): continue
 
     if f['type'] in ('textarea','filter_extend_text'):
       f['type']='text'
 
-    if exists_arg('filter_type',f):
+    elif f['type'] in ('select_values','filter_extend_select_values'):
+      f['type']='select'
+    
+    elif f['type'] == 'filter_extend_date':
+      f['type']='date'
+    
+    elif f['type'] in ('filter_extend_select_from_table','select_from_table'):
+      f['type']='select'
+      if not(exists_arg('header_field',f)): f['header_field']='header'
+      if not(exists_arg('value_field',f)): f['value_field']='id'
+      f['values']=get_values_for_select_from_table(f,form)
+
+    elif f['type']=='memo':
+      f['users']=form.db.query(
+        query='SELECT '+f['auth_id_field']+' v, '+f['auth_name_field']+' d from '+f['auth_table']+' ORDER BY '+f['auth_name_field'],
+        errors=form.log
+      )
+
+    if f['type'] in ('date','time','datetime','daymon','yearmon') and not exists_arg('filter_type',f) : 
       f['range']=1
     
+    if exists_arg('filter_type',f) and f['filter_type'] == 'range':
+      f['range']=1
+    
+    for k in ('tablename','db_name','regexp','tab','table','where','table_id','header_field','value_field','filter_type','empty_value'):
+      if exists_arg(k,f): del f[k]
+    
+
+    if exists_arg('filter_on',f):
+      f['order']=order
+      order+=1
+
     filters.append(f)
 
     # foreach my $k ( keys %{$f}){
