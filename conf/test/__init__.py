@@ -6,9 +6,13 @@ from .events import events
 class Config(Form):
     events=events
     def __init__(self,arg):
-        super().__init__(arg)
-
-        self.work_table='test'
+        
+        
+        super().__init__(arg) 
+        self.work_table='test' 
+        self.QUERY_SEARCH_TABLES=[
+            {'table':'test','alias':'wt'}
+        ]
         self.title='тестовый конфиг'
         self.cols=[
             [
@@ -23,6 +27,7 @@ class Config(Form):
                 {'description':'Дата, время и т.д.','name':'timing','hide':1},
             ]
         ]
+        self.filters_groups=[]
         self.on_filters=[
             {
                 'name':'f_date',
@@ -33,3 +38,16 @@ class Config(Form):
             },
         ]
         self.fields=fields
+
+"""
+create table test(
+    id int primary key auto_increment,
+    address varchar(255) not null default '',
+    textarea text,
+    wysiwyg text,
+    checkbox tinyint unsigned not null default '0',
+    switch  tinyint unsigned not null default '0',
+    f_datetime datetime,
+    status  tinyint unsigned not null default '0'
+) engine=innodb default charset=utf8;
+"""

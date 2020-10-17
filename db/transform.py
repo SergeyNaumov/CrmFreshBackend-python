@@ -14,7 +14,7 @@ def tree_use_transform(list,table_id='id'):
       #   parent_item['child']=[]
 
       parent_item['child'].append(l)
-      print('parent_item:',parent_item)
+      #print('parent_item:',parent_item)
 
     else:
       new_list.append(l)

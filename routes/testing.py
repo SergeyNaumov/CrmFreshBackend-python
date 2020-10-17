@@ -40,9 +40,13 @@ async def show_config():
 
 @router.get('/test-query')
 async def test_query():
-  manager=db.query(
-    query='select * from manager where login=%s',
-    values=['admin'],
-    onerow=1
+  errors=[]
+  result=db.query(
+    query='desc test',
+    values=[],
+    errors=errors
   )
-  return manager
+  return {
+    'result':result,
+    'errors':errors
+  }

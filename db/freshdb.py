@@ -126,8 +126,14 @@ class FreshDB():
         cur.execute(arg['query'],arg['values'])
         self.connect.commit()
       except pymysql.err.ProgrammingError as err:
-          out_error(self,str(err),arg)
-          self.error_str = str(err)
+
+        if 'errors' in arg:
+          arg['errors'].append(str(err))
+          print('arg',arg) 
+
+        print('Err:',str(err))
+        
+        self.error_str = str(err)
 
       # except pymysql.err.IntegrityError as e2:
       #     out_error(self,str(e2),arg)
@@ -257,22 +263,31 @@ class FreshDB():
       self.execute(cur,arg)
       rez=''
       if exists_arg('onevalue',arg):
-        rez = cur.fetchone()
+        try:
+          rez = cur.fetchone()
+        except pymysql.err.ProgrammingError as err:
+          return None
         if rez: rez=rez[0]
       else:
           if exists_arg('onerow',arg):
-            rez=cur.fetchone()
-            #print('onerow!',rez)
+            try:
+              rez=cur.fetchone()
+            except pymysql.err.ProgrammingError as err:
+              return None
 
           else:
-            rez=cur.fetchall()
-            if exists_arg('massive',arg):
-              rez=massive_transform(rez)
+            try:
+              rez=cur.fetchall()
+              if exists_arg('massive',arg):
+                rez=massive_transform(rez)
+              else:
+                if exists_arg('tree_use',arg): rez=tree_use_transform(rez)
 
+            except pymysql.err.ProgrammingError as err:
+              #print('ERR:',err)
+              #if exists_arg('errors',arg): arg['errors'].append(e)
+              return None
 
-            else:
-              
-              if exists_arg('tree_use',arg): rez=tree_use_transform(rez)
       
       if exists_arg('to_json',arg): rez=to_json(rez)
 

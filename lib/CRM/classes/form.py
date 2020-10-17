@@ -13,7 +13,7 @@ class Form():
   
   def __init__(self,arg): # Значения по умолчанию
     self.title=''
-
+    script=arg['script']
     #self.db=s.db
     self.work_table=''
     self.work_table_id='id'
@@ -30,16 +30,37 @@ class Form():
     self.errors=[]
     self.before_filters_html=[]
     self.on_filters=[]
-    self.page='1'
-    self.perpage='20'
+
     self.javascript={
       'admin_table':''
     }
-    self.priority_sort=None
-    self.filters_groups=[]
-    self.search_plugin=''
+    
+    self.filters_groups=[[]]
     self.search_on_load=0
+    self.search_plugin=''
+    
     self.card_format='vue'
+    
+    if script=='find_objects':
+      self.QUERY_SEARCH=''
+      self.query_search={
+        'on_filters_hash':{},
+        'SELECT_FIELDS':[],
+        'WHERE':[],'HAVING':[],'ORDER':[],'TABLES':[],'GROUP':[]
+      }
+      #self.search_result={
+      #  'log':form.log,'config':form.config,'headers':[],'card_format':form.card_format
+      #}
+
+      #self.QUERY_SEARCH_TABLES=[{'table':self.work_table,'alias':'wt'}]
+      
+      
+      self.priority_sort=None
+      
+      self.page='1'
+      self.perpage='20'
+      self.not_perpage=False
+
     self.events={
       'permissions':[],
       'before_search':[],

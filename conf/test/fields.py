@@ -129,28 +129,28 @@ fields=[
       'view_only_selected':1,
       'tab':'tags'
     },
-    { # Memo
-        # Комментарий 
-        'description':'Комментарий',
-        'name':'memo',
-        'type':'memo',
-        'memo_table':'test_memo',
-        'memo_table_id':'id',
-        'memo_table_comment':'body',
-        'memo_table_auth_id':'manager_id',
-        'memo_table_registered':'registered',
-        'memo_table_foreign_key':'test_id',
-        'auth_table':'manager',
-        'auth_login_field':'login',
-        'auth_id_field':'id',
-        'auth_name_field':'name',
-        'reverse':1,
-        'memo_table_alias':'memo',
-        'auth_table_alias':'m_memo',
-        'make_delete':'1',
-        'make_edit':'1',
-        'tab':'memo'
-    },
+    # { # Memo
+    #     # Комментарий 
+    #     'description':'Комментарий',
+    #     'name':'memo',
+    #     'type':'memo',
+    #     'memo_table':'test_memo',
+    #     'memo_table_id':'id',
+    #     'memo_table_comment':'body',
+    #     'memo_table_auth_id':'manager_id',
+    #     'memo_table_registered':'registered',
+    #     'memo_table_foreign_key':'test_id',
+    #     'auth_table':'manager',
+    #     'auth_login_field':'login',
+    #     'auth_id_field':'id',
+    #     'auth_name_field':'name',
+    #     'reverse':1,
+    #     'memo_table_alias':'memo',
+    #     'auth_table_alias':'m_memo',
+    #     'make_delete':'1',
+    #     'make_edit':'1',
+    #     'tab':'memo'
+    # },
 #   {
 #     'description':'Файл',
 #     'type':'file',
@@ -158,61 +158,61 @@ fields=[
 #     tab=>'files',
 #     filedir=>'./files/test/files'
 #   },
-    {
-        'description':'1_to_m',
-        'type':'1_to_m',
-        'name':'onetom_test',
-        'table':'test_onetomany',
-        'table_id':'id',
-        'foreign_key':'test_id',
-        'tab':'one_to_m',
-        'sort':1,
-        'view_type':'list',  
-        'fields':[
-            {
-                'description':'select',
-                'name':'sel',
-                'type':'select_values',
-                'values':[
-                    {'v':1,'d':'красный'},
-                    {'v':2,'d':'оранжевый'},
-                    {'v':3,'d':'жёлтый'},
-                    {'v':4,'d':'зелёный'},
-                    {'v':5,'d':'Голубой'},
-                    {'v':6,'d':'Синий'},
-                    {'v':7,'d':'Фиолетовый'},
-                ]
-            },
-            {
-                'description':'chk',
-                'name':'chk',
-                'type':'checkbox'
-            },
-            {
-                'description':'Телефон',
-                'type':'text',
-                'name':'phone',
-                'change_in_slide':1,
-                'replace_rules':[
-                    '/^8/','+7',
-                ],
-                'regexp_rules':[
-                    #q{/^\+[0-9]+$/},'Номер телефона в формате: +7XXXXXXXXXX, например: +74951234567',
-                    #q{/^[0-9]+$/}=>'Допускаются только цифры',
-                ]
-            },
+    # {
+    #     'description':'1_to_m',
+    #     'type':'1_to_m',
+    #     'name':'onetom_test',
+    #     'table':'test_onetomany',
+    #     'table_id':'id',
+    #     'foreign_key':'test_id',
+    #     'tab':'one_to_m',
+    #     'sort':1,
+    #     'view_type':'list',  
+    #     'fields':[
+    #         {
+    #             'description':'select',
+    #             'name':'sel',
+    #             'type':'select_values',
+    #             'values':[
+    #                 {'v':1,'d':'красный'},
+    #                 {'v':2,'d':'оранжевый'},
+    #                 {'v':3,'d':'жёлтый'},
+    #                 {'v':4,'d':'зелёный'},
+    #                 {'v':5,'d':'Голубой'},
+    #                 {'v':6,'d':'Синий'},
+    #                 {'v':7,'d':'Фиолетовый'},
+    #             ]
+    #         },
+    #         {
+    #             'description':'chk',
+    #             'name':'chk',
+    #             'type':'checkbox'
+    #         },
+    #         {
+    #             'description':'Телефон',
+    #             'type':'text',
+    #             'name':'phone',
+    #             'change_in_slide':1,
+    #             'replace_rules':[
+    #                 '/^8/','+7',
+    #             ],
+    #             'regexp_rules':[
+    #                 #q{/^\+[0-9]+$/},'Номер телефона в формате: +7XXXXXXXXXX, например: +74951234567',
+    #                 #q{/^[0-9]+$/}=>'Допускаются только цифры',
+    #             ]
+    #         },
 
-            {
-                'description':'Файл',
-                'type':'file',
-                'name':'attach',
-                'keep_orig_file_name':1,
-                'filedir':'./files/test',
-                'read_only':1,
-                'preview':'200x0'
-            }
-        ]
-    },
+    #         {
+    #             'description':'Файл',
+    #             'type':'file',
+    #             'name':'attach',
+    #             'keep_orig_file_name':1,
+    #             'filedir':'./files/test',
+    #             'read_only':1,
+    #             'preview':'200x0'
+    #         }
+    #     ]
+    # },
     # {
     #     'description':'Соцсети',
     #     'name':'soc',

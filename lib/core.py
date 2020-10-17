@@ -26,10 +26,13 @@ def success(errors):
   return 1
 
 def is_errors(form):
-  #print('errors:',hasattr(form,'errors'))
-  if hasattr(form,'errors') and len(form.errors):
-    return True
-  return False
+
+  if isinstance(form,dict):
+    return ( ('errors' in form) and len(form['errors']) )
+  else:
+    return (hasattr(form,'errors') and len(form.errors))
+
+
 
 def create_fields_hash(form):
   form.fields_hash={}
