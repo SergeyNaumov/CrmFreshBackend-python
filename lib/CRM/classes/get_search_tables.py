@@ -1,23 +1,20 @@
-from lib.core import exists_arg
+from lib.core import exists_arg, get_func
 import re
 
 #def adding_select_fields()
 
 def adding_select_fields_in_desc(form,db_field,t):
+  fld_on_query=t['alias']+'.'+db_field['Field']+' '+t['alias']+'__'+db_field['Field']
   if not exists_arg('select_fields', t):
-    return True
+    form.query_search['SELECT_FIELDS'].append(fld_on_query)
 
   if exists_arg('select_fields', t) and exists_arg(field_name, t['select_fields']):
-    fld_on_query=''.join(t['alias'],'.',db_field['Field'],' ',t['alias'],'__',db_field['Field'])
+    
     form.query_search['SELECT_FIELDS'].append(fld_on_query)
 
     
 
-def get_func(f):
-  if exists_arg('db_name',f):
-    rez=re.search('func:\((.+)\)',s)
-    if rez: return rez[1]
-  return ''
+
   
 
 def get_search_tables(form,query):
@@ -61,16 +58,15 @@ def get_search_tables(form,query):
 
     if need_add_table:
       TABLES.append(t_str)
+      
       if not exists_arg('not_add_in_select_fields', t):
         desc = form.db.query(
           query = 'desc '+t['table'],
           errors=form.log
         )
-
         if desc:
             for db_field in desc:
               #adding_select_fields(form,db_field,t)
-              
               adding_select_fields_in_desc(form,db_field,t)
 
   for f in form.fields:

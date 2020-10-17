@@ -129,10 +129,8 @@ class FreshDB():
 
         if 'errors' in arg:
           arg['errors'].append(str(err))
-          print('arg',arg) 
-
-        print('Err:',str(err))
-        
+          
+       
         self.error_str = str(err)
 
       # except pymysql.err.IntegrityError as e2:
@@ -181,7 +179,7 @@ class FreshDB():
       self.execute(cur,arg)
       
       rez=cur.fetchone()
-      print('rez',rez)
+      #print('rez',rez)
       if not rez: rez=''
       else: rez=rez[0]
       

@@ -26,7 +26,10 @@ async def test_cookie_write():
 
 
 
-
+@router.get('/test/quote')
+async def test_quote():
+  string=db.connect.escape_string('sv " \' cms')
+  return {'result':string}
 @router.get('/test-cookie-read')
 async def test_cookie_read():
   print(s.get_cookie('cookie_testing'))

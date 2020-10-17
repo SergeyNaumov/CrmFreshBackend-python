@@ -8,8 +8,8 @@ from .default_config_attr import default_config_attr
 
 
 class Form():
-  def info(self):
-    print('title:',self.title)
+  #def info(self):
+  #  print('title:',self.title)
   
   def __init__(self,arg): # Значения по умолчанию
     self.title=''
@@ -30,15 +30,16 @@ class Form():
     self.errors=[]
     self.before_filters_html=[]
     self.on_filters=[]
+    self.default_find_filter=[]
 
     self.javascript={
       'admin_table':''
     }
-    
+    self.explain=0
     self.filters_groups=[[]]
     self.search_on_load=0
     self.search_plugin=''
-    
+
     self.card_format='vue'
     
     if script=='find_objects':
@@ -48,6 +49,10 @@ class Form():
         'SELECT_FIELDS':[],
         'WHERE':[],'HAVING':[],'ORDER':[],'TABLES':[],'GROUP':[]
       }
+      self.query_hash={}
+      self.explain_query=''
+      self.out_before_search=[]
+      self.out_after_search=[]
       #self.search_result={
       #  'log':form.log,'config':form.config,'headers':[],'card_format':form.card_format
       #}
@@ -55,8 +60,8 @@ class Form():
       #self.QUERY_SEARCH_TABLES=[{'table':self.work_table,'alias':'wt'}]
       
       
-      self.priority_sort=None
-      
+      self.priority_sort=[]
+      self.not_order=False
       self.page='1'
       self.perpage='20'
       self.not_perpage=False
