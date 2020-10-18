@@ -4,6 +4,7 @@ import shlex
 def get_search_where(form,query):
   WHERE,headers=[],[]
   VALUES=[]
+
   form.SEARCH_RESULT['query_fields']=[]
   print('get_search_where - доделать')
   if not len(query):
@@ -18,7 +19,9 @@ def get_search_where(form,query):
 
   for q in query:
       name,values=q
+      #print(f'name:{name} values:{values}')
       f=form.fields_hash[name]
+
       form.query_hash[name]=values
 
       form.SEARCH_RESULT['query_fields'].append(f)
@@ -50,6 +53,7 @@ def get_search_where(form,query):
           if f['type'] in ['date','datetime','filter_extend_date','filter_extend_datetime']:
               operable_fld=table+'.'+db_name
               o=operable_fld+" desc"
+
 
           elif f['type'] in ['select_from_table','filter_extend_select_from_table']:
               func=get_func(f)
@@ -97,7 +101,21 @@ def get_search_where(form,query):
           print('WHERE:',WHERE)
 
       elif (f['type'] in ['date','datetime','filter_extend_date','filter_extend_datetime'] and not(exists_arg('filter_type',f))) or exists_arg('filter_type',f)=='range' :
+
           min,max=values
+          min_date=from_datetime_get_date(min)
+          
+          if min_date:
+            min_date=min_date+' 00:00:00'
+            WHERE.append('('+table+'.'+db_name+'>=%s)')
+            VALUES.append(min_date)
+
+          max_date=from_datetime_get_date(max)
+          if max_date:
+            max_date=max_date+' 23:59:59'
+            WHERE.append('('+table+'.'+db_name+'<=%s)')
+            VALUES.append(max_date)          
+
       elif f['type']=='memo':
         v=values[0]
         date_low=from_datetime_get_date(v['registered_low'])
@@ -141,6 +159,6 @@ def get_search_where(form,query):
             map_rezult.append(v)
         if len(map_rezult):
           WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')
-
+  print('WHERE:',WHERE)
   form.query_search['WHERE']=WHERE
   form.query_search['VALUES']=VALUES

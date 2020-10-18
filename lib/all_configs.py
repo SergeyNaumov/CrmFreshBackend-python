@@ -17,11 +17,10 @@ def read_config(**arg):
       'errors':['Конфиг '+arg['config']+' не найден']
     }
   
-
-
   config_class=configs[arg['config']]
   form=config_class(arg)
   form.default_config_attr(arg)
+  form.set_orig_types()
   #default_config_attr(form,arg)
 
 

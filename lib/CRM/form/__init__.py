@@ -4,8 +4,10 @@ from lib.engine import s
 from .get_search_tables import get_search_tables
 from .get_search_where import get_search_where
 from .default_config_attr import default_config_attr
-
-
+from .save_form import save_form
+from .edit_form_process_fields import edit_form_process_fields as func_edit_form_process_fields
+from .get_values import func_get_values
+from .set_orig_types import func_set_orig_types
 
 class Form():
   #def info(self):
@@ -13,6 +15,7 @@ class Form():
   
   def __init__(self,arg): # Значения по умолчанию
     self.title=''
+    
     script=arg['script']
     #self.db=s.db
     self.work_table=''
@@ -31,17 +34,26 @@ class Form():
     self.before_filters_html=[]
     self.on_filters=[]
     self.default_find_filter=[]
-
+    
     self.javascript={
       'admin_table':''
     }
     self.explain=0
-    self.filters_groups=[[]]
-    self.search_on_load=0
-    self.search_plugin=''
-
     self.card_format='vue'
-    
+
+    if script=='admin_table':
+      self.filters_groups=[[]]
+      self.search_on_load=0
+      self.search_plugin=''
+
+    # Поля для edit_form
+    if script=='edit_form':
+      self.width=''
+      self.cols=[]
+      self.work_table_foreign_key=''
+      self.work_table_foreign_key_value=''
+      self.edit_form_fields=[]
+
     if script=='find_objects':
       self.QUERY_SEARCH=''
       self.query_search={
@@ -90,3 +102,29 @@ class Form():
   
   def default_config_attr(form,arg):
     default_config_attr(form,arg)
+
+  def edit_form_process_fields(form): # в perl-версии process_edit_form_fields
+    return func_edit_form_process_fields
+    #print('edit_form_process_fields не реализована')
+    #return {'success':'1'}
+
+  def delete_file(form):
+    print('form.delete_file не реализована')
+    return {'success':'1'}
+
+  def save(form,**arg): save_form(form,arg)
+
+  def run_event(form,**arg):
+    print('run_event:',arg)
+
+  def success(form): # если нет ошибок -- 1
+    return (1,0)[len(form.errors)>0]
+
+  def set_default_attributes(form):
+    func_set_default_attributes(form)
+  
+  def set_orig_types(form):
+    func_set_orig_types(form)
+
+  def get_values(form):
+    func_get_values(form)

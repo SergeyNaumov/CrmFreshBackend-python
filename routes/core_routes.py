@@ -1,4 +1,4 @@
-from lib.core import cur_year,cur_date, success
+from lib.core import cur_year,cur_date
 from fastapi import FastAPI, APIRouter
 from config import config
 #from db import db,db_read,db_write
@@ -105,7 +105,7 @@ async def startpage():
     'copyright':config['copyright'],
     'left_menu':left_menu,
     'errors':errors,
-    'success':success(errors),
+    'success': not len(errors),
     'manager':manager
   }
 

@@ -1,7 +1,7 @@
 from lib.engine import s
 from lib.core import create_fields_hash, exists_arg
 from lib.session import project_get_permissions_for, get_permissions_for
-
+from .set_default_attributes import set_default_attributes
 def form_self():
   return s
 
@@ -79,7 +79,7 @@ def default_config_attr(form,arg): # Атрибуты формы по умолч
 
     if exists_arg('action',arg): form.action=arg['action']
     
-    if exists_arg('id',arg) and arg['id'].isnumeric():
+    if exists_arg('id',arg):
       form.id=arg['id']
 
     if not form.work_table: form.work_table=arg['config']
@@ -101,7 +101,9 @@ def default_config_attr(form,arg): # Атрибуты формы по умолч
     else:
       form.manager=get_permissions_for(form,login)
 
-
+    set_default_attributes(form)
     form.self=form_self
+    print('read_conf: default_config_attr - доделать')
+
     # Доделать!
     #return form

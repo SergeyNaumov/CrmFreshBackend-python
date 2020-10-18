@@ -1,5 +1,6 @@
 import random
 import datetime
+import re
 
 def cur_year():
   dat = datetime.date.today()
@@ -20,10 +21,6 @@ def cur_date(delta=0,format="%Y-%m-%d"):
   dat = dat + datetime.timedelta(days=delta)
   return dat.strftime(format)
 
-def success(errors):
-  if(len(errors)):
-    return 0
-  return 1
 
 def is_errors(form):
 
@@ -41,6 +38,7 @@ def get_func(f):
   return ''
 
 def from_datetime_get_date(dt):
+  if not dt: return False
   rez=re.search('^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2}:\d{2})?$',dt)
   if rez: return rez[1]
   return False
@@ -49,3 +47,20 @@ def create_fields_hash(form):
   form.fields_hash={}
   for f in form.fields:
     form.fields_hash[f['name']]=f
+
+
+
+# is_wt_field
+check_list=[
+  'text','textarea','hidden','wysiwyg','select_from_table','select_values',
+  'date','time','datetime','yearmon','daymon','hidden','checkbox','switch','font-awesome','file'
+]
+def check_wt_field(t):
+  return t in check_list
+def is_wt_field(f):
+
+  if 'type_orig' in f and f['type_orig']:
+    return check_wt_field(f['type_orig'])
+  else:
+    return check_wt_field(f['type'])
+

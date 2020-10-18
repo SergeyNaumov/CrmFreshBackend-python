@@ -1,18 +1,18 @@
 fields=[ 
 
-   # {
-   #      'description':'Wysiwyg',
-   #      'type':'wysiwyg',
-   #      'name':'wysiwyg',
-   #      not_filter=>1,
-   #      tab=>'wysiwyg'
-   #  },
+   {
+        'description':'Wysiwyg',
+        'type':'wysiwyg',
+        'name':'wysiwyg',
+        'not_filter':1,
+        'tab':'wysiwyg'
+    },
     # {
     #     'description':'Текстовое поле',
     #     'type':'text',
     #     'name':'header',
     #     change_in_search=>1,
-    #     tab=>'plain'
+    #     'tab';'plain'
     # },
     {
         'description':'Адрес',
@@ -34,20 +34,20 @@ fields=[
     #     'type':'textarea',
     #     'name':'textarea',
     #     full_str=>1,
-    #     tab=>'plain'
+    #     'tab';'plain'
     # },
-    # {
-    #     'description':'checkbox',
-    #     'type':'checkbox',
-    #     'name':'checkbox',
-    #     tab=>'plain'
-    # },
-    # {
-    #     'description':'switch',
-    #     'type':'switch',
-    #     'name':'switch',
-    #     tab=>'plain'
-    # },
+    {
+        'description':'checkbox',
+        'type':'checkbox',
+        'name':'checkbox',
+        'tab':'plain'
+    },
+    {
+        'description':'switch',
+        'type':'switch',
+        'name':'switch',
+        'tab':'plain'
+    },
     {
         'description':'Дата',
         'type':'date',
@@ -60,7 +60,7 @@ fields=[
     #     'description':'Время',
     #     'type':'time',
     #     'name':'f_time',
-    #     tab=>'timing'
+    #     'tab';'timing'
     # },
     {
         'description':'Дата и время',
@@ -74,14 +74,14 @@ fields=[
     #     'type':'yearmon',
     #     'name':'f_yearmon',
     #     empty_value=>'null',
-    #     tab=>'timing'
+    #     'tab';'timing'
     # },
     # {
     #     'description':'День и месяц (daymon)',
     #     'type':'daymon',
     #     'name':'f_daymon',
     #     empty_value=>'null',
-    #     tab=>'timing'
+    #     'tab';'timing'
     # },
     {
         'name':'status',
@@ -110,25 +110,25 @@ fields=[
         ],
         'tab':'plain'
     },
-    {
-      # before_code=>sub{
-      #         my $e=shift;                    
+    # {
+    #   # before_code=>sub{
+    #   #         my $e=shift;                    
               
-      # },
-      'description':'Тэги',
-      'type':'multiconnect',
-      'tree_table':'tag',
-      'name':'tags',
-      'relation_table':'tag',
-      'relation_save_table':'test_tag',
-      'relation_table_header':'header',
-      'relation_table_id':'id',
-      'relation_save_table_id_worktable':'test_id',
-      'relation_save_table_id_relation':'tag_id',
-      'make_add':1,
-      'view_only_selected':1,
-      'tab':'tags'
-    },
+    #   # },
+    #   'description':'Тэги',
+    #   'type':'multiconnect',
+    #   'tree_table':'tag',
+    #   'name':'tags',
+    #   'relation_table':'tag',
+    #   'relation_save_table':'test_tag',
+    #   'relation_table_header':'header',
+    #   'relation_table_id':'id',
+    #   'relation_save_table_id_worktable':'test_id',
+    #   'relation_save_table_id_relation':'tag_id',
+    #   'make_add':1,
+    #   'view_only_selected':1,
+    #   'tab':'tags'
+    # },
     # { # Memo
     #     # Комментарий 
     #     'description':'Комментарий',
@@ -155,7 +155,7 @@ fields=[
 #     'description':'Файл',
 #     'type':'file',
 #     'name':'file',
-#     tab=>'files',
+#     'tab';'files',
 #     filedir=>'./files/test/files'
 #   },
     # {
@@ -221,7 +221,7 @@ fields=[
     #     table=>'test_social',
     #     table_id=>'id',
     #     foreign_key=>'test_id',
-    #     tab=>'one_to_m',
+    #     'tab';'one_to_m',
     #     fields=>[
     #       {
     #         'description':'Соцсеть',

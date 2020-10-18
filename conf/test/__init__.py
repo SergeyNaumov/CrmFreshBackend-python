@@ -1,4 +1,4 @@
-from lib.CRM.classes.form import Form
+from lib.CRM.form import Form
 from .fields import fields
 from .events import events
 
@@ -14,6 +14,7 @@ class Config(Form):
             {'table':'test','alias':'wt'}
         ]
         self.title='тестовый конфиг'
+        self.explain=1
         self.cols=[
             [
                 {'description':'wysiwyg','name':'wysiwyg','hide':1},
@@ -30,8 +31,11 @@ class Config(Form):
         self.filters_groups=[]
         self.on_filters=[
             {
+                'name':'address'
+            },
+            {
                 'name':'f_date',
-                'value':["2020-01-01","2020-01-02"]
+                #'value':["2020-01-01","2020-01-02"]
             },
             {
                 'name':'header'
