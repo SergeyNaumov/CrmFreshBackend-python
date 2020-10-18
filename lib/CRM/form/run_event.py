@@ -1,7 +1,7 @@
 def run_event(form,event_name,arg={}):
     
     
-    if 'field' in arg:
+    if arg and 'field' in arg:
       field=arg['field']
       if event_name in field:
         event_func=field[event_name]
@@ -18,7 +18,11 @@ def run_event(form,event_name,arg={}):
         if isinstance(event,list):
           print('is list!')
           for e in event:
-            e(form,arg)
+            if arg:
+              print('arg:',arg)
+              e(form,arg)
+            else:
+              e(form)
         else:
           event(form,arg)
 

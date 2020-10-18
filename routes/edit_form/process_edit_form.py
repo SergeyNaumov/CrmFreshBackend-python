@@ -49,10 +49,7 @@ def process_edit_form(**arg):
     form.errors.append('Вам запрещено создавать новые записи')
 
   form.set_orig_types()
-  form.run_event(
-    event=form.events['permissions'],
-    description='events->permissions'
-  )
+  form.run_event('permissions')
   form.get_values()
   if form.action in ['update','insert']:
     form.new_values=values
