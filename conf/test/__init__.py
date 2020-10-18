@@ -6,13 +6,12 @@ from .events import events
 class Config(Form):
     events=events
     def __init__(self,arg):
-        
-        
         super().__init__(arg) 
         self.work_table='test' 
         self.QUERY_SEARCH_TABLES=[
             {'table':'test','alias':'wt'}
         ]
+        self.events=events
         self.title='тестовый конфиг'
         self.explain=1
         self.cols=[

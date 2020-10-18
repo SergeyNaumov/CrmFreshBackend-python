@@ -17,9 +17,11 @@ def func_get_values(form):
       values=form.db.query(
         query=f'SELECT * from {form.work_table} WHERE {form.work_table_id}=%s',
         values=[form.id],
-        onerow=1
+        onerow=1,
+        debug=1,
+        log=form.log
       )
-      print('values:',values)
+      print('GET_VALUES:',values)
       if not values:
           form.errors.append(f'В инструменте {form.title} запись с id: {form.id} не найдена. Редактирование невозможно')
           return
@@ -41,9 +43,9 @@ def func_get_values(form):
         f['value']=str(values[name])
 
 
-      if form.action not in ['insert','update'] and f['orig_type']=='select_from_table':
+      if form.action not in ['insert','update'] and exists_arg('orig_type',f)=='select_from_table':
         f[values]=get_values_for_select_from_table(form,f)
-      print('f:',f)
+      #print('f:',f)
       if f['type'] == '1_to_m':
         get_1_to_m_data(form,f)
 

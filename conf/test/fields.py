@@ -1,3 +1,24 @@
+def kladr_after_search(data):
+    i=0
+    list=[]
+    if not data:
+        return list
+    
+    for d in data:
+        res=[]
+        for d2 in d['parents']:
+
+            if d2['name']=='Москва' and d2['contentType']!='city':
+                continue
+            res.append,f'{d2["typeShort"]} {d2["name"]}'
+
+
+        res.append(f'{d["typeShort"]} {d["name"]}')
+        h=', '.join(res)
+        list.append({'header':h})
+    return list
+
+
 fields=[ 
 
    {
@@ -18,11 +39,8 @@ fields=[
         'description':'Адрес',
         'type':'text',
         'name':'address',
-        'subtype':'dadata_address',
-        'dadata':{
-            'API_KEY':'0504bf475461ecb2b0223936a54ea814d2fc59d2',
-            'SECRET_KEY':'60df5c61174703321131e32104288e324733a2f5',
-        },
+        'subtype': 'kladr',
+        'kladr':{'after_search':kladr_after_search},
         'prefix_list_header':'Укажите регион',
         'prefix_list':['Москва','Московская Область','Калужская Область'],
         'change_in_search':1,

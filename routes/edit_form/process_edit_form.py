@@ -3,11 +3,9 @@ from lib.all_configs import read_config
 def form_update_or_insert(form):
     
 
-    form.run_event(
-      event=form.events['permissions'],
-      description='events->permissions'
-    )
-    form.get_values()
+
+
+    
     if form.read_only:
       form.errors.append('Вам запрещено сохранять изменения')
     else:
@@ -30,11 +28,11 @@ def process_edit_form(**arg):
   action=arg['action']
   config=arg['config']
   R=arg['R']
-  
+  #print('GET_VALUES -1 ',action)
   values=[]
   if 'values' in R:
     values=R['values']
-
+  if 'id' not in arg: arg['id']=''
   form=read_config(
     action=action,
     config=config,
@@ -50,9 +48,15 @@ def process_edit_form(**arg):
   if form.action == 'insert' and form.not_create:
     form.errors.append('Вам запрещено создавать новые записи')
 
-
+  form.set_orig_types()
+  form.run_event(
+    event=form.events['permissions'],
+    description='events->permissions'
+  )
+  form.get_values()
   if form.action in ['update','insert']:
     form.new_values=values
+    #print('NEW_VALUES: ',values)
     return form_update_or_insert(form)
   #elif from.action == 'delete_file':form.delete_file()
   #elif form.action == 'upload_file': form.upload_file()

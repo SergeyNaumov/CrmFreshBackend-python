@@ -8,37 +8,46 @@ def save_form(form,arg):
       if exists_arg('read_only',f) or exists_arg('not_process',f):
         continue
       name=f['name']
-      type=f['type']
+      
 
       if not exists_arg(name,form.new_values):
         continue
 
+      
       v=None
       if name in form.new_values:
         v=form.new_values[name]
 
+      
 
       if is_wt_field(f):
         
-        if type in ['select_values','select_from_table'] and (v==None):
+        if f['type'] in ['select_values','select_from_table'] and (v==None):
           continue
 
-        if type=='date':
+        if f['type']=='date':
+          
           date_value=from_datetime_get_date(v)
-          if not date_value:
+
+          if date_value:
+            v=date_value
+            
+          else:
             empty_value=exists_arg('empty_value',f) or ''
             if form.engine == 'mysql-strong' or empty_value=='null':
               v='func:(NULL)'
             else:
               v='0000-00-00'
-
-        if type=='time' and not v:
+          
+        if f['type']=='time' and not v:
           v='00:00:00'
           
         #if type in ['select_from_table','select_values'] a:
         #  continue
-
+        #if v != None:
+        
         save_hash[name]=v
+  
   
   if len(save_hash):
     if form.id:
@@ -70,17 +79,16 @@ def save_form(form,arg):
 
   for f in form.fields:
     name=f['name']
-    type=f['type']
     if len(form.errors): break
 
     if exists_arg('read_only',f) or ( name not in form.new_values ):
       continue
 
     value=form.new_values[name]
-    if type=='multiconnect':
+    if f['type']=='multiconnect':
       if isinstance(value,list) and len(list):
         multiconnect_save(form,field)
-    elif type=='in_ext_url':
+    elif f['type']=='in_ext_url':
         save_in_ext_url(form,field,value)
 
 

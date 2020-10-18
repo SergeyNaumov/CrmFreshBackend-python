@@ -8,6 +8,7 @@ from .save_form import save_form
 from .edit_form_process_fields import edit_form_process_fields as func_edit_form_process_fields
 from .get_values import func_get_values
 from .set_orig_types import func_set_orig_types
+from .run_event import run_event as func_run_event
 
 class Form():
   #def info(self):
@@ -40,6 +41,9 @@ class Form():
     }
     self.explain=0
     self.card_format='vue'
+    # для проектов
+    self.work_table_foreign_key=''
+    self.work_table_foreign_key_value=''
 
     if script=='admin_table':
       self.filters_groups=[[]]
@@ -50,8 +54,7 @@ class Form():
     if script=='edit_form':
       self.width=''
       self.cols=[]
-      self.work_table_foreign_key=''
-      self.work_table_foreign_key_value=''
+
       self.edit_form_fields=[]
 
     if script=='find_objects':
@@ -114,8 +117,9 @@ class Form():
 
   def save(form,**arg): save_form(form,arg)
 
-  def run_event(form,**arg):
-    print('run_event:',arg)
+  def run_event(form,event_name,field=None):
+    func_run_event(form,event_name,field)
+
 
   def success(form): # если нет ошибок -- 1
     return (1,0)[len(form.errors)>0]
