@@ -7,13 +7,8 @@ app = FastAPI(Debug=True)
 @app.middleware("http")
 async def for_all_requests(request: Request,call_next, response=Response):
 
-  #host=request.headers['host']
-
   response_obj=response()
-  #body = request.json()
-  
 
-  #print('BODY: ',body)
   s.reset(
     request=request,
     status_code=200

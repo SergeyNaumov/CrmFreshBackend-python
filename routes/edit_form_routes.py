@@ -2,11 +2,11 @@ from fastapi import APIRouter
 #from lib.core import cur_year,cur_date,  exists_arg
 from lib.all_configs import read_config
 from .edit_form.process_edit_form import process_edit_form
+
+from .wysiwyg_routes import router as wysiwyg_routes
+
 router = APIRouter()
 
-def wysiwyg_process(**arg):
-  print('wysiwyg_process - реализовать')
-  return {'wysiwyg_process':'реализовать'}
 
 # форма добавления элемента
 @router.post('/edit-form/{config}')
@@ -49,22 +49,6 @@ async def worm_work(config:str,id:int,R:dict):
     R=R
   )
 
-@router.post('/wysiwyg/{config}/{field_name}')
-async def wysiwyg1(config:str,field_name:str,R:dict):
-  return wysiwyg_process(
-    config=config,
-    field_name=field_name,
-    script='wysiwyg'
-  )
-
-@router.post('/wysiwyg/{config}/{field_name}/{id}')
-async def wysiwyg2(config:str,field_name:str,id:int):
-  return wysiwyg_process(
-    config=config,
-    field_name=field_name,
-    id=id,
-    script='wysiwyg'
-  )
 
 
 
@@ -89,7 +73,7 @@ async def delete_element(config: str,id:int):
     if not cnt:
       form.errors.append('действие запрещено. запрещённый foreign_key. обратитесь к разработчику')
 
-  print('errors:',form.errors)
+  
   if form.success():
     form.db.query(
       query=f'DELETE FROM {form.work_table} WHERE {form.work_table_id}=%s',
@@ -108,6 +92,7 @@ async def delete_element(config: str,id:int):
           }
         )
 
-
-
   return {'success':form.success(),'errors':form.errors,'log':form.log}
+
+
+router.include_router(wysiwyg_routes)

@@ -14,7 +14,10 @@ def get_func(s):
   return rez
   #return rez
 
-print(from_datetime_get_date('d2020-10-15 05:55:12'))
+# Вывод списка файлов
+# import os
+# print(os.listdir('./'))
+#print(from_datetime_get_date('d2020-10-15 05:55:12'))
 
 """
 curl -X POST \
