@@ -57,14 +57,16 @@ async def wysiwyg1(config:str,field_name:str,R:dict):
     script='wysiwyg'
   )
 
-@router.post('/wysiwyg/{config}/{field_name}/{id}/{script}')
-async def wysiwyg2(config:str,field_name:str,id:int,script:int):
-  wysiwyg_process(
+@router.post('/wysiwyg/{config}/{field_name}/{id}')
+async def wysiwyg2(config:str,field_name:str,id:int):
+  return wysiwyg_process(
     config=config,
     field_name=field_name,
     id=id,
     script='wysiwyg'
   )
+
+
 
 @router.get('/delete-element/{config}/{id}')
 async def delete_element(config: str,id:int):

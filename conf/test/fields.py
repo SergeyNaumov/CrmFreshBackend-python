@@ -40,7 +40,9 @@ fields=[
         'type':'text',
         'name':'address',
         'subtype': 'kladr',
-        'kladr':{'after_search':kladr_after_search},
+        'kladr':{
+            #'after_search':kladr_after_search
+        },
         'prefix_list_header':'Укажите регион',
         'prefix_list':['Москва','Московская Область','Калужская Область'],
         'change_in_search':1,

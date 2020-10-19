@@ -35,7 +35,7 @@ class Form():
     self.before_filters_html=[]
     self.on_filters=[]
     self.default_find_filter=[]
-    
+    self.engine='mysql'
     self.javascript={
       'admin_table':''
     }

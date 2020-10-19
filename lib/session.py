@@ -181,12 +181,17 @@ def child_groups(db,group_id):
   group_table='manager_group'
   if 0: # s.use_project
     group_table='project_manager_group'
-
+  
+  # group_id to str for join
+  j=0
+  for g in group_id:
+    group_id[j]=str(group_id[j])
   g_list=db.query(
     query="SELECT id from "+group_table+" where parent_id IN (" + ','.join(group_id) + ')'
   )
   for g1 in g_list:
     for g2 in child_groups(db,[g1['id']]):
+
       group_id.append(g2)
 
   return group_id

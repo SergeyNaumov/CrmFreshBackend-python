@@ -68,9 +68,16 @@ async def startpage():
         values=[manager['id']],
         massive=1
       )
+      j=0
+      for p in manager['permissions']: 
+        manager['permissions'][j]=str(manager['permissions'][j])
+        #print(f'P:{p},  j:{j}')
+        j+=1
+      #manager['permissions'][0::,0] = manager['permissions'][0::,0].astype(str)
       
       perm_str='0'
-      if(len(manager['permissions'])):
+      print('manager:',manager)
+      if len(manager['permissions']):
         perm_str=','.join(manager['permissions'])
 
       left_menu=s.db.query(
