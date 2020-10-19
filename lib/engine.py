@@ -35,9 +35,10 @@ class Engine():
     hostname=socket.gethostname()
     # Если мы не логинимся -- проверяем сессию
     if self.request.url.path not in ['/login','/testupload']:
-        if 0 and hostname=='sv-home':
+        if hostname in ['sv-home','sv-digital']:
           self.manager={'id':'1','login':'admin'}
-          print('hostname',hostname)
+          self.login='admin'
+          s.use_project=0
         else:
           session_start(self,encrypt_method='mysql_sha2');
 

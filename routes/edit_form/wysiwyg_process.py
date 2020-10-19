@@ -109,7 +109,7 @@ def wysiwyg_process(**arg):
 
                 file_list=get_file_list(path=path,errors=errors,form=form)
                 return {
-                    'success':(0,1)[len(errors)],
+                    'success':(1,0)[len(errors)],
                     'errors':errors,
                     'file_list':file_list,
                     'files_dir_web':form.manager['files_dir_web']
@@ -124,7 +124,7 @@ def wysiwyg_process(**arg):
 
         file_list=get_file_list(path=path,errors=errors,form=form)
         return {
-            'success':(0,1)[len(errors)],
+            'success':(1,0)[len(errors)],
             'errors':errors,
             'file_list':file_list,
         }
