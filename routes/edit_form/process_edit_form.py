@@ -1,6 +1,7 @@
 from lib.all_configs import read_config
 from lib.core import exists_arg, random_filename, get_ext
 from lib.save_base64_file import save_base64_file
+import re 
 def form_update_or_insert(form):
     if form.read_only:
       form.errors.append('Вам запрещено сохранять изменения')
@@ -62,27 +63,44 @@ def process_edit_form(**arg):
     if not value:
       form.errors.append('не указано value')
 
-    orig_name=exists_arg('value',R)
+    orig_name=exists_arg('orig_name',value)
     if not orig_name:
       form.errors.append('не указано orig_name')
+    else:
+      ext = get_ext(orig_name)
+      if not ext: 
+        form.errors.append(f'не удалось определить расщирение. orig_name: {orig_name}')
+
 
     src=exists_arg('src',value)
     if not src:
       form.errors.append('нет value.src')
 
     
-    if not form.success(): return {'success':0,'errors':errors}
-    filename_for_out=''
+    if not form.success():
+        return {'success':0,'errors':errors}
+
+    filename_for_out=filename_without_ext+'.'+ext
 
     if value:
       orig_name=value['orig_name']
-      filename_without_ext
-      save_base64_file(
-        orig_name=orig_name,
-        src=value['src'],
-        form=form,
+      filename_without_ext=random_filename()
+      crops=None
+      if 'crops' in value: crops=value['crops']
+      
+      b64=b64_split(src)
 
-      )
+
+
+      if b64 and not len(form.errors):
+        form.errors=save_base64_file(
+          form=form,
+          src=b64['rez'],
+          field=field,
+          orig_name=orig_name,
+          filename=filename_without_ext+'.'+ext
+        )
+      # crops...
       # value['src']
     #return form.upload_file()
   else:
