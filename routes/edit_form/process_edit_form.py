@@ -1,11 +1,7 @@
 from lib.all_configs import read_config
-
+from lib.core import exists_arg, random_filename, get_ext
+from lib.save_base64_file import save_base64_file
 def form_update_or_insert(form):
-    
-
-
-
-    
     if form.read_only:
       form.errors.append('Вам запрещено сохранять изменения')
     else:
@@ -51,12 +47,44 @@ def process_edit_form(**arg):
   form.set_orig_types()
   form.run_event('permissions')
   form.get_values()
+
   if form.action in ['update','insert']:
     form.new_values=values
-    #print('NEW_VALUES: ',values)
     return form_update_or_insert(form)
   #elif from.action == 'delete_file':form.delete_file()
-  #elif form.action == 'upload_file': form.upload_file()
+  
+  elif form.action == 'upload_file':
+    name=exists_arg('name',R)
+    if not name:
+      form.errors.append('не указано name')
+    
+    value=exists_arg('value',R)
+    if not value:
+      form.errors.append('не указано value')
+
+    orig_name=exists_arg('value',R)
+    if not orig_name:
+      form.errors.append('не указано orig_name')
+
+    src=exists_arg('src',value)
+    if not src:
+      form.errors.append('нет value.src')
+
+    
+    if not form.success(): return {'success':0,'errors':errors}
+    filename_for_out=''
+
+    if value:
+      orig_name=value['orig_name']
+      filename_without_ext
+      save_base64_file(
+        orig_name=orig_name,
+        src=value['src'],
+        form=form,
+
+      )
+      # value['src']
+    #return form.upload_file()
   else:
     if form.action in ['new','edit']:
       if len(form.errors): form.read_only=1

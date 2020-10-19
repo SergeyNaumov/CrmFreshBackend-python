@@ -51,7 +51,6 @@ async def worm_work(config:str,id:int,R:dict):
 
 
 
-
 @router.get('/delete-element/{config}/{id}')
 async def delete_element(config: str,id:int):
   form=read_config(

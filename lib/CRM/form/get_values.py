@@ -42,7 +42,6 @@ def func_get_values(form):
       if name in values and is_wt_field(f):
         f['value']=str(values[name])
 
-
       if form.action not in ['insert','update'] and exists_arg('orig_type',f)=='select_from_table':
         f[values]=get_values_for_select_from_table(form,f)
       #print('f:',f)

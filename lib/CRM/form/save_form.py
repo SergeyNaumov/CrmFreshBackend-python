@@ -3,14 +3,15 @@ from .multiconnect_save import multiconnect_save
 def save_form(form,arg):
   if len(form.errors): return
   save_hash={}
-
+  
   for f in form.fields:
+     
       if exists_arg('read_only',f) or exists_arg('not_process',f):
         continue
       name=f['name']
-      
+     
 
-      if not exists_arg(name,form.new_values):
+      if name not in form.new_values:
         continue
 
       
@@ -19,9 +20,7 @@ def save_form(form,arg):
         v=form.new_values[name]
 
       
-
       if is_wt_field(f):
-        
         if f['type'] in ['select_values','select_from_table'] and (v==None):
           continue
 
@@ -47,7 +46,6 @@ def save_form(form,arg):
         #if v != None:
         
         save_hash[name]=v
-  
   
   if len(save_hash):
     if form.id:
