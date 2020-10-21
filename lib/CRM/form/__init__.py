@@ -22,6 +22,10 @@ class Form():
     self.work_table=''
     self.work_table_id='id'
     self.id=''
+    self.sort=0
+    self.tree_use=0
+    self.sort_field=''
+    self.header_field='header'
     self.script=''
     self.action=''
     self.read_only=0
@@ -39,16 +43,23 @@ class Form():
     self.javascript={
       'admin_table':''
     }
+
     self.explain=0
     self.card_format='vue'
     # для проектов
     self.work_table_foreign_key=''
     self.work_table_foreign_key_value=''
-
+    
+    if script=='admin_tree':
+      self.tree_select_header_query=''
+      self.default_find_filter=''
+      self.max_level=0
+      
     if script=='admin_table':
       self.filters_groups=[[]]
       self.search_on_load=0
       self.search_plugin=''
+
 
     # Поля для edit_form
     if script=='edit_form':

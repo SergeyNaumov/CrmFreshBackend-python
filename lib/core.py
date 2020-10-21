@@ -44,7 +44,10 @@ def from_datetime_get_date(dt):
 def create_fields_hash(form):
   form.fields_hash={}
   for f in form.fields:
-    form.fields_hash[f['name']]=f
+    if 'name' in f:
+      form.fields_hash[f['name']]=f
+    else:
+      print('Отсутствует name в поле: ',f)
 
 
 # Возвращает расширение файла

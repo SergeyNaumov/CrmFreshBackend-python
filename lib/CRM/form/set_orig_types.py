@@ -1,5 +1,7 @@
 def func_set_orig_types(form):
   for f in form.fields:
+    if not 'type' in f:
+      print('Отсутствует type: ',f)
     type=f['type']
     if f['type'].startswith('filter_'):
       continue

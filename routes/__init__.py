@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from lib.engine import s
 from .core_routes import router as router_core
 
-
+from .admin_tree_routes import router as router_admin_tree
 from .get_filters_routes import router as router_get_filters
 from .get_result_routes import router as router_get_result
 from .edit_form_routes import router as router_edit_form
@@ -18,8 +18,10 @@ router.include_router(router_core)
 router.include_router(router_testing)
 router.include_router(router_get_filters)
 router.include_router(router_get_result)
+router.include_router(router_admin_tree)
 router.include_router(router_edit_form)
 router.include_router(router_extend)
+
 
 
 #router.include_router(router_admin_table)
