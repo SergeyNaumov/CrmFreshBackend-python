@@ -34,13 +34,24 @@ def func_get_values(form):
 
     for f in form.fields:
 
-      if f['type'].startswith('filter_'):
-        continue
+      #if f['type'] in ['date','datetime','text','textarea']:
+
+
 
       name=f['name']
       
       if name in values and is_wt_field(f):
-        f['value']=str(values[name])
+
+        if not name in values or not values[name]:
+          if f['type'] in ['checkbox','switch','select_values','select']:
+            values[name]='0'
+          else:
+            values[name]=''
+        else:
+          f['value']=str(values[name])
+
+        #if not f['value']:
+        #  f['value']=''
 
       if form.action not in ['insert','update'] and exists_arg('orig_type',f)=='select_from_table':
         f[values]=get_values_for_select_from_table(form,f)

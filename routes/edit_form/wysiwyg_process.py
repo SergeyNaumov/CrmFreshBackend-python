@@ -7,16 +7,37 @@ def check_path(path,errors):
         errors.append('Wrong parametr path!')
 
 def get_file_list(**arg):
+    error=''
+    res_dirs=[]
+    res_files=[]
+    res=[]
     if not len(arg):
         return
     form=arg['form']
     path=arg['path']
     
     path_directory=form.manager['files_dir']+path
+
+    # если нет директории -- создаём её
+    print ('ifnot: ',os.path.isdir(form.manager['files_dir']+path),form.manager['files_dir']+path)
+    if not os.path.isdir(form.manager['files_dir']+path):
+      
+      dirname=form.manager['files_dir']
+      if path != '/':
+        dirname+=path
+
+      if os.path.isfile(dirname):
+        print('not is FILE',dirname)
+        error=f'Ошибка wysiwyg: {dirname} -- это файл (а должна быть директория), обратитесь к разработчику'
+        return res,error
+      else:
+        print('MKDIR',form.manager['files_dir']+path)
+        os.mkdir(form.manager['files_dir']+path)
+
+
+
     list=sorted(os.listdir(path_directory))
-    res_dirs=[]
-    res_files=[]
-    res=[]
+
     for l in list:
         
         if(os.path.isdir(path_directory+'/'+l)):
@@ -27,7 +48,7 @@ def get_file_list(**arg):
     for f in res_dirs: res.append(f)
     for f in res_files: res.append(f)
     #['file1.png','file2.png','file3.png']
-    return res
+    return res,error
 
 def wysiwyg_process(**arg):
   #print('wysiwyg_process - реализовать')
@@ -68,7 +89,9 @@ def wysiwyg_process(**arg):
   #print('action:',action,' errors:',errors,'path: ',path)
   if not len(errors):
     if action == 'file_list':
-        file_list=get_file_list(path=path,errors=errors,form=form)
+        file_list,error=get_file_list(path=path,errors=errors,form=form)
+        if error:
+          errors.append(error)
         return {
             'success':(not len(errors)),
             'errors':errors,
@@ -107,7 +130,9 @@ def wysiwyg_process(**arg):
                     print('remove: ',obj_path)
                     os.remove(obj_path)
 
-                file_list=get_file_list(path=path,errors=errors,form=form)
+                file_list,error=get_file_list(path=path,errors=errors,form=form)
+                if error:
+                  errors.append(error)
                 return {
                     'success':(1,0)[len(errors)],
                     'errors':errors,
@@ -122,7 +147,9 @@ def wysiwyg_process(**arg):
         with open(form.manager['files_dir']+'/'+file.filename, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        file_list=get_file_list(path=path,errors=errors,form=form)
+        file_list,error=get_file_list(path=path,errors=errors,form=form)
+        if error:
+          errors.append(error)
         return {
             'success':(1,0)[len(errors)],
             'errors':errors,

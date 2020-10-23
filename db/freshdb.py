@@ -1,5 +1,6 @@
 import pymysql
 import json
+import re
 from .transform import tree_use_transform, massive_transform
 
 def exists_arg(key,dict):
@@ -7,6 +8,12 @@ def exists_arg(key,dict):
     return True
   return False
 
+def get_func(value):
+
+  if value and isinstance(value,str):
+    rez=re.search('func:\((.+)\)',value)
+    if rez: return rez[1]
+  return ''
 
 
 
@@ -127,18 +134,16 @@ class FreshDB():
         self.connect.commit()
       except pymysql.err.ProgrammingError as err:
 
-        if 'errors' in arg:
-          arg['errors'].append(str(err))
-          
-       
-        self.error_str = str(err)
+        if 'errors' in arg: arg['errors'].append(str(err))
+        #self.error_str = str(err)
 
       # except pymysql.err.IntegrityError as e2:
       #     out_error(self,str(e2),arg)
       #     self.error_str=e2
 
       except pymysql.err.InternalError as err:
-          out_error(self,str(err),arg)
+          if 'errors' in arg: arg['errors'].append(str(err))
+          #out_error(self,str(err),arg)
           self.error_str = str(err)
           
 
@@ -298,6 +303,7 @@ class FreshDB():
       #print("query:")
       #print({'arg':arg})
 
+
     def save(self, **arg):
         self.error_str=''
         arg['method']='save'
@@ -321,10 +327,16 @@ class FreshDB():
         update_names=[]
         for name in data.keys():
           if name in exists_fields:
-            insert_fields.append(name)
-            insert_vopr.append('%s')
-            insert_values.append(data[name])
-            update_names.append(name+'=%s')
+            func=get_func(data[name])
+            if func:
+              insert_fields.append(name)
+              #insert_values.append(func)
+              update_names.append(name+'='+func)
+            else:
+              insert_fields.append(name)
+              insert_vopr.append('%s')
+              insert_values.append(data[name])
+              update_names.append(name+'=%s')
 
         
         if exists_arg('update',arg):

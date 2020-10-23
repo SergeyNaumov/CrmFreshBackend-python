@@ -21,10 +21,10 @@ def save_form(form,arg):
 
       
       if is_wt_field(f):
-        if f['type'] in ['select_values','select_from_table'] and (v==None):
-          continue
+        if f['type'] in ['switch','checkbox','select_values','select_from_table'] and not v:
+          v='0'
 
-        if f['type']=='date':
+        if f['type'] in ['date','datetime'] :
           
           date_value=from_datetime_get_date(v)
 
@@ -74,6 +74,7 @@ def save_form(form,arg):
           debug=form.explain,
           log=form.log
         )
+        print('errors:',form.errors)
 
   for f in form.fields:
     name=f['name']

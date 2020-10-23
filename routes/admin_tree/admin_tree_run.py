@@ -130,8 +130,6 @@ def admin_tree_run(**arg):
   parent_id=str(exists_arg('parent_id',R) or '')
   id=exists_arg('id',R) or ''
 
-  
-
   form=read_config(
     config=arg['config'],
     script='admin_tree',
@@ -169,19 +167,20 @@ def admin_tree_run(**arg):
               qw+=' WHERE parent_id is null'
           
           cur_sort=form.db.query(query=qw,onevalue=1)
+          
           if not cur_sort:
             cur_sort='1'
           else:
             cur_sort=str(int(cur_sort)+1)
-           
+          
 
         sql_query=''
         value=[]
         fields=[]
         data={form.header_field:h}
         if form.sort:
-          data['sort_field']=cur_sort
-
+          data[form.sort_field]=cur_sort
+        
         if form.tree_use:
 
           if parent_id and parent_id.isnumeric():
@@ -274,6 +273,16 @@ def admin_tree_run(**arg):
 
   elif form.action=='move':
     return move(form,R)
+  
+  elif form.action=='load_many_childs':
+    obj_list=R['list']
+    data_result={}
+
+    if len(obj_list):
+      for id in obj_list:
+        data_result[id]=get_branch(form=form,get_childs=0,parent_id=id)
+    return {'success':1,'data':data_result}
+
 
   else: # по умолчанию
     branch=get_branch(form=form,get_childs=1,parent_id='')
