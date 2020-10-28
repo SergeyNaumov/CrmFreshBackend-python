@@ -7,5 +7,7 @@ def func_set_orig_types(form):
       continue
 
     name=f['name']
-    if form.action not in ['insert','update'] and type in ['select_from_table','select_values']:
+    if type in ['select_from_table','select_values']:
       f['orig_type']=f['type']
+      if form.script=='edit_form':
+        f['type']='select'

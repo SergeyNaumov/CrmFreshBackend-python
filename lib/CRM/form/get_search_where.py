@@ -98,7 +98,7 @@ def get_search_where(form,query):
           else:
             WHERE.append('('+table+'.'+db_name+' LIKE %s)')
           VALUES.append(v)
-          print('WHERE:',WHERE)
+          #print('WHERE:',WHERE)
 
       elif (f['type'] in ['date','datetime','filter_extend_date','filter_extend_datetime'] and not(exists_arg('filter_type',f))) or exists_arg('filter_type',f)=='range' :
 
@@ -159,6 +159,6 @@ def get_search_where(form,query):
             map_rezult.append(v)
         if len(map_rezult):
           WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')
-  print('WHERE:',WHERE)
+  #print('WHERE:',WHERE)
   form.query_search['WHERE']=WHERE
   form.query_search['VALUES']=VALUES

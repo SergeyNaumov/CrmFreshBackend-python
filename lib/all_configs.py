@@ -18,7 +18,7 @@ def read_config(**arg):
   response={}
   
   if not (arg['config'] in configs):
-    return error(arg['congif'])
+    return error(arg['config'])
   
   config_class=configs[arg['config']]
   form=config_class(arg)

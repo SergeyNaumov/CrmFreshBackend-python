@@ -1,5 +1,5 @@
 from lib.CRM.form import Form
-from .fields import fields
+from .fields import get_fields
 from .events import events
 
 
@@ -11,22 +11,23 @@ class Config(Form):
         self.QUERY_SEARCH_TABLES=[
             {'table':'test','alias':'wt'}
         ]
-        self.events=events
-        self.title='тестовый конфиг'
+        #self.events=events
+        self.title='тестовый конфиг yep'
+
         self.explain=1
-        # self.cols=[
-        #     [
-        #         {'description':'wysiwyg','name':'wysiwyg','hide':1},
-        #         {'description':'Простые типы данных','name':'plain'},
-        #         {'description':'Тэги','name':'tags','hide':1},
-        #         {'description':'Комментарии','name':'memo','hide':1},
-        #     ],
-        #     [
-        #         {'description':'Файлы','name':'files','hide':1},
-        #         {'description':'Один ко многим','name':'one_to_m','hide':0},
-        #         {'description':'Дата, время и т.д.','name':'timing','hide':1},
-        #     ]
-        # ]
+        self.cols=[
+            [
+                {'description':'wysiwyg','name':'wysiwyg','hide':1},
+                {'description':'Простые типы данных','name':'plain'},
+                {'description':'Тэги','name':'tags','hide':1},
+                {'description':'Комментарии','name':'memo','hide':1},
+            ],
+            [
+                {'description':'Файлы','name':'files','hide':0},
+                {'description':'Один ко многим','name':'one_to_m','hide':0},
+                {'description':'Дата, время и т.д.','name':'timing','hide':1},
+            ]
+        ]
         self.filters_groups=[]
         self.on_filters=[
             {
@@ -40,7 +41,7 @@ class Config(Form):
                 'name':'header'
             },
         ]
-        self.fields=fields
+        self.fields=get_fields()
 
 """
 create table test(

@@ -23,14 +23,14 @@ from config import config
 crm_read=config['connects']['crm_read']
 crm_write=config['connects']['crm_read']
 
-print('connect_read!')
+#print('connect_read!')
 db_read=FreshDB(
   dbname=crm_read['dbname'],
   user=crm_read['user'],
   password=crm_read['password'],
   host=crm_read['host'],
 )
-print('connect_write')
+#print('connect_write')
 db_write=FreshDB(
   dbname=crm_write['dbname'],
   user=crm_write['user'],

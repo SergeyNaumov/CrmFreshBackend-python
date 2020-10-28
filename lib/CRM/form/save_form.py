@@ -3,7 +3,7 @@ from .multiconnect_save import multiconnect_save
 def save_form(form,arg):
   if len(form.errors): return
   save_hash={}
-  
+  #print('NEW_VALUES:',form.new_values)
   for f in form.fields:
      
       if exists_arg('read_only',f) or exists_arg('not_process',f):
@@ -27,7 +27,7 @@ def save_form(form,arg):
         if f['type'] in ['date','datetime'] :
           
           date_value=from_datetime_get_date(v)
-
+          #print(f['name'],'(date_value): ',date_value)
           if date_value:
             v=date_value
             
@@ -48,6 +48,7 @@ def save_form(form,arg):
         save_hash[name]=v
   
   if len(save_hash):
+    #print('save_hash:',save_hash)
     if form.id:
         where=f'{form.work_table_id}={form.id}'
         if form.work_table_foreign_key and form.work_table_foreign_key_value:
@@ -74,7 +75,7 @@ def save_form(form,arg):
           debug=form.explain,
           log=form.log
         )
-        print('errors:',form.errors)
+        #print('errors:',form.errors)
 
   for f in form.fields:
     name=f['name']

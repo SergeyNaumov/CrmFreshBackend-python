@@ -18,8 +18,8 @@ def kladr_after_search(data):
         list.append({'header':h})
     return list
 
-
-fields=[ 
+def get_fields():
+    return [ 
 
    {
         'description':'Wysiwyg',
@@ -28,13 +28,13 @@ fields=[
         'not_filter':1,
         'tab':'wysiwyg'
     },
-    # {
-    #     'description':'Текстовое поле',
-    #     'type':'text',
-    #     'name':'header',
-    #     change_in_search=>1,
-    #     'tab';'plain'
-    # },
+    {
+        'description':'Текстовое поле',
+        'type':'text',
+        'name':'header',
+        'change_in_search':1,
+        'tab':'plain'
+    },
     {
         'description':'Адрес',
         'type':'text',
@@ -48,14 +48,14 @@ fields=[
         'change_in_search':1,
         'tab':'plain'
     },
-    # {
-    #     'description':'Наименование поля',
-    #     add_'description':'дополнительное описание',
-    #     'type':'textarea',
-    #     'name':'textarea',
-    #     full_str=>1,
-    #     'tab';'plain'
-    # },
+    {
+        'description':'Наименование поля',
+        'add_description':'дополнительное описание',
+        'type':'textarea',
+        'name':'textarea',
+        'full_str':1,
+        'tab':'plain'
+    },
     {
         'description':'checkbox',
         'type':'checkbox',
@@ -66,6 +66,33 @@ fields=[
         'description':'switch',
         'type':'switch',
         'name':'switch',
+        'tab':'plain'
+    },
+    {
+        'name':'status',
+        'description':'Выбор из списка (select_values)',
+        'add_description':'с цветами',
+        'type':'select_values',
+        #'change_in_search':1,
+        # regexp_rules=>[
+        #     q{/^[0-9]+$/},'Поле должно быть заполнено'
+        # ],
+        'values':[
+            {'v':'0','d':'Другое','c':'#FFFFFF'},
+            {'v':'1','d':'Ждем материалы от клиента','c':'#CC99FF'},
+            {'v':'2','d':'Сделать медиаплан','c':'#FFFF00'},
+            {'v':'3','d':'Сделать креатив','c':'#FF0000'},
+            {'v':'4','d':'Работа с сайтом','c':'#99CCFF'},
+            {'v':'5','d':'Мониторить рекламу','c':'#CCFFCC'},
+            {'v':'6','d':'Сделать отчет','c':'#FF6600'},
+            {'v':'7','d':'Работа закончена','c':'#DDDDDD'},
+            {'v':'8','d':'Отправлять напоминание','c':'#24FF00'},
+            {'v':'9','d':'Выставлен счёт','c':'#99CCFF'},
+            {'v':'10','d':'Переговоры по продлению','c':'#800080'},
+            {'v':'11','d':'Сделать конкурентный анализ','c':'#84193C'},
+            {'v':'12','d':'Согласование УТП','c':'#164775'},
+            {'v':'13','d':'Совместная работа','c':'#c1f498'},
+        ],
         'tab':'plain'
     },
     {
@@ -103,33 +130,7 @@ fields=[
     #     empty_value=>'null',
     #     'tab';'timing'
     # },
-    {
-        'name':'status',
-        'description':'Выбор из списка (select_values)',
-        'add_description':'с цветами',
-        'type':'select_values',
-        'change_in_search':1,
-        # regexp_rules=>[
-        #     q{/^[0-9]+$/},'Поле должно быть заполнено'
-        # ],
-        'values':[
-            {'v':'0','d':'Другое','c':'#FFFFFF'},
-            {'v':'1','d':'Ждем материалы от клиента','c':'#CC99FF'},
-            {'v':'2','d':'Сделать медиаплан','c':'#FFFF00'},
-            {'v':'3','d':'Сделать креатив','c':'#FF0000'},
-            {'v':'4','d':'Работа с сайтом','c':'#99CCFF'},
-            {'v':'5','d':'Мониторить рекламу','c':'#CCFFCC'},
-            {'v':'6','d':'Сделать отчет','c':'#FF6600'},
-            {'v':'7','d':'Работа закончена','c':'#DDDDDD'},
-            {'v':'8','d':'Отправлять напоминание','c':'#24FF00'},
-            {'v':'9','d':'Выставлен счёт','c':'#99CCFF'},
-            {'v':'10','d':'Переговоры по продлению','c':'#800080'},
-            {'v':'11','d':'Сделать конкурентный анализ','c':'#84193C'},
-            {'v':'12','d':'Согласование УТП','c':'#164775'},
-            {'v':'13','d':'Совместная работа','c':'#c1f498'},
-        ],
-        'tab':'plain'
-    },
+
     # {
     #   # before_code=>sub{
     #   #         my $e=shift;                    
@@ -171,67 +172,96 @@ fields=[
     #     'make_edit':'1',
     #     'tab':'memo'
     # },
-   {
-     'description':'Файл',
-     'type':'file',
-     'name':'file',
-     'filedir':'./files/test/files'
-   },
     # {
-    #     'description':'1_to_m',
-    #     'type':'1_to_m',
-    #     'name':'onetom_test',
-    #     'table':'test_onetomany',
-    #     'table_id':'id',
-    #     'foreign_key':'test_id',
-    #     'tab':'one_to_m',
-    #     'sort':1,
-    #     'view_type':'list',  
-    #     'fields':[
-    #         {
-    #             'description':'select',
-    #             'name':'sel',
-    #             'type':'select_values',
-    #             'values':[
-    #                 {'v':1,'d':'красный'},
-    #                 {'v':2,'d':'оранжевый'},
-    #                 {'v':3,'d':'жёлтый'},
-    #                 {'v':4,'d':'зелёный'},
-    #                 {'v':5,'d':'Голубой'},
-    #                 {'v':6,'d':'Синий'},
-    #                 {'v':7,'d':'Фиолетовый'},
-    #             ]
-    #         },
-    #         {
-    #             'description':'chk',
-    #             'name':'chk',
-    #             'type':'checkbox'
-    #         },
-    #         {
-    #             'description':'Телефон',
-    #             'type':'text',
-    #             'name':'phone',
-    #             'change_in_slide':1,
-    #             'replace_rules':[
-    #                 '/^8/','+7',
-    #             ],
-    #             'regexp_rules':[
-    #                 #q{/^\+[0-9]+$/},'Номер телефона в формате: +7XXXXXXXXXX, например: +74951234567',
-    #                 #q{/^[0-9]+$/}=>'Допускаются только цифры',
-    #             ]
-    #         },
-
-    #         {
-    #             'description':'Файл',
-    #             'type':'file',
-    #             'name':'attach',
-    #             'keep_orig_file_name':1,
-    #             'filedir':'./files/test',
-    #             'read_only':1,
-    #             'preview':'200x0'
-    #         }
-    #     ]
+    #   'description':'Файл',
+    #   'type':'file',
+    #   'name':'file',
+    #   'filedir':'./files/test',
+    #   'tab':'files'
     # },
+    {
+        'description':'Файл',
+        'type':'file',
+        'tab':'files',
+        'name':'file',
+        #'keep_orig_filename':1,
+        'filedir':'./files/test',
+        
+        #'preview':'200x0',
+        #'crops':1,
+        'resize':[
+            {
+              'description':'Горизонтальное фото',
+              'file':'<%filename_without_ext%>_mini2.<%ext%>',
+              'size':'1004x490',
+              'quality':'90'
+            },
+            {
+              'description':'Вертикальное фото',
+              'file':'<%filename_without_ext%>_mini1.<%ext%>',
+              'size':'488x1008',
+              'quality':'95'
+            },
+            {
+              'description':'Квадратное фото',
+              'file':'<%filename_without_ext%>_mini3.<%ext%>',
+              'size':'500x500',
+              'quality':'95'
+            },
+            {
+              'description':'Фото для страницы статьи',
+              'file':'<%filename_without_ext%>_mini4.<%ext%>',
+              'size':'1165x672',
+              'quality':'90'
+            },
+        ]
+    },
+    {
+        'description':'1_to_m',
+        'type':'1_to_m',
+        'name':'onetom_test',
+        'table':'test_onetomany',
+        'table_id':'id',
+        'foreign_key':'test_id',
+        'tab':'one_to_m',
+        'sort':1,
+        'view_type':'list',  
+        'fields':[
+            {
+                'description':'select',
+                'name':'sel',
+                'type':'select_values',
+                'values':[
+                    {'v':1,'d':'красный'},
+                    {'v':2,'d':'оранжевый'},
+                    {'v':3,'d':'жёлтый'},
+                    {'v':4,'d':'зелёный'},
+                    {'v':5,'d':'Голубой'},
+                    {'v':6,'d':'Синий'},
+                    {'v':7,'d':'Фиолетовый'},
+                ]
+            },
+            {
+                'description':'chk',
+                'name':'chk',
+                'type':'checkbox'
+            },
+            {
+                'description':'Телефон',
+                'type':'text',
+                'name':'phone',
+                'change_in_slide':1,
+                'replace_rules':[
+                    '/^8/','+7',
+                ],
+                'regexp_rules':[
+                    #q{/^\+[0-9]+$/},'Номер телефона в формате: +7XXXXXXXXXX, например: +74951234567',
+                    #q{/^[0-9]+$/}=>'Допускаются только цифры',
+                ]
+            },
+
+        ]
+    },
     # {
     #     'description':'Соцсети',
     #     'name':'soc',

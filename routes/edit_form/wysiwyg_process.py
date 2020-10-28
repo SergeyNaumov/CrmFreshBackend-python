@@ -19,7 +19,6 @@ def get_file_list(**arg):
     path_directory=form.manager['files_dir']+path
 
     # если нет директории -- создаём её
-    print ('ifnot: ',os.path.isdir(form.manager['files_dir']+path),form.manager['files_dir']+path)
     if not os.path.isdir(form.manager['files_dir']+path):
       
       dirname=form.manager['files_dir']
@@ -27,11 +26,9 @@ def get_file_list(**arg):
         dirname+=path
 
       if os.path.isfile(dirname):
-        print('not is FILE',dirname)
         error=f'Ошибка wysiwyg: {dirname} -- это файл (а должна быть директория), обратитесь к разработчику'
         return res,error
       else:
-        print('MKDIR',form.manager['files_dir']+path)
         os.mkdir(form.manager['files_dir']+path)
 
 
@@ -54,7 +51,6 @@ def wysiwyg_process(**arg):
   #print('wysiwyg_process - реализовать')
   config=arg['config']
   field_name=arg['field_name']
-  print('arg:',arg)
   errors=[]
   R={}
 
@@ -93,7 +89,7 @@ def wysiwyg_process(**arg):
         if error:
           errors.append(error)
         return {
-            'success':(not len(errors)),
+            'success':form.success(),
             'errors':errors,
             'file_list':file_list,
             'files_dir_web':form.manager['files_dir_web']
@@ -127,7 +123,6 @@ def wysiwyg_process(**arg):
                 if os.path.isdir(obj_path):
                     os.rmdir(obj_path)
                 elif os.path.exists(obj_path):
-                    print('remove: ',obj_path)
                     os.remove(obj_path)
 
                 file_list,error=get_file_list(path=path,errors=errors,form=form)

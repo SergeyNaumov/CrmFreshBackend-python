@@ -9,7 +9,8 @@ from .edit_form_process_fields import edit_form_process_fields as func_edit_form
 from .get_values import func_get_values
 from .set_orig_types import func_set_orig_types
 from .run_event import run_event as func_run_event
-
+from .upload_file import upload_file as func_upload_file
+from .delete_file import delete_file as func_delete_file
 class Form():
   #def info(self):
   #  print('title:',self.title)
@@ -67,6 +68,7 @@ class Form():
       self.cols=[]
 
       self.edit_form_fields=[]
+
 
     if script=='find_objects':
       self.QUERY_SEARCH=''
@@ -143,3 +145,9 @@ class Form():
 
   def get_values(form):
     func_get_values(form)
+
+  def UploadFile(form):
+    return func_upload_file(form)
+
+  def DeleteFile(form):
+    return func_delete_file(form)

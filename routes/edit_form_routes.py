@@ -36,10 +36,10 @@ async def update_form(config: str,id: int,R: dict):
   )
 
 @router.post('/edit-form/{config}/{id}')
-async def worm_work(config:str,id:int,R:dict):
+async def work_form(config:str,id:int,R:dict):
   action=''
   values=None
-  print('R:',R)
+  #print('R:',R)
   if 'action' in R: action=R['action']
   #if 'values' in R: values=R['values']
   return process_edit_form(
