@@ -4,7 +4,7 @@ from lib.all_configs import read_config
 from .edit_form.process_edit_form import process_edit_form
 
 from .wysiwyg_routes import router as wysiwyg_routes
-
+from .edit_form.multiconnect import multiconnect_process
 router = APIRouter()
 
 
@@ -92,6 +92,14 @@ async def delete_element(config: str,id:int):
         )
 
   return {'success':form.success(),'errors':form.errors,'log':form.log}
+
+@router.post('/multiconnect/{config}/{field_name}')
+async def multiconnect(config:str,field_name:str,R:dict):
+  return multiconnect_process(
+    config=config,
+    field_name=field_name,
+    R=R
+  )
 
 
 router.include_router(wysiwyg_routes)

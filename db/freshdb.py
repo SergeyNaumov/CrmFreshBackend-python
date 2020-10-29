@@ -351,6 +351,9 @@ class FreshDB():
                 q='REPLACE'
               else:
                 q='INSERT'
+              if exists_arg('ignore',arg):
+                q+=' IGNORE'
+                
               q +=' INTO '+arg['table'] +'(' + ','.join(insert_fields)+') VALUES (' + ','.join(insert_vopr) + ')'
               arg['query']=q
 

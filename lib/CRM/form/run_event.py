@@ -16,7 +16,6 @@ def run_event(form,event_name,arg={}):
         #print('TYPE:',type(event))
         #event(form)
         if isinstance(event,list):
-          print('is list!')
           for e in event:
             if arg:
               print('arg:',arg)

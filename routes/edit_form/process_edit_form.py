@@ -6,13 +6,22 @@ def form_update_or_insert(form):
     if form.read_only:
       form.errors.append('Вам запрещено сохранять изменения')
     else:
-      form.run_event('before_update')
-      form.run_event('before_insert')
-      form.run_event('before_save')
+      if form.action=='update':
+          form.run_event('before_update')
+      if form.action=='insert':
+          form.run_event('before_insert')
+      if form.action in ['insert','update']:
+          form.run_event('before_save')
       form.save()
-      form.run_event('after_update')
-      form.run_event('after_insert')
-      form.run_event('after_save')
+      #print('ACTION:',form.action)
+      if form.action=='update':
+          form.run_event('after_update')
+
+      if form.action=='insert':
+          form.run_event('after_insert')
+
+      if form.action in ['insert','update']:
+        form.run_event('after_save')
 
     return {
       'success':form.success(),

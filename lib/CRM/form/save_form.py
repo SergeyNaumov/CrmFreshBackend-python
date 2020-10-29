@@ -1,5 +1,7 @@
 from lib.core import exists_arg, is_wt_field, from_datetime_get_date
-from .multiconnect_save import multiconnect_save
+#from routes.edit_form.multiconnect import save as multiconnect_save
+from lib.multiconnect import save as multiconnect_save
+
 def save_form(form,arg):
   if len(form.errors): return
   save_hash={}
@@ -48,7 +50,7 @@ def save_form(form,arg):
         save_hash[name]=v
   
   if len(save_hash):
-    #print('save_hash:',save_hash)
+    print('save_hash:',save_hash)
     if form.id:
         where=f'{form.work_table_id}={form.id}'
         if form.work_table_foreign_key and form.work_table_foreign_key_value:
@@ -86,10 +88,11 @@ def save_form(form,arg):
 
     value=form.new_values[name]
     if f['type']=='multiconnect':
-      if isinstance(value,list) and len(list):
-        multiconnect_save(form,field)
+      print('!!NEW_VALUES:',value)
+      if isinstance(value,list):
+        multiconnect_save(form,f,value)
     elif f['type']=='in_ext_url':
-        save_in_ext_url(form,field,value)
+        save_in_ext_url(form,f,value)
 
 
 
