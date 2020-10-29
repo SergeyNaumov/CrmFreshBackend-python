@@ -33,15 +33,28 @@ from lib.resize import resize_one
 # }
 
 
+# resize_one(
+#   fr='./files/test/FORESTER.jpg',
+#   to='./files/test/FORESTER_resize.jpg',
+#   width=500,
+#   height=0
+# )
+
 resize_one(
   fr='./files/test/FORESTER.jpg',
   to='./files/test/FORESTER_resize.jpg',
-  width=500,
-  height=0
-)
-resize_one(
-  fr='./files/test/FORESTER.jpg',
-  to='./files/test/FORESTER_resize2.jpg',
-  width=500,
+  quality=70,
+  width=0,
+  optimize=0,
+  composite_file='./files/composite/composite.png',
+  composite_gravity='right,bottom',
   height=500
 )
+# resize_one(
+#   fr='./files/test/FORESTER.jpg',
+#   to='./files/test/FORESTER_resize2.jpg',
+#   width=0,
+#   height=500,
+#   quality=70,
+#   optimize=1
+# )

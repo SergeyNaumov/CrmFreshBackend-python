@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageOps
 import re
 from lib.core import exists_arg, get_name_and_ext
 from lib.save_base64_file import save_base64_file
@@ -59,60 +59,145 @@ def resize_all(**arg):
               )
 
 
+def crop(img,crop_type,width,height):
+  min_x,min_y=0,0
+  max_x,max_y=img.size[0],img.size[1]
+
+  if crop_type == 'middle':
+
+    min_x = (img.size[0] - width) / 2
+    min_y = (img.size[1] - height) / 2
+    max_x=min_x+width
+    max_y=min_y+height
+
+    box = (min_x, min_y, max_x, max_y)
+    print('size:',img.size, 'width:',width,'height:',height, 'crop_box:',box)
+  return img.crop(box)
 
 def resize_one(**arg):
   composite_file=''
   grayscale=''
-  quality=''
+  quality=100
   crop_type='middle'
-
-  width=arg['width']
-  height=arg['height']
+  optimize=1
+  width=int(arg['width'])
+  height=int(arg['height'])
   fr=arg['fr']
   to=arg['to']
+  ny=0
+  nx=0
 
-  if exists_arg('crop_type',arg):
-    crop_type=arg['crop_type']
 
+
+  if exists_arg('grayscale',arg): grayscale=arg['grayscale']
+  if exists_arg('crop_type',arg): crop_type=arg['crop_type']
+  if exists_arg('quality',arg): quality=arg['quality']
+  if exists_arg('composite_file',arg): composite_file=arg['composite_file']
+  if 'optimize' in arg: optimize=arg['optimize']
   
   
 
   size=(width,height)
   img = Image.open(fr)
-  #w, h = img.size
-  print('img.size:',img.size)
-  img_ratio = img.size[0] / float(img.size[1])
-  ratio = size[0] / float(size[1])
+  ox, oy = img.size
+  k=1
+  if not height:
+    if width > ox:
+      img.save(to)
+      return
 
-  if ratio > img_ratio:
-        img = img.resize((size[0], size[0] * img.size[1] / img.size[0]),
-                Image.ANTIALIAS)
-        # Crop in the top, middle or bottom
-        if crop_type == 'top':
-            box = (0, 0, img.size[0], size[1])
-        elif crop_type == 'middle':
-            box = (0, (img.size[1] - size[1]) / 2, img.size[0], (img.size[1] + size[1]) / 2)
-        elif crop_type == 'bottom':
-            box = (0, img.size[1] - size[1], img.size[0], img.size[1])
-        else :
-            raise ValueError('ERROR: invalid value for crop_type')
-        img = img.crop(box)
-  elif ratio < img_ratio:
-        img = img.resize((size[1] * img.size[0] / img.size[1], size[1]),
-                Image.ANTIALIAS)
-        # Crop in the top, middle or bottom
-        if crop_type == 'top':
-            box = (0, 0, size[0], img.size[1])
-        elif crop_type == 'middle':
-            box = ((img.size[0] - size[0]) / 2, 0, (img.size[0] + size[0]) / 2, img.size[1])
-        elif crop_type == 'bottom':
-            box = (img.size[0] - size[0], 0, img.size[0], img.size[1])
-        else :
-            raise ValueError('ERROR: invalid value for crop_type')
-        img = img.crop(box)
-  else :
-        img = img.resize((size[0], size[1]),
-                Image.ANTIALIAS)
-        # If the scale is the same, we do not need to crop
+    k = oy / ox
+    height = int(width * k)
+    
+
+  elif not width:
+    k = ox / oy
+    width = int(height * k)
   
-  img.save(to)
+  else:
+    ny= int( (oy / ox) * width)
+    nx= int( (ox / oy) * height)
+
+  if width == height:
+    if ox != oy:
+      min_len=min(ox,oy)
+      
+      img=crop(img,crop_type,min_len,min_len)
+    img.resize((width,height),  Image.ANTIALIAS)
+
+  elif nx >= width: # горизонтально ориентированная
+    img.resize( (nx,height), Image.ANTIALIAS)
+    if nx >width:
+      crop(img,crop_type,width,height)
+      
+      #nnx = int( (nx - width) / 2 )
+
+
+  else: # вертикально ориентированная
+    if ny < height:
+      ny = height
+    img=img.resize( (width,ny), Image.ANTIALIAS ) 
+
+    if ny > height:
+      crop(img,crop_type,width,height)
+
+  if composite_file:
+    composite_gravity=exists_arg('composite_gravity',arg)
+    
+    if not composite_gravity:
+      composite_gravity='center'
+
+    composite_image = Image.open(composite_file)
+    wm_position_x=0
+    wm_position_y=0
+
+    if composite_gravity=='center':
+      wm_position_x = int( ( width - composite_image.size[0] ) / 2  )
+      wm_position_y = int( ( height - composite_image.size[1] ) / 2 )
+    
+    elif composite_gravity=='left,top':
+      wm_position_x = 0
+      wm_position_y = 0
+    
+    elif composite_gravity=='center,top':
+      wm_position_x = int( ( width - composite_image.size[0] ) / 2  )
+      wm_position_y = 0
+    
+    elif composite_gravity=='right,top':
+      wm_position_x = width - composite_image.size[0]
+      wm_position_y = 0
+    
+    elif composite_gravity=='left,center':
+      wm_position_x = 0
+      wm_position_y = int( ( height - composite_image.size[1] ) / 2 )
+    
+    elif composite_gravity=='right,center':
+      wm_position_x = width - composite_image.size[0]
+      wm_position_y = int( ( height - composite_image.size[1] ) / 2 )
+
+    elif composite_gravity=='left,bottom':
+      wm_position_x = 0
+      wm_position_y = int(  height - composite_image.size[1] )
+
+    elif composite_gravity=='center,bottom':
+      wm_position_x = int( ( width - composite_image.size[0] ) / 2  )
+      wm_position_y = int(  height - composite_image.size[1] )
+
+    elif composite_gravity=='right,bottom':
+      wm_position_x = width - composite_image.size[0]
+      wm_position_y = int(  height - composite_image.size[1] )
+
+    print('img_size:', wm_position_x, wm_position_y)
+    
+    
+    img.paste(composite_image, (wm_position_x, wm_position_y) ,composite_image)
+
+
+    #print('водяные знаки не реализованы')
+
+  #print('optimize:',optimize)
+  if grayscale:
+    img = ImageOps.grayscale(img)
+  #print('save:',to,'size: ',img.size)
+  img.save(to,quality=quality,optimize=optimize)
+
