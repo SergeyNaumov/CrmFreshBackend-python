@@ -89,7 +89,7 @@ def get_branch(**arg):
     sql_query+=' ORDER BY w.'+form.sort_field
   else:
     sql_query+=' ORDER BY w.'+form.header_field
-  print('sql_query:',sql_query)
+
   result_lst=form.db.query(
     query=sql_query
   )
@@ -248,7 +248,7 @@ def admin_tree_run(**arg):
         )
 
         query=add_where_to_query(f'DELETE FROM {form.work_table}',where)
-        form.db.query(query=query,errors=form.errors,debug=1)
+        form.db.query(query=query,errors=form.errors)
 
         cur_count='0'
         if form.tree_use:
