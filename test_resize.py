@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from lib.resize import resize_one
 
 # field={
@@ -40,15 +42,25 @@ from lib.resize import resize_one
 #   height=0
 # )
 
+
 resize_one(
-  fr='./files/test/FORESTER.jpg',
-  to='./files/test/FORESTER_resize.jpg',
-  quality=70,
-  width=0,
-  optimize=0,
-  composite_file='./files/composite/composite.png',
-  composite_gravity='right,bottom',
-  height=500
+  # fr='./files/test/FORESTER.jpg',
+  # to='./files/test/FORESTER_resize.jpg',
+  # quality=70,
+  # width=0,
+  # optimize=0,
+  # composite_file='./files/composite/composite.png',
+  # composite_gravity='right,bottom',
+  # height=500
+  fr='./files/manager/1603990473_7388.png',
+  to='./files/manager/1603990473_7388_mini1.png',
+  width='256',
+  height='256',
+  grayscale=False,
+  composite_file=False,
+  composite_gravity=False,
+  composite_resize=False,
+  quality=100
 )
 # resize_one(
 #   fr='./files/test/FORESTER.jpg',

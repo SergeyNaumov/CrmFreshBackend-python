@@ -96,8 +96,9 @@ def resize_one(**arg):
   if 'optimize' in arg: optimize=arg['optimize']
   
   
-
+  #print(f'width: {width}, height: {height}')
   size=(width,height)
+  print('size:',size)
   img = Image.open(fr)
   ox, oy = img.size
   k=1
@@ -117,16 +118,16 @@ def resize_one(**arg):
   else:
     ny= int( (oy / ox) * width)
     nx= int( (ox / oy) * height)
-
+  #print('nx: ',nx,'ny:',ny)
   if width == height:
     if ox != oy:
       min_len=min(ox,oy)
-      
       img=crop(img,crop_type,min_len,min_len)
-    img.resize((width,height),  Image.ANTIALIAS)
-
+    
+    img=img.resize((width,height),  Image.ANTIALIAS)
+    
   elif nx >= width: # горизонтально ориентированная
-    img.resize( (nx,height), Image.ANTIALIAS)
+    img=img.resize( (nx,height), Image.ANTIALIAS)
     if nx >width:
       crop(img,crop_type,width,height)
       

@@ -58,31 +58,6 @@ def save_base64_file(**arg):
       field=field,
       value=old_photo
     )
-    # if old_photo:
-    #   
-    #   #print('of_arr:',of_arr[1],of_arr[2])
-    #   if of_arr:
-    #     f_without_ext=of_arr[1]
-    #     ext=of_arr[2]
-
-    #     # удаляем ресайзы
-    #     if 'resize' in field and len(field['resize']):
-    #       for r in field['resize']:
-    #         #print('r:',r)
-    #         f=r['file']
-    #         f=f.replace('<%filename_without_ext%>',f_without_ext)
-    #         f=f.replace('<%ext%>',ext)
-    #         #$f=~s/<\%ext\%>/$ext/g;
-    #         file_for_del=field['filedir']+'/'+f
-    #         if os.path.isfile(file_for_del):
-    #           os.remove(file_for_del)
-    #           #print('del: ',file_for_del)
-
-    #     # удаляем основной файл
-    #     file_for_del=field['filedir']+'/'+old_photo
-    #     if os.path.isfile(file_for_del):
-    #       os.remove(file_for_del)
-    #       print('del main file:',file_for_del)
 
 
     # сохраняем полное имя в базе или нет?
@@ -102,11 +77,7 @@ def save_base64_file(**arg):
       debug=1
     )
 
-    #resize_all(
-    #  field=field,
-    #  value=filename
-    #)
-    
+  
     
 
 
