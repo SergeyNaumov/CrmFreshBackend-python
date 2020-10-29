@@ -23,17 +23,23 @@ async def mainpage():
       values=[s.project['id']]
     )
   else:
+    
     response['manager']=s.db.query(
       query='SELECT id,login,name,position, concat("/edit-form/manager/",id) link from manager where id=%s',
       values=[s.manager['id']],
-      onerow=1
+      onerow=1,
+      debug=1
     )
+
 
     response['news_list']=s.db.query(
       query='SELECT header,DATE_FORMAT(registered, %s) registered, body from crm_news order by registered desc limit 5',
       values=["%e.%m.%y"]
     )
   
+  if not response['manager']:
+    print('отсутствует запись с manager.id=='+s.manager['id'])
+
   return response
 
 # Стартовая страница
@@ -76,7 +82,6 @@ async def startpage():
       #manager['permissions'][0::,0] = manager['permissions'][0::,0].astype(str)
       
       perm_str='0'
-      print('manager:',manager)
       if len(manager['permissions']):
         perm_str=','.join(manager['permissions'])
 

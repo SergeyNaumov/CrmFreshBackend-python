@@ -89,7 +89,7 @@ def get_branch(**arg):
     sql_query+=' ORDER BY w.'+form.sort_field
   else:
     sql_query+=' ORDER BY w.'+form.header_field
-
+  print('sql_query:',sql_query)
   result_lst=form.db.query(
     query=sql_query
   )
@@ -128,6 +128,8 @@ def admin_tree_run(**arg):
   R=arg['R']
   action=exists_arg('action',R) or ''
   parent_id=str(exists_arg('parent_id',R) or '')
+  if parent_id =='0':
+    parent_id=''
   id=exists_arg('id',R) or ''
 
   form=read_config(
@@ -212,6 +214,24 @@ def admin_tree_run(**arg):
           }
         }
 
+  elif form.action == 'sort':
+    if form.sort:
+      where=[f'{form.work_table_id}=%s']
+      add_where_foreign_key(form,where)
+      if parent_id:
+        where.append('parent_id='+parent_id)
+
+      query=add_where_to_query(f'UPDATE {form.work_table} SET sort=%s',where)
+      for id in R['obj_sort'].keys():
+        form.db.query(
+          query=query,
+          values=[R['obj_sort'][id],id],
+          errors=form.errors
+        )
+
+      return {'success':form.success(),'errors':form.errors}
+    else:
+      return {'success':'0','errors':['сортировка запрещена']}
   elif form.action == 'get_branch' and parent_id and parent_id.isnumeric():
     return {'success':1,'data':get_branch(form=form,parent_id=parent_id)}
 
@@ -228,7 +248,7 @@ def admin_tree_run(**arg):
         )
 
         query=add_where_to_query(f'DELETE FROM {form.work_table}',where)
-        form.db.query(query=query,errors=form.errors)
+        form.db.query(query=query,errors=form.errors,debug=1)
 
         cur_count='0'
         if form.tree_use:
