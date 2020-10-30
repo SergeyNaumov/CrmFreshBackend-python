@@ -245,7 +245,11 @@ class FreshDB():
       if self.error_str:
         rez=[]
       else:
-        rez=cur.fetchall()
+        try:
+          rez=cur.fetchall()
+        except pymysql.err.ProgrammingError as err:
+          return []
+
       return self.prepare_result(rez,arg)
 
 

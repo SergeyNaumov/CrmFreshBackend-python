@@ -88,6 +88,11 @@ def get_name_and_ext(filename):
 
   return filename,''
 
+def get_child_field(field,name):
+  for f in field['fields']:
+    if f['name']==name: return f
+  return None
+
 def del_file_and_resizes(**arg):
   field=arg['field']
   value=arg['value']

@@ -242,6 +242,12 @@ def get_fields():
                 ]
             },
             {
+                'description':'Файл',
+                'name':'attachx',
+                'type':'file',
+                'filedir':'./files/test/1_to_m'
+            },
+            {
                 'description':'chk',
                 'name':'chk',
                 'type':'checkbox'
