@@ -117,5 +117,6 @@ def upload_file(form):
 
     return {
       'success':form.success(),
-      'errors':form.errors
+      'errors':form.errors,
+      'value':filename_for_out
     }

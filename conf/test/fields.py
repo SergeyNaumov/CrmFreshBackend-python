@@ -187,7 +187,7 @@ def get_fields():
         #'keep_orig_filename':1,
         'filedir':'./files/test',
         
-        #'preview':'200x0',
+        'preview':'200x0',
         #'crops':1,
         'resize':[
             {
