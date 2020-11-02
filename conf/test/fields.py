@@ -245,7 +245,21 @@ def get_fields():
                 'description':'Файл',
                 'name':'attachx',
                 'type':'file',
-                'filedir':'./files/test/1_to_m'
+                'filedir':'./files/test/1_to_m',
+                'resize':[
+                    {
+                      'description':'Горизонтальное фото',
+                      'file':'<%filename_without_ext%>_mini1.<%ext%>',
+                      'size':'10x10',
+                      'quality':'90'
+                    },
+                    {
+                      'description':'Вертикальное фото',
+                      'file':'<%filename_without_ext%>_mini2.<%ext%>',
+                      'size':'20x20',
+                      'quality':'95'
+                    },
+                ]
             },
             {
                 'description':'chk',

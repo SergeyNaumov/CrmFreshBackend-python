@@ -1,5 +1,5 @@
 from lib.core import exists_arg
-from lib.get_1_to_m_data import normalize_value_row
+from lib.get_1_to_m_data import normalize_value_row, get_1_to_m_data
 from .get_data import get_data
 
 def insert_or_update(form,field,arg):
@@ -57,7 +57,7 @@ def insert_or_update(form,field,arg):
         form.run_event('after_update_code',{'field':field,'data':data})
         form.run_event('after_save_code',{'field':field,'data':data})
 
-
+      get_1_to_m_data(form,field)
 
       return {
         'success':form.success(),
