@@ -1,6 +1,6 @@
 from lib.engine import s
 #from lib.core import exists_arg
-
+from lib.check_field import check_field
 from .get_search_tables import get_search_tables
 from .get_search_where import get_search_where
 from .default_config_attr import default_config_attr
@@ -148,6 +148,11 @@ class Form():
 
   def UploadFile(form):
     return func_upload_file(form)
+
+  def check(form): # проверяем new_values
+    for field in form.fields:
+      if field['name'] in form.new_values:
+        check_field(form,field,form.new_values[field['name']])
 
   def DeleteFile(form):
     return func_delete_file(form)

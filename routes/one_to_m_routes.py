@@ -2,7 +2,6 @@ from fastapi import APIRouter, File, UploadFile
 from lib.all_configs import read_config
 from .edit_form.one_to_m import process_one_to_m
 
-
 router = APIRouter()
 
 

@@ -1,4 +1,3 @@
-import re
 from lib.core import is_wt_field, exists_arg
 from lib.get_1_to_m_data import get_1_to_m_data
 from .get_values_for_select_from_table import get_values_for_select_from_table
@@ -9,10 +8,6 @@ def tree_to_list(tree_list,lst,level):
     lst.append({'v':t['v'],'d':t['d']})
     if exists_arg('children',t) and len(t['children']):
       tree_to_list(t['children'],lst,level+1)
-
-
-
-
 
 def get_in_ext_url(form,f):
   print('get_in_ext_url не готова')
@@ -25,7 +20,7 @@ def func_get_values(form):
         query=f'SELECT * from {form.work_table} WHERE {form.work_table_id}=%s',
         values=[form.id],
         onerow=1,
-        debug=1,
+        #debug=1,
         log=form.log
       )
       #print('GET_VALUES:',values)
@@ -88,10 +83,11 @@ def func_get_values(form):
         if values[name].isnumeric():
           values[name]=str(values[name])
         f['value']=values[name]
-      #else:
-      #  print(f['name'],' - not numeric:', values[name])
 
-      #values[name]=f['value']
+
+
+          
+
       
     form.values=values
     #print('GET_VALUES2:',values)

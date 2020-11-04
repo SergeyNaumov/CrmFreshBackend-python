@@ -59,6 +59,13 @@ def get_ext(filename):
         return arr[l-1]
     return ''
 
+def get_name_and_ext(filename):
+  name_and_ext_arr=re.search(r'([^\/]+)\.([^\.]+)$',filename)
+  if(name_and_ext_arr):
+    return name_and_ext_arr[1],name_and_ext_arr[2]
+
+  return filename,''
+
 def b64_split(data):
     rez=re.search(r'^data:(.+?);base64,(.+)',data)
     if rez:
@@ -81,12 +88,7 @@ def is_wt_field(f):
   else:
     return check_wt_field(f['type'])
 
-def get_name_and_ext(filename):
-  name_and_ext_arr=re.search(r'([^\/]+)\.([^\.]+)$',filename)
-  if(name_and_ext_arr):
-    return name_and_ext_arr[1],name_and_ext_arr[2]
 
-  return filename,''
 
 def get_child_field(field,name):
   for f in field['fields']:

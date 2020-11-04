@@ -33,7 +33,11 @@ def get_fields():
         'type':'text',
         'name':'header',
         'change_in_search':1,
-        'tab':'plain'
+        'tab':'plain',
+
+        'regexp_rules':[
+            '/^[ab]+$/i','в текстовом поле допустимы только символы a и b',
+        ],
     },
     {
         'description':'Адрес',

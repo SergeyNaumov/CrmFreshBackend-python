@@ -67,6 +67,7 @@ def process_edit_form(**arg):
 
   if form.action in ['update','insert']:
     form.new_values=values
+    form.check() # проверяем все поля в new_values
     return form_update_or_insert(form)
   
   elif form.action == 'delete_file':

@@ -13,7 +13,6 @@ def event_after_insert(form):
     form.db.query(
       query='UPDATE permissions set pname=%s where id=%s',
       values=[gen_pas(12),form.id],
-      debug=1
     )
 
 

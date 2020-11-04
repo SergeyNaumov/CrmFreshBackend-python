@@ -46,11 +46,12 @@ def save_form(form,arg):
         #if type in ['select_from_table','select_values'] a:
         #  continue
         #if v != None:
-        
+
+
         save_hash[name]=v
   
-  if len(save_hash):
-    print('save_hash:',save_hash)
+  if form.success() and len(save_hash):
+    #print('save_hash:',save_hash)
     if form.id:
         where=f'{form.work_table_id}={form.id}'
         if form.work_table_foreign_key and form.work_table_foreign_key_value:
