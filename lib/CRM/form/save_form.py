@@ -5,7 +5,7 @@ from lib.multiconnect import save as multiconnect_save
 def save_form(form,arg):
   if len(form.errors): return
   save_hash={}
-  #print('NEW_VALUES:',form.new_values)
+  
   for f in form.fields:
      
       if exists_arg('read_only',f) or exists_arg('not_process',f):

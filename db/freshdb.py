@@ -100,7 +100,8 @@ def to_json(data):
 
 class FreshDB():
     def go_connect(self,arg):
-      self.connect = pymysql.connect(arg['host'], arg['user'], arg['password'], arg['dbname'])
+      #self.connect = pymysql.connect(arg['host'], arg['user'], arg['password'], arg['dbname'])
+      self.connect = pymysql.connect(user=arg['user'], password=arg['password'], host=arg['host'], database=arg['dbname'])
       self.connect.ping(reconnect=True)
 
 
@@ -273,6 +274,7 @@ class FreshDB():
         try:
           rez = cur.fetchone()
         except pymysql.err.ProgrammingError as err:
+          print("\033[31m {}",'ERR:',err,arg['query'])
           return None
         if rez: rez=rez[0]
       else:
@@ -280,6 +282,7 @@ class FreshDB():
             try:
               rez=cur.fetchone()
             except pymysql.err.ProgrammingError as err:
+              print("\033[31m {}",'ERR:',err,arg['query'])
               return None
 
           else:
@@ -291,7 +294,7 @@ class FreshDB():
                 if exists_arg('tree_use',arg): rez=tree_use_transform(rez)
 
             except pymysql.err.ProgrammingError as err:
-              #print('ERR:',err)
+              print('ERR:',err,arg['query'])
               #if exists_arg('errors',arg): arg['errors'].append(e)
               return None
 
@@ -333,14 +336,14 @@ class FreshDB():
           if name in exists_fields:
             func=get_func(data[name])
             if func:
-              insert_fields.append(name)
+              insert_fields.append('`'+name+'`')
               #insert_values.append(func)
-              update_names.append(name+'='+func)
+              update_names.append('`'+name+'`='+func)
             else:
               insert_fields.append(name)
               insert_vopr.append('%s')
               insert_values.append(data[name])
-              update_names.append(name+'=%s')
+              update_names.append('`'+name+'`=%s')
 
         
         if exists_arg('update',arg):

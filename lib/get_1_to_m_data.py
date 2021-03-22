@@ -29,7 +29,9 @@ def normalize_value_row(form,field,d):
 
 
 def get_1_to_m_data(form,f):
-  
+  #print('f:',f)
+  if not exists_arg('fields',f): f['fields']=[]
+
   for cf in f['fields']:
       if cf['type'] == 'select_from_table':
           cf['values']=get_values_for_select_from_table(form,cf)

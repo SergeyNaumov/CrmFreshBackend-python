@@ -75,6 +75,8 @@ async def startpage():
         massive=1
       )
       j=0
+
+      print('manager.permissions:',manager['permissions'])
       for p in manager['permissions']: 
         manager['permissions'][j]=str(manager['permissions'][j])
         #print(f'P:{p},  j:{j}')
@@ -142,7 +144,7 @@ async def login(R: dict):
         login=R['login'],
         password=R['password'],
         ip=s.env['x-real-ip'],
-        encrypt_method=config['encrypt_methon'],
+        encrypt_method=config['encrypt_method'],
         max_fails_login=3,
         max_fails_login_interval=3600,
         max_fails_ip=20,

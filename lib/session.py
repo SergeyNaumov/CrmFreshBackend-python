@@ -36,8 +36,7 @@ def session_create(s,**arg):
         onevalue=True,
         errors=errors
       )
-
-      if fails > arg['max_fails_login'] :
+      if fails and fails > arg['max_fails_login'] :
         return 'Ошибка безопасности: превышено максимальное количество входа по логину'
   
   # проверяем, сколько было попыток зайти с данного ip под данным паролем
@@ -49,7 +48,7 @@ def session_create(s,**arg):
         errors=errors
       )
 
-      if fails > arg['max_fails_ip'] :
+      if fails and fails > arg['max_fails_ip'] :
           return 'Ошибка безопасности: превышено максимальное количество входа по IP'
   
 
@@ -216,8 +215,8 @@ def get_permissions_for(form,login):
     """,
     values=[login],onerow=1,log=form.log
   )
-
-  del manager['password']
+  
+  if manager['password']: del manager['password']
   
   permissions_list=form.db.query(
     query='SELECT p.id, p.pname from permissions p, manager_permissions mp where p.id = mp.permissions_id and mp.manager_id = %s',

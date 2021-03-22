@@ -8,6 +8,7 @@ class Config(Form):
     def __init__(self,arg):
         super().__init__(arg) 
         self.title='Менеджеры'
+        self.explain=1
         self.work_table='manager' 
         self.QUERY_SEARCH_TABLES=[
             {'table':self.work_table,'alias':'wt'}

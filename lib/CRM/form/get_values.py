@@ -1,13 +1,8 @@
-from lib.core import is_wt_field, exists_arg
+from lib.core import is_wt_field, exists_arg, tree_to_list
 from lib.get_1_to_m_data import get_1_to_m_data
 from .get_values_for_select_from_table import get_values_for_select_from_table
 
-def tree_to_list(tree_list,lst,level):
-  for t in tree_list:
-    t['d']=('..'*level) + t['d']
-    lst.append({'v':t['v'],'d':t['d']})
-    if exists_arg('children',t) and len(t['children']):
-      tree_to_list(t['children'],lst,level+1)
+
 
 def get_in_ext_url(form,f):
   print('get_in_ext_url не готова')

@@ -1,5 +1,12 @@
 import random, re, time, datetime, os
 
+def tree_to_list(tree_list,lst,level):
+  for t in tree_list:
+    t['d']=('..'*level) + t['d']
+    lst.append({'v':t['v'],'d':t['d']})
+    if exists_arg('children',t) and len(t['children']):
+      tree_to_list(t['children'],lst,level+1)
+
 def cur_year():
   dat = datetime.date.today()
   dat = dat + datetime.timedelta(days=0)

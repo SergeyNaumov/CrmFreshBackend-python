@@ -193,21 +193,21 @@ def get_fields():
        'tab':'permissions'
     },
 
-    {
-       'name':'group_id',
-       'description':'Группа менеджера',
-       'type':'select_from_table',
-      'table':'manager_group',
-      'tree_use':1,
-      'tablename':'mg',
-      'header_field':'header',
-      'value_field':'id',
-       'tab':'permissions',
-      # filter_code=>sub{
-      #   my $s=$_[0]->{str};
-      #   return qq{<a href="./edit_form.pl?config=manager_group&action=edit&id=$s->{mg__id}" target="_blank">$s->{mg__header}</a>}
-      # }
-    },
+    # {
+    #    'name':'group_id',
+    #    'description':'Группа менеджера',
+    #    'type':'select_from_table',
+    #   'table':'manager_group',
+    #   'tree_use':1,
+    #   'tablename':'mg',
+    #   'header_field':'header',
+    #   'value_field':'id',
+    #    'tab':'permissions',
+    #   # filter_code=>sub{
+    #   #   my $s=$_[0]->{str};
+    #   #   return qq{<a href="./edit_form.pl?config=manager_group&action=edit&id=$s->{mg__id}" target="_blank">$s->{mg__header}</a>}
+    #   # }
+    # },
 
     {
       # before_code=>sub{
