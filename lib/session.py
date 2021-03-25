@@ -137,7 +137,8 @@ def session_start(s,**arg):
 def session_logout(s):
   user_id=s.get_cookie('auth_user_id')
   key=s.get_cookie('auth_key')
-  if user_id.isdigit() and int(user_id) and key :
+  #print('user_id:',user_id)
+  if user_id and user_id.isdigit() and int(user_id) and key :
       if config['use_project']:
         s.db.query(
           query='DELETE FROM project_session WHERE auth_id=%s and session_key=%s',

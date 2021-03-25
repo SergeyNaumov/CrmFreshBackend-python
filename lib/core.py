@@ -17,8 +17,7 @@ def exists_arg(key,dict):
     return dict[key]
   return False
 
-def gen_pas(length=8):
-  letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+def gen_pas(length=8,letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678'):
   return ''.join(random.choice(letters) for i in range(length))
   
 def cur_date(delta=0,format="%Y-%m-%d"):

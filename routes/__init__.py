@@ -2,7 +2,7 @@ from fastapi import APIRouter
 #from config import config
 from lib.engine import s
 from .core_routes import router as router_core
-
+from .register import router as router_register
 from .admin_tree_routes import router as router_admin_tree
 from .get_filters_routes import router as router_get_filters
 from .get_result_routes import router as router_get_result
@@ -15,7 +15,13 @@ from .extend_routes import router as router_extend
 
 router = APIRouter()
 
+# /login, /logout, /mainpage, /startpage 
 router.include_router(router_core)
+
+# /register /remember
+router.include_router(router_register)
+
+
 router.include_router(router_testing)
 router.include_router(router_get_filters)
 router.include_router(router_get_result)

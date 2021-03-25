@@ -76,7 +76,6 @@ async def startpage():
       )
       j=0
 
-      print('manager.permissions:',manager['permissions'])
       for p in manager['permissions']: 
         manager['permissions'][j]=str(manager['permissions'][j])
         #print(f'P:{p},  j:{j}')
@@ -113,10 +112,11 @@ async def startpage():
         left_menu=config.menu
       
   CY=cur_year()
+  
   del manager['password']
   return {
     'title':config['title'],
-    'copyright':config['copyright'],
+    'copyright':config['copyright'].replace('{{cur_year}}',CY),
     'left_menu':left_menu,
     'errors':errors,
     'success': not len(errors),

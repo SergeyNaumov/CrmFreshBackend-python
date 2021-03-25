@@ -27,5 +27,8 @@ config={
   },
   'events':[
     'quiz'
-  ]
+  ],
+  'login':{
+    'register':True,
+  }
 }

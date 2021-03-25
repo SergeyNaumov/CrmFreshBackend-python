@@ -134,7 +134,8 @@ class FreshDB():
         cur.execute(arg['query'],arg['values'])
         self.connect.commit()
       except pymysql.err.ProgrammingError as err:
-
+        if 'errors' in arg: arg['errors'].append(str(err))
+      except pymysql.err.DataError as err:
         if 'errors' in arg: arg['errors'].append(str(err))
         #self.error_str = str(err)
 

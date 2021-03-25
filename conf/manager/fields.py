@@ -39,35 +39,11 @@ def get_fields():
       'unique':1,
       'regexp_rules':[
         '/.{5}/','длина логина должна быть не менее 5 символов',
-        '/^[a-zA-Z0-9\-_@\/]+$/','только символы: a..z,A..Z, 0-9, _, -, @, .'
+        '/^[a-zA-Z0-9\.\-_@\/]+$/','только символы: a..z,A..Z, 0-9, _, -, @, .'
       ],
       'tab':'main'
     },
-    {
-      'description':'Аватар',
-      'type':'file',
-      'name':'photo',
-       'filedir':'./files/manager',
-      # . 'accept':'doc,.docx,.xml,application/msword,application/vnd.openxm
-      # 'accept':'image/png, image/jpeg',
-       'accept':'image/*',
-       #'crops':1,
-       'resize':[
-        {
-          'description':'Горизонтальное фото',
-          'file':'<%filename_without_ext%>_mini1.<%ext%>',
-          'size':'256x256',
-          'quality':'100'
-        },
-      ],
-       'tab':'main'
-    },
-    # {
-    #   'name':'login_tel',
-    #   'description':'Логин для IP-телефонии',
-    #    'type':'text',
-    #    'tab':'main'
-    # },
+
     {
       'description':'Телефон',
       'type':'text',
@@ -77,10 +53,10 @@ def get_fields():
         '^(\+7\d{10})?$/','Если указывается телефон, он должен быть в формате +7XXXXXXXXXX',
       ],
       'replace_rules':[
-        #'/^[87]/':'+7',
-        #'/[^\d\+]+/':'',
-        #'/^([^87\+])/':'+7$1',
-      ],
+        ['/^[87]/','+7'],
+        ['/[^\d\+]+/',''],
+        ['/^([^87\+])/','+7$1']
+      ]
       #regexp':'^(\+\d{6}\d*)?$',
       # replace=>[
       #   ['(^\(|,\s*\()','+7'],
@@ -95,28 +71,7 @@ def get_fields():
       #   ['(\d)\+7','$1, +7']
       # ],
     },
-    {
-      'description':'Добавочный',
-      'type':'text',
-      'name':'phone_dob',
-      'tab':'main',
-      'regexp':'^\d*$'
-    },
-    {
-      'description':'Мобильный телефон',
-      'type':'text',
-      'name':'mobile_phone',
-       'tab':'main',
-       'regexp_rules':[
-            '/^(\+7\d{10})?$/',
-            'Если указывается телефон, он должен быть в формате +7XXXXXXXXXX',
-        ],
-      'replace_rules':[
-        #'/^[87]/':'+7',
-        #'/[^\d\+]+/':'',
-        #'/^([^87\+])/':'+7$1',
-      ],
-    },
+
     {
       'description':'Пароль',
       'name':'password',
@@ -131,10 +86,28 @@ def get_fields():
        'tab':'main'
     },
     {
-      'description':'Вкл',
+      'description':'Зарегистрирован',
+      'type':'datetime',
+      'name':'registered',
+      'read_only':1,
+      'tab':'permissions'
+    },
+    { 
+      'description':'Имеет доступ в систему',
       'name':'enabled',
       'type':'checkbox',
-       'tab':'main'
+      'tab':'permissions'
+    },
+    {
+      'name':'type',
+      'description':'Тип учётной записи',
+      'type':'select_values',
+      'tab':'permissions',
+      'values':[
+        {'v':'1','d':'Сотрудник компании Анна'},
+        {'v':'2','d':'Представитель юридического лица'},
+        {'v':'3','d':'Представитель аптеки'},
+      ]
     },
     {
        'name':'email',
@@ -147,86 +120,7 @@ def get_fields():
 
        'tab':'main'
     },
-    {
-      'description':'Уволен',
-      'type':'checkbox',
-      'name':'gone',
-       'tab':'permissions'
-    },
-    {
-      'description':'Текущая роль',
-      'type':'select_from_table',
-      'table':'manager',
-      'header_field':'name',
-      'value_field':'id',
-      'not_filter':'1',
-      'name':'current_role',
-      # before_code=>sub{
-      #   my $e=shift;
-      #   if(!$form->{is_admin}){
-      #     $e->{where}=qq{id in (select role from manager_role where manager_id=$form->{manager}->{id}) }
-      #   }
-      #   else{
-      #     #$e->{autocomplete}=1
-      #   }
-      # },
-       'tab':'permissions',
 
-    },
-    {
-      'description':'Доступные роли',
-      'name':'manager_role',
-      'type':'1_to_m',
-      'table':'manager_role',
-      'table_id':'id',
-      'foreign_key':'manager_id',
-      'fields':[
-            {
-              'description':'Роль',
-              'name':'role',
-              'type':'select_from_table',
-              'table':'manager',
-              'header_field':'name',
-              'value_field':'id'
-            }
-       ],
-       'tab':'permissions'
-    },
 
-    # {
-    #    'name':'group_id',
-    #    'description':'Группа менеджера',
-    #    'type':'select_from_table',
-    #   'table':'manager_group',
-    #   'tree_use':1,
-    #   'tablename':'mg',
-    #   'header_field':'header',
-    #   'value_field':'id',
-    #    'tab':'permissions',
-    #   # filter_code=>sub{
-    #   #   my $s=$_[0]->{str};
-    #   #   return qq{<a href="./edit_form.pl?config=manager_group&action=edit&id=$s->{mg__id}" target="_blank">$s->{mg__header}</a>}
-    #   # }
-    # },
-
-    {
-      # before_code=>sub{
-      #         my $e=shift;                    
-      #         #$e->{read_only}=1 unless($form->{manager}->{permissions}->{make_change_permissions});
-      # },
-      'description':'Права менеджеров',
-      'type':'multiconnect',
-      'tree_use':1,
-      'tree_table':'permissions',
-      'name':'permissions',
-      'relation_table':'permissions',
-      'relation_save_table':'manager_permissions',
-      'relation_table_header':'header',
-      'relation_save_table_header':'header',
-      'relation_table_id':'id',
-      'relation_save_table_id_worktable':'manager_id',
-      'relation_save_table_id_relation':'permissions_id',
-      'tab':'permissions'
-    },
 
 ]

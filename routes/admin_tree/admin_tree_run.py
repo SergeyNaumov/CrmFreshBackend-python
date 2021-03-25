@@ -138,10 +138,10 @@ def admin_tree_run(**arg):
     action=action,
     id=id
   )
-  if form.errors:
+  if len(form.errors):
     return {
        'success':0,
-       'errors':form['errors']
+       'errors':form.errors
     }
   if not form.sort_field: form.sort_field='sort'
 
@@ -201,11 +201,15 @@ def admin_tree_run(**arg):
           table=form.work_table,
           data=data
         )
+        
+        if not form.id:
+          form.errors.append('произошла ошибка при добавлении раздела. Возможно, превышен максимальный уровень вложенности')
 
         form.run_event('after_insert')
         form.run_event('after_save')
         return {
-          'success':1,
+          'success':form.success(),
+          'errors':form.errors,
           'data':{
             'id':form.id,
             'sort':cur_sort,

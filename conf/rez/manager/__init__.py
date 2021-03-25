@@ -6,9 +6,8 @@ from .events import events
 class Config(Form):
     events=events
     def __init__(self,arg):
-        self.title='Учётные записи системы'
         super().__init__(arg) 
-        
+        self.title='Менеджеры'
         self.explain=0
         self.work_table='manager' 
         self.QUERY_SEARCH_TABLES=[
