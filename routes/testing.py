@@ -1,6 +1,10 @@
 from fastapi import FastAPI, APIRouter
 from config import config
 from db import db,db_read,db_write
+#from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
+from lib.send_mes import send_mes
+
+
 
 
 router = APIRouter()
@@ -53,3 +57,12 @@ async def test_query():
     'result':result,
     'errors':errors
   }
+
+@router.get('/test/mailsend')
+async def testmailsend():
+  send_mes(
+    to='svcomplex@gmail.com',
+    subject='Тестовая тема (Fastapi)',
+    message='<p><b>Привет!</b> Это html!</p>'
+  )
+  return {'ok':1}

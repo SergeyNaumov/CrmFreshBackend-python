@@ -14,12 +14,13 @@ from .testing import router as router_testing
 from .extend_routes import router as router_extend
 
 router = APIRouter()
+# /register /remember
+router.include_router(router_register)
 
 # /login, /logout, /mainpage, /startpage 
 router.include_router(router_core)
 
-# /register /remember
-router.include_router(router_register)
+
 
 
 router.include_router(router_testing)

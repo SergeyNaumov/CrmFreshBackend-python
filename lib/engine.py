@@ -33,8 +33,9 @@ class Engine():
     #self.cookies['User-Agent']=''
 
     hostname=socket.gethostname()
+
     # Если мы не логинимся -- проверяем сессию
-    if self.request.url.path not in ['/login','/testupload']:
+    if self.request.url.path not in ['/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password']:
         if hostname in ['sv-home','sv-digital']:
           self.manager={'id':'1','login':'admin'}
           self.login='admin'

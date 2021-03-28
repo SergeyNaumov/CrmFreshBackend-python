@@ -135,6 +135,7 @@ class FreshDB():
         self.connect.commit()
       except pymysql.err.ProgrammingError as err:
         if 'errors' in arg: arg['errors'].append(str(err))
+
       except pymysql.err.DataError as err:
         if 'errors' in arg: arg['errors'].append(str(err))
         #self.error_str = str(err)
@@ -163,14 +164,21 @@ class FreshDB():
 
       arg['query']='desc '+arg['table']
 
-
-      self.execute(cur, arg)
-      if self.error_str: return {}
       
-      fields=cur.fetchall()
+      self.execute(cur, arg)
+      
+      
       result={}
-      for f in fields:
-        result[ f['Field'] ]=f
+      if self.error_str: 
+        return {}
+      try:
+        fields=cur.fetchall()
+
+        
+        for f in fields:
+          result[ f['Field'] ]=f
+      except pymysql.err.ProgrammingError as err:
+        self.error_str = str(err)
 
       return result
 
@@ -203,8 +211,12 @@ class FreshDB():
 
       self.execute(cur,arg)
       if self.error_str: return {}
-
-      rez=cur.fetchone()
+      try:
+        rez=cur.fetchone()
+      except pymysql.err.ProgrammingError as err:
+        
+        self.error_str = str(err)
+        return None
       
       if exists_arg('to_json',arg):
         return to_json(rez)
@@ -232,6 +244,7 @@ class FreshDB():
       return rez
     def get(self, **arg):
       self.error_str=''
+
       if exists_arg('onerow',arg):
         return self.getrow(**arg)
 
@@ -326,6 +339,10 @@ class FreshDB():
         
         exists_fields=self.desc(table=arg['table'])
         data=arg['data']
+        if self.error_str :
+          print('after desc:',self.error_str)
+          return 
+        
         
 
         insert_fields=[]

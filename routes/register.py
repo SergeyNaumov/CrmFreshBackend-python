@@ -5,6 +5,8 @@ from config import config
 from lib.engine import s
 from lib.session import *
 import re
+from lib.send_mes import send_mes
+
 
 valid_email=re.compile(r"^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$")
 valid_phone=re.compile(r"")
@@ -18,7 +20,7 @@ def exist_login(R):
     values=[R['login']],
     onerow=1
   )
-  
+  #print('errors:',s.db.error_str)
   # если заявки нет, проверяем есть ли такой менеджер
   if not exists:
     exists=s.db.get(
@@ -45,7 +47,7 @@ def check_rules(rules):
 @router.post('/register')
 async def register(R: dict):
   response={'success':0,'errors':[]}
-  
+  print('REGISTER!')
   if R:
     rules=[
        [ (R['phone']),'Телефон не указан'],
@@ -60,13 +62,34 @@ async def register(R: dict):
     if(not len(response['errors'])): # все проверки пройдены, сохраняем
       response['reg_order_id']=s.db.save(
         table='order_reg_company',
+        errors=response['errors'],
         data=R
       );
-      response['success']=1
+      if not len(response['errors']):
+        response['success']=1
+        
 
+      
     
   else:
-    response['errors']=['ошибка в запросе!']
+    response['errors'].append('ошибка в запросе!')
+
+  send_mes(
+    to=R['login'],
+    subject='Ваша заявка на регистрацию была успешно отправлена',
+    message=f"""
+      Ваши регистрационные данные:<br>
+      Наименование компании: {R['firm']}<br>
+      Юридический адрес: {R['ur_address']}<br>
+      ИНН: {R['inn']}<br>
+      Контактное лицо: {R['name']}<br>
+      Контактный телефон: {R['phone']}<br>
+      Email: {R['login']}<br>
+      
+
+      После того, как наш менеджер проверит Вашу заявку на регистрацию и утвердит её, Вы получите дополнительное подтверждение
+    """
+  )
 
   return response
 # Напоминание пароля
@@ -95,8 +118,24 @@ async def remember_get_code(R: dict):
       )
 
       # отправка на manager.email
-      print(manager['email'],remember_code)
+      print('Send Mes: ', manager['email'],remember_code)
+      send_mes(
+        to=manager['email'],
+        subject='Восстановление пароля в система AннА',
+        message=f"""
+          <p>
+            Вы запросили изменение пароля в Системе АннА!<br>
+            Ваш код доступа: {remember_code}
+          </p>
 
+
+          <div style="color: red;">
+            Внимание! Если Вы не запрашивали изменение пароля, проигнорируйте данное сообщение
+          </div>
+
+          После того, как наш менеджер проверит Вашу заявку на регистрацию и утвердит её, Вы получите дополнительное подтверждение
+        """
+      )
     
   
   return response
