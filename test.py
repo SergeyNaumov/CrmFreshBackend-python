@@ -21,23 +21,12 @@ def from_datetime_get_date(dt):
     return rez[0]
   return False
 
-R={'firm': 'Рога и копыта', 'ur_address': 'Москва, Перерва, д4', 'inn': '2362763762', 'name': 'Сергей', 'phone': '+7 (999) 999-99-99', 'login': 'test@test.ru'}
+def print_console_error(text):
+  print("\033[31m {}" .format(text),"\033[0m")
 
-errors=[]
-rules=[
-   [ (R['phone']),'Телефон не указан'],
-   [ (re.match(r'^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$',R['phone'])),'Телефон указан не корректно' ],
-   [ (R['login']),'Email не указан'],
-   [ (re.match(r'^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$',R['login'])),'Email указан не коррктно' ]
-]
-
-print(R['phone'])
-for (reg_res,message) in rules:
-  if not reg_res:
-    errors.append(message)
-    break
-
-print(errors)
+print('обычный текст')
+print_console_error('Ошибка')
+print('обычный текст')
 
 # f={
 #   'name': 'status',

@@ -47,7 +47,7 @@ def process_result_list(form,R,result_list):
       if field['type_orig'] in ['filter_extend_select_values', 'select_values']:
           values_finded=0
           for v in field['values']:
-            if v['v']==value:
+            if str(v['v'])==str(value):
               value,values_finded=v['d'],1
 
           if not values_finded:

@@ -10,9 +10,9 @@ def events_permissions(form):
 def events_before_code(form):
     print('is_before_code')
 
-def before_delete(form):
+def before_delete(form,opt):
     print('before_detele STARTED!')
-    form.errors.append('Вам запрещено удалять!')
+    #form.errors.append('Вам запрещено удалять!')
 
 events={
   'permissions':[

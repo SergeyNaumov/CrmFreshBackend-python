@@ -8,14 +8,18 @@ def get_in_ext_url(form,f):
   print('get_in_ext_url не готова')
 
 def func_get_values(form):
+
     values={}
+    if(hasattr(form,'values')):
+      values=form.values
+    
 
     if form.id:
-      values=form.db.query(
-        query=f'SELECT * from {form.work_table} WHERE {form.work_table_id}=%s',
+      values=form.db.getrow(
+        table=form.work_table,
+        where=f'{form.work_table_id}=%s',
         values=[form.id],
-        onerow=1,
-        #debug=1,
+        str=1,
         log=form.log
       )
       #print('GET_VALUES:',values)
@@ -50,10 +54,7 @@ def func_get_values(form):
           if f['type']=='datetime' and values[name]=='0000-00-00 00:00:00':
             values[name]=''
 
-        # if name in values:
-        #   print('after:',name,':',values[name])
-      # else:
-      #   print('not_wt_field:',f)
+
           
           
 
@@ -73,12 +74,13 @@ def func_get_values(form):
         #values[name]=f['value']
 
 
-
       if name in values:
         if values[name].isnumeric():
           values[name]=str(values[name])
         f['value']=values[name]
 
+      # if 'before_code' in f:
+      #   f['before_code'](form=form,field=f)  
 
 
           

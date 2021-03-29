@@ -16,11 +16,13 @@ class Form():
   #  print('title:',self.title)
   
   def __init__(self,arg): # Значения по умолчанию
+    
     self.title=''
     
     script=arg['script']
     #self.db=s.db
-    self.work_table=''
+    
+    self.work_table=arg['config']
     self.work_table_id='id'
     self.id=''
     self.sort=0
@@ -153,6 +155,12 @@ class Form():
     for field in form.fields:
       if field['name'] in form.new_values:
         check_field(form,field,form.new_values[field['name']])
+  
+  # запускаем before_code для всех полей
+  def run_all_before_code(form): 
+    for f in form.fields:
+      if 'before_code' in f:
+        f['before_code'](form=form,field=f)
 
   def DeleteFile(form):
     return func_delete_file(form)

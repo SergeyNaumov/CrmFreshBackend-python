@@ -1,4 +1,8 @@
-
+def before_code_type(**arg):
+  form=arg['form']
+  field=arg['field']
+  if not field['value']:
+    field['value']='vue'
 
 
 fields=[ 
@@ -21,11 +25,9 @@ fields=[
           {'v':'vue','d':'VUE'},
           {'v':'src','d':'internal_prog'},
         ],
-        'tab':'main'
-        #filter_code':sub{
-        #  use Data::Dumper;
-          #return Dumper($_[0]->{str}->{wt__type})
-        #}
+        'tab':'main',
+        'before_code':before_code_type
+
       },
       {
         'description':'Значение',

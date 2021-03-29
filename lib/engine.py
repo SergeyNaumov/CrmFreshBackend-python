@@ -36,11 +36,11 @@ class Engine():
 
     # Если мы не логинимся -- проверяем сессию
     if self.request.url.path not in ['/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password']:
-        if hostname in ['sv-home','sv-digital']:
+      if hostname in ['sv-home','sv-digital']:
           self.manager={'id':'1','login':'admin'}
           self.login='admin'
           s.use_project=0
-        else:
+      else:
           session_start(self,encrypt_method='mysql_sha2');
 
 

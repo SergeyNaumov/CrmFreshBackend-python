@@ -25,7 +25,7 @@ async def mainpage():
   else:
     
     response['manager']=s.db.query(
-      query='SELECT id,login,name,position, concat("/edit-form/manager/",id) link from manager where id=%s',
+      query='SELECT id,login,name,position, concat("/edit-form/manager/",id) link, type from manager where id=%s',
       values=[s.manager['id']],
       onerow=1,
       debug=1

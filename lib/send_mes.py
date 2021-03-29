@@ -14,15 +14,11 @@ def send_mes(**opt):
   msg['To'] = opt['to']
   msg['Subject'] = opt['subject']
   
-  
-    
-  
   msg.add_header('Content-Type', 'text/html; charset=utf-8')
   #msg.set_payload(opt['message'])
   message_part= MIMEText(opt['message'], 'html')
   msg.attach(message_part)    
   #print(msg['From'], [ msg['To'] ], msg.as_string())
-
 
   try: 
     server=smtplib.SMTP()
@@ -31,6 +27,6 @@ def send_mes(**opt):
     server.set_debuglevel(2)
     server.sendmail(msg['From'], [ msg['To'] ], msg.as_string())
   except ConnectionRefusedError as e:
-    print('ошибка при отправке почты: ', e)
+    print("\033[31m {}" .format('ошибка при отправке почты:'),e,"\033[0m")
   except smtplib.SMTPRecipientsRefused as e:
     print('SMTPRecipientsRefused: ', e)

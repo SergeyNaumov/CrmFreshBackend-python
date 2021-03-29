@@ -39,8 +39,11 @@ async def update_form(config: str,id: int,R: dict):
 async def work_form(config:str,id:int,R:dict):
   action=''
   values=None
-  #print('R:',R)
-  if 'action' in R: action=R['action']
+  
+  if 'action' in R:
+    action=R['action']
+  else:
+    action='edit'
   #if 'values' in R: values=R['values']
   return process_edit_form(
     action=action,
@@ -57,7 +60,7 @@ async def delete_element(config: str,id:int):
     config=config,
     id=id,
     script='delete_element',
-    action=''
+    action='delete'
   )
   if not form.make_delete:
     form.errors.append('удаление запрещено')

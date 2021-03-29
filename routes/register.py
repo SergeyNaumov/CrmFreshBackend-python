@@ -11,21 +11,23 @@ from lib.send_mes import send_mes
 valid_email=re.compile(r"^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$")
 valid_phone=re.compile(r"")
 router = APIRouter()
-
+errors=[]
 def exist_login(R):
   # Проверяем заявку
   exists=s.db.get(
     table='order_reg_company',
     where='login = %s',
+    errors=errors,
     values=[R['login']],
     onerow=1
   )
-  #print('errors:',s.db.error_str)
+  
   # если заявки нет, проверяем есть ли такой менеджер
   if not exists:
     exists=s.db.get(
       table='manager',
       where='login = %s',
+      errors=errors,
       values=[R['login']],
       onerow=1
     )
@@ -36,7 +38,7 @@ def exist_login(R):
 
 
 def check_rules(rules):
-  errors=[]
+  
   for (reg_res,message) in rules:
     if not reg_res:
       errors.append(message)
@@ -46,8 +48,9 @@ def check_rules(rules):
 # Регистрация
 @router.post('/register')
 async def register(R: dict):
+  errors=[]
   response={'success':0,'errors':[]}
-  print('REGISTER!')
+  #print('REGISTER!')
   if R:
     rules=[
        [ (R['phone']),'Телефон не указан'],
@@ -84,7 +87,7 @@ async def register(R: dict):
       ИНН: {R['inn']}<br>
       Контактное лицо: {R['name']}<br>
       Контактный телефон: {R['phone']}<br>
-      Email: {R['login']}<br>
+      Email: {R['login']}<br><br>
       
 
       После того, как наш менеджер проверит Вашу заявку на регистрацию и утвердит её, Вы получите дополнительное подтверждение

@@ -6,6 +6,7 @@ def session_project_create(s): # создание сессии для проек
   print('project_create')
 
 def session_create(s,**arg):
+
   errors=[]
   if not(exists_arg('login',arg)):
     arg['login']='adminX' # $R->{login}
@@ -53,12 +54,15 @@ def session_create(s,**arg):
   
 
   auth_id=None
+
   if arg['encrypt_method']=='mysql_sha2':
       auth_id=s.db.query(
         query='SELECT '+arg['auth_id_field']+' FROM '+arg['auth_table']+' WHERE '+arg['auth_log_field']+'=%s AND '+arg['auth_pas_field']+'=sha2(%s,256)'+add_where,
         values=[arg['login'],arg['password']],
-        onevalue=True
+        onevalue=True,
+        debug=0
       )
+
   else:
       auth_id=s.db.query(
           query="SELECT "+arg['auth_id_field']+' FROM '+arg['auth_table']+' WHERE '+arg['auth_log_field']+'=%s AND '+arg['auth_pas_field']+'=%s '+add_where,
@@ -118,6 +122,8 @@ def session_start(s,**arg):
         values=[user_id],
         onerow=1,errors=errors
       );
+
+      manager['id']=str(manager['id'])
       if manager:
         del manager['password']
         s.manager=manager
@@ -216,6 +222,7 @@ def get_permissions_for(form,login):
     """,
     values=[login],onerow=1,log=form.log
   )
+  manager['id']=str(manager['id'])
   
   if manager['password']: del manager['password']
   

@@ -101,6 +101,10 @@ def get_child_field(field,name):
     if f['name']==name: return f
   return None
 
+# Вывод ошибки в консоль
+def print_console_error(text):
+  print("\033[31m {}" .format(text),"\033[0m")
+
 def del_file_and_resizes(**arg):
   field=arg['field']
   value=arg['value']

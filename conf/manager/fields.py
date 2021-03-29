@@ -3,26 +3,23 @@ def send_mes():
     print()
 
 def password_method_send(new_password):
-            send_mes()
+  send_mes()
+
+def type_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
+  if(form.action == 'new'):
+    field['value']='1'
+
+
+def enabled_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
+  if(form.action == 'new'):
+    field['value']='1'
 
 def get_fields():
     return [ 
-
- {
-      'description':'ID',
-      'name':'id',
-      'type':'text',
-      'read_only':1,
-      'filter_on':1
-
-    },
-    {
-      'name':'name',
-      'description':'Имя',
-      'type':'text',
-      'tab':'main',
-      'filter_on':1
-    },
     {
       'name':'login',
       'description':'Логин',
@@ -43,7 +40,19 @@ def get_fields():
       ],
       'tab':'main'
     },
-
+    {
+      'description':'Пароль',
+      'name':'password',
+      'type':'password',
+      'encrypt_method':'sha256',
+      'methods_send':[
+        {
+          'description':'сохранить',
+          'method_send':password_method_send
+        }
+      ],
+       'tab':'main'
+    },
     {
       'description':'Телефон',
       'type':'text',
@@ -72,19 +81,15 @@ def get_fields():
       # ],
     },
 
+
     {
-      'description':'Пароль',
-      'name':'password',
-      'type':'password',
-      'encrypt_method':'sha256',
-      'methods_send':[
-        {
-          'description':'сохранить',
-          'method_send':password_method_send
-        }
-      ],
-       'tab':'main'
+      'name':'name',
+      'description':'Имя',
+      'type':'text',
+      'tab':'main',
+      'filter_on':1
     },
+
     {
       'description':'Зарегистрирован',
       'type':'datetime',
@@ -96,17 +101,19 @@ def get_fields():
       'description':'Имеет доступ в систему',
       'name':'enabled',
       'type':'checkbox',
-      'tab':'permissions'
+      'tab':'permissions',
+      'before_code':enabled_before_code
     },
     {
       'name':'type',
       'description':'Тип учётной записи',
       'type':'select_values',
       'tab':'permissions',
+      'before_code':type_before_code,
       'values':[
-        {'v':'1','d':'Сотрудник компании Анна'},
-        {'v':'2','d':'Представитель юридического лица'},
-        {'v':'3','d':'Представитель аптеки'},
+        {'v':1,'d':'Сотрудник компании Анна'},
+        {'v':2,'d':'Представитель юридического лица'},
+        {'v':3,'d':'Представитель аптеки'},
       ]
     },
     {

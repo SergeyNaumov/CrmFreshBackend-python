@@ -47,7 +47,7 @@ def process_edit_form(**arg):
     values=values,
     script='edit_form'
   )
-
+  
   field=None
   if 'name' in R and R['name']:
     field=form.fields_hash[R['name']]
@@ -63,8 +63,10 @@ def process_edit_form(**arg):
 
   form.set_orig_types()
   form.run_event('permissions')
+  
   form.get_values()
-
+  form.run_all_before_code()
+  
   if form.action in ['update','insert']:
     form.new_values=values
     form.check() # проверяем все поля в new_values

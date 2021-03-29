@@ -2,7 +2,11 @@ import pymysql
 import json
 import re
 from .transform import tree_use_transform, massive_transform
-
+from lib.core import print_console_error
+def rez_to_str(rez):
+  for k in rez:
+    rez[k]=str(rez[k])
+    
 def exists_arg(key,dict):
   if (key in dict) and dict[key]:
     return True
@@ -213,6 +217,9 @@ class FreshDB():
       if self.error_str: return {}
       try:
         rez=cur.fetchone()
+        if exists_arg('str',arg):
+          rez_to_str(rez)
+
       except pymysql.err.ProgrammingError as err:
         
         self.error_str = str(err)
@@ -288,7 +295,9 @@ class FreshDB():
         try:
           rez = cur.fetchone()
         except pymysql.err.ProgrammingError as err:
-          print("\033[31m {}",'ERR:',err,arg['query'])
+          #print("\033[31m {}",'ERR:',err,arg['query'])
+          print_console_error(err)
+          print(arg['query'])
           return None
         if rez: rez=rez[0]
       else:
@@ -296,7 +305,9 @@ class FreshDB():
             try:
               rez=cur.fetchone()
             except pymysql.err.ProgrammingError as err:
-              print("\033[31m {}",'ERR:',err,arg['query'])
+              #print("\033[31m {}",'ERR:',err,arg['query'])
+              print_console_error(err)
+              print(arg['query'])
               return None
 
           else:

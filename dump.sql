@@ -1,3 +1,11 @@
+ CREATE TABLE `crm_news` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `header` varchar(255) NOT NULL DEFAULT '',
+  `body` text,
+  `registered` date NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ 
 CREATE TABLE `manager` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `login` varchar(50) NOT NULL DEFAULT '',
