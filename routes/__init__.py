@@ -9,6 +9,7 @@ from .get_result_routes import router as router_get_result
 from .edit_form_routes import router as router_edit_form
 from .one_to_m_routes import router as router_one_to_m
 from .testing import router as router_testing
+from .anna import router as router_anna
 
 # Расширения
 from .extend_routes import router as router_extend
@@ -30,6 +31,7 @@ router.include_router(router_admin_tree)
 router.include_router(router_edit_form)
 router.include_router(router_one_to_m)
 router.include_router(router_extend)
+router.include_router(router_anna,prefix='/anna')
 
 
 

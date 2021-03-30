@@ -1,7 +1,7 @@
 config={
   'title':'CRM Digital',
   'copyright':'copyright 2005 - {{cur_year}}',
-  'encrypt_methon':'mysql_sha2',
+  'encrypt_method':'mysql_sha2',
   'use_project':False,
   'system_email':'svcomplex@gmail.com',
   'connects':{
@@ -28,7 +28,19 @@ config={
   'events':[
     'quiz'
   ],
+
   'login':{
-    'register':True,
+    'register':True, # возможность регистрации
+    'remember':True, # возможность напоминания пароля
+    
+    # Доступно без авторизации
+    'not_login_access': [
+        '/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password'
+    ]
+  },
+  'debug':{ # для отладки
+    'hosts':['sv-home','sv-digital'],
+    'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+
   }
 }

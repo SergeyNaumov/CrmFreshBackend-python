@@ -24,13 +24,13 @@ async def mainpage():
     )
   else:
     
-    response['manager']=s.db.query(
-      query='SELECT id,login,name,position, concat("/edit-form/manager/",id) link, type from manager where id=%s',
+    response['manager']=s.db.getrow(
+      table="manager",
+      select_fields='id,login,name,position, concat("/edit-form/manager/",id) link',
+      where='id=%s',
       values=[s.manager['id']],
-      onerow=1,
-      debug=1
+      str=1,
     )
-
 
     response['news_list']=s.db.query(
       query='SELECT header,DATE_FORMAT(registered, %s) registered, body from crm_news order by registered desc limit 5',
@@ -63,10 +63,12 @@ async def startpage():
       )
 
   else:
+
       manager=s.db.query(
         query='select *,concat("/edit_form/manager/",id) link from manager where login=%s',
         values=[s.login],
-        onerow=1
+        onerow=1,
+        debug=1
       )
       
       manager['permissions']=s.db.query(

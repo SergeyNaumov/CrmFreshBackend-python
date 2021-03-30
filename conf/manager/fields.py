@@ -81,15 +81,34 @@ def get_fields():
       # ],
     },
 
-
     {
-      'name':'name',
+      'name':'name_f',
+      'description':'Полное имя',
+      'type':'text',
+      'tab':'main',
+      'filter_on':1
+    },
+    {
+      'name':'name_f',
+      'description':'Фамилия',
+      'type':'text',
+      'tab':'main',
+      'filter_on':1
+    },
+    {
+      'name':'name_i',
       'description':'Имя',
       'type':'text',
       'tab':'main',
       'filter_on':1
     },
-
+    {
+      'name':'name_o',
+      'description':'Отчество',
+      'type':'text',
+      'tab':'main',
+      'filter_on':1
+    },
     {
       'description':'Зарегистрирован',
       'type':'datetime',

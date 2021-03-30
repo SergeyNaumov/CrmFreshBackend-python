@@ -4,12 +4,12 @@ from config import config
 #from db import db,db_read,db_write
 from lib.engine import s
 from lib.session import *
-import re
+#import re
 from lib.send_mes import send_mes
+from lib.form_control import check_rules, is_email, is_phone
 
-
-valid_email=re.compile(r"^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$")
-valid_phone=re.compile(r"")
+#valid_email=re.compile(r"^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$")
+#valid_phone=re.compile(r"")
 router = APIRouter()
 errors=[]
 def exist_login(R):
@@ -19,6 +19,7 @@ def exist_login(R):
     where='login = %s',
     errors=errors,
     values=[R['login']],
+
     onerow=1
   )
   
@@ -37,13 +38,7 @@ def exist_login(R):
 
 
 
-def check_rules(rules):
-  
-  for (reg_res,message) in rules:
-    if not reg_res:
-      errors.append(message)
-      break
-  return errors
+
 
 # Регистрация
 @router.post('/register')
@@ -54,9 +49,9 @@ async def register(R: dict):
   if R:
     rules=[
        [ (R['phone']),'Телефон не указан'],
-       [ (re.match(r'^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$',R['phone'])),'Телефон указан не корректно' ],
+       [ is_phone(R['phone']),'Телефон указан не корректно' ],
        [ (R['login']),'Email не указан'],
-       [ (re.match(r'^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$',R['login'])),'Email указан не корректно' ],
+       [ is_email(R['login']),'Email указан не корректно' ],
        [ not exist_login(R), 'Такой Emal уже существует в нашей системе. Пожалуйста укажите другой, или воспользуетесь <a href="/remember">формой восстановления пароля</a>']
     ]
 
@@ -82,11 +77,16 @@ async def register(R: dict):
     subject='Ваша заявка на регистрацию была успешно отправлена',
     message=f"""
       Ваши регистрационные данные:<br>
-      Наименование компании: {R['firm']}<br>
+      Наименование компании: {R['firm']}<br><br>
+      
+      <b>Контактное лицо:</b><br>
+      Фамилия: {R['name_f']}<br>
+      Имя: {R['name_i']}<br>
+      Отчество: {R['name_o']}<br>
       Юридический адрес: {R['ur_address']}<br>
       ИНН: {R['inn']}<br>
-      Контактное лицо: {R['name']}<br>
-      Контактный телефон: {R['phone']}<br>
+      
+      Телефон: {R['phone']}<br>
       Email: {R['login']}<br><br>
       
 
@@ -195,6 +195,7 @@ async def remember_check_code(R: dict):
       response['errors'].append('код не подошёл')
 
   return response
+
 
 # @router.get('/logout')
 # async def logout():

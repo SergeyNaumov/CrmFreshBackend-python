@@ -41,6 +41,8 @@ def get_func(f):
     if rez: return rez[1]
   return ''
 
+
+
 def from_datetime_get_date(dt):
   if not dt: return False
   rez=re.search('^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2}(:\d{2})?)?$',dt)

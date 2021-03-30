@@ -4,7 +4,7 @@ import socket # только для определения hostname
 import json
 from db import db,db_read,db_write
 from .session import *
-
+from config import config
 class Engine():
   def __init__(self,**arg):
     self.manager={}
@@ -33,15 +33,29 @@ class Engine():
     #self.cookies['User-Agent']=''
 
     hostname=socket.gethostname()
-
+    print('hosts:',config['debug']['hosts'],'host:',hostname)
     # Если мы не логинимся -- проверяем сессию
-    if self.request.url.path not in ['/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password']:
-      if hostname in ['sv-home','sv-digital']:
-          self.manager={'id':'1','login':'admin'}
-          self.login='admin'
-          s.use_project=0
+    s.use_project=config['use_project']
+        
+    if not(self.request.url.path in config['login']['not_login_access']):
+
+      if hostname in config['debug']['hosts']:
+        self.manager=db.getrow(
+          table="manager",
+          select_fields="id,login",
+          where="id=%s",
+          values=[config['debug']['manager_id']]
+        )
+        print('manager:',self.manager)
+        self.login=self.manager['login']
       else:
-          session_start(self,encrypt_method='mysql_sha2');
+        print('NOT IN')
+        session_start(self,encrypt_method=config['encrypt_method']);
+
+            
+            
+      
+          
 
 
     

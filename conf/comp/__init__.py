@@ -9,7 +9,7 @@ class Config(Form):
         super().__init__(arg) 
         
         self.title='Юридические лица'
-        self.explain=0
+        self.explain=1
         
         self.QUERY_SEARCH_TABLES=[
             {'table':self.work_table,'alias':'wt'}
