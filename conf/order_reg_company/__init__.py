@@ -10,7 +10,10 @@ class Config(Form):
         
         self.title='Заявки на регистрацию юридических лиц'
         self.explain=0
-        
+        self.make_delete=0
+        self.not_create=1
+        self.read_only=0
+
         self.QUERY_SEARCH_TABLES=[
             {'table':self.work_table,'alias':'wt'}
         ]

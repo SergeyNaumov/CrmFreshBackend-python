@@ -21,7 +21,6 @@ def delete_file(form,field,child_field,one_to_m_id):
     """,
     values=[form.id,one_to_m_id],
     onevalue=1,
-    debug=1,
     errors=form.errors
   )
   #print('oldfile:',oldfile)

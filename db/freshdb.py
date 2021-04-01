@@ -396,5 +396,10 @@ class FreshDB():
         arg['values']=insert_values
 
         cur = pymysql.cursors.DictCursor(self.connect)
-        self.execute(cur,arg)
+      
+        try:
+          self.execute(cur,arg)
+        except pymysql.err.IntegrityError as err:
+          if 'errors' in arg: arg['errors'].append(str(err))
+          out_error(self,"FreshDB::"+str(err),arg)
         return cur.lastrowid

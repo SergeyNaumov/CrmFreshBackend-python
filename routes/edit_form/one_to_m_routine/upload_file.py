@@ -64,7 +64,6 @@ def upload_file(form,field,arg):
           query=f'SELECT {child_field["name"]} from {field["table"]} WHERE {field["foreign_key"]}=%s and {field["table_id"]}=%s',
           values=[form.id,arg["one_to_m_id"] ],
           onevalue=1,
-          debug=1,
           errors=form.errors
         )
 
@@ -109,7 +108,6 @@ def upload_file(form,field,arg):
         
         id = form.db.save(
           table=field['table'],
-          debug=1,
           data={
             field['foreign_key']:form.id,
             child_field_name:db_value

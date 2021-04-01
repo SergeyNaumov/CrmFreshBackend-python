@@ -23,7 +23,6 @@ def insert_or_update(form,field,arg):
           data[field['table_id']]=form.db.save(
             table=field['table'],
             data=data,
-            debug=1,
             errors=form.errors,
           )
 
@@ -42,7 +41,6 @@ def insert_or_update(form,field,arg):
             update=1,
             errors=form.errors,
             data=data,
-            debug=1
           )
 
           data=form.db.query(

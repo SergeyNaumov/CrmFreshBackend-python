@@ -39,6 +39,7 @@ def process_edit_form(**arg):
   if 'values' in R:
     values=R['values']
   if 'id' not in arg: arg['id']=''
+  
   form=read_config(
     action=action,
     config=config,
@@ -51,21 +52,23 @@ def process_edit_form(**arg):
   field=None
   if 'name' in R and R['name']:
     field=form.fields_hash[R['name']]
-
+  
   #print("\nField:\n",field)
-  if len(form.errors): return form
-
+  #if len(form.errors): return form
+  
   if form.not_create and form.action in ['insert','new']:
     form.read_only=1
-
+  
   if form.action == 'insert' and form.not_create:
     form.errors.append('Вам запрещено создавать новые записи')
-
-  form.set_orig_types()
-  form.run_event('permissions')
   
-  form.get_values()
-  form.run_all_before_code()
+  form.set_orig_types()
+  
+  # Перенёс в .lib.all_configs.read_form
+  #form.run_event('permissions')
+  
+  #form.get_values()
+  #form.run_all_before_code()
   
   if form.action in ['update','insert']:
     form.new_values=values
@@ -81,7 +84,9 @@ def process_edit_form(**arg):
   else:
     if form.action in ['new','edit']:
       if len(form.errors): form.read_only=1
+    
     form.edit_form_process_fields()
+    
     return {
       'title':form.title,
       'success':form.success(),

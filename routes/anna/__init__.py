@@ -2,6 +2,7 @@ from fastapi import FastAPI, APIRouter
 from lib.engine import s
 from lib.send_mes import send_mes
 from lib.form_control import check_rules, is_email, is_phone
+from lib.core import exists_arg
 
 router = APIRouter()
 
@@ -20,11 +21,12 @@ def password_ok(p):
         values=[s.manager['id'],p],
         onevalue=1
     )
-def get_manager_data():
+def get_manager_data(errors=[]):
     return s.db.getrow(
           table="manager",
           select_fields='id,login,name_f,name_i,name_o,name,phone,type',
           where='id=%s',
+          errors=errors,
           values=[s.manager['id']],
     )
 
@@ -33,34 +35,43 @@ async def get_reg_data():
     response={
         'success':1,
         'comp_list':[],
-        'apt_list':[]
+        'apt_list':[],
     }
-    manager=get_manager_data()
-    response['manager']=manager
-    # Менеджер Анна
-    if manager['type']==1:
-        response['comp_list'] = s.db.get(
-            table='comp',
-            where="anna_manager_id = %s",
-            values=[s.manager['id']]
-        )
+    errors=[]
+    manager=get_manager_data(errors)
 
-    # Представитель юридического лица
-    if manager['type']==2:
-        response['comp_list']=s.db.get(
-            table='comp',
-            select_fields='id,header,inn,phone,email,email_for_notify,0 more',
-            where='manager_id = %s',
-            values=[s.manager['id']]
-        )
+    if not len(errors):
+        response['manager']=manager
+        # Менеджер Анна
+        if str(manager['type'])=="1":
+            response['comp_list'] = s.db.get(
+                table='comp',
+                where="anna_manager_id = %s",
+                values=[s.manager['id']]
+            )
 
-    # Представитель аптеки
-    if manager['type']==3:
-        response['apt_list']=s.db.get(
-            table='apteka',
-            where='manager_id = %s',
-            values=[s.manager['id']]
-        )
+        # Представитель юридического лица
+        if str(manager['type'])=="2":
+            response['comp_list']=s.db.get(
+                table='comp',
+                select_fields='*, 0 more',
+                where='manager_id = %s',
+                values=[s.manager['id']],
+                errors=errors
+            )
+
+        # Представитель аптеки
+        if str(manager['type'])=="3":
+            
+            response['apt_list']=s.db.get(
+                table='apteka',
+                select_fields='*, 0 more',
+                where='manager_id = %s',
+                values=[s.manager['id']],
+                errors=errors
+            )
+    response['errors']=errors
+    if len(errors): response['success']=0
     return response
 
 # Проверка пароля
@@ -137,7 +148,8 @@ async def change_reg_data(R:dict):
        
        [ not exist_login(R['login']), 'Такой Логин уже существует в нашей системе. Пожалуйста укажите другой, или воспользуетесь <a href="/remember">формой восстановления пароля</a>']
     ]
-    errors=check_rules(rules)
+    errors=[]
+    check_rules(rules,errors)
     if len(errors):
         success=0
     else:
@@ -165,12 +177,54 @@ async def change_comp_order(R:dict):
        [ (R['phone']),'Телефон не указан'],
        [ is_phone(R['phone']),'Телефон указан не корректно' ],
        [ (R['email']),'Email не указан'],
-
        [ is_email(R['email']),'Email указан не корректно, укажите валидный email' ],
        [ (R['header']),'Заполните наименование компании'],
        [ (  not(R['inn']) or len(R['inn'])==10 or len(R['inn'])==12 ),'ИНН должен быть 10 или 12 цифр'],
        
        
     ]
-    errors=check_rules
+    check_rules(rules,errors)
+
+    if not len(errors):
+        R['manager_id']=s.manager['id']
+        s.db.save(
+            table="change_comp_order",
+            data=R,
+            errors=errors
+        )
+
+    if len(errors):
+        success=0
+
+    return {'success':success,'errors':errors}
+
+# Заявка на изменение данных аптеки
+@router.post('/change-apteka-order')
+async def change_comp_order(R:dict):
+    errors=[]
+    success=1
+    rules=[
+       [ (exists_arg('apteka_id',R) and str(R['apteka_id']).isdigit()) ,'Не указан comp_id. обратитесь к разработчику'],
+       [ (R['phone']),'Телефон не указан'],
+       [ is_phone(R['phone']),'Телефон указан не корректно' ],
+       [ (R['email']),'Email не указан'],
+       [ is_email(R['email']),'Email указан не корректно, укажите валидный email' ],
+       [ (R['header']),'Заполните наименование компании'],
+       [ (  not(R['inn']) or len(R['inn'])==10 or len(R['inn'])==12 ),'ИНН должен быть 10 или 12 цифр'],
+       
+       
+    ]
+    check_rules(rules,errors)
+
+    if not len(errors):
+        R['manager_id']=s.manager['id']
+        s.db.save(
+            table="change_apteka_order",
+            data=R,
+            errors=errors
+        )
+
+    if len(errors):
+        success=0
+
     return {'success':success,'errors':errors}

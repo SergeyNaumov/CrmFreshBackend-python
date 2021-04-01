@@ -46,7 +46,6 @@ def save_base64_file(**arg):
     old_photo=form.db.query(
       query=f'SELECT {field["name"]} from {arg["table"]} WHERE id=%s',
       values=[arg['id']],
-      debug=1,
       onevalue=1,
       errors=form.errors
     )
@@ -74,7 +73,6 @@ def save_base64_file(**arg):
       query=f'UPDATE {arg["table"]} SET {field["name"]}=%s where id=%s',
       errors=form.errors,
       values=[filename,arg['id']],
-      debug=1
     )
 
   

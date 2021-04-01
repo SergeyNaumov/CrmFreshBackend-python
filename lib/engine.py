@@ -33,8 +33,9 @@ class Engine():
     #self.cookies['User-Agent']=''
 
     hostname=socket.gethostname()
-    print('hosts:',config['debug']['hosts'],'host:',hostname)
+    
     # Если мы не логинимся -- проверяем сессию
+    s.config=config
     s.use_project=config['use_project']
         
     if not(self.request.url.path in config['login']['not_login_access']):
@@ -46,7 +47,7 @@ class Engine():
           where="id=%s",
           values=[config['debug']['manager_id']]
         )
-        print('manager:',self.manager)
+        
         self.login=self.manager['login']
       else:
         print('NOT IN')

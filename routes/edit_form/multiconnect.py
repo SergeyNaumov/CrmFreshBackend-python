@@ -1,6 +1,6 @@
 from lib.core import exists_arg
 from lib.all_configs import read_config
-from lib.multiconnect import get_values
+from lib.CRM.form.multiconnect import get_values
 
 
 def get_tag_id(form,header):
@@ -20,6 +20,7 @@ def check_defaults(form,field):
     'relation_save_table_id_worktable':form.work_table+'_id',
     'relation_save_table_id_relation':field['relation_table']+'_id'
   }
+  
   for k in defaults.keys():
     if not k in field: field[k]=defaults[k]
 
@@ -32,8 +33,14 @@ def get(form,field):
   if exists_arg('tree_use',field):
     if where: where+=' AND '
     where+='parent_id is null'
+    select_fields=f'{field["relation_table_id"]} id, {field["relation_save_table_header"]} header'
+
+    # В элементе v-treeview нет возможности задизейблить весь элемент, поэтому для каждой галочки добавляем read_only:
+    if form.read_only or exists_arg('read_only',field):
+      select_fields+=',1 read_only'
+    
   _list=form.db.get(
-    select_fields=f'{field["relation_table_id"]} id, {field["relation_save_table_header"]} header',
+    select_fields=select_fields,
     table=field["relation_table"],
     where=where,
     order=exists_arg('relation_tree_order',field),

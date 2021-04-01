@@ -1,6 +1,6 @@
 from lib.core import exists_arg, is_wt_field, from_datetime_get_date
 #from routes.edit_form.multiconnect import save as multiconnect_save
-from lib.multiconnect import save as multiconnect_save
+from .multiconnect import save as multiconnect_save
 
 def save_form(form,arg):
   if len(form.errors): return
@@ -23,7 +23,11 @@ def save_form(form,arg):
 
       
       if is_wt_field(f):
-        if f['type'] in ['switch','checkbox','select_values','select_from_table'] and not v:
+        
+
+
+
+        if f['type'] in ['switch','checkbox','select_values','select_from_table','select'] and not v:
           v='0'
 
         if f['type'] in ['date','datetime'] :
@@ -42,13 +46,17 @@ def save_form(form,arg):
           
         if f['type']=='time' and not v:
           v='00:00:00'
-          
-        #if type in ['select_from_table','select_values'] a:
-        #  continue
-        #if v != None:
-
 
         save_hash[name]=v
+
+      # Если мы только создаём карточку -- пароль также разрешено сохранить
+      if(f['type']=='password' and form.action=='insert'):
+        if form.s.config['encrypt_method'] == 'mysql_sha2':
+          save_hash[name]=form.db.query(
+            query="select sha2(%s,256)",
+            values=[v],
+            onevalue=1
+          )
   
   if form.success() and len(save_hash):
     #print('save_hash:',save_hash)

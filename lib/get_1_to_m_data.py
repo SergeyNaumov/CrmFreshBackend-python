@@ -70,11 +70,11 @@ def get_1_to_m_data(form,f):
         where=where,
         order=order,
         errors=form.errors,
+        
         log=form.log,
-        debug=1
       )
 
-      print('ONETOM_DATA:',data)
+      #print('ONETOM_DATA:',data)
       
       #element_fields={}
       for d in data:

@@ -30,7 +30,6 @@ def delete_file(form,arg={}):
         query=f'UPDATE {form.work_table} SET {name}="" {keep_str} WHERE {form.work_table_id}=%s',
         errors=form.errors,
         values=[form.id],
-        debug=1
       )
 
 

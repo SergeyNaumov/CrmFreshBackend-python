@@ -1,31 +1,35 @@
 from lib.CRM.form import Form
 from .fields import get_fields
 from .events import events
-
+from .ajax import ajax
 
 class Config(Form):
     events=events
-    def __init__(self,arg):
+    def __init__(form,arg):
         super().__init__(arg) 
 
-        self.title='Учётные записи системы'
-        self.explain=0
-        self.work_table='manager' 
-        self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'},
+        form.title='Учётные записи системы'
+        form.explain=0
+        form.work_table='manager' 
+        form.QUERY_SEARCH_TABLES=[
+            {'table':form.work_table,'alias':'wt'},
         ]
-        self.events=events
-        #self.explain=1
-        self.cols=[
+        form.read_only=1
+        form.events=events
+        form.explain=0
+        form.cols=[
             [ # Колонка1
               {'description':'Общая информация','name':'main'},
             ],
             [
+              {'description':'Юридические лица','name':'comp','hide':1},
+              {'description':'Аптеки','name':'apteka','hide':1},
               {'description':'Права','name':'permissions'},
+              
             ]
         ]
-        self.filters_groups=[]
-        self.on_filters=[
+        form.filters_groups=[]
+        form.on_filters=[
             # {
             #     'name':'address'
             # },
@@ -34,18 +38,9 @@ class Config(Form):
             #     #'value':["2020-01-01","2020-01-02"]
             # },
         ]
-        self.search_on_load=1
-        self.fields=get_fields()
+        form.search_on_load=1
+        form.ajax=ajax
 
-"""
-create table test(
-    id int primary key auto_increment,
-    address varchar(255) not null default '',
-    textarea text,
-    wysiwyg text,
-    checkbox tinyint unsigned not null default '0',
-    switch  tinyint unsigned not null default '0',
-    f_datetime datetime,
-    status  tinyint unsigned not null default '0'
-) engine=innodb default charset=utf8;
-"""
+        # обязательно через функцию, чтобы очищались
+        form.fields=get_fields()
+

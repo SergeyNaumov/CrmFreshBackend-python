@@ -77,7 +77,7 @@ fields=[
             'name':'permission_id',
             'type':'select_from_table',
             'order':'sort',
-            'tree_use':1,
+            #'tree_use':1,
             'table':'permissions',
             'value_field':'id',
             'header_field':'header',

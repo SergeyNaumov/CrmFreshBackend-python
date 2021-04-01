@@ -10,7 +10,7 @@ router = APIRouter()
 @router.get('/mainpage')
 async def mainpage():
   curdate=cur_date(format="%d.%m.%Y")
-  response={'curdate':curdate}
+  response={'curdate':curdate,'errors':[],'success':1}
   if s.project:
     response['manager']=s.db.query(
       query='SELECT id,login,name,position, concat("/edit-form/project_manager/",id) link from project_manager where project_id=%s and id=%s',
@@ -29,6 +29,7 @@ async def mainpage():
       select_fields='id,login,name,position, concat("/edit-form/manager/",id) link',
       where='id=%s',
       values=[s.manager['id']],
+      errors=response['errors'],
       str=1,
     )
 
@@ -37,9 +38,11 @@ async def mainpage():
       values=["%e.%m.%y"]
     )
   
-  if not response['manager']:
-    print('отсутствует запись с manager.id=='+s.manager['id'])
-
+  if not len(response['errors']) and not response['manager']:
+    response['errors'].append('отсутствует запись с manager.id=='+str(s.manager['id']))
+  
+  if len(response['errors']):
+    response['success']=0
   return response
 
 # Стартовая страница
@@ -68,7 +71,6 @@ async def startpage():
         query='select *,concat("/edit_form/manager/",id) link from manager where login=%s',
         values=[s.login],
         onerow=1,
-        debug=1
       )
       
       manager['permissions']=s.db.query(
@@ -159,7 +161,7 @@ async def login(R: dict):
         login=R['login'],
         password=R['password'],
         ip=s.env['x-real-ip'],
-        encrypt_method=config['encrypt_methon'],
+        encrypt_method=config['encrypt_method'],
         max_fails_login=3,
         max_fails_login_interval=3600,
         max_fails_ip=20,

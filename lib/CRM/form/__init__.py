@@ -158,9 +158,26 @@ class Form():
   
   # запускаем before_code для всех полей
   def run_all_before_code(form): 
-    for f in form.fields:
-      if 'before_code' in f:
-        f['before_code'](form=form,field=f)
+    for field in form.fields:
+      if 'before_code' in field:
+        #form.run_event(form,'before_code for '+f['name'],f)
+        try:
+          field['before_code'](form=form,field=field)
+        except AttributeError as e:
+          form.errors.append(str(e))
+        # except ValueError as e:
+        #   form.errors.append(str(e))
+        # finally:
+        #   form.errors.append('Ошибка')
 
   def DeleteFile(form):
     return func_delete_file(form)
+
+  def pre(form,data):
+    form.log.append(data)
+
+  def get_field(form,field_name):
+    for f in form.fields:
+      if(f['name']==field_name):
+        return f
+    return None

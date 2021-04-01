@@ -33,8 +33,15 @@ def read_config(**arg):
   
   config_class=configs[arg['config']]
   form=config_class(arg)
+  form.s=s
   form.default_config_attr(arg)
   form.set_orig_types()
+  # Перенёс из routes.edit_form.process_edit_form.py
+  form.run_event('permissions')
+  
+  form.get_values()
+  form.run_all_before_code()
+
   #default_config_attr(form,arg)
 
 

@@ -8,6 +8,10 @@ from .get_filters_routes import router as router_get_filters
 from .get_result_routes import router as router_get_result
 from .edit_form_routes import router as router_edit_form
 from .one_to_m_routes import router as router_one_to_m
+from .password import router as router_password
+from .ajax import router as router_ajax
+
+# Роутеры, не входящие в систему
 from .testing import router as router_testing
 from .anna import router as router_anna
 
@@ -17,7 +21,8 @@ from .extend_routes import router as router_extend
 router = APIRouter()
 # /register /remember
 router.include_router(router_register)
-
+router.include_router(router_password)
+router.include_router(router_ajax)
 # /login, /logout, /mainpage, /startpage 
 router.include_router(router_core)
 
@@ -31,6 +36,7 @@ router.include_router(router_admin_tree)
 router.include_router(router_edit_form)
 router.include_router(router_one_to_m)
 router.include_router(router_extend)
+
 router.include_router(router_anna,prefix='/anna')
 
 

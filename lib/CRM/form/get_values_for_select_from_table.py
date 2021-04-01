@@ -49,9 +49,13 @@ def get_values_for_select_from_table(form,f):
     _lst = f['list']
   else:
     lst=form.db.query(
-      query=query,errors=form.errors,
-      debug=1
+      query=query,
+      errors=form.errors
     )
+    
+    if len(form.errors): 
+      return lst
+    
     if not len(lst): lst=[]
     lst.insert(0,{'v':'0','d':'выберите значение'})
     # else:

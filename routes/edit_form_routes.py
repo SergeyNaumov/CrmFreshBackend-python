@@ -80,7 +80,6 @@ async def delete_element(config: str,id:int):
     form.db.query(
       query=f'DELETE FROM {form.work_table} WHERE {form.work_table_id}=%s',
       values=[form.id],
-      debug=1,
       errors=form.errors
     )
 

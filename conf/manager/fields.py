@@ -5,11 +5,23 @@ def send_mes():
 def password_method_send(new_password):
   send_mes()
 
+def permissions_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
+
+  # Для администратора или для менеджера с галкой открываем возможность изменять права доступа
+  if form.is_admin:
+    field['read_only']=0
+  
+    
+
 def type_before_code(**arg):
   form=arg['form']
   field=arg['field']
+  
   if(form.action == 'new'):
     field['value']='1'
+  s=form.s
 
 
 def enabled_before_code(**arg):
@@ -36,35 +48,43 @@ def get_fields():
       'unique':1,
       'regexp_rules':[
         '/.{5}/','длина логина должна быть не менее 5 символов',
-        '/^[a-zA-Z0-9\.\-_@\/]+$/','только символы: a..z,A..Z, 0-9, _, -, @, .'
+        #'/^[a-zA-Z0-9\.\-_@\/]+$/','только символы: a..z,A..Z, 0-9, _, -, @, .'
       ],
+      'frontend':{'ajax':{'name':'login','timeout':600}},
       'tab':'main'
     },
     {
       'description':'Пароль',
       'name':'password',
       'type':'password',
-      'encrypt_method':'sha256',
+      'min_length':8,
+      'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#!@$%^&*();=-+.,;\'"',
       'methods_send':[
         {
           'description':'сохранить',
           'method_send':password_method_send
         }
       ],
-       'tab':'main'
+      #'before_code':password_before_code,
+      'tab':'main'
     },
     {
       'description':'Телефон',
       'type':'text',
       'name':'phone',
-       'tab':'main',
-       'regexp_rules':[
-        '^(\+7\d{10})?$/','Если указывается телефон, он должен быть в формате +7XXXXXXXXXX',
+      'tab':'main',
+      'regexp_rules':[
+          '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
       ],
       'replace_rules':[
-        ['/^[87]/','+7'],
-        ['/[^\d\+]+/',''],
-        ['/^([^87\+])/','+7$1']
+          '/[^\d]/g','',
+          '/^(\d{11}).*$/','$1',
+          '/^[87]/','+7',
+          '/^\+7(\d{3})(\d)/','+7 ($1) $2',
+          '/^(\+7 \(\d{3}\))(\d{3})/','$1 $2',
+          '/(\d{3})(\d{2})/',"$1-$2",
+          '/-(\d{2})(\d{2}\d*)$/',"-$1-$2"
+
       ]
       #regexp':'^(\+\d{6}\d*)?$',
       # replace=>[
@@ -82,10 +102,14 @@ def get_fields():
     },
 
     {
-      'name':'name_f',
+      'name':'name',
       'description':'Полное имя',
       'type':'text',
       'tab':'main',
+      'value':'Тестовый пользователь',
+      'regexp_rules':[
+          '/^.+$/','Полное имя обязательно для заполнения',
+      ],
       'filter_on':1
     },
     {
@@ -93,21 +117,24 @@ def get_fields():
       'description':'Фамилия',
       'type':'text',
       'tab':'main',
-      'filter_on':1
+      'filter_on':1,
+      'frontend':{'ajax':{'name':'name','timeout':300}}
     },
     {
       'name':'name_i',
       'description':'Имя',
       'type':'text',
       'tab':'main',
-      'filter_on':1
+      'filter_on':1,
+      'frontend':{'ajax':{'name':'name'}}
     },
     {
       'name':'name_o',
       'description':'Отчество',
       'type':'text',
       'tab':'main',
-      'filter_on':1
+      'filter_on':1,
+      'frontend':{'ajax':{'name':'name'}}
     },
     {
       'description':'Зарегистрирован',
@@ -136,17 +163,53 @@ def get_fields():
       ]
     },
     {
+      'before_code': permissions_before_code,
+      'description':'Права учётной записи',
+      'type':'multiconnect',
+      'tree_use':1,
+      'tree_table':'permissions',
+      'name':'permissions',
+      'relation_table':'permissions',
+      'relation_save_table':'manager_permissions',
+      'relation_table_header':'header',
+      'relation_save_table_header':'header',
+      'relation_table_id':'id',
+      'relation_save_table_id_worktable':'manager_id',
+      'relation_save_table_id_relation':'permissions_id',
+      'tab':'permissions',
+      'read_only':1
+    },
+    {
        'name':'email',
        'description':'Email',
        'type':'text',
         'replace':[
             ['\s+','']
         ],
-        'regexp':'^([a-zA-Z0-9_\-\.]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9_\-]+)?$',
+        #'regexp':'^([a-zA-Z0-9_\-\.]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9_\-]+)?$',
 
        'tab':'main'
     },
 
-
+    # Юридические лица
+    {
+      'description':'Юридические лица',
+      'name':'comp',
+      'type':'1_to_m',
+      'table':'comp',
+      'table_id':'id',
+      'foreign_key':'manager_id',
+      'tab':'comp',
+      'fields':[
+        {
+          'description':'Юридическое лицо',
+          'type':'select_from_table',
+          'table':'comp',
+          'header_field':'header',
+          'value_field':'id',
+          'name':'comp_id'
+        }
+      ]
+    },
 
 ]

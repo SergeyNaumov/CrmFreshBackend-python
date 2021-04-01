@@ -55,7 +55,7 @@ async def register(R: dict):
        [ not exist_login(R), 'Такой Emal уже существует в нашей системе. Пожалуйста укажите другой, или воспользуетесь <a href="/remember">формой восстановления пароля</a>']
     ]
 
-    response['errors']=check_rules(rules)
+    check_rules(rules,response['errors'])
 
     if(not len(response['errors'])): # все проверки пройдены, сохраняем
       response['reg_order_id']=s.db.save(
@@ -104,7 +104,6 @@ async def remember_get_code(R: dict):
       table='manager',
       where='login = %s',
       values=[R['login']],
-      debug=1,
       onerow=1
     )
     
@@ -117,7 +116,6 @@ async def remember_get_code(R: dict):
           'code':remember_code
         },
         replace=1,
-        debug=1
       )
 
       # отправка на manager.email
@@ -152,7 +150,6 @@ async def remember_check_code(R: dict):
       table='remember_code',
       where='code = %s',
       values=[R['remember_code']],
-      debug=1,
       onerow=1
     )
     
@@ -182,7 +179,6 @@ async def remember_check_code(R: dict):
       s.db.query(
         query='UPDATE manager set password=sha2(%s,256) where id=%s',
         values=[R['password'],R['id']],
-        debug=1
       )
       # s.db.query(
       #   query='DELETE FROM remember_code where id=%s',

@@ -32,5 +32,8 @@ def run_event(form,event_name,arg={}):
             else:
               e(form)
         else:
-          event(form,arg)
+          try:
+            event(form,arg)
+          except AttributeError as e:
+            form.errors.append(str(e))
 
