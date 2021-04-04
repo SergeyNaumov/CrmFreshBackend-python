@@ -22,12 +22,16 @@ def func_get_values(form):
         str=1,
         log=form.log
       )
-      #print('GET_VALUES:',values)
+      for v in values:
+        if values[v]=='None':
+          values[v]=None
+        
       if not values:
           form.errors.append(f'В инструменте {form.title} запись с id: {form.id} не найдена. Редактирование невозможно')
           return
 
       for f in form.fields:
+
         if f['type']=='password':
           del values[f['name']]
 
@@ -66,8 +70,8 @@ def func_get_values(form):
          f['values']=get_values_for_select_from_table(form,f)
       # #print('f:',f)
       if f['type'] == '1_to_m':
-
         get_1_to_m_data(form,f)
+        print('1_to_m_data:',f)
 
       if f['type']=='get_in_ext_url':
         get_in_ext_url(form,f)

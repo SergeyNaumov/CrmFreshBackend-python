@@ -5,9 +5,8 @@ def send_mes():
 def password_method_send(new_password):
   send_mes()
 
-def permissions_before_code(**arg):
-  form=arg['form']
-  field=arg['field']
+def permissions_before_code(form,field):
+
 
   # Для администратора или для менеджера с галкой открываем возможность изменять права доступа
   if form.is_admin:
@@ -15,18 +14,15 @@ def permissions_before_code(**arg):
   
     
 
-def type_before_code(**arg):
-  form=arg['form']
-  field=arg['field']
+def type_before_code(form,field):
+
   
   if(form.action == 'new'):
     field['value']='1'
   s=form.s
 
 
-def enabled_before_code(**arg):
-  form=arg['form']
-  field=arg['field']
+def enabled_before_code(form,field):
   if(form.action == 'new'):
     field['value']='1'
 

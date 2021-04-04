@@ -1,8 +1,14 @@
-def before_code_type(**arg):
-  form=arg['form']
-  field=arg['field']
+def before_code_type(form,field):
   if not field['value']:
     field['value']='vue'
+
+def value_before_code(form,field):
+  if form.id:
+    if field['value']=="0":
+      if form.values['parent_id']:
+        field['value']='vue'
+
+
 
 
 fields=[ 
@@ -31,10 +37,11 @@ fields=[
       },
       {
         'description':'Значение',
-        'type':'text',
+        'type':'select_values',
         'name':'value',
-        'after_html':'<div>admin-table<br>admin-tree<br>const<br>parser-excel<br></div>',
+        'before_code':value_before_code,
         'values':[
+          {'v':'','d':'раздел меню'},
           {'v':'admin-table','d':'admin-table'},
           {'v':'admin-tree','d':'admin-tree'},
           {'v':'const','d':'const'},
@@ -70,7 +77,7 @@ fields=[
         'table_id': 'id',
         'foreign_key': 'menu_id',
         'tab':'advanced',
-        'fields ':
+        'fields':
         [
           {
             'description':'Право доступа',

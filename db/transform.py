@@ -1,3 +1,4 @@
+from lib.core import exists_arg
 # Преобразует список в дерево, основываясь на parent_id
 def tree_use_transform(list,table_id='id'):
   list_hash={}
@@ -8,9 +9,10 @@ def tree_use_transform(list,table_id='id'):
 
   for l in list:
 
-    if l['parent_id']:
-      parent_item=list_hash[l['parent_id']]
-      parent_item['child'].append(l)
+    if exists_arg('parent_id',l):
+      if exists_arg(l['parent_id'],list_hash):
+        parent_item=list_hash[l['parent_id']]
+        parent_item['child'].append(l)
     else:
       new_list.append(l)
 

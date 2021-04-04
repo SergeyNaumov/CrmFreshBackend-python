@@ -15,8 +15,8 @@ class Config(Form):
         self.header_field='header'
         self.default_find_filter='header'
         self.cols=[
-          [{'name':'main','description':'Основные Параметры'}],
-          [{'name':'advanced','description':'Дополнительные Параметры'}]
+          [{'name':'main','description':'Основные Параметры','hide':0}],
+          [{'name':'advanced','description':'Дополнительные Параметры','hide':0}]
         ]
         # self.cols=[
         #     [
