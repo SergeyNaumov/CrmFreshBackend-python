@@ -143,7 +143,15 @@ def get_search_where(form,query):
           WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+','.join(user_id)+') )')
 
       elif f['type'] in ['select_from_table','filter_extend_select_from_table']:
-        WHERE.append(' ('+table+'.'+f['value_field']+' IN ('+','.join(values)+'))')
+        
+
+        map_rezult=[]
+        for v in values:
+          if v.isnumeric():
+            map_rezult.append(v)
+
+        if len(map_rezult):
+          WHERE.append(' ('+table+'.'+f['value_field']+' IN ('+','.join(map_rezult)+'))')
 
       elif f['type'] == 'multiconnect':
         if not exists_arg('tablename',f):
@@ -157,6 +165,7 @@ def get_search_where(form,query):
         for v in values:
           if v.isnumeric():
             map_rezult.append(v)
+
         if len(map_rezult):
           WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')
   #print('WHERE:',WHERE)

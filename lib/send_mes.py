@@ -24,7 +24,7 @@ def send_mes(**opt):
     server=smtplib.SMTP()
     server.connect('localhost')
     #server.starttls()
-    server.set_debuglevel(2)
+    #server.set_debuglevel(2)
     server.sendmail(msg['From'], [ msg['To'] ], msg.as_string())
   except ConnectionRefusedError as e:
     print("\033[31m {}" .format('ошибка при отправке почты:'),e,"\033[0m")

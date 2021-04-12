@@ -84,6 +84,8 @@ def process_result_list(form,R,result_list):
             if not exists_arg(name,form.SEARCH_RESULT['selects']):
                 form.SEARCH_RESULT['selects'][name]=field['values']
           else:
+            if not('db_name' in field): field['db_name']=field['name']
+
             if field['db_name'].startswith('func:'):
               value = name
             elif r[tbl+'__'+field['header_field']]:
@@ -108,9 +110,13 @@ def process_result_list(form,R,result_list):
 
         elif field['type_orig']=='in_ext_url':
           value=exists_arg('in_ext_url__ext_url',r)
-
-        elif field['type_orig']=='date' and exists_arg('make_change_in_search',field):
-          type='date'
+        elif field['type_orig'] == 'datetime':
+          value=str(value)
+        elif field['type_orig']=='date':
+          value=str(value)
+          if exists_arg('make_change_in_search',field):
+            type='date'
+          
           #if exists_arg('make_change_in_search',field):
 
       if not value: value=''

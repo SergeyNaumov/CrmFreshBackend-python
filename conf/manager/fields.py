@@ -5,8 +5,9 @@ def send_mes():
 def password_method_send(new_password):
   send_mes()
 
-def permissions_before_code(form,field):
-
+def permissions_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
 
   # Для администратора или для менеджера с галкой открываем возможность изменять права доступа
   if form.is_admin:
@@ -14,15 +15,18 @@ def permissions_before_code(form,field):
   
     
 
-def type_before_code(form,field):
-
+def type_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
   
   if(form.action == 'new'):
     field['value']='1'
   s=form.s
 
 
-def enabled_before_code(form,field):
+def enabled_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
   if(form.action == 'new'):
     field['value']='1'
 
@@ -54,7 +58,7 @@ def get_fields():
       'name':'password',
       'type':'password',
       'min_length':8,
-      'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#!@$%^&*();=-+.,;\'"',
+      'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
       'methods_send':[
         {
           'description':'сохранить',
@@ -69,9 +73,9 @@ def get_fields():
       'type':'text',
       'name':'phone',
       'tab':'main',
-      'regexp_rules':[
-          '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
-      ],
+      # 'regexp_rules':[
+      #     '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
+      # ],
       'replace_rules':[
           '/[^\d]/g','',
           '/^(\d{11}).*$/','$1',

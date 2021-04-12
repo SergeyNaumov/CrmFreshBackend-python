@@ -38,13 +38,9 @@ def read_config(**arg):
   form.set_orig_types()
   # Перенёс из routes.edit_form.process_edit_form.py
   form.run_event('permissions')
-  for f in form.fields:
-    if exists_arg('permissions',f): form.run_event('permissions',{'field':f})
-
+  
   form.get_values()
-  for f in form.fields:
-    if exists_arg('before_code',f): form.run_event('before_code',{'field':f})
-  #form.run_all_before_code()
+  form.run_all_before_code()
 
   #default_config_attr(form,arg)
 

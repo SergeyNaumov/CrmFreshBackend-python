@@ -30,20 +30,15 @@ def normalize_value_row(form,field,d):
 
 def get_1_to_m_data(form,f):
   #print('f:',f)
-  #print('F: ',f,"\n\n")
+  if not exists_arg('fields',f): f['fields']=[]
 
-  if not exists_arg('fields',f):
-    f['fields']=[]
-    form.errors.append(f'В поле {f["name"]} отсутствует fields')
-
-  #print('fields1:',f['fields'])
   for cf in f['fields']:
       if cf['type'] == 'select_from_table':
           cf['values']=get_values_for_select_from_table(form,cf)
 
   headers=[]
   for c in f['fields']:
-      print('c:',c)
+      
       if exists_arg('not_out_in_slide',c):
           continue
 

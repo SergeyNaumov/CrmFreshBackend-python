@@ -147,26 +147,6 @@ class Form():
 
   def get_values(form):
     func_get_values(form)
-  
-  # def get_values2():
-  #   form.values={}
-  #   if form.id:
-  #     values=form.db.onerow(
-  #       query=f'SELECT * from {form.work_table} WHERE {form.work_table_id}=%s',
-  #       str=1,
-  #       values=[form.id]
-  #     )
-  #     form.values=values
-  #     if not values:
-  #       form.errors.append(f'В инструменте {form.title} запись с id: {form.id} не найдена. Редактирование невозможно')
-  #       return
-      
-  #   #
-  #   for f in form.fields:
-  #     # удаляем значение, если пароль
-  #     if f['type'] == 'password': del values[f['name']]
-      
-
 
   def UploadFile(form):
     return func_upload_file(form)
@@ -177,15 +157,18 @@ class Form():
         check_field(form,field,form.new_values[field['name']])
   
   # запускаем before_code для всех полей
-  # def run_all_before_code(form): 
-  #   for field in form.fields:
-  #     if 'before_code' in field:
-  #       #form.run_event(form,'before_code for '+f['name'],f)
-  #       try:
-  #         field['before_code'](form=form,field=field)
-  #       except AttributeError as e:
-  #         form.errors.append(str(e))
-
+  def run_all_before_code(form): 
+    for field in form.fields:
+      if 'before_code' in field:
+        #form.run_event(form,'before_code for '+f['name'],f)
+        try:
+          field['before_code'](form=form,field=field)
+        except AttributeError as e:
+          form.errors.append(str(e))
+        # except ValueError as e:
+        #   form.errors.append(str(e))
+        # finally:
+        #   form.errors.append('Ошибка')
 
   def DeleteFile(form):
     return func_delete_file(form)

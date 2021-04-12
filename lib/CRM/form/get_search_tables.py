@@ -44,7 +44,7 @@ def get_search_tables(form,query):
       if exists_arg('lelf_join',t):
         t_str = t_str + ' LEFT '
       
-      t_str = ''.join(t_str,' JOIN ',t['table'],' as ',t['alias'],' ON (',t['link']+')')
+      t_str = ''.join([t_str,' JOIN ',t['table'],' as ',t['alias'],' ON (',t['link'],')'])
 
       if exists_arg('for_fields',t) :
         need_add_table = 0
