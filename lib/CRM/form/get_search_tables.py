@@ -41,7 +41,7 @@ def get_search_tables(form,query):
       t['link']=t['l']
 
     if exists_arg('link',t):
-      if exists_arg('lelf_join',t):
+      if exists_arg('left_join',t):
         t_str = t_str + ' LEFT '
       
       t_str = ''.join([t_str,' JOIN ',t['table'],' as ',t['alias'],' ON (',t['link'],')'])
