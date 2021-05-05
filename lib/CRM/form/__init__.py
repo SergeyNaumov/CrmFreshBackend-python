@@ -122,7 +122,8 @@ class Form():
     default_config_attr(form,arg)
 
   def edit_form_process_fields(form): # в perl-версии process_edit_form_fields
-    return func_edit_form_process_fields
+    
+    return func_edit_form_process_fields(form)
     #print('edit_form_process_fields не реализована')
     #return {'success':'1'}
 
