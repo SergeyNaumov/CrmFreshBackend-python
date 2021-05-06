@@ -54,7 +54,7 @@ def process_result_list(form,R,result_list):
             value='не выбрано'
 
       if not exists_arg('make_change_in_search',field) and exists_arg('filter_code',field) and not (isinstance(field['filter_code'],str)):
-        value=field['filter_code'](str=str,value=value)
+        value=field['filter_code'](form=form,field=field,row=r)
       else:
         if field['type']=='memo':
           type='memo'
