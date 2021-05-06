@@ -72,7 +72,7 @@ def process_result_list(form,R,result_list):
           if exists_arg('make_change_in_search',field):
             type=field['type']
           else:
-            value=('нет','да')[value]
+            value='да' if value else 'нет'
 
         elif field['type_orig'] in ['filter_extend_checbox','filter_extend_switch']:
           value=('нет','да')[value]
