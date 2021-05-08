@@ -63,8 +63,8 @@ def func_get_values(form):
         #  f['value']=''
 
       if form.action not in ['insert','update'] and exists_arg('orig_type',f)=='select_from_table':
+         f['value']=exists_arg(f['name'],values);
          f['values']=get_values_for_select_from_table(form,f)
-      # #print('f:',f)
       if f['type'] == '1_to_m':
 
         get_1_to_m_data(form,f)

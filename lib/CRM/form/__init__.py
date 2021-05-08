@@ -11,6 +11,7 @@ from .set_orig_types import func_set_orig_types
 from .run_event import run_event as func_run_event
 from .upload_file import upload_file as func_upload_file
 from .delete_file import delete_file as func_delete_file
+from .template import template as func_template
 class Form():
   #def info(self):
   #  print('title:',self.title)
@@ -21,7 +22,7 @@ class Form():
     
     script=arg['script']
     #self.db=s.db
-    
+    self.run_js=''
     self.work_table=arg['config']
     self.work_table_id='id'
     self.id=''
@@ -68,6 +69,7 @@ class Form():
     if script=='edit_form':
       self.width=''
       self.cols=[]
+      self.tabs=[]
 
       self.edit_form_fields=[]
 
@@ -171,14 +173,30 @@ class Form():
         # finally:
         #   form.errors.append('Ошибка')
 
-  def DeleteFile(form):
-    return func_delete_file(form)
+  def DeleteFile(form): return func_delete_file(form)
 
-  def pre(form,data):
-    form.log.append(data)
+  def pre(form,data): form.log.append(data)
+
+  # для отладки
+  def field_names(form):
+    lst=[]
+    for f in form.fields:
+      lst.append(f['name'])
+    return lst
 
   def get_field(form,field_name):
     for f in form.fields:
-      if(f['name']==field_name):
-        return f
+      if(f['name']==field_name): return f
     return None
+  
+  def remove_field(form,name):
+    new_fields=[]
+    for f in form.fields:
+      if f['name']!=name:
+        new_fields.append(f)
+    
+    form.fields=new_fields
+
+
+
+  def template(form,filename,**values): return func_template(form,filename,**values)

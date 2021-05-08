@@ -1,7 +1,6 @@
 from lib.core import get_name_and_ext, exists_arg
 def edit_form_process_fields(form):
   for f in form.fields:
-    print('f:',f)
     if f['type']=='password':
       if 'enctypt_method' in f: del( f['enctypt_method'])
       if 'method_send' in f:

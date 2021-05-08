@@ -27,13 +27,16 @@ def run_event(form,event_name,arg={}):
         if isinstance(event,list):
           for e in event:
             if arg:
-              print('arg:',arg)
+              #print('arg:',arg)
               e(form,arg)
             else:
               e(form)
         else:
           try:
-            event(form,arg)
+            if arg:
+              event(form,arg)
+            else:
+              event(form)
           except AttributeError as e:
             form.errors.append(str(e))
 

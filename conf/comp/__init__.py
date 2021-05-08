@@ -13,10 +13,13 @@ class Config(Form):
         self.read_only=1
         self.make_delete=0
         self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'}
+            {'table':self.work_table,'alias':'wt'},
+            {'table':'manager','alias':'m1','link':'wt.manager_id=m1.id','left_join':1},
+            {'table':'manager','alias':'m2','link':'wt.anna_manager_id=m2.id','left_join':1},
         ]
         self.events=events
         self.filters_groups=[]
+        #self.explain=1
         self.on_filters=[
             # {
             #     'name':'address'

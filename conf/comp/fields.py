@@ -40,6 +40,7 @@ def get_fields():
       'name':'manager_id',
       'type':'select_from_table',
       'table':'manager',
+      'tablename':'m1',
       'header_field':'name',
       'value_field':'id',
       'where':'type=2'
@@ -49,6 +50,7 @@ def get_fields():
       'name':'anna_manager_id',
       'type':'select_from_table',
       'table':'manager',
+      'tablename':'m2',
       'header_field':'name',
       'value_field':'id',
       'where':'type=1'

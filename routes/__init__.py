@@ -10,6 +10,7 @@ from .edit_form_routes import router as router_edit_form
 from .one_to_m_routes import router as router_one_to_m
 from .password import router as router_password
 from .ajax import router as router_ajax
+from .autocomplete import router as router_autocomplete
 
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
@@ -36,6 +37,7 @@ router.include_router(router_admin_tree)
 router.include_router(router_edit_form)
 router.include_router(router_one_to_m)
 router.include_router(router_extend)
+router.include_router(router_autocomplete,prefix='/autocomplete')
 
 router.include_router(router_anna,prefix='/anna')
 

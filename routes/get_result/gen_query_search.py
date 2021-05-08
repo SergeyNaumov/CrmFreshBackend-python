@@ -45,10 +45,13 @@ def gen_query_search(form):
       if not form.not_perpage:
         query = query + ' LIMIT '+str( (page-1)*perpage ) +', '+form.perpage
 
+      if 'query_count' in qs:
+        query_count=qs['query_count']
       
-      if len(qs['GROUP']):
-        query_count = 'SELECT count(*) FROM (' + 'select '+ SELECT_FIELDS + ' FROM '+ TABLES + WHERE + GROUP + HAVING + ') x'
       else:
-        query_count = ' SELECT count(*) cnt from ' + TABLES + WHERE + GROUP + HAVING
+        if len(qs['GROUP']):
+          query_count = 'SELECT count(*) cnt FROM (' + 'select wt.'+ form.work_table_id + ' FROM '+ TABLES + WHERE + GROUP + HAVING + ') x'
+        else:
+          query_count = ' SELECT count(*) cnt from ' + TABLES + WHERE + GROUP + HAVING
 
   return query, query_count

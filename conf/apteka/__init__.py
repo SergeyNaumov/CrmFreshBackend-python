@@ -11,7 +11,7 @@ class Config(Form):
         self.title='Аптеки'
         self.explain=0
         self.read_only=1
-        self.make_delete=0
+        self.make_delete=False
         self.QUERY_SEARCH_TABLES=[
             {'table':self.work_table,'alias':'wt'}
         ]

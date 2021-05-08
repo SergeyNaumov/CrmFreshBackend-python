@@ -1,5 +1,5 @@
 config={
-  'title':'CRM Digital',
+  'title':'CRM АннА',
   'copyright':'copyright 2005 - {{cur_year}}',
   'encrypt_method':'mysql_sha2',
   'use_project':False,

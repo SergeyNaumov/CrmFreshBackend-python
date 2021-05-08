@@ -62,7 +62,7 @@ def process_edit_form(**arg):
   if form.action == 'insert' and form.not_create:
     form.errors.append('Вам запрещено создавать новые записи')
   
-  form.set_orig_types()
+  #form.set_orig_types() # уже есть в all_configs.read_config
   
   # Перенёс в .lib.all_configs.read_form
   #form.run_event('permissions')
@@ -97,5 +97,7 @@ def process_edit_form(**arg):
       'read_only':form.read_only,
       'width':form.width,
       'cols':form.cols,
-      'config':form.config
+      'tabs':form.tabs,
+      'config':form.config,
+      'run_js':form.run_js if form.run_js else '' 
     }

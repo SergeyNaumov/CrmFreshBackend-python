@@ -4,8 +4,9 @@ import re
 from .transform import tree_use_transform, massive_transform
 from lib.core import print_console_error
 def rez_to_str(rez):
-  for k in rez:
-    rez[k]=str(rez[k])
+  if rez:
+    for k in rez:
+      rez[k]=str(rez[k])
     
 def exists_arg(key,dict):
   if (key in dict) and dict[key]:
@@ -286,7 +287,7 @@ class FreshDB():
       arg['method']='query'
       if not exists_arg('query',arg):
         out_error(self,'FreshDB::query: not exists attribute query',arg)
-
+      print('arg:',arg)
       if self.error_str : return []
       
       self.execute(cur,arg)
@@ -297,7 +298,7 @@ class FreshDB():
         except pymysql.err.ProgrammingError as err:
           #print("\033[31m {}",'ERR:',err,arg['query'])
           print_console_error(err)
-          print(arg['query'])
+          
           return None
         if rez: rez=rez[0]
       else:
