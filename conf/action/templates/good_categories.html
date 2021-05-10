@@ -1,0 +1,74 @@
+{%if plan_list|length%}
+<style>
+  .catheader {border: 1px solid black; padding: 10px; margin-bottom: 10px; border-radius: 5px;}
+  .plans h2{ 
+    margin-bottom: 10px;
+    margin-top: 30px;
+   }
+   .plans .more {
+      margin-left: 0px;
+      background-color: #eeeeee;
+      border: 1px solid gray;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+   }
+
+   table.goodlist{
+      border-collapse: collapse
+   }
+   table.goodlist td {border: 1px solid gray; padding: 2px; }
+   table.goodlist td.c {text-align: center;}
+   table.goodlist tr.h td {text-align: left; font-weight: bold;}
+</style>
+<div class="plans">
+  <h2 >Группы товаров</h2>
+  
+  
+  {% for p in plan_list%}
+    <div class="catheader">
+      <a href="#" id="toggle{{p.id}}" data-id="{{p.id}}">
+      {%if p.child|length>0%}
+        <b>{{p.header}}</b>
+      {%else%}
+        {{p.header}}
+      {%endif%}
+      </a>
+      ({{p.begin_date}} - {{p.end_date}})
+      
+    </div>
+    <div id="plan{{p.id}}" style="display: none;" class="more">
+      План: {{p.plan}}<br>
+      {{p.value_name}}: {{p.value}}
+      {% if(p.child|length) %}
+        <table class="goodlist">
+          <tr class="h">
+            <td>Штрих код товара</td>
+            <td>Наименование</td>
+            <td>Витрина</td>
+            <td>Сип-цена</td>
+            
+            <td>Начисления<br> по бонусу</td>
+          </tr>
+        
+        {% for g in p.child %}
+          <tr >
+            <td class="c">{{g.code}}</td>
+            <td>{{g.header}}</td>
+            <td class="c">{{g.showcase}}</td>
+            <td class="c">{{g.price}}</td>
+            
+            <td class="c">{{g.percent}}%</td>
+            
+          </tr>
+        {% endfor%}
+        </table>
+      {% endif%}
+
+    </div>
+  {% endfor %}
+
+</div>
+{%else%}
+<p>Данные о группах товаров отсутствуют</p>
+{%endif%}
