@@ -55,6 +55,7 @@ def process_result_list(form,R,result_list):
 
       if not exists_arg('make_change_in_search',field) and exists_arg('filter_code',field) and not (isinstance(field['filter_code'],str)):
         value=field['filter_code'](form=form,field=field,row=r)
+        
       else:
         if field['type']=='memo':
           type='memo'
@@ -117,7 +118,10 @@ def process_result_list(form,R,result_list):
           if exists_arg('make_change_in_search',field):
             type='date'
           
-          #if exists_arg('make_change_in_search',field):
+      if not exists_arg('make_change_in_search',field):
+        type='html'
+
+      print('name:',field['name'],' type:',type)
 
       if not value: value=''
       data.append({

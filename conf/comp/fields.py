@@ -15,6 +15,7 @@ def get_fields():
       'name':'header',
       'description':'Наименование',
       'type':'text',
+      #'make_change_in_search':1,
       'filter_on':1
     }, 
     {

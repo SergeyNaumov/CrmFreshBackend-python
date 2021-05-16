@@ -73,7 +73,7 @@ from lib.core import gen_pas
 #       form.log.append({'comp_id':comp_id})
 
 
-def after_save(form,opt):
+def after_save(form):
   form.log.append(form.values)  
   ov=form.values
   nv=form.new_values
@@ -91,7 +91,7 @@ def after_save(form,opt):
 #def events_before_code(form):
     
 
-def before_delete(form,opt):
+def before_delete(form):
     print('before_detele STARTED!')
     #form.errors.append('Вам запрещено удалять!')
 

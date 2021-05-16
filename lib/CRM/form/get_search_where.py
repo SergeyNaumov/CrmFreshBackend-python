@@ -90,7 +90,7 @@ def get_search_where(form,query):
         v=values
         if v:
           # form.db.connect.escape_string(v)
-          v='%'+v+'%'
+          v='%'+str(v)+'%'
           #v="'"+v+"'"
           func=get_func(f)
           if func:
