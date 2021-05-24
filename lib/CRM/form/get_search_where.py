@@ -84,8 +84,18 @@ def get_search_where(form,query):
 
       if not values or (isinstance(values,list) and not len(values)):
           continue
+      if exists_arg('filter_type',f)=='range':
 
-      if f['type'] in ('text','textarea','email','filter_extend_text'):
+        min,max=values
+        if min:
+          WHERE.append('('+db_name+' >= %s)')
+          VALUES.append(min)
+
+        if max:
+          WHERE.append('('+db_name+' <= %s)')
+          VALUES.append(max)
+
+      elif f['type'] in ('text','textarea','email','filter_extend_text'):
 
         v=values
         if v:

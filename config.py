@@ -39,7 +39,7 @@ config={
     ]
   },
   'debug':{ # для отладки
-    'hosts':['sv-home','sv-digital'],
+    'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p'],
     'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
 
   }

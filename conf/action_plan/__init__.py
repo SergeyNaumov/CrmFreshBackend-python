@@ -9,7 +9,7 @@ class Config(Form):
         super().__init__(arg) 
         
         self.title='Планы акций'
-        self.explain=0
+        self.explain=1
         self.read_only=1
         self.make_delete=0
         self.QUERY_SEARCH_TABLES=[

@@ -287,7 +287,7 @@ class FreshDB():
       arg['method']='query'
       if not exists_arg('query',arg):
         out_error(self,'FreshDB::query: not exists attribute query',arg)
-      print('arg:',arg)
+      #print('arg:',arg)
       if self.error_str : return []
       
       self.execute(cur,arg)
