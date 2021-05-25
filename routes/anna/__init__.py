@@ -52,13 +52,42 @@ async def get_reg_data():
 
         # Представитель юридического лица
         if str(manager['type'])=="2":
-            response['comp_list']=s.db.get(
-                table='comp',
-                select_fields='*, 0 more',
-                where='manager_id = %s',
-                values=[s.manager['id']],
-                errors=errors
+            response['comp_list']=s.db.query(
+                query="""
+                    SELECT
+                        wt.*, 0 more, concat(m.name_f,' ',m.name_i,' ',m.name_o)  ma_fio, m.email ma_email,
+                        m.phone ma_phone
+                    FROM
+                        ur_lico_manager ulm
+                        join ur_lico wt ON wt.id=ulm.ur_lico_id
+                        left join manager m ON wt.anna_manager_id=m.id
+                    WHERE
+                        ulm.manager_id=%s
+
+                """,
+                values=[s.manager['id']]
             )
+            for c in response['comp_list']:
+                c['apteka_list']=s.db.query(
+                    query="""
+                        SELECT
+                            wt.id,wt.ur_address,0 more,
+                            concat(m.name_f,' ',m.name_i,' ',m.name_o)  m_fio, m.email m_email,
+                            m.phone m_phone
+                        from 
+                            apteka wt
+                            LEFT JOIN manager m ON m.id=wt.manager_id
+                        where wt.ur_lico_id=%s
+                    """,
+                    values=[c['id']]
+                )
+            # s.db.get(
+            #     table='comp',
+            #     select_fields='*, 0 more',
+            #     where='manager_id = %s',
+            #     values=[s.manager['id']],
+            #     errors=errors
+            # )
 
         # Представитель аптеки
         if str(manager['type'])=="3":

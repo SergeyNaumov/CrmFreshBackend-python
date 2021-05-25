@@ -27,7 +27,8 @@ def process_result_list(form,R,result_list):
                 GROUP BY rst.{field['relation_save_table_id_worktable']
               """
             )
-            for ma in multiconnect_arr: multiconnect_values[ma['id']]=ma['header']
+            if multiconnect_arr:
+              for ma in multiconnect_arr: multiconnect_values[ma['id']]=ma['header']
   for r in result_list:
     
     data=[]
@@ -62,7 +63,9 @@ def process_result_list(form,R,result_list):
         
         elif field['type']=='multiconnect':
           type='multiconnect'
-          if exists_arg('wt__'+form.work_table_id,r):
+          if exists_arg(r['wt__'+form.work_table_id],multiconnect_values):
+            #print('ARG:',exists_arg('wt__'+form.work_table_id,r))
+            #print('multiconnect_values:',multiconnect_values)
             value=multiconnect_values[r['wt__'+form.work_table_id]]
           else: value=''
 
@@ -121,7 +124,7 @@ def process_result_list(form,R,result_list):
       if not exists_arg('make_change_in_search',field):
         type='html'
 
-      print('name:',field['name'],' type:',type)
+      #print('name:',field['name'],' type:',type)
 
       if not value: value=''
       data.append({

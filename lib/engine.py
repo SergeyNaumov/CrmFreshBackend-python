@@ -33,12 +33,11 @@ class Engine():
     #self.cookies['User-Agent']=''
 
     hostname=socket.gethostname()
-    print('host:',hostname)
+    #print('host:',hostname)
     # Если мы не логинимся -- проверяем сессию
     s.config=config
     s.use_project=config['use_project']
-        
-    if not(self.request.url.path in config['debug']['hosts']):
+    if not(self.request.url.path in config['login']['not_login_access']):
 
       if hostname in config['debug']['hosts']:
         self.manager=db.getrow(
@@ -50,7 +49,7 @@ class Engine():
         
         self.login=self.manager['login']
       else:
-        #print(hostname,' NOT IN ',config['debug']['hosts'])
+        #print('session start')
         session_start(self,encrypt_method=config['encrypt_method']);
 
             

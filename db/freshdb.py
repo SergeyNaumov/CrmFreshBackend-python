@@ -128,6 +128,8 @@ class FreshDB():
       self.tmpl_saver=tmpl_saver
 
     def execute(self,cur,arg):
+      self.connect.ping()  # reconnecting mysql
+
       if ('debug' in arg) and (arg['debug']):
         print(arg['query'])
         if exists_arg('values',arg): print(arg['values'])

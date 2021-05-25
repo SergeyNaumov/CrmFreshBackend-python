@@ -23,6 +23,8 @@ async def get_result(R: dict):
   if exists_arg('page',R):
     page=str(R['page'])
     if page.isnumeric(): form.page=page
+  else:
+    page=1
 
   if exists_arg('params',R):
     params=R['params']
@@ -90,7 +92,7 @@ async def get_result(R: dict):
     else:
       form.SEARCH_RESULT['count_pages']=math.ceil(total_count / int(form.perpage) )
 
-
+  
   if int(page) > form.SEARCH_RESULT['count_pages']:
     form.page='1'
 
