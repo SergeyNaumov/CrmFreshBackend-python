@@ -92,7 +92,7 @@ def process_result_list(form,R,result_list):
 
             if field['db_name'].startswith('func:'):
               value = name
-            elif r[tbl+'__'+field['header_field']]:
+            elif exists_arg(tbl+'__'+field['header_field'],r) and r[tbl+'__'+field['header_field']]:
               value=r[tbl+'__'+field['header_field']]
             else:
               value=''

@@ -44,6 +44,7 @@ config={
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)
     #'manager_id':141, # dir1@digitalstrateg.ru Кнейжиц Игорь Владимирович, Представитель юридического лица
     'manager_id': 211, # pavlik-libra5@mail.ru, Представитель юридического лица
+    
   
   }
 }

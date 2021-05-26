@@ -1,34 +1,5 @@
 
-def send_mes():
-    print()
 
-def password_method_send(new_password):
-  send_mes()
-
-def permissions_before_code(**arg):
-  form=arg['form']
-  field=arg['field']
-
-  # Для администратора или для менеджера с галкой открываем возможность изменять права доступа
-  if form.is_admin:
-    field['read_only']=0
-  
-    
-
-def type_before_code(**arg):
-  form=arg['form']
-  field=arg['field']
-  
-  if(form.action == 'new'):
-    field['value']='1'
-  s=form.s
-
-
-def enabled_before_code(**arg):
-  form=arg['form']
-  field=arg['field']
-  if(form.action == 'new'):
-    field['value']='1'
 
 def get_fields():
     return [ 
@@ -163,8 +134,22 @@ def get_fields():
       ]
     },
     {
+      'description':'Менеджер компании Анна',
+      'add_description':'для ',
+      'name':'anna_manager_id',
+      'type':'select_from_table',
+      'header_field':'concat(email," ",name_f," ",name_i," ",name_o)',
+      'where':'type=1',
+      'table':'manager',
+      'tablename':'ma',
+      'value_field':'id',
+      'tab':'permissions',
+      'filter_code': anna_manager_id_filter_code
+    },
+    {
       'before_code': permissions_before_code,
       'description':'Права учётной записи',
+      'add_description':'для юрлиц и аптек',
       'type':'multiconnect',
       'tree_use':1,
       'tree_table':'permissions',
@@ -213,3 +198,40 @@ def get_fields():
     },
 
 ]
+
+def anna_manager_id_filter_code(form,field,row):
+  if row['ma__id']:
+    return row['ma__name_f']+' '+row['ma__name_i']+row['ma__name_o']
+  else:
+    return 'не указан'
+
+def send_mes():
+    print()
+
+def password_method_send(new_password):
+  send_mes()
+
+def permissions_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
+
+  # Для администратора или для менеджера с галкой открываем возможность изменять права доступа
+  if form.is_admin:
+    field['read_only']=0
+  
+    
+
+def type_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
+  
+  if(form.action == 'new'):
+    field['value']='1'
+  s=form.s
+
+
+def enabled_before_code(**arg):
+  form=arg['form']
+  field=arg['field']
+  if(form.action == 'new'):
+    field['value']='1'

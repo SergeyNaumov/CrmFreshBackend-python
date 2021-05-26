@@ -103,7 +103,7 @@ def default_config_attr(form,arg): # Атрибуты формы по умолч
 
     set_default_attributes(form)
     form.self=form_self
-    print('read_conf: default_config_attr - доделать')
+    #print('read_conf: default_config_attr - доделать')
 
     # Доделать!
     #return form

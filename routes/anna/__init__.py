@@ -22,13 +22,59 @@ def password_ok(p):
         onevalue=1
     )
 def get_manager_data(errors=[]):
-    return s.db.getrow(
-          table="manager",
-          select_fields='id,login,name_f,name_i,name_o,name,phone,type',
-          where='id=%s',
-          errors=errors,
-          values=[s.manager['id']],
+    return s.db.query(
+        query="""
+            SELECT
+                wt.id,wt.login,wt.name_f,wt.name_i,wt.name_o,wt.name,wt.phone,wt.type,
+                ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, ma.email ma_email, ma.phone ma_phone
+            FROM 
+                manager wt
+                LEFT JOIN manager ma ON wt.anna_manager_id=ma.id
+            WHERE wt.id=%s
+        """,
+        values=[s.manager['id']],
+        onerow=1
+
     )
+
+    # s.db.getrow(
+    #       table="manager",
+    #       select_fields='id,login,name_f,name_i,name_o,name,phone,type',
+    #       where='id=%s',
+    #       errors=errors,
+    #       values=[s.manager['id']],
+    # )
+# Опции для аптеки
+@router.post('/change-set-apteka')
+async def change_set(R: dict):
+    if exists_arg('apteka_id',R) and 'value' in R and exists_arg('number',R): 
+        field_name='set'+str(R['number'])
+
+        exists=s.db.query(
+            query="SELECT apteka_id from apteka_settings where apteka_id=%s limit 1",
+            values=[R['apteka_id']],
+            onevalue=1
+        )
+        if exists:
+            s.db.query(
+                query=f"UPDATE apteka_settings SET {field_name}=%s where apteka_id=%s""",
+                debug=1,
+                values=[R['value'],R['apteka_id']]
+            )
+        else:
+            s.db.save(
+                table='apteka_settings',
+                data={
+                    'apteka_id': R['apteka_id'],
+                    field_name: R['value']
+                }
+            )
+        return {'success':1}
+    else:
+        return {'success':0}
+    
+
+
 
 @router.get('/get-reg-data')
 async def get_reg_data():
@@ -68,19 +114,34 @@ async def get_reg_data():
                 values=[s.manager['id']]
             )
             for c in response['comp_list']:
+
                 c['apteka_list']=s.db.query(
                     query="""
                         SELECT
                             wt.id,wt.ur_address,0 more,
+                            wt.email, wt.inn, wt.header, wt.phone,
                             concat(m.name_f,' ',m.name_i,' ',m.name_o)  m_fio, m.email m_email,
-                            m.phone m_phone
+                            m.phone m_phone,
+                            apt_set.apteka_id apt_set_id, apt_set.set1, apt_set.set2,
+                            1 saved_s1, 1 saved_s2
                         from 
                             apteka wt
                             LEFT JOIN manager m ON m.id=wt.manager_id
+                            LEFT JOIN apteka_settings apt_set ON apt_set.apteka_id=wt.id
                         where wt.ur_lico_id=%s
                     """,
                     values=[c['id']]
                 )
+                for a in c['apteka_list']:
+                    if not a['apt_set_id']:
+                        s.db.save(
+                            table="apteka_settings",
+                            data={
+                                'apteka_id':a['id'],'set1':1,'set2':1
+                            }
+                        )
+                        a['set1']=1
+                        a['set2']=1
             # s.db.get(
             #     table='comp',
             #     select_fields='*, 0 more',

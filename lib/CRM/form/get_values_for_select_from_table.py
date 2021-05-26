@@ -3,6 +3,9 @@ from lib.core import exists_arg, tree_to_list
 def get_values_for_select_from_table(form,f):
   #print('get_values_for_select_from_table не готово')
   #values=[]
+
+
+
   if not exists_arg('value_field',f):
     f['value_field'] = 'id'
   
@@ -13,6 +16,10 @@ def get_values_for_select_from_table(form,f):
   if exists_arg('tree_use',f):
     select_fields+=', parent_id'
 
+  
+  if not(exists_arg('table',f)):
+    form.errors.append(f'Для поля {f["name"]} не указан атрибут table')
+    return []
 
   query=f'SELECT {select_fields} from {f["table"]}'
 

@@ -24,6 +24,8 @@ fields=[
           {'v':'','d':'не выбрано'},
           {'v':'vue','d':'VUE'},
           {'v':'src','d':'internal_prog'},
+          {'v':'link','d':'link'},
+          {'v':'newtab','d':'newtab'},
         ],
         'tab':'main',
         'before_code':before_code_type

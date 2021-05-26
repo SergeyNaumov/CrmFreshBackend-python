@@ -9,22 +9,27 @@ class Config(Form):
         super().__init__(arg) 
 
         form.title='Учётные записи системы'
-        form.explain=0
+        
         form.work_table='manager' 
         form.QUERY_SEARCH_TABLES=[
             {'table':form.work_table,'alias':'wt'},
+            {
+                'table':'manager','alias':'ma','link':'wt.anna_manager_id=ma.id','left_join':1, 
+                #'for_fields':['anna_manager_id']
+            }
+            # 
         ]
         form.read_only=1
         form.events=events
         form.explain=0
         form.cols=[
             [ # Колонка1
-              {'description':'Общая информация','name':'main'},
+              {'description':'Общая информация','name':'main','hide':0},
             ],
             [
               {'description':'Юридические лица','name':'comp','hide':1},
               {'description':'Аптеки','name':'apteka','hide':1},
-              {'description':'Права','name':'permissions'},
+              {'description':'Права','name':'permissions','hide':0},
               
             ]
         ]

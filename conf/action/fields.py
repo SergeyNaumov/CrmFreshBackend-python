@@ -25,22 +25,22 @@ def get_fields():
       'tab':'main',
       'filter_on':1
     },
-    {
-      'name':'good_categories',
-      'description':'Группы товаров',
-      'type':'accordion',
-      'tab':'goods',
-      # Запрос для вывода заголовках аккордиона
-      'headers_query':'SELECT id,header from action_plan where action_id=<id>',
-      
-    },
     # {
     #   'name':'good_categories',
-    #   'type':'code',
+    #   'description':'Группы товаров',
+    #   'type':'accordion',
     #   'tab':'goods',
-    #   'description':'категории товаров',
-    #   'code':good_categories
+    #   # Запрос для вывода заголовках аккордиона
+    #   'headers_query':'SELECT id,header from action_plan where action_id=<id>',
+      
     # },
+    {
+      'name':'good_categories',
+      'type':'code',
+      'tab':'goods',
+      'description':'категории товаров',
+      'code':good_categories
+    },
     {
       'name':'distrib',
       'description':'Разрешённые дистрибьюторы',
