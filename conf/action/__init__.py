@@ -5,19 +5,21 @@ from .events import events
 
 class Config(Form):
     events=events
-    def __init__(self,arg):
+    def __init__(form,arg):
+        
         super().__init__(arg) 
         
-        self.title='Маркетинговые мероприятия'
-        self.explain=0
-        self.read_only=1
-        self.make_delete=0
-        self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'}
+        form.title='Маркетинговые мероприятия'
+        form.explain=0
+        form.read_only=1
+        form.make_delete=0
+        form.not_edit=1
+        form.QUERY_SEARCH_TABLES=[
+            {'table':form.work_table,'alias':'wt'}
         ]
-        self.events=events
-        self.filters_groups=[]
-        #self.on_filters=[
+        form.events=events
+        form.filters_groups=[]
+        #form.on_filters=[
             # {
             #     'name':'address'
             # },
@@ -26,13 +28,15 @@ class Config(Form):
             #     #'value':["2020-01-01","2020-01-02"]
             # },
         #]
-        self.tabs=[
+
+        
+        form.tabs=[
             {'description':'Группы товаров','name':'goods'},
             #{'description':'Общая информация','name':'main'},
             {'description':'Разрешённые дистрибьюторы','name':'distrib'},
         ]
-        #self.search_on_load=1
-        self.fields=get_fields()
+        form.search_on_load=1
+        form.fields=get_fields()
 
 """
 create table test(

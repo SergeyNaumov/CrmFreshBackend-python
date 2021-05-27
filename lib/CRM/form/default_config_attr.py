@@ -47,6 +47,7 @@ def get_cur_role(**arg):
 
 def default_config_attr(form,arg): # Атрибуты формы по умолчанию
     script=arg['script']
+
     form.config=arg['config']
     form.script=script
 
@@ -73,7 +74,7 @@ def default_config_attr(form,arg): # Атрибуты формы по умолч
         form.make_create=1
 
     
-
+    
     create_fields_hash(form)
 
 
@@ -104,6 +105,6 @@ def default_config_attr(form,arg): # Атрибуты формы по умолч
     set_default_attributes(form)
     form.self=form_self
     #print('read_conf: default_config_attr - доделать')
-
+    
     # Доделать!
     #return form

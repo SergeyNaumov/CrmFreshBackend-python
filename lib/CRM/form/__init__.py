@@ -47,6 +47,7 @@ class Form():
     self.javascript={
       'admin_table':''
     }
+    
 
     self.explain=0
     self.card_format='vue'

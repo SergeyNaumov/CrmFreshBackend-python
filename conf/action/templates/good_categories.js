@@ -21,6 +21,29 @@ function show_plan(plan_id,el){
 function load_categories(){
   setTimeout(
     ()=>{
+      
+      for(let a of document.querySelectorAll('a.popup_vitrina')){
+        a.onclick=()=>{
+          window.EditForm.popup={
+              show:true,
+              header:'Витрина',
+              body: 'По условиям контракта, товар должен быть выложен на полке'
+          }
+          return false
+        }
+      }
+
+      for(let a of document.querySelectorAll('a.popup_bonus')){
+        a.onclick=()=>{
+          window.EditForm.popup={
+              show:true,
+              header:'Бонус',
+              body: '% бонуса зависит от закупленного товара. Каждый товар имеет свой % бонуса'
+          }
+          return false
+        }
+      }
+
       let catheaders_list=document.querySelectorAll('.catheader a')
       for(let a of catheaders_list){
         

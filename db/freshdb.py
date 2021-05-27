@@ -159,6 +159,7 @@ class FreshDB():
 
 
     def desc(self, **arg):
+      self.connect.ping()  # reconnecting mysql
       cur = pymysql.cursors.DictCursor(self.connect)
       
       if not('method' in arg) :
@@ -190,6 +191,7 @@ class FreshDB():
       return result
 
     def getvalue(self, **arg):
+      self.connect.ping()  # reconnecting mysql
       cur = self.connect.cursor()
       #print('arg:',arg)
       arg['method']='getvalue'
@@ -208,6 +210,7 @@ class FreshDB():
       return self.prepare_result(rez,arg)
 
     def getrow(self, **arg):
+      self.connect.ping()  # reconnecting mysql
       self.error_str=''
       cur = pymysql.cursors.DictCursor(self.connect)
       arg['method']='getrow'
@@ -253,6 +256,7 @@ class FreshDB():
 
       return rez
     def get(self, **arg):
+      self.connect.ping()  # reconnecting mysql
       self.error_str=''
 
       if exists_arg('onerow',arg):
@@ -340,6 +344,7 @@ class FreshDB():
 
 
     def save(self, **arg):
+        self.connect.ping()  # reconnecting mysql
         self.error_str=''
         arg['method']='save'
         if not exists_arg('table',arg):

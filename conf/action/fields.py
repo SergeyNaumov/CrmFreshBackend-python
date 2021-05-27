@@ -15,7 +15,8 @@ def get_fields():
       'description':'Начало подписки',
       'type':'date',
       'tab':'main',
-      'filter_on':1
+      'filter_on':1,
+      'filter_code':date_start_filter_code
     }, 
     {
       'name':'date_stop',
@@ -23,6 +24,7 @@ def get_fields():
       'type':'date',
       'default_off':1,
       'tab':'main',
+      'filter_code':date_stop_filter_code, # в результатах поиска это поле превращается в подписку
       'filter_on':1
     },
     # {
@@ -71,6 +73,14 @@ def distrib_code(form,field):
   
 def header_filter_code(form,field,row):
   return f'<a href="/edit-form/action/{row["wt__id"]}" target="_blank">{row["wt__header"]}</a>'
+
+def date_start_filter_code(form,field,row):
+  return f"{row['wt__date_start']} - {row['wt__date_stop']}"
+
+def date_stop_filter_code(form,field,row):
+  return """
+    <a href="">подписаться</a>
+  """
 
 def good_categories(form,field):
   #'Здесь будет какая-то инфа'
@@ -129,3 +139,6 @@ def good_categories(form,field):
       plan_list=plan_list
     )
     form.run_js=form.template('./conf/action/templates/good_categories.js')
+
+def date_stop_before_code(form,field):
+  form.pre({'script':form.script})

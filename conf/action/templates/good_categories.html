@@ -17,7 +17,7 @@
    table.goodlist{
       border-collapse: collapse
    }
-   table.goodlist td {border: 1px solid gray; padding: 2px; }
+   table.goodlist td {border: 1px solid gray; padding: 2px 5px; }
    table.goodlist td.c {text-align: center;}
    table.goodlist tr.h td {text-align: left; font-weight: bold;}
 </style>
@@ -45,10 +45,11 @@
           <tr class="h">
             <td>Штрих код товара</td>
             <td>Наименование</td>
-            <td>Витрина</td>
+            <td>Витрина <a href="#" class="popup_vitrina">?</a></td>
             <td>Сип-цена</td>
-            
-            <td>Начисления<br> по бонусу</td>
+            <td>Начисления<br> по бонусу
+              <a href="#" class="popup_bonus">?</a>
+            </td>
           </tr>
         
         {% for g in p.child %}
@@ -56,7 +57,14 @@
             <td class="c">{{g.code}}</td>
             <td>{{g.header}}</td>
             <td class="c">{{g.showcase}}</td>
-            <td class="c">{{g.price}}</td>
+            <td class="c">
+              {% if g.price == '0' %}
+                закупочная цена
+              {% else %}
+                {{g.price}}
+              {% endif %}
+              
+            </td>
             
             <td class="c">{{g.percent}}%</td>
             

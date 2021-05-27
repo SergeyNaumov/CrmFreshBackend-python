@@ -1,5 +1,6 @@
 
 def events_permissions(form):
+  #if(form.script=='')
   if form.id:
     form.ov=form.db.query(
       query='select * from action where id=%s',
@@ -27,10 +28,37 @@ def events_permissions(form):
     else:
       new_fields.append(f)
 
+
+
+
   form.fields=new_fields
+  #form.pre(form.script)
+
+  if form.script in ['find_objects']:
+    for f in form.fields:
+      if f['name']=='date_start':
+        f['description']='Период подписки'
+      
+      if f['name']=='date_stop':
+        f['description']='Подписка'
+
+  if form.script=='admin_table':
+    form.javascript['admin_table']=form.template(
+      './conf/action/templates/admin_table.js',
+    )
+
+
+def before_search(form):
+  #form.pre()
+  form.query_search['WHERE'].append('wt.date_stop>=curdate()')
+  
+  #form.query_search
 
 events={
   'permissions':[
       events_permissions
   ],
+  'before_search':[
+      before_search
+  ]
 }

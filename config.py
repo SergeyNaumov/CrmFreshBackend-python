@@ -38,12 +38,14 @@ config={
         '/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password'
     ]
   },
+
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','asus-tarusa'],
     #'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)
     #'manager_id':141, # dir1@digitalstrateg.ru Кнейжиц Игорь Владимирович, Представитель юридического лица
-    'manager_id': 211, # pavlik-libra5@mail.ru, Представитель юридического лица
+    #'manager_id': 211, # pavlik-libra5@mail.ru, Представитель юридического лица
+    'manager_id':228, # realko2-z@mail.ru, Представитель юридического лица
     
   
   }
