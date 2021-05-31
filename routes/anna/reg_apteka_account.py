@@ -35,9 +35,16 @@ def reg_apteka_account(R):
         )
         if apt_manager_id:
           s.db.query(
+            query="UPDATE manager set password=sha2(%s,256) WHERE id=%s",
+            values=[R['password'], apt_manager_id],
+            #debug=1,
+            errors=errors
+          )
+
+          s.db.query(
             query="UPDATE apteka set manager_id=%s where id=%s",
             values=[apt_manager_id,R['apteka_id']],
-            debug=1,
+            #debug=1,
             errors=errors
           )
         
@@ -46,8 +53,8 @@ def reg_apteka_account(R):
         to=R['login'],
         subject='Для Вас создан аккаунт в системе АннА',
         message=f"""
-            Уважаемый(ая) R['name_f']  R['name_f'] R['name_f']!<br>
-            Только что для Вас был создан аккаунт для входа в систему Анна:<br>
+            Уважаемый(ая) {R['name_f']}  {R['name_f']} {R['name_f']}!<br>
+            Только что для Вас был создан аккаунт для входа в систему АннА:<br>
             Логин: {R['login']}<br>
             Пароль: {R['password']}
         """
@@ -105,7 +112,7 @@ def change_apteka_account(R):
               to=R['login'],
               subject='Изменение данных аккаунта в системе АннА',
               message=f"""
-                  Уважаемый(ая) R['name_f']  R['name_f'] R['name_f']!<br>
+                  Уважаемый(ая) {R['name_f']}  {R['name_f']} {R['name_f']}!<br>
                   Только что были изменены регистрационные данные в системе АннА:<br>
                   Логин: {R['login']}<br>
                   Пароль: {R['password']}

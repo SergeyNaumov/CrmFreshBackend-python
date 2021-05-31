@@ -36,7 +36,7 @@ def is_errors(form):
 def get_func(f):
   db_name=f['name']
   if exists_arg('db_name',f):
-    db_name=name
+    db_name=f['name']
     rez=re.search('func:\((.+)\)',db_name)
     if rez: return rez[1]
   return ''

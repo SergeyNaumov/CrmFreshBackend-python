@@ -55,7 +55,7 @@ def goods_field(form,field):
 
 def action_filter_code(form,field,row):
   if row["a__id"]:
-    return f'<a href="/edit-form/action/{row["a__id"]}" target="_blank">{row["a__header"]}</a>'
+    return f'<a href="/edit-form/action_plan/{row["a__id"]}" target="_blank">{row["a__header"]}</a>'
   else:
     return ''
 
@@ -79,17 +79,18 @@ def get_fields():
       'filter_code':action_filter_code,
       'filter_on':1
     }, 
-    {
-      'name':'manufacturer_id',
-      'description':'Производитель',
-      'type':'select_from_table',
-      'header_field':'header',
-      'value_field':'id',
-      'table':'manufacturer',
-      'tablename':'man',
-      'read_only':1,
-      'filter_on':1
-    },
+    # # Производителя убрал по просьбе Тани
+    # {
+    #   'name':'manufacturer_id',
+    #   'description':'Производитель',
+    #   'type':'select_from_table',
+    #   'header_field':'header',
+    #   'value_field':'id',
+    #   'table':'manufacturer',
+    #   'tablename':'man',
+    #   'read_only':1,
+    #   'filter_on':1
+    # },
     {
       'name':'begin_date',
       'description':'Дата начала',
@@ -104,41 +105,41 @@ def get_fields():
       'default_off':1,
       'filter_on':1
     },
-    {
-      'name':'plan',
-      'description':'План',
-      'type':'select_values',
-      'values':[
-        {'v':'1','d':'суммовой'},
-        {'v':'2','d':'колличественный'},
-        {'v':'3','d':'только процент за любые закупки'},
-      ],
-      'default_off':1,
-      'filter_on':1
-    },
-    {
-      'name':'value',
-      'description':'сумма или количество',
-      'type':'text',
-      'filter_type':'range',
-      'default_off':1,
-      'filter_on':1
-    },
-    {
-      'name':'reward_percent',
-      'description':'% вознаграждения (для суммовой акции)',
-      'type':'text',
-      'filter_type':'range',
-      'default_off':1,
-      'filter_on':1
-    },
-    {
-      'name':'allgood',
-      'description':'Для всех товаров',
-      'type':'checkbox',
-      'default_off':1,
-      'filter_on':1
-    },
+    # {
+    #   'name':'plan',
+    #   'description':'План',
+    #   'type':'select_values',
+    #   'values':[
+    #     {'v':'1','d':'суммовой'},
+    #     {'v':'2','d':'колличественный'},
+    #     {'v':'3','d':'только процент за любые закупки'},
+    #   ],
+    #   'default_off':1,
+    #   'filter_on':1
+    # },
+    # {
+    #   'name':'value',
+    #   'description':'сумма или количество',
+    #   'type':'text',
+    #   'filter_type':'range',
+    #   'default_off':1,
+    #   'filter_on':1
+    # },
+    # {
+    #   'name':'reward_percent',
+    #   'description':'% вознаграждения (для суммовой акции)',
+    #   'type':'text',
+    #   'filter_type':'range',
+    #   'default_off':1,
+    #   'filter_on':1
+    # },
+    # {
+    #   'name':'allgood',
+    #   'description':'Для всех товаров',
+    #   'type':'checkbox',
+    #   'default_off':1,
+    #   'filter_on':1
+    # },
     {
       'description':'Товары',
       'type':'code',

@@ -44,10 +44,9 @@ async def mainpage():
   if len(response['errors']):
     response['success']=0
   return response
-
-# Стартовая страница
-@router.get('/startpage')
-async def startpage():
+# Левое меню по-умолчанию
+@router.get('/left-menu')
+async def leftmenu():
   errors=[]
   manager=None
   manager_menu_table=None
@@ -64,9 +63,7 @@ async def startpage():
         errors=errors,
         tree_use=1
       )
-
   else:
-
       manager=s.db.query(
         query='select *,concat("/edit_form/manager/",id) link from manager where login=%s',
         values=[s.login],
@@ -115,22 +112,51 @@ async def startpage():
       if ('menu' in config) and config['menu'] and len(config['menu']):
         left_menu=config.menu
       
-  CY=cur_year()
   
+  
+  del manager['password']
+  return {
+    'left_menu':left_menu,
+    'errors':errors,
+    'success': not len(errors),
+  }
+
+# Стартовая страница
+@router.get('/startpage')
+async def startpage():
+  errors=[]
+  manager=None
+  manager_menu_table=None
+  left_menu=[]
+
+  if(config['use_project']):
+      manager=s.db.query(
+        query='select *,concat("/edit_form/project_manager/",id) link from project_manager where project_id=%s and login=%s',
+        values=[s.project_id,s.login]
+      )
+      manager_menu_table='project_manager_menu'
+
+  else:
+
+      manager=s.db.query(
+        query='select *,concat("/edit_form/manager/",id) link from manager where login=%s',
+        values=[s.login],
+        onerow=1,
+      )
+      
+      
+      
+  CY=cur_year()
+
   del manager['password']
   return {
     'title':config['title'],
     'copyright':config['copyright'].replace('{{cur_year}}',CY),
-    'left_menu':left_menu,
+    'left_menu_controller':s.config['controllers']['left_menu'],
     'errors':errors,
     'success': not len(errors),
     'manager':manager
   }
-
-
-
-  return {"startpage":True}
-
 
 # get-events
 @router.get('/get-events')

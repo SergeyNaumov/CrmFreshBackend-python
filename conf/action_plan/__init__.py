@@ -15,7 +15,8 @@ class Config(Form):
         self.QUERY_SEARCH_TABLES=[
             {'table':self.work_table,'alias':'wt'},
             {'table':'action','alias':'a','link':'wt.action_id=a.id','left_join':1},
-            {'table':'manufacturer','alias':'man','link':'wt.manufacturer_id=man.id','left_join':1},
+            # Производителя убрал по просьбе Тани
+            #{'table':'manufacturer','alias':'man','link':'wt.manufacturer_id=man.id','left_join':1},
         ]
         self.events=events
         self.filters_groups=[]

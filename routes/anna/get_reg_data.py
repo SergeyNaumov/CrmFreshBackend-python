@@ -8,7 +8,6 @@ def get_reg_data():
     }
     errors=[]
     manager=get_manager_data(errors)
-    
     if not len(errors):
         response['manager']=manager
         # Менеджер Анна
@@ -34,8 +33,12 @@ def get_reg_data():
                         ulm.manager_id=%s
 
                 """,
+                errors=errors,
                 values=[s.manager['id']]
             )
+            #if not response['comp_list']: response['comp_list']=[]
+
+            #print('comp_list:',response['comp_list'])
             for c in response['comp_list']:
 
                 c['apteka_list']=s.db.query(

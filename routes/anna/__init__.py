@@ -8,8 +8,14 @@ from .reg_apteka_account import reg_apteka_account, change_apteka_account
 from .change_comp_order import change_comp_order
 from .change_apteka_order import change_apteka_order
 from .get_reg_data import get_reg_data
+from .left_menu import left_menu
 
 router = APIRouter()
+
+@router.get('/left-menu')
+def controller_left_menu():
+    return left_menu()
+
 
 @router.post('/check-account-login')
 def check_account_login(R:dict):

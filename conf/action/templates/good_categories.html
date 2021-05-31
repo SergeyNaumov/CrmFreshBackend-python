@@ -40,6 +40,11 @@
     <div id="plan{{p.id}}" style="display: none;" class="more">
       План: {{p.plan}}<br>
       {{p.value_name}}: {{p.value}}
+      
+      {% if p.reward_percent%}
+        <div>% бонуса: {{p.reward_percent}}</div>
+      {% endif%}
+
       {% if(p.child|length) %}
         <table class="goodlist">
           <tr class="h">
@@ -47,9 +52,11 @@
             <td>Наименование</td>
             <td>Витрина <a href="#" class="popup_vitrina">?</a></td>
             <td>Сип-цена</td>
+            {% if not p.reward_percent %}
             <td>Начисления<br> по бонусу
               <a href="#" class="popup_bonus">?</a>
             </td>
+            {% endif %}
           </tr>
         
         {% for g in p.child %}
@@ -65,8 +72,9 @@
               {% endif %}
               
             </td>
-            
-            <td class="c">{{g.percent}}%</td>
+            {% if not p.reward_percent %}
+              <td class="c">{{g.percent}}%</td>
+            {% endif%}
             
           </tr>
         {% endfor%}

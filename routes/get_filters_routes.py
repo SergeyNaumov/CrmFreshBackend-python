@@ -31,7 +31,7 @@ async def get_filters_controller(config: str):
     #  f['filter']
     if f['type'] in ('password','code','1_to_m','hidden'): continue
 
-    if f['type'] in ('textarea','filter_extend_text'):
+    if f['type'] in ('textarea','filter_extend_text','text'):
       f['type']='text'
 
     elif f['type'] in ('select_values','filter_extend_select_values'):
@@ -44,7 +44,9 @@ async def get_filters_controller(config: str):
       f['type']='select'
       if not(exists_arg('header_field',f)): f['header_field']='header'
       if not(exists_arg('value_field',f)): f['value_field']='id'
-      f['values']=get_values_for_select_from_table(f,form)
+      
+      if not exists_arg('values',f):
+        f['values']=get_values_for_select_from_table(f,form)
 
     elif f['type']=='memo':
       f['users']=form.db.query(

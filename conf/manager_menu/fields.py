@@ -65,34 +65,52 @@ fields=[
         'tab':'advanced'
       },
       {
-        'name': 'permissions',
-        'description ': 'Права доступа',
-        'type': '1_to_m',
-        'table': 'manager_menu_permissions',
-        'table_id': 'id',
-        'foreign_key': 'menu_id',
+        'description':'Выводить для менеджера АннА',
+        'name':'out_manager_anna',
+        'type':'checkbox',
         'tab':'advanced',
-        'fields ':
-        [
-          {
-            'description':'Право доступа',
-            'name':'permission_id',
-            'type':'select_from_table',
-            'order':'sort',
-            #'tree_use':1,
-            'table':'permissions',
-            'value_field':'id',
-            'header_field':'header',
-          },
-          {
-            'description':'Если включено, то',
-            'name':'denied',
-            'type':'select_values',
-            'values':[
-              {'v':0,'d':'давать доступ'},
-              {'v':1,'d':'запрещать доступ'}
-            ]
-          },
-        ]
       },
+      {
+        'description':'Выводить для юридического лица',
+        'name':'out_ur_lico',
+        'type':'checkbox',
+        'tab':'advanced',
+      },
+      {
+        'description':'Выводить для аптеки',
+        'name':'out_apteka',
+        'type':'checkbox',
+        'tab':'advanced',
+      },
+      # {
+      #   'name': 'permissions',
+      #   'description ': 'Права доступа',
+      #   'type': '1_to_m',
+      #   'table': 'manager_menu_permissions',
+      #   'table_id': 'id',
+      #   'foreign_key': 'menu_id',
+      #   'tab':'advanced',
+      #   'fields ':
+      #   [
+      #     {
+      #       'description':'Право доступа',
+      #       'name':'permission_id',
+      #       'type':'select_from_table',
+      #       'order':'sort',
+      #       #'tree_use':1,
+      #       'table':'permissions',
+      #       'value_field':'id',
+      #       'header_field':'header',
+      #     },
+      #     {
+      #       'description':'Если включено, то',
+      #       'name':'denied',
+      #       'type':'select_values',
+      #       'values':[
+      #         {'v':0,'d':'давать доступ'},
+      #         {'v':1,'d':'запрещать доступ'}
+      #       ]
+      #     },
+      #   ]
+      # },
 ]

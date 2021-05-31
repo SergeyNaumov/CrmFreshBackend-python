@@ -13,7 +13,7 @@ def get_fields():
     },
     {
       'name':'number',
-      'description':'Номер',
+      'description':'Номер акта',
       'type':'text',
       'filter_on':1
     }, 
@@ -50,5 +50,11 @@ def get_fields():
       'default_off':1,
       'filter_on':1
     },
+    {
+      'name':'id',
+      'description':'Поставщики',
+      'type':'filter_extend_checkbox',
+      
+    }
 
 ]

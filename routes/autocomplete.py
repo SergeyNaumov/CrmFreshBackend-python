@@ -28,6 +28,7 @@ async def autocomplete(config:str,R: dict):
 
   if R['action'] == 'get_begin_value': # тут нужно будет доделать, хз, что это
     return get_begin_value(form=form,element=element)
+  
   elif term:
     #print('NAME',name)
     # используем get_name_and_ext для получения name и subname 
@@ -40,7 +41,7 @@ async def autocomplete(config:str,R: dict):
           field=f
     else:
       field=form.get_field(name)
-      print('FIELD',field)
+      #print('FIELD',field)
   else:
     errors.append('не указан term')
 
@@ -51,7 +52,8 @@ async def autocomplete(config:str,R: dict):
       form=form,
       name=name,
       element=field,
-      value=term
+      value=term,
+      values=R['values']
     )
     
   
@@ -62,11 +64,14 @@ async def autocomplete(config:str,R: dict):
 def get_list(**arg):
   form=arg['form']
   element=arg['element']
-  
+  like_values=[]
+  where=''
 
   work_table=''
   if not exists_arg('value',arg):
     arg['value']=''
+  
+  like_val=arg['value']
 
   if exists_arg('before_search',element):
     element['before_search'](form,element)
@@ -89,7 +94,7 @@ def get_list(**arg):
       ''',
       values=['%'+arg['value']+'%']
     )
-  if T == 'filter_extent_text':
+  if T == 'filter_extend_text':
     for x in form.QUERY_SEARCH_TABLES:
       if x['alias'] == element['filter_table']:
         work_table=x['table']
@@ -98,28 +103,51 @@ def get_list(**arg):
         break
 
   if T in ['select_from_table','filter_extend_select_from_table']:
-    where=''
+    
     if not exists_arg('out_header',element): 
       element['out_header'] = element['header_field']
 
     select_fields=element['value_field']+' v, '+element['out_header']+' d'
 
     if exists_arg('where', element):
-      where=' WHERE '+element['where']
+      where+=element['where']
+
+    if like_val:
+      if where:
+        where=where+' AND '
+      where+=f"{element['header_field']} like %s"
+      like_values.append('%'+like_val+'%')
+
+      if exists_arg('values',arg):
+        values_array=[]
+        for v in arg['values']:
+          #print('v:',v)
+          values_array.append(str(v))
+        #print('values_array:',values_array)
+        
+        if len(values_array):
+          if where: where+=' OR '
+          where+=element['value_field']+' IN ('+','.join(values_array)+')'
 
     if T=='filter_extend_select_from_table' and exists_arg(filter_table,element):
       element['table']=element['filter_table']
 
-    if exists_arg('search_query',element):
-      like_val=arg['value']
-      element['search_query']=element['search_query'].replace('<%like%>',like_val).replace('<%v%>',like_val)
-    else:
+    if not exists_arg('search_query',element):
+      if where: where='WHERE '+where
       element['search_query']=f'''
-          SELECT {select_fields} from {element['table']} {where}  ORDER by {element['header_field']} limit 30
+          SELECT {select_fields} from {element['table']}  {where}  ORDER by {element['header_field']} limit 30
       '''
+
+    if exists_arg('search_query',element):
+      
+      element['search_query']=element['search_query'].replace('<%like%>',like_val).replace('<%v%>',like_val)
+    
+
+    print('search_query:',element['search_query'])
       
     return form.db.query(
-      query=element['search_query']
+      query=element['search_query'],
+      values=like_values
     );
 
 

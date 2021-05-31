@@ -10,9 +10,20 @@ def get_fields():
         'value_field':'id',
         'multilpe':0,
         'autocomplete':1,
+        'where':'date_stop>=curdate()',
+        'autocomplete_start_loaded':1, # подгружать autocomplete по умолчанию
+        'before_code':action_before_code,
         'filter_code':action_filter_code,
         'filter_on':1,
 
+      },
+      {
+        'description':'Группа товаров',
+        'type':'filter_extend_text',
+        'name':'action_plan_header',
+        'tablename':'ap',
+        'db_name':'header',
+        'filter_on':1,
       },
       {
         'description':'Выводить даты',
@@ -56,6 +67,7 @@ def get_fields():
         'description':'Наименование товара',
         'name':'header',
         'type':'text',
+        'autocomplete':1,
         'filter_on':1,
       },
       {
@@ -112,3 +124,33 @@ def action_filter_code(form,field,row):
   return ''
 def suppliers_filter_code(form,field,row):
   return row['suppliers2']
+
+def action_before_code(form,field):
+  manager_type=form.manager['type']
+  
+  field['where']=''
+
+  # Ограничение для юрлиц
+  if form.manager['type']==2:
+    where=' 1 '
+  
+  # Ограничение для аптек
+  if form.manager['type']==3: 
+    where=' 2 '
+
+  if form.script=='admin_table':
+    
+    query="SELECT id v,header d from action limit 10"
+    if field['where']:
+      query+=' WHERE '+field['where']
+    
+    field['values']=form.db.query(
+      query=query
+    )
+    
+
+    if len(field['values']):
+      field['value']=field['values'][0]['v']
+
+
+    form.pre(form.manager['type'])

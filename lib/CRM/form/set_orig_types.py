@@ -5,8 +5,10 @@ def func_set_orig_types(form):
     type=f['type']
     if f['type'].startswith('filter_'):
       continue
+    #if f['type'] in ['text','textarea']
 
-    name=f['name']
+
+    #name=f['name']
     if type in ['select_from_table','select_values']:
       f['orig_type']=f['type']
       if form.script=='edit_form':

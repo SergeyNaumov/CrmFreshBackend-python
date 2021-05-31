@@ -295,8 +295,13 @@ class FreshDB():
         out_error(self,'FreshDB::query: not exists attribute query',arg)
       #print('arg:',arg)
       if self.error_str : return []
-      
-      self.execute(cur,arg)
+      try:
+        self.execute(cur,arg)
+      except pymysql.err.OperationalError as err:
+        print_console_error('query:'+arg['query']+"\n"+str(err))
+        print('ARG:',arg)
+        return []
+
       rez=''
       if exists_arg('onevalue',arg):
         try:
@@ -305,7 +310,7 @@ class FreshDB():
           #print("\033[31m {}",'ERR:',err,arg['query'])
           print_console_error(err)
           
-          return None
+          return []
         if rez: rez=rez[0]
       else:
           if exists_arg('onerow',arg):
@@ -315,7 +320,7 @@ class FreshDB():
               #print("\033[31m {}",'ERR:',err,arg['query'])
               print_console_error(err)
               print(arg['query'])
-              return None
+              return []
 
           else:
             try:
@@ -326,9 +331,11 @@ class FreshDB():
                 if exists_arg('tree_use',arg): rez=tree_use_transform(rez)
 
             except pymysql.err.ProgrammingError as err:
+              print_console_error('freshdb query error:')
               print('ERR:',err,arg['query'])
-              #if exists_arg('errors',arg): arg['errors'].append(e)
-              return None
+              
+              if exists_arg('errors',arg): arg['errors'].append(err)
+              return []
 
       
       if exists_arg('to_json',arg): rez=to_json(rez)

@@ -51,7 +51,7 @@ def events_permissions(form):
 def before_search(form):
   #form.pre()
   form.query_search['WHERE'].append('wt.date_stop>=curdate()')
-  
+  #form.out_before_search.append('<h2 class="subheadling mb-2">История начисления бонусов</h2>')
   #form.query_search
 
 events={

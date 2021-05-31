@@ -46,8 +46,10 @@ class Engine():
           where="id=%s",
           values=[config['debug']['manager_id']]
         )
-        
-        self.login=self.manager['login']
+        if self.manager:
+          self.login=self.manager['login']
+        else:
+          self.manager={'id':config['debug']['manager_id'],'name':'менеджер не найден'}
       else:
         #print('session start')
         session_start(self,encrypt_method=config['encrypt_method']);

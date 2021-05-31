@@ -1,9 +1,11 @@
+# UPDATE manager set password=sha2('123',256);
 config={
   'title':'CRM АннА',
   'copyright':'copyright 2005 - {{cur_year}}',
   'encrypt_method':'mysql_sha2',
   'use_project':False,
   'system_email':'svcomplex@gmail.com',
+
   'connects':{
     'crm_read':{
       'user':'crm',
@@ -17,6 +19,10 @@ config={
       'host':'localhost',
       'dbname':'crm',
     },
+  },
+  'controllers':{
+    #'left_menu':'/left-menu'
+    'left_menu':'/anna/left-menu'
   },
   'docpack':{
     'user_table':'user',
@@ -41,12 +47,12 @@ config={
 
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','asus-tarusa'],
-    #'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+    'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)
     #'manager_id':141, # dir1@digitalstrateg.ru Кнейжиц Игорь Владимирович, Представитель юридического лица
     #'manager_id': 211, # pavlik-libra5@mail.ru, Представитель юридического лица
-    'manager_id':228, # realko2-z@mail.ru, Представитель юридического лица
-    
+    #'manager_id':228, # realko2-z@mail.ru, Представитель юридического лица
+    #'manager_id':144, # Представитель артеки: apt2@digitalstrateg.ru
   
   }
 }

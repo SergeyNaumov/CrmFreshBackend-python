@@ -25,6 +25,7 @@ def before_search(form):
       purchase_good wt
       LEFT JOIN purchase p ON p.id=wt.purchase_id
       LEFT JOIN action  act ON p.action_id=act.id
+      LEFT JOIN apteka a ON wt.apteka_id = a.id
     '''
   if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
     form.errors.append('Фильтр "мероприятие" обязателен')
@@ -35,9 +36,10 @@ def before_search(form):
   sf=form.query_search['SELECT_FIELDS']
   
   sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
+  sf.append('ap.header ap__header')
 
   form.out_before_search=''
-    
+  #form.explain=1
 
 events={
   'before_search':before_search,
