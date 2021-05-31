@@ -299,7 +299,7 @@ class FreshDB():
         self.execute(cur,arg)
       except pymysql.err.OperationalError as err:
         print_console_error('query:'+arg['query']+"\n"+str(err))
-        print('ARG:',arg)
+        #print('ARG:',arg)
         return []
 
       rez=''
