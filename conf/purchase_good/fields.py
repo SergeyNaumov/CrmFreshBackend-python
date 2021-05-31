@@ -1,7 +1,7 @@
 def get_fields():
     return [ 
       {
-        'description':'Мероприятие',
+        'description':'Название маркетингового мероприятия',
         'name':'action_id',
         'type':'select_from_table',
         'table':'action',
@@ -26,7 +26,7 @@ def get_fields():
         'filter_on':1,
       },
       {
-        'description':'Выводить даты',
+        'description':'Период действия акции',
         'name':'date_start',
         'type':'checkbox',
         'not_process':True,
@@ -71,7 +71,7 @@ def get_fields():
         'filter_on':1,
       },
       {
-        'description':'Кол-во',
+        'description':'Закуплено товаров, шт',
         'name':'cnt',
         'type':'text',
         'filter_on':1,
