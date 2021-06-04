@@ -7,8 +7,9 @@ from .permissions import *
 from .reg_apteka_account import reg_apteka_account, change_apteka_account
 from .change_comp_order import change_comp_order
 from .change_apteka_order import change_apteka_order
-from .get_reg_data import get_reg_data
+from .get_reg_data import get_reg_data, access_ur_lico_ok
 from .left_menu import left_menu
+from .action_subscribe import *
 
 router = APIRouter()
 
@@ -30,6 +31,8 @@ def check_account_login(R:dict):
     if len(errors):
         return {"success":0,"errors":errors}
     return {"success":1,"errors":[]}
+
+
 
 # Регистрация менеджера-представителя аптеки
 @router.post('/reg-apteka-account')
@@ -189,6 +192,19 @@ async def get_account_data(R:dict):
             return {"success":1,"data":data}
         
     return {"success":0,"errors":"что-то пошло не так"}
+
+
+# Заявка от юрлица для подписки на акцию
+@router.get('/subscribe-action/{action_id}/ur_lico/{ur_lico_id}')
+async def request(action_id:int, ur_lico_id:int):
+    return action_subscribe_ur_lico(action_id,ur_lico_id)
+
+
+
+# Заявка от аптеки для подписки на акцию
+@router.get('/subscribe-action/{action_id}/apteka/{apteka_id}')
+async def request(action_id:int, apteka_id:int):
+    return action_subscribe_apteka(action_id,apteka_id)
 
 # Заявка на изменение данных аптеки
 @router.post('/change-apteka-order')

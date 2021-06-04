@@ -1,3 +1,5 @@
+from lib.engine import s
+from lib.core import exists_arg
 
 def get_fields():
     return [ 
@@ -78,9 +80,61 @@ def date_start_filter_code(form,field,row):
   return f"{row['wt__date_start']} - {row['wt__date_stop']}"
 
 def date_stop_filter_code(form,field,row):
-  return """
-    <a href="">подписаться</a>
-  """
+
+  if str(form.manager['type'])=='2': # Юридическое лицо
+    #form.pre(row)
+    # получаем списки подписанных и отправивших запрос на акцию юрлиц
+    if not exists_arg('subscribed_ur_lico_id',row): row['subscribed_ur_lico_id']=''
+    if not exists_arg('requested_ur_lico_id',row): row['requested_ur_lico_id']=''
+    row['subscribed_ur_lico_id']=row['subscribed_ur_lico_id'].split('|')
+    row['requested_ur_lico_id']=row['requested_ur_lico_id'].split('|')
+
+    #ur_lico_subscribe='[{"id":"1","name":"ЗАО лекарствснаб","v":"0"},{"id":"2","name":"ФЕРЕЙН","v":"1"},{"id":"3","name":"ООО Ихтиандр","v":"2"}]'
+    ur_lico_subscribe=[]
+    
+    for u in form.manager['ur_lico_list']:
+      v=0
+      if str(u['id']) in row['subscribed_ur_lico_id']: v=2 # подписанных
+      elif str(u['id']) in row['requested_ur_lico_id']: v=1 # отправил запрос на подписку
+      else: v=0
+      ur_lico_subscribe.append({'id':u['id'],'v':str(v),'name':u['name']})
+
+    # Количество подписанных аптек
+    apteka_subscribe=0
+    ur_lico_subscribe=s.to_json(ur_lico_subscribe)
+    
+    if (row['apteka_id_list']):
+      apteka_subscribe=len(row['apteka_id_list'].split('|'))
+    return f'<div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{ur_lico_subscribe}|{apteka_subscribe}</div>'
+
+
+  elif str(form.manager['type'])=='3': # Аптека
+    # subscribe_status: 0 - не подписна ; 1 - отправлен запрос на участие ; 2- подписана
+    if not exists_arg('subscribed_apteka_id',row): row['subscribed_apteka_id']=''
+    row['subscribed_apteka_id']=row['subscribed_apteka_id'].split('|')
+    if not exists_arg('requested_apteka_id',row): row['requested_apteka_id']=''
+    row['requested_apteka_id']=row['requested_apteka_id'].split('|')
+
+    apteka_subscribe=[]
+
+    for a in form.manager['apteka_list']:
+      v=0
+      if str(a['id']) in row['subscribed_apteka_id']: v=2
+      if str(a['id']) in row['requested_apteka_id']: v=1
+      apteka_subscribe.append({'id':a['id'],'v':str(v),'name':a['name']})
+    apteka_subscribe=s.to_json(apteka_subscribe)
+
+    return f'<div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{apteka_subscribe}</div>'
+
+    form.pre(apteka_subscribe)
+
+    #form.pre(row)
+    subscribe_status=0
+    return subscribe_status
+    # else:
+  return ''
+
+  
 
 def good_categories(form,field):
   #'Здесь будет какая-то инфа'

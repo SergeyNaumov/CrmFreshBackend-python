@@ -1,5 +1,6 @@
 from lib.engine import s
 from .permissions import get_manager_data
+
 def get_reg_data():
     response={
         'success':1,
@@ -93,3 +94,32 @@ def get_reg_data():
     response['errors']=errors
     if len(errors): response['success']=0
     return response
+
+# Проверяем, имеем ли мы доступ к аптеке
+def access_apteka_ok(manager_id,apteka_id):
+    return s.db.query(
+        query='select id from apteka where manager_id=%s and id=%s',
+        onevalue=1,
+        values=[manager_id,apteka_id]
+    )
+def access_ur_lico_ok(manager_id,ur_lico_id):
+    return s.db.query(
+        query='''
+            select 
+                ur_lico_id
+            from
+                ur_lico_manager
+                
+            where
+                ur_lico_id=%s and manager_id=%s
+        ''',
+        values=[ur_lico_id,manager_id],
+        #debug=1,
+        onevalue=1
+    )
+    
+# def apteka_ids_dict(reg_data):
+#     pass
+
+# def ur_lico_ids_dict(reg_data)
+#     print reg_data

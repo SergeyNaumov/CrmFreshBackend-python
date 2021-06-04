@@ -1,9 +1,19 @@
+#def pre(d):
+#    form.pre(d)
+
 def events_permissions(form):
+    
     if ('superadmin' in form.manager['permissions']) or (form.manager['login']=='admin'):
       form.is_admin=1
       form.read_only=0
     else:
       form.is_admin=0
+
+    if not ( str(form.manager['type']) == "1" ):
+      form.errors.append('доступ запрещён!')
+      #return 
+
+
 
 
     if form.id:
@@ -29,11 +39,10 @@ def events_permissions(form):
 
 
 def events_before_code(form):
-    print('is_before_code')
+    pass
 
 def before_delete(form,opt):
-    print('before_detele STARTED!')
-    #form.errors.append('Вам запрещено удалять!')
+    pass
 
 events={
   'permissions':[

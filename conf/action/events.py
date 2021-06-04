@@ -1,58 +1,34 @@
+from .permissions import events_permissions
 
-def events_permissions(form):
-  #if(form.script=='')
-  if form.id:
-    form.ov=form.db.query(
-      query='select * from action where id=%s',
-      values=[form.id],
-      onerow=1
-    )
-
-    if form.ov:
-      form.title='Маркетинговое мероприятие '+form.ov['header']
-
-  new_fields=[]
-  for f in form.fields:
-    f['read_only']=1
-    if form.id:
-      if not (f['name'] in ['date_start','date_stop']):
-         new_fields.append(f)
-
-      if  f['name'] =='date_stop':
-        new_fields.append({
-          'description':'Даты подписки',
-          'type':'code',
-          'after_html':f'<p><b>Дата подписки:</b> {form.ov["date_start"]} - {form.ov["date_stop"]}</p>',
-          'name':'dates'
-        })
-    else:
-      new_fields.append(f)
-
-
-
-
-  form.fields=new_fields
-  #form.pre(form.script)
-
-  if form.script in ['find_objects']:
-    for f in form.fields:
-      if f['name']=='date_start':
-        f['description']='Период подписки'
-      
-      if f['name']=='date_stop':
-        f['description']='Подписка'
-
-  if form.script=='admin_table':
-    form.javascript['admin_table']=form.template(
-      './conf/action/templates/admin_table.js',
-    )
 
 
 def before_search(form):
-  #form.pre()
-  form.query_search['WHERE'].append('wt.date_stop>=curdate()')
+  
+  # Для представителя юридического лица выводим информацию подписанных юридических лицах, а также о тех,
+  # которые отправили запросы на подписку
+  
+
+  if str(form.manager['type'])=='2':
+    if len(form.manager['ur_lico_list']):
+      form.query_search['SELECT_FIELDS'].append('group_concat(distinct aul.ur_lico_id SEPARATOR "|") subscribed_ur_lico_id')
+      form.query_search['SELECT_FIELDS'].append('group_concat(distinct aul_r.ur_lico_id SEPARATOR "|") requested_ur_lico_id')
+      form.query_search['SELECT_FIELDS'].append('group_concat(distinct aa.apteka_id SEPARATOR "|" ) apteka_id_list')
+  
+
+  if str(form.manager['type'])=='3': # для представителя аптеки
+    if len(form.manager['apteka_list']):
+      form.query_search['SELECT_FIELDS'].append('group_concat(distinct aa.apteka_id SEPARATOR "|" ) subscribed_apteka_id')
+      form.query_search['SELECT_FIELDS'].append('group_concat(distinct aar.apteka_id SEPARATOR "|" ) requested_apteka_id')
+      
+    #subscribed_ur_lico_id
+    # Добавляем в поисковый запрос список подписанных юрлиц
+    # form.QUERY_SEARCH_TABLES.append(
+    #   {'t':'action_ur_lico','a':'aul','l':'aul.action_id=wt.id','lj':1}
+    # )
+    #form.pre(form.query_search)
+
   #form.out_before_search.append('<h2 class="subheadling mb-2">История начисления бонусов</h2>')
-  #form.query_search
+  
 
 events={
   'permissions':[

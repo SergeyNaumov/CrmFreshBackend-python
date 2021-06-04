@@ -19,10 +19,14 @@ async def get_filters_controller(config: str):
   )
   
   if is_errors(form):
-    return form
+    return {
+      'success':0,
+      'errors':form.errors
+    }
 
   filters=[]
   order=1
+
   for f in form.fields:
     # if(ref($f->{before_code}) eq 'CODE'){
     #   run_event(event=>$f->{before_code},description=>'before_code for '.$f->{name},form=>$form,arg=>$f);

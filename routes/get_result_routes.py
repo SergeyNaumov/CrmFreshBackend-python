@@ -50,7 +50,7 @@ async def get_result(R: dict):
   form.get_search_tables(R['query'])
   
   form.get_search_where(R['query'])
-
+  
   form.run_event('before_search')
 
   form.run_event('before_search_mysql',
@@ -126,6 +126,7 @@ async def get_result(R: dict):
               'results':form.SEARCH_RESULT,
               'errors':form.errors,
               'out_before_search':form.out_before_search,
+              'javascript':form.javascript['find_objects'],
               'out_after_search':form.out_after_search,
               'explain_query':form.explain_query
       }

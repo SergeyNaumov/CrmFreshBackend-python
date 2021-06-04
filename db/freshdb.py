@@ -327,8 +327,12 @@ class FreshDB():
               rez=cur.fetchall()
               if exists_arg('massive',arg):
                 rez=massive_transform(rez)
+                if exists_arg('str',arg):
+                  rez = [str(item) for item in rez]
               else:
                 if exists_arg('tree_use',arg): rez=tree_use_transform(rez)
+
+
 
             except pymysql.err.ProgrammingError as err:
               print_console_error('freshdb query error:')
