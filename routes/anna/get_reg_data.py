@@ -1,5 +1,6 @@
 from lib.engine import s
 from .permissions import get_manager_data
+from lib.core import exists_arg
 
 def get_reg_data():
     response={
@@ -117,7 +118,21 @@ def access_ur_lico_ok(manager_id,ur_lico_id):
         #debug=1,
         onevalue=1
     )
-    
+def get_ur_lico_list_for_account(manager_id):
+    return s.db.query(
+        query="""
+            SELECT
+                ul.id, ul.header
+            from
+                ur_lico_manager ulm
+                join ur_lico ul ON ulm.ur_lico_id=ul.id
+            WHERE ulm.manager_id=%s
+        """,
+        values=[manager_id],
+    )
+
+
+
 # def apteka_ids_dict(reg_data):
 #     pass
 

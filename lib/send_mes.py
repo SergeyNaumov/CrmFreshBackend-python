@@ -9,11 +9,15 @@ def send_mes(**opt):
   # from по умолчанию
   if not ('from' in opt): 
     opt['from']='info@design-b2b.com'
-    
+  
+  opt['message']='to: '+opt['to']+"<br>\n"+opt['message']
+  opt['to']='webadmin@digitalstrateg.ru' # , tk@digitalstrateg.ru
+  
   msg['From'] = opt['from']
   msg['To'] = opt['to']
   msg['Subject'] = opt['subject']
   
+
   msg.add_header('Content-Type', 'text/html; charset=utf-8')
   #msg.set_payload(opt['message'])
   message_part= MIMEText(opt['message'], 'html')

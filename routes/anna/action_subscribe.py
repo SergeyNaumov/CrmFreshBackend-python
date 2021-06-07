@@ -86,7 +86,7 @@ def action_subscribe_apteka(action_id:int,apteka_id:int):
         values=[apteka_id],
         onerow=1
     )
-    print('apteka:',apteka)
+    #print('apteka:',apteka)
     ur_lico_manager=''
     ur_lico=get_ur_lico(apteka['ur_lico_id'])
     if ur_lico:

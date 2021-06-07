@@ -105,6 +105,7 @@ async def get_result(R: dict):
     errors=form.errors,
   )
   
+  
   if form.explain:
     form.explain_query=query
     form.explain_query=form.explain_query+'<br><br>VALUES: ['+','.join(form.query_search['VALUES'])+']'
@@ -117,7 +118,7 @@ async def get_result(R: dict):
 
   output=process_result_list(form,R,result_list)
 
-    
+  
   if 1 : # not s['end'])
       form.SEARCH_RESULT['log']=form.log
       form.SEARCH_RESULT['output']=output

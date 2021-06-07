@@ -17,7 +17,10 @@ def check_rules(rules,errors):
   return errors
 
 def is_email(email):
-  return re.match(r'^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_]+\.[a-zA-Z0-8\-_\.]+$',email)
+  if email:
+    return re.match(r'^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_]+\.[a-zA-Z0-8\-_\.]+$',email)
+  else:
+    return False
 
 
 def is_phone(phone):

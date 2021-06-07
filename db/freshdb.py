@@ -298,8 +298,11 @@ class FreshDB():
       try:
         self.execute(cur,arg)
       except pymysql.err.OperationalError as err:
-        print_console_error('query:'+arg['query']+"\n"+str(err))
-        #print('ARG:',arg)
+        
+        if 'errors' in arg:
+          arg['errors'].append(f"error query: {arg['query']} {str(err)}")
+        else:
+          print_console_error("err1 query:\n"+arg['query']+"\n"+str(err))
         return []
 
       rez=''
@@ -307,9 +310,11 @@ class FreshDB():
         try:
           rez = cur.fetchone()
         except pymysql.err.ProgrammingError as err:
-          #print("\033[31m {}",'ERR:',err,arg['query'])
-          print_console_error(err)
-          
+          if 'errors' in arg:
+            arg['errors'].append(f"error query: {arg['query']} {str(err)}")
+          else:
+            print_console_error("err2 query:\n"+arg['query']+"\n"+str(err))
+
           return []
         if rez: rez=rez[0]
       else:
@@ -317,7 +322,7 @@ class FreshDB():
             try:
               rez=cur.fetchone()
             except pymysql.err.ProgrammingError as err:
-              #print("\033[31m {}",'ERR:',err,arg['query'])
+              print('err3')
               print_console_error(err)
               print(arg['query'])
               return []

@@ -10,6 +10,8 @@ from .change_apteka_order import change_apteka_order
 from .get_reg_data import get_reg_data, access_ur_lico_ok
 from .left_menu import left_menu
 from .action_subscribe import *
+from .change_reg_data import change_reg_data
+from .change_password import change_password
 
 router = APIRouter()
 
@@ -99,81 +101,14 @@ async def check_password(R: dict):
     }
 
 @router.post('/change-password')
-async def change_password(R:dict):
-    error=''
-    success=1
-    p1=R['password1']
-    p2=R['password2']
-
-    if not password_ok(R['password']):
-        error='Ваш текущий пароль не принят системой, попробуйте ещё раз'
-    else:
-        if len(p1)<6:
-            error='указанный пароль слишком короткий'
-
-        else:
-            if not(p1) or not(p2) or p1 != p2 or len(p1)<6:
-                error='пароли не совпадают'
-
-
-    if error:
-        success=0
-    else: # все проверки пройдены, меняем пароль
-        s.db.query(
-            query='UPDATE manager set password=sha2(%s,256) where id=%s',
-            values=[p1,s.manager['id']]
-        )
-
-        # Отправляем сообщение об изменениях пароля сотруднику
-        manager=get_manager_data()
-        if is_email(R['login']):
-            send_mes(
-                to=R['login'],
-                subject='Изменение пароля в системе Анна',
-                message=f"""
-                    Логин: {manager['login']}<br>
-                    Новый пароль: {p1}
-                """
-            )
-
-
-    return {'success':success,'error':error}
+async def change_password_controller(R:dict):
+    return change_password(R)
 
 # Изменени рег. данных менеджера
 @router.post('/change-reg-data')
-async def change_reg_data(R:dict):
-    
-    success=1
-    
-    rules=[
-       [ (R['phone']),'Телефон не указан'],
-       [ is_phone(R['phone']),'Телефон указан не корректно' ],
-       [ (R['login']),'Логин не указан'],
-       [ is_email(R['login']),'Логин указан не корректно, укажите валидный email' ],
-       [ (R['name_f']),'Фамилия не указана'],
-       [ (R['name_i']),'Имя не указано'],
-       [ (R['name_o']),'Отчество не указано'],
-       
-       [ not exist_login(R['login']), 'Такой Логин уже существует в нашей системе. Пожалуйста укажите другой, или воспользуетесь <a href="/remember">формой восстановления пароля</a>']
-    ]
-    errors=[]
-    check_rules(rules,errors)
-    if len(errors):
-        success=0
-    else:
-        s.db.query(
-            query="UPDATE manager set login=%s, email=%s, phone=%s, name=%s, name_f=%s, name_i=%s, name_o=%s WHERE id=%s",
-            values=[
-                R['login'],R['login'],
-                R['phone'],
-                R['name_f']+' '+R['name_i']+' '+R['name_o'], # Обновляем поле "полное имя"
-                R['name_f'],
-                R['name_i'],
-                R['name_o'],
-                s.manager['id']
-            ]
-        )
-    return {'success':success,'errors':errors}
+async def change_reg_data_controller(R:dict):
+    return change_reg_data(R)
+
 
 # Заявка на изменение данных юрлица
 @router.post('/change-comp-order')

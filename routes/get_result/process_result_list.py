@@ -7,7 +7,14 @@ def process_result_list(form,R,result_list):
   multiconnect_values={}
   id_list=[]
 
-  for r in result_list: id_list.append(r['wt__'+form.work_table_id])
+
+  for r in result_list:
+    id_fields=form.work_table_id.split(',')
+    for idf in id_fields:
+      if 'wt__'+idf in r:
+        id_list.append(r['wt__'+idf])
+      else:
+        form.errors.append(f'Ошибка: поле "{idf}"" отсутствует в основной таблице но упомянуто в work_table_id')
 
   if len(id_list):
       for q in R['query']:
@@ -132,7 +139,23 @@ def process_result_list(form,R,result_list):
           'type':type,
           'value':value
       })
+
+    # все эти заморочки для структур с составнам work_table_id,
+    # например form.work_table_id='ur_lico_id,action_id'
+    work_table_id_fields=form.work_table_id.split(',')
+    key_list=[]
+    values_list=[]
+    for fld in work_table_id_fields:
+      key_list.append('wt__'+fld)
+      if 'wt__'+fld in r:
+        values_list.append(str(r['wt__'+fld]))
       
-    output.append({'key':r['wt__'+form.work_table_id],'data':data})
+
+    id_field=','.join(key_list)
+    id_value=','.join(values_list)
+    #print('id_field:',id_field,'id_value:',values_list)
+    output.append({'key':id_value,'data':data})
+
+    #output.append({'key':r['wt__'+form.work_table_id],'data':data})
   
   return output

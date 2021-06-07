@@ -53,7 +53,7 @@ def reg_apteka_account(R):
         to=R['login'],
         subject='Для Вас создан аккаунт в системе АннА',
         message=f"""
-            Уважаемый(ая) {R['name_f']}  {R['name_f']} {R['name_f']}!<br>
+            Уважаемый(ая) {R['name_f']}  {R['name_i']} {R['name_o']}!<br>
             Только что для Вас был создан аккаунт для входа в систему АннА:<br>
             Логин: {R['login']}<br>
             Пароль: {R['password']}
