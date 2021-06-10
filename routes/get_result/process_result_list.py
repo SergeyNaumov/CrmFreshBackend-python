@@ -124,7 +124,14 @@ def process_result_list(form,R,result_list):
         elif field['type_orig'] == 'datetime':
           value=str(value)
         elif field['type_orig']=='date':
-          value=str(value)
+          
+          if value:
+            value=str(value)
+            date_list=value.split('-')
+            date_list.reverse()
+            value='.'.join(date_list)
+          else:
+            value=''
           if exists_arg('make_change_in_search',field):
             type='date'
           
