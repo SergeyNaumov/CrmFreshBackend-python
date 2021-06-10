@@ -6,7 +6,7 @@ def get_search_where(form,query):
   VALUES=[]
 
   form.SEARCH_RESULT['query_fields']=[]
-  print('get_search_where - доделать')
+  #print('get_search_where - доделать')
   if not len(query):
     if isinstance(form.default_find_filter,str):
       form.default_find_filter=[form.default_find_filter.split(',')]
@@ -16,7 +16,9 @@ def get_search_where(form,query):
           f=form.fields_hash[name]
           form.SEARCH_RESULT['query_fields'].append(f)
           query.append([name,''])
-
+  for f in form.fields:
+    form.fields_hash[f['name']]=f
+    
   for q in query:
       name,values=q
       #print(f'name:{name} values:{values}')
@@ -163,7 +165,10 @@ def get_search_where(form,query):
               map_rezult.append(v)
 
           if len(map_rezult):
-            WHERE.append(' ('+table+'.'+f['value_field']+' IN ('+','.join(map_rezult)+'))')
+            if f['type']=='filter_extend_select_from_table':
+              WHERE.append(' ('+table+'.'+f['name']+' IN ('+','.join(map_rezult)+'))')
+            else:
+              WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')
 
       elif f['type'] == 'multiconnect':
         if not exists_arg('tablename',f):

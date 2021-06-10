@@ -7,6 +7,7 @@ from lib.core import exists_arg
 def change_reg_data(R:dict):
     success=1
     manager=get_manager_data()
+    print('manager:',manager)
     rules=[
        [ (R['phone']),'Телефон не указан'],
        [ is_phone(R['phone']),'Телефон указан не корректно' ],
@@ -111,7 +112,7 @@ def change_reg_data(R:dict):
             subject=subject,
             message=message_manager_anna
         )
-        print('send_to (anna manager):',manager['login'])
+        print('send_to (anna manager):',manager['ma_email'])
 
     if is_email(manager['login']):
         send_mes(

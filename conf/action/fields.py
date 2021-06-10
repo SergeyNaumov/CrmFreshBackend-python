@@ -195,4 +195,5 @@ def good_categories(form,field):
     form.run_js=form.template('./conf/action/templates/good_categories.js')
 
 def date_stop_before_code(form,field):
-  form.pre({'script':form.script})
+  print()
+  #form.pre({'script':form.script})

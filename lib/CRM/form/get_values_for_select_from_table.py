@@ -3,7 +3,7 @@ from lib.core import exists_arg, tree_to_list
 def get_values_for_select_from_table(form,f):
   #print('get_values_for_select_from_table не готово')
   #values=[]
-
+  #print('get_values_for_select_from_table:',f)
 
 
   if not exists_arg('value_field',f):

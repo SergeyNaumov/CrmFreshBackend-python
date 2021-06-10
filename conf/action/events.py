@@ -1,4 +1,4 @@
-from .permissions import events_permissions
+from .permissions import events_permissions, filter_ur_lico
 
 
 
@@ -6,8 +6,8 @@ def before_search(form):
   
   # Для представителя юридического лица выводим информацию подписанных юридических лицах, а также о тех,
   # которые отправили запросы на подписку
-  
-
+  #form.explain=1
+  form.query_search['WHERE'].append('wt.date_stop>=curdate()')
   if str(form.manager['type'])=='2':
     if len(form.manager['ur_lico_list']):
       form.query_search['SELECT_FIELDS'].append('group_concat(distinct aul.ur_lico_id SEPARATOR "|") subscribed_ur_lico_id')
@@ -33,6 +33,7 @@ def before_search(form):
 events={
   'permissions':[
       events_permissions
+      #filter_ur_lico
   ],
   'before_search':[
       before_search

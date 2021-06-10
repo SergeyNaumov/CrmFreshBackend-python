@@ -34,7 +34,7 @@ def func_get_values(form):
 
 
     for f in form.fields:
-
+      #print('f:',f)
       #if f['type'] in ['date','datetime','text','textarea']:
 
 
@@ -62,7 +62,7 @@ def func_get_values(form):
         #if not f['value']:
         #  f['value']=''
 
-      if form.action not in ['insert','update'] and exists_arg('orig_type',f)=='select_from_table':
+      if form.action not in ['insert','update'] and exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
          f['value']=exists_arg(f['name'],values);
          f['values']=get_values_for_select_from_table(form,f)
       if f['type'] == '1_to_m':
