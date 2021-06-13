@@ -11,7 +11,7 @@ def send_mes(**opt):
     opt['from']='info@design-b2b.com'
   
   opt['message']='to: '+opt['to']+"<br>\n"+opt['message']
-  opt['to']='webadmin@digitalstrateg.ru' # , tk@digitalstrateg.ru
+  opt['to']='tk@digitalstrateg.ru' # , tk@digitalstrateg.ru
   
   msg['From'] = opt['from']
   msg['To'] = opt['to']

@@ -94,10 +94,18 @@ def get_manager_data(manager_id=0,errors=[]):
     if manager:
 
       if manager['type']==3: # Если это аптека
-        manager['apteka']=s.db.getrow(
-          table='apteka',where="manager_id=%s",values=[manager_id]
+        manager['apteka']=s.db.query(
+          query='''
+            select
+              a.*
+            from
+              apteka a
+            where a.manager_id=%s
+          ''',
+          values=[manager_id],
+          onerow=1
         )
-
+        print('apteka:',manager['apteka'])
         if exists_arg('ur_lico_id',manager['apteka']):
           ur_lico=get_ur_lico(manager['apteka']['ur_lico_id'])
           

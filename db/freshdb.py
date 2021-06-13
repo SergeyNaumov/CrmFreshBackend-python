@@ -322,9 +322,9 @@ class FreshDB():
             try:
               rez=cur.fetchone()
             except pymysql.err.ProgrammingError as err:
-              print('err3')
+              print('err3: ',err )
               print_console_error(err)
-              print(arg['query'])
+              print(arg['query'],)
               return []
 
           else:

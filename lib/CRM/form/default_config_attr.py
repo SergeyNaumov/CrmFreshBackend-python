@@ -39,10 +39,6 @@ def default_config_attr(form,arg): # Атрибуты формы по умолч
 
 
     if exists_arg('action',arg): form.action=arg['action']
-    
-    if exists_arg('id',arg):
-      form.id=arg['id']
-
     if not form.work_table: form.work_table=arg['config']
     
 

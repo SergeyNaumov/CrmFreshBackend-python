@@ -166,9 +166,12 @@ def get_search_where(form,query):
 
           if len(map_rezult):
             if f['type']=='filter_extend_select_from_table':
-              WHERE.append(' ('+table+'.'+f['name']+' IN ('+','.join(map_rezult)+'))')
-            else:
+              
+
               WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')
+            else:
+              
+              WHERE.append(' (wt.'+db_name+' IN ('+','.join(map_rezult)+'))')
 
       elif f['type'] == 'multiconnect':
         if not exists_arg('tablename',f):

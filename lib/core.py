@@ -42,6 +42,14 @@ def get_func(f):
   return ''
 
 
+def date_to_rus(d):
+  d=str(d)
+  if d:
+    date_list=d.split('-')
+    date_list.reverse()
+    return '.'.join(date_list)
+  return ''
+
 
 def from_datetime_get_date(dt):
   if not dt: return False

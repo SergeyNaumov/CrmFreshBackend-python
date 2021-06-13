@@ -1,15 +1,20 @@
 
+from .get_old_values import get_old_values
 
 def events_permissions(form):
   #form.pre('zzz')
   filter_ur_lico(form)
-
+  #print('action:',form.action)
+  #print('script:',form.script)
   if form.id:
-    form.ov=form.db.query(
-      query='select * from action where id=%s',
-      values=[form.id],
-      onerow=1
-    )
+    #form.ov=form.db.query(
+    #  query='select * from action where id=%s',
+    #  values=[form.id],
+    #  onerow=1
+    #)
+
+    form.ov=get_old_values(form)
+    #form.pre(form.ov)
 
     if form.ov:
       form.title='Маркетинговое мероприятие '+form.ov['header']
@@ -25,7 +30,7 @@ def events_permissions(form):
         new_fields.append({
           'description':'Даты подписки',
           'type':'code',
-          'after_html':f'<p><b>Дата подписки:</b> {form.ov["date_start"]} - {form.ov["date_stop"]}</p>',
+          'after_html':f'<p><b>Дата подписки:</b> { form.ov["date_start"] } - { form.ov["date_stop"] }</p>',
           'name':'dates'
         })
     else:
@@ -144,25 +149,46 @@ def events_permissions(form):
 
 def filter_ur_lico(form):
   # в том случае, если это юридическое лицо, в подчинении у которого есть другие юрлица -- выводим фильтр для фильтрации по этим юрлицам
-  if form.manager['type']==2 and form.script in ['admin_table','find_objects']:
+  if form.manager['type']==2 and form.script in ['admin_table','find_objects','edit_form']:
       form.manager['ur_lico_list']=form.db.query(
         query='''
           SELECT
-            wt.id,wt.header name
+            wt.id,wt.header name,
+            group_concat(distinct a.id SEPARATOR "|") apt_ids
           from 
             ur_lico wt
             JOIN ur_lico_manager ulm ON wt.id=ulm.ur_lico_id
+            LEFT JOIN apteka a ON a.ur_lico_id=wt.id
           WHERE ulm.manager_id=%s
+          GROUP BY wt.id
         ''',
         values=[form.manager['id']]
       )
+      apt_list_ids=[]
+
+      for u in form.manager['ur_lico_list']:
+        u['apt_ids']=u['apt_ids'].split('|')
+        apt_list_ids=list(apt_list_ids)+list(u['apt_ids'])
+      
+      if not len(apt_list_ids): apt_list_ids=[]
+      form.manager['apt_list_ids']=apt_list_ids
+
+      ur_lico_ids=[]
+
+      
+      for u in form.manager['ur_lico_list']: ur_lico_ids.append(str(u['id']))
+      form.manager['ur_lico_ids']=ur_lico_ids
+      if not len(ur_lico_ids): ur_lico_ids=['0']
+
+      #form.pre(form.manager['ur_lico_list'])
+
+
   
   if form.manager['type']==2:
     if form.script in ['admin_table','find_objects'] and len(form.manager['ur_lico_list'])>1:
-      ur_lico_ids=[]
-      for u in form.manager['ur_lico_list']: ur_lico_ids.append(str(u['id']))
 
-      #form.pre(ur_lico_ids)
+
+      
       #form.explain=1
       form.fields.append(
          {
@@ -173,8 +199,9 @@ def filter_ur_lico(form):
            'header_field':'header',
            'value_field':'id',
            'tablename':'aul',
-           'where':'id in ('+','.join(ur_lico_ids)+')',
-           'filter_on':1
+           'where':'id in ('+','.join(form.manager['ur_lico_ids'])+')',
+           'filter_on':1,
+           'not_process':1
          }
       )
      # print(f"script: {form.script}")

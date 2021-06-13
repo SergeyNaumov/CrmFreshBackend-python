@@ -41,7 +41,7 @@ if( 1 || !('bind_subscribe_buttons'  in window) ){
             btn=ce({t:'a'})
             btn.innerHTML='<span style="color: red;">подписаться</span>'
             btn.setAttribute("href",'#')
-            btn.setAttribute("data-action_id",u.id)
+            btn.setAttribute("data-action_id",u.actionid)
             btn.setAttribute("data-id",u.id)
             btn.setAttribute("data-type",u.id)
             btn.setAttribute("data-subscribed",u.v)

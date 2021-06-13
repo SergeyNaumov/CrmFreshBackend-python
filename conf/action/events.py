@@ -7,10 +7,20 @@ def before_search(form):
   # Для представителя юридического лица выводим информацию подписанных юридических лицах, а также о тех,
   # которые отправили запросы на подписку
   #form.explain=1
+  tables=' '.join(form.query_search['TABLES'])
+  where=' AND '.join(form.query_search['WHERE'])
+  if where:
+    where=' WHERE '+where
+
+
+  #form.pre(form.query_search)
+  #form.pre(query_apt_count)
   form.query_search['WHERE'].append('wt.date_stop>=curdate()')
   if str(form.manager['type'])=='2':
     if len(form.manager['ur_lico_list']):
       form.query_search['SELECT_FIELDS'].append('group_concat(distinct aul.ur_lico_id SEPARATOR "|") subscribed_ur_lico_id')
+      form.query_search['SELECT_FIELDS'].append('group_concat( distinct aa.apteka_id SEPARATOR "|" ) subscribed_apteka_id')
+      
       form.query_search['SELECT_FIELDS'].append('group_concat(distinct aul_r.ur_lico_id SEPARATOR "|") requested_ur_lico_id')
       form.query_search['SELECT_FIELDS'].append('group_concat(distinct aa.apteka_id SEPARATOR "|" ) apteka_id_list')
   

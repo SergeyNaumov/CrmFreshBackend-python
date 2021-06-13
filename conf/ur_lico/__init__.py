@@ -5,22 +5,23 @@ from .events import events
 
 class Config(Form):
     events=events
-    def __init__(self,arg):
+    def __init__(form,arg):
         super().__init__(arg) 
         
-        self.title='Юридические лица'
-        self.explain=0
-        self.read_only=1
-        self.make_delete=0
-        self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'},
-            {'table':'manager','alias':'m1','link':'wt.manager_id=m1.id','left_join':1},
+        form.title='Юридические лица'
+        form.explain=0
+        form.read_only=1
+        form.make_delete=0
+        form.QUERY_SEARCH_TABLES=[
+            {'table':form.work_table,'alias':'wt'},
+            #{'table':'manager','alias':'m1','link':'wt.manager_id=m1.id','left_join':1},
             {'table':'manager','alias':'m2','link':'wt.anna_manager_id=m2.id','left_join':1},
+            {'table':'apteka','alias':'a','link':'a.ur_lico_id=wt.id'}
         ]
-        self.events=events
-        self.filters_groups=[]
-        #self.explain=1
-        self.on_filters=[
+        form.events=events
+        form.filters_groups=[]
+        #form.explain=1
+        form.on_filters=[
             # {
             #     'name':'address'
             # },
@@ -29,8 +30,9 @@ class Config(Form):
             #     #'value':["2020-01-01","2020-01-02"]
             # },
         ]
-        self.search_on_load=1
-        self.fields=get_fields()
+        form.search_on_load=1
+        form.fields=get_fields()
+        form.GROUP_BY='wt.id'
 
 """
 create table test(

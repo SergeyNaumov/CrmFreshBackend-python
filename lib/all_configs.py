@@ -95,6 +95,10 @@ def read_config(**arg):
   else:
     form.manager=get_permissions_for(form,login)
     # Атрибуты по умолчанию
+  
+  if exists_arg('id',arg): form.id=arg['id']
+  if exists_arg('action',arg): form.action=arg['action']
+  if not form.work_table: form.work_table=arg['config']
 
   form.run_event('permissions')
   form.default_config_attr(arg)

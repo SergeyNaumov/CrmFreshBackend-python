@@ -3,7 +3,8 @@ def get_fields():
       {
         'description':'Название маркетингового мероприятия',
         'name':'action_id',
-        'type':'select_from_table',
+        'db_name':'id',
+        'type':'filter_extend_select_from_table',
         'table':'action',
         'tablename':'act',
         'header_field':'header',
@@ -153,4 +154,4 @@ def action_before_code(form,field):
       field['value']=field['values'][0]['v']
 
 
-    form.pre(form.manager['type'])
+    #form.pre(form.manager['type'])

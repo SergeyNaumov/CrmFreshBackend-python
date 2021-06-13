@@ -1,4 +1,4 @@
-from lib.core import exists_arg
+from lib.core import exists_arg, date_to_rus
 def process_result_list(form,R,result_list):
   # Обрабатывает результат, возвращает output
   if not result_list: result_list=[]
@@ -126,10 +126,7 @@ def process_result_list(form,R,result_list):
         elif field['type_orig']=='date':
           
           if value:
-            value=str(value)
-            date_list=value.split('-')
-            date_list.reverse()
-            value='.'.join(date_list)
+            value=date_to_rus(value)
           else:
             value=''
           if exists_arg('make_change_in_search',field):

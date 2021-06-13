@@ -57,7 +57,7 @@ def change_reg_data(R:dict):
 
     
     subject=f"Изменение регистрационных данных - {manager['login']}"
-    # отпаравляем представителю юрлица
+    # отправляем представителю юрлица
 
 
     if manager['type']==2:
@@ -80,7 +80,7 @@ def change_reg_data(R:dict):
     
     message=f"""
     только что {manager['name_f']} {manager['name_i']} {manager['name_o']}, {name_role}<br>
-    Отправил(а) запрос на изменение своих регистрационных данных:<br>
+    изменение регистрационных данных:<br>
     <b>Логин:</b> {R['login']}<br>
     <b>Телефон:</b> {R['phone']}<br>
     <b>Фамилия:</b> {R['name_f']}<br>
@@ -88,7 +88,7 @@ def change_reg_data(R:dict):
     <b>Отчество:</b> {R['name_o']}<br>
     """
 
-    message_manager_anna=f"""{manager['ma_name_f']} {manager['ma_name_i']} {manager['ma_name_o']} -<br>{message}"""
+    
 
     if apteka: # если это представитель аптеки -- отправляем в юрлицо
         #print('apteka:',apteka)
@@ -102,16 +102,35 @@ def change_reg_data(R:dict):
                 subject=subject,
                 message=message
             )
-    
-    #print('manager:',manager)
 
+
+    else:
+        message_manager_anna=f"""
+            {manager['ma_name_f']} {manager['ma_name_i']} {manager['ma_name_o']} -<br>
+            {message}
+        """
+    # Письмо менеджеру АннА
+    
     if manager['type'] in [2,3] and is_email(manager['ma_email']):
+        # если рег. данные меняет юр.лицо
+        if manager['type']==2: # гер
+            send_mes(
+                to=manager['ma_email'],
+                subject=f"Изменение регистрационных",
+                message=message_manager_anna
+            )
         
-        send_mes(
-            to=manager['ma_email'],
-            subject=subject,
-            message=message_manager_anna
-        )
+        # Если рег. данные меняет аптека
+        if manager['type']==3:
+            send_mes(
+                to=manager['ma_email'],
+                subject=f"{manager['ma_name_f']} {manager['ma_name_i']} {manager['ma_name_o']} - изменение регистрационных данных для аптеки",
+                message=f"""
+                    <b>{ur_lico['header']}</b><br>
+                    {message}
+                """
+            )
+
         print('send_to (anna manager):',manager['ma_email'])
 
     if is_email(manager['login']):

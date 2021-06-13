@@ -1,3 +1,4 @@
+from lib.anna.get_apt_list import get_apt_list_ids
 def events_permissions(form):
     
   for f in form.fields:
@@ -37,7 +38,15 @@ def before_search(form):
   
   sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
   sf.append('ap.header ap__header')
-
+  if form.manager['type']==2:
+    
+    get_apt_list=get_apt_list_ids(form, form.manager['id'])
+    form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(get_apt_list) })''')
+    #form.pre(form.])
+  
+  # для аптеки делаем ограничение
+  if form.manager['type']==3:
+    form.query_search['WHERE'].append(f"wt.apteka_id={form.manager['id']}")
   form.out_before_search=''
   #form.explain=1
 

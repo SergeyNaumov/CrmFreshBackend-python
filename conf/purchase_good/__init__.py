@@ -5,16 +5,16 @@ from .events import events
 
 class Config(Form):
     events=events
-    def __init__(self,arg):
+    def __init__(form,arg):
         super().__init__(arg) 
         
-        self.title='Отчёты онлайн'
-        self.not_edit=1
-        self.explain=0
-        self.read_only=1
-        self.make_delete=0
-        self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'},
+        form.title='Отчёты онлайн'
+        form.not_edit=1
+        #form.explain=1
+        form.read_only=1
+        form.make_delete=0
+        form.QUERY_SEARCH_TABLES=[
+            {'table':form.work_table,'alias':'wt'},
             {'table':'purchase','alias':'p','link':'p.id=wt.purchase_id','left_join':1},
             {'table':'action','alias':'act','link':'p.action_id=act.id','left_join':1},
             {'table':'action_plan','alias':'ap','link':'ap.action_id=act.id','left_join':1,'not_add_in_select_fields':1},
@@ -23,10 +23,10 @@ class Config(Form):
             {'table':'apteka','alias':'a','link':'wt.apteka_id = a.id','left_join':1},
             {'table':'supplier','alias':'s','link':'wt.supplier_id = s.id','left_join':1},
         ]
-        self.GROUP_BY='wt.id'
-        self.events=events
-        self.filters_groups=[]
-        # self.on_filters=[
+        form.GROUP_BY='wt.id'
+        form.events=events
+        form.filters_groups=[]
+        # form.on_filters=[
         #     # {'name':'header'},
         #     # {'name':'code'},
         #     # {'name':'cnt'},
@@ -35,8 +35,9 @@ class Config(Form):
         #     # {'name':'supplier_id'},
 
         # ]
-        #self.search_on_load=1
-        self.fields=get_fields()
+        #form.search_on_load=1
+
+        form.fields=get_fields()
 
 """
 create table test(

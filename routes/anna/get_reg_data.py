@@ -14,14 +14,19 @@ def get_reg_data():
         response['manager']=manager
         # Менеджер Анна
         if str(manager['type'])=="1":
-            response['comp_list'] = s.db.get(
-                table='comp',
-                where="anna_manager_id = %s",
-                values=[s.manager['id']]
+            manager['ur_lico_list']=s.db.query(
+                query='''
+                    SELECT
+                        *
+                    FROM
+                        ur_lico
+                    WHERE
+                        anna_manager_id=%s
+                ''',
+                values=[manager['id']]
             )
-
         # Представитель юридического лица
-        if str(manager['type'])=="2":
+        if manager['type'] == 2:
             response['comp_list']=s.db.query(
                 query="""
                     SELECT
@@ -83,7 +88,7 @@ def get_reg_data():
             # )
 
         # Представитель аптеки
-        if str(manager['type'])=="3":
+        if manager['type'] == 3:
             
             response['apt_list']=s.db.get(
                 table='apteka',

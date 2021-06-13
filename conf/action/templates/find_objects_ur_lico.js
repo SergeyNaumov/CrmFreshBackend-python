@@ -41,13 +41,13 @@ if( 1 || !('bind_subscribe_buttons'  in window) ){
             btn=ce({t:'a'})
             btn.innerHTML='<span style="color: red;">подписаться</span>'
             btn.setAttribute("href",'#')
-            btn.setAttribute("data-action_id",u.id)
+            btn.setAttribute("data-action_id",u.action_id)
             btn.setAttribute("data-id",u.id)
             btn.setAttribute("data-type",u.id)
             btn.setAttribute("data-subscribed",u.v)
             // Нажатие на кнопку "подписаться / отписаться" для юрлица
             btn.onclick=function(){
-              console.log('action_id:',u.action_id)
+              
               url=(type==1)?'/anna/subscribe-action/'+u.action_id+'/ur_lico/'+u.id:'/anna/subscribe-action/'+u.action_id+'/ur_lico/'+u.id
 
               window.app.$http.get(
@@ -105,6 +105,7 @@ if( 1 || !('bind_subscribe_buttons'  in window) ){
 
 
 
+
           return btn
       }
 
@@ -114,6 +115,7 @@ if( 1 || !('bind_subscribe_buttons'  in window) ){
         button_processing
         let [ur_lico_subscribe, apteka_subscribe]=b.innerText.split('|')
         ur_lico_subscribe=ur_lico_subscribe?JSON.parse(ur_lico_subscribe):[]
+        //console.log('ur_lico_subscribe:',ur_lico_subscribe)
         apteka_subscribe=apteka_subscribe?apteka_subscribe:'0' // кол-во подписанных аптек
 
 
@@ -134,7 +136,7 @@ if( 1 || !('bind_subscribe_buttons'  in window) ){
         if(ur_lico_subscribe.length){
           for(let u of ur_lico_subscribe){
             u.action_id=action_id
-            b.appendChild(ce({t:'span',html:`${u.name}: `}))
+            b.appendChild(ce({t:'span',html:`${u.name}<small>(${u.apt_cnt})</small>: `}))
 
             let btn=create_button(u,1)
             //let label=document.createElement(`span`)
@@ -142,7 +144,8 @@ if( 1 || !('bind_subscribe_buttons'  in window) ){
             //b.appendChild(label)
             
             b.appendChild(btn)
-            
+            //console.log('u:',u)
+            //b.appendChild(ce({t:'small',html:``}))
             if(ur_lico_subscribe.length){ // разделение между юрлицами (если их несколько)
               b.appendChild(ce({t:'br'}))
             }
@@ -152,19 +155,10 @@ if( 1 || !('bind_subscribe_buttons'  in window) ){
 
           }
         }
-
+        /* "пожписано аптек" убираем (вместо этого сделали подписи для каждого юрлица)
         b.appendChild( ce({t:'div',html:`<hr><b>Подписано аптек: </b> ${apteka_subscribe}<br>`}) )
-        
-        // if(apteka_subscribe.length){
-        //   b.appendChild(ce({t:'hr'}))
-        //   b.appendChild(ce({t:'span',html:'<br><b>Аптеки:</b>'}))
-        //   for(let a of apteka_subscribe){
-        //     b.appendChild(ce({t:'span',html:`<br>${a.name}: `}))
-        //     // кнопка
-        //     b.appendChild(create_button(a,2))
-        //   }
+        */
 
-        // }
         
         
         
