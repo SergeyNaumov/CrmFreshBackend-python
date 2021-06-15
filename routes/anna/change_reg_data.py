@@ -7,7 +7,7 @@ from lib.core import exists_arg
 def change_reg_data(R:dict):
     success=1
     manager=get_manager_data()
-    print('manager:',manager)
+   # print('manager:',manager)
     rules=[
        [ (R['phone']),'Телефон не указан'],
        [ is_phone(R['phone']),'Телефон указан не корректно' ],

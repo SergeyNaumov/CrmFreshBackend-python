@@ -1,6 +1,6 @@
 from lib.engine import s
 from .permissions import get_manager_data
-from lib.core import exists_arg
+from lib.core import exists_arg, date_to_rus
 
 def get_reg_data():
     response={
@@ -9,7 +9,8 @@ def get_reg_data():
         'apt_list':[],
     }
     errors=[]
-    manager=get_manager_data(errors)
+    manager=get_manager_data(s.manager['id'],errors)
+    #print('MANAGER:',manager)
     if not len(errors):
         response['manager']=manager
         # Менеджер Анна
@@ -43,9 +44,11 @@ def get_reg_data():
                 errors=errors,
                 values=[s.manager['id']]
             )
-            #if not response['comp_list']: response['comp_list']=[]
+            
+            
 
-            #print('comp_list:',response['comp_list'])
+
+            apteka_ids=[]
             for c in response['comp_list']:
 
                 c['apteka_list']=s.db.query(
@@ -70,6 +73,7 @@ def get_reg_data():
                 )
 
                 for a in c['apteka_list']:
+                    apteka_ids.append(str(a['id']))
                     if not a['apt_set_id']:
                         s.db.save(
                             table="apteka_settings",
@@ -86,10 +90,30 @@ def get_reg_data():
             #     values=[s.manager['id']],
             #     errors=errors
             # )
+            response['orders_change_apteka']=[]
+            if len(apteka_ids):
+                
+                # Заявки на изменение данных, которые оставляли его аптеки:
+                response['orders_change_apteka']=s.db.query(
+                    query=f'''
+                        SELECT
+                            a.ur_address, o.id, o.registered
+                        FROM
+                            apteka a
+                            join order_change_account o ON a.manager_id=o.manager_id
+                        WHERE a.id IN ({','.join(apteka_ids)}) order by registered desc
+                        LIMIT 10 
 
-        # Представитель аптеки
+                    '''
+                )
+                for o in response['orders_change_apteka']:
+                    o['registered']=date_to_rus(str(o['registered']))
+                    #.replace('T',' ')
+                    
+                #print('orders:',response['orders_change_apteka'])
+            # Представитель аптеки
         if manager['type'] == 3:
-            
+                
             response['apt_list']=s.db.get(
                 table='apteka',
                 select_fields='*, 0 more',

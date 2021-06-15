@@ -13,6 +13,7 @@ def cur_year():
   return dat.strftime("%Y")
 
 def exists_arg(key,dict):
+  #print('dict:',key,dict)
   if (key in dict) and dict[key]:
     return dict[key]
   return False
@@ -44,7 +45,10 @@ def get_func(f):
 
 def date_to_rus(d):
   d=str(d)
-  if d:
+  rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
+  if rez:
+    return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
+  elif d:
     date_list=d.split('-')
     date_list.reverse()
     return '.'.join(date_list)

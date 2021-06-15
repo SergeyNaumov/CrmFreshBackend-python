@@ -9,7 +9,7 @@ class Config(Form):
         super().__init__(arg) 
         
         self.title='Аптеки'
-        self.explain=0
+        self.explain=1
         self.read_only=1
         self.not_create=1
         self.make_delete=False
@@ -18,6 +18,7 @@ class Config(Form):
         ]
         self.events=events
         self.filters_groups=[]
+
         self.on_filters=[
             # {
             #     'name':'address'

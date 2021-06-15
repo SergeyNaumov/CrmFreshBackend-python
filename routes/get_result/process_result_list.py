@@ -19,6 +19,10 @@ def process_result_list(form,R,result_list):
   if len(id_list):
       for q in R['query']:
         name,values=q
+        
+        if not (name in form.fields_hash):
+          continue
+
         field=form.fields_hash[name]
         if field['type'] == 'multiconnect':
             multiconnect_arr=form.db.query(
@@ -41,7 +45,9 @@ def process_result_list(form,R,result_list):
     data=[]
     for q in R['query']:
       name=q[0]
-
+      
+      if not (name in form.fields_hash):
+        continue
       field=form.fields_hash[name]
       type='html' #field['type']
       tbl = exists_arg('tablename',field) or 'wt'

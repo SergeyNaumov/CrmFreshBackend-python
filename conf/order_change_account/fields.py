@@ -8,12 +8,12 @@ def get_fields():
       'filter_on':1
     },
 
-    {
-      'name':'firm',
-      'description':'Логин',
-      'type':'text',
-      'filter_on':1
-    }, 
+    # {
+    #   'name':'firm',
+    #   'description':'Логин',
+    #   'type':'text',
+    #   'filter_on':1
+    # }, 
     {
       'name':'phone',
       'description':'Телефон',

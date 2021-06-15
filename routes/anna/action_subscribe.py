@@ -134,7 +134,7 @@ def action_subscribe_apteka(action_id:int,apteka_id:int):
                 'action_id':action_id,
                 'apteka_id':apteka_id
             },
-            debug=1,
+            
             errors=errors
         )
 
@@ -142,7 +142,7 @@ def action_subscribe_apteka(action_id:int,apteka_id:int):
         if exists_arg('email',ur_lico_manager):
             
 
-            subject=f"{ur_lico_manager['fio']} - {s.env['host']} Подписка на мероприятие:{action['header']} от {ur_lico['header']}"
+            subject=f"{s.env['host']} Подписка на мероприятие:{action['header']} от {ur_lico['header']}"
             message=f'''
                 Только что представитель аптеки  <a href="https://{s.env['host']}/edit-form/apteka/{apteka_id}">{apteka['ur_address']}</a>,<br>
                 {manager_data['name_f']} {manager_data['name_i']} {manager_data['name_o']}<br>

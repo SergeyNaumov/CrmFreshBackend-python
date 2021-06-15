@@ -9,7 +9,7 @@ class Config(Form):
         super().__init__(arg) 
         
         self.title='Заявки на изменение данных об аптеках'
-        self.explain=0
+        self.explain=1
         self.make_delete=0
         self.not_create=1
         self.read_only=0

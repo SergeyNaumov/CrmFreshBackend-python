@@ -8,7 +8,7 @@ def get_apt_list(form,manager_id):
                 m.phone ma_phone
             FROM
                 ur_lico_manager ulm
-                join ur_lico wt ON wt.id=ulm.ur_lico_id
+                join apteka wt ON wt.ur_lico_id=ulm.ur_lico_id
                 left join manager m ON wt.anna_manager_id=m.id
             WHERE
                 ulm.manager_id=%s
@@ -21,7 +21,6 @@ def get_apt_list(form,manager_id):
 def get_apt_list_ids(form,manager_id):
     res_lst=[]
     lst=get_apt_list(form,manager_id)
-    
     for a in lst:
         res_lst.append(str(a['id']))
     
@@ -29,3 +28,19 @@ def get_apt_list_ids(form,manager_id):
         res_lst=['0']
 
     return res_lst
+
+def get_apt_managers_ids(form,manager_id):
+    ids=get_apt_list_ids(form,manager_id)
+    rez=form.db.query(
+        query=f'''
+        select
+            manager_id 
+        from
+            apteka
+        where id in ({",".join(ids)}) and manager_id is not null group by manager_id 
+        ''',
+        debug=1,
+        massive=1
+    )
+    #return [str(x) for x in rez]
+    return rez

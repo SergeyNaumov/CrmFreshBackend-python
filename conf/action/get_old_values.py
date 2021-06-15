@@ -31,13 +31,26 @@ def get_old_values(form):
         onerow=1,
         values=[form.id]
     )
-    if not ov['subscribed_ur_lico_id']: ov['subscribed_ur_lico_id']=''
-    if not ov['subscribed_apteka_id']: ov['subscribed_apteka_id']=''
-    if not ov['requested_ur_lico_id']: ov['requested_ur_lico_id']=''
-    ov['subscribed_ur_lico_id']=ov['subscribed_ur_lico_id'].split(',')
-    ov['subscribed_apteka_id']=ov['subscribed_apteka_id'].split(',')
+    if ov['subscribed_ur_lico_id']:
+      ov['subscribed_ur_lico_id']=ov['subscribed_ur_lico_id'].split(',')
+    else:
+      ov['subscribed_ur_lico_id']=[]
+
+    if ov['subscribed_apteka_id']:
+      ov['subscribed_apteka_id']=ov['subscribed_apteka_id'].split(',')
+    else:
+      ov['subscribed_apteka_id']=[]
     
-    print('ov:',ov)
+    if ov['requested_ur_lico_id']:
+      ov['requested_ur_lico_id']=ov['requested_ur_lico_id'].split(',')
+    else:
+      ov['requested_ur_lico_id']=[]
+    
+
+
+
+
+    #print('ov:',ov)
     for u in form.manager['ur_lico_list']:
       v=0
       if str(u['id']) in ov['subscribed_ur_lico_id']: v=2 # подписанных
@@ -53,6 +66,7 @@ def get_old_values(form):
           'apt_cnt':len(list(set(u['apt_ids']) & set(ov['subscribed_apteka_id'])))
         }
       )
+  
 
     if len(ov['subscribed_ur_lico_id']):
       ov['subscribed_on_action']=1
