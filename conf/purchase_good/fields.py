@@ -75,46 +75,54 @@ def get_fields():
         'description':'Закуплено товаров, шт',
         'name':'cnt',
         'type':'text',
-        'filter_on':1,
+#        'filter_on':1,
       },
       {
         'description':'Сумма',
         'name':'summ',
         'type':'text',
-        'filter_on':1,
+#        'filter_on':1,
       },
       {
         'description':'Штрих-код',
         'name':'code',
         'type':'text',
-        'filter_on':1,
+#        'filter_on':1,
       },
       {
         'description':'Аптека',
         'name':'apteka_id',
-        'autocomplete':1,
+        #'autocomplete':1,
         'type':'select_from_table',
         'table':'apteka',
         'tablename':'a',
         'header_field':'ur_address',
         'value_field':'id',
         'filter_on':1,
+        'before_code':apteka_id_before_code
       },
-      {
-        'description':'Поставщик',
-        'autocomplete':1,
-        'name':'supplier_id',
-        'type':'select_from_table',
-        'table':'supplier',
-        'tablename':'s',
-        'header_field':'header',
-        'value_field':'id',
-        'filter_on':1,
-      },
+      # {
+      #   'description':'Поставщик',
+      #   'autocomplete':1,
+      #   'name':'supplier_id',
+      #   'type':'select_from_table',
+      #   'table':'supplier',
+      #   'tablename':'s',
+      #   'header_field':'header',
+      #   'value_field':'id',
+      #   'filter_on':1,
+      # },
 
     ]
 
 
+def apteka_id_before_code(form,field):
+  # для юридического лица выводим только те аптеки, которые закреплены за ним
+  if form.manager['type']==2:
+    field['autocomplete']=0
+    field['where']=f' id in ({ ",".join(form.manager["apt_list_ids"]) }) '
+    del(field['autocomplete'])
+    
 
 def dates_filter_code(form,field,row):
   return f"{row['act__date_start']} ... {row['act__date_stop']}"
@@ -127,7 +135,6 @@ def suppliers_filter_code(form,field,row):
   return row['suppliers2']
 
 def action_before_code(form,field):
-  manager_type=form.manager['type']
   
   field['where']=''
 
@@ -141,7 +148,7 @@ def action_before_code(form,field):
 
   if form.script=='admin_table':
     
-    query="SELECT id v,header d from action limit 10"
+    query="SELECT id v, concat(header,'-',date_stop) d from action where date_stop>=curdate() limit 10"
     if field['where']:
       query+=' WHERE '+field['where']
     
@@ -150,8 +157,8 @@ def action_before_code(form,field):
     )
     
 
-    if len(field['values']):
-      field['value']=field['values'][0]['v']
+    #if len(field['values']):
+    #  field['value']=field['values'][0]['v']
 
 
     #form.pre(form.manager['type'])

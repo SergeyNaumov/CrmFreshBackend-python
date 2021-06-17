@@ -12,6 +12,8 @@ from .run_event import run_event as func_run_event
 from .upload_file import upload_file as func_upload_file
 from .delete_file import delete_file as func_delete_file
 from .template import template as func_template
+
+
 class Form():
   #def info(self):
   #  print('title:',self.title)
@@ -59,11 +61,14 @@ class Form():
       self.tree_select_header_query=''
       self.default_find_filter=''
       self.max_level=0
-      
+    
+
+
     if script=='admin_table':
+      self.search_plugin=[]
       self.filters_groups=[[]]
       self.search_on_load=0
-      self.search_plugin=''
+      
 
 
     # Поля для edit_form
@@ -86,6 +91,8 @@ class Form():
       self.explain_query=''
       self.out_before_search=[]
       self.out_after_search=[]
+      # Если что-то отдаёт плагин -- выводим его данные
+      self.plugin_output=False
       #self.search_result={
       #  'log':form.log,'config':form.config,'headers':[],'card_format':form.card_format
       #}

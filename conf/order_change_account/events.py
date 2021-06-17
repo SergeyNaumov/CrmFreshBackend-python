@@ -56,7 +56,8 @@ def after_save(form):
     
 
 def before_delete(form):
-    print('before_detele STARTED!')
+    pass
+    #print('before_detele STARTED!')
     #form.errors.append('Вам запрещено удалять!')
 
 events={

@@ -1,9 +1,6 @@
 import re
 from lib.core import exists_arg, tree_to_list
 def get_values_for_select_from_table(form,f):
-  #print('get_values_for_select_from_table не готово')
-  #values=[]
-  #print('get_values_for_select_from_table:',f)
 
 
   if not exists_arg('value_field',f):
@@ -20,9 +17,12 @@ def get_values_for_select_from_table(form,f):
   if not(exists_arg('table',f)):
     form.errors.append(f'Для поля {f["name"]} не указан атрибут table')
     return []
-
   query=f'SELECT {select_fields} from {f["table"]}'
-
+  
+  if exists_arg('query',f):
+    query=f['query']
+  
+  #form.pre(query)
   if not exists_arg('where',f):
     f['where']=''
 
@@ -56,7 +56,8 @@ def get_values_for_select_from_table(form,f):
   else:
     lst=form.db.query(
       query=query,
-      errors=form.errors
+      errors=form.errors,
+
     )
     
     if len(form.errors): 

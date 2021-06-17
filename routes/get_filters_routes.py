@@ -76,7 +76,7 @@ async def get_filters_controller(config: str):
 
   make_create=1
   if form.not_create: make_create=0
-  #print('form: ',dict(form))
+  print('script:',form.script, 'search_plugin: ',form.search_plugin)
   return {
     'success':1,
     'title':form.title,
@@ -86,6 +86,7 @@ async def get_filters_controller(config: str):
     'javascript':form.javascript['admin_table'],
     'filters_groups':form.filters_groups,
     'log':form.log,
+    'search_plugin':form.search_plugin,
     'permissions':{
       'make_create':make_create,
       'make_delete':form.make_delete,

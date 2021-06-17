@@ -46,13 +46,18 @@ def get_func(f):
 def date_to_rus(d):
   d=str(d)
   rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
-  if rez:
+  
+  print('d:',d,'rez:',rez)
+  if rez[5]:
     return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
-  elif d:
-    date_list=d.split('-')
-    date_list.reverse()
-    return '.'.join(date_list)
+  elif rez:
+    return f"{rez[4]}.{rez[3]}.{rez[2]}"
   return ''
+  # elif d:
+  #   date_list=d.split('-')
+  #   date_list.reverse()
+  #   return '.'.join(date_list)
+  
 
 
 def from_datetime_get_date(dt):

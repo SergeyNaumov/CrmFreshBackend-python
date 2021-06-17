@@ -5,7 +5,6 @@ config={
   'encrypt_method':'mysql_sha2',
   'use_project':False,
   'system_email':'svcomplex@gmail.com',
-
   'connects':{
     'crm_read':{
       'user':'crm',

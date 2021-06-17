@@ -1,6 +1,13 @@
 from lib.anna.get_apt_list import get_apt_list_ids
+from lib.CRM.plugins.search.xlsx import go as init_search_plugin
+
 def events_permissions(form):
+  
+  init_search_plugin(form)
+  if form.manager['type']==2:
     
+    apt_list_ids=get_apt_list_ids(form, form.manager['id'])
+    form.manager['apt_list_ids']=apt_list_ids
   for f in form.fields:
     f['read_only']=1
   
@@ -29,7 +36,7 @@ def before_search(form):
       LEFT JOIN apteka a ON wt.apteka_id = a.id
     '''
   if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
-    form.errors.append('Фильтр "мероприятие" обязателен')
+    form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
 
   if len(qs['WHERE']):
     query_count+=' WHERE '+' AND '.join(qs['WHERE'])
@@ -39,10 +46,8 @@ def before_search(form):
   sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
   sf.append('ap.header ap__header')
   if form.manager['type']==2:
+    form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
     
-    get_apt_list=get_apt_list_ids(form, form.manager['id'])
-    form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(get_apt_list) })''')
-    #form.pre(form.])
   
   # для аптеки делаем ограничение
   if form.manager['type']==3:
@@ -55,4 +60,5 @@ events={
   'permissions':[
       events_permissions
   ],
+  'after_search':[]
 }

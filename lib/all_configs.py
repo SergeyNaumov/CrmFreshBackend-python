@@ -105,10 +105,13 @@ def read_config(**arg):
   form.set_orig_types()
   
   # Перенёс из routes.edit_form.process_edit_form.py
-  
-  
-  form.get_values()
+  #form.get_values()
   form.run_all_before_code()
+  
+  #print('before_get_values:',form.fields[0])
+  form.get_values()
+  print('after_get_values:',form.fields[0])
+  
 
   #default_config_attr(form,arg)
 

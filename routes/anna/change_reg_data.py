@@ -79,8 +79,8 @@ def change_reg_data(R:dict):
 
     
     message=f"""
-    только что {manager['name_f']} {manager['name_i']} {manager['name_o']}, {name_role}<br>
-    изменение регистрационных данных:<br>
+    {manager['name_f']} {manager['name_i']} {manager['name_o']}, {name_role}<br>
+    Изменение регистрационных данных:<br>
     <b>Логин:</b> {R['login']}<br>
     <b>Телефон:</b> {R['phone']}<br>
     <b>Фамилия:</b> {R['name_f']}<br>

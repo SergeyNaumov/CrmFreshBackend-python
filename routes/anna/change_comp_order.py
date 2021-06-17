@@ -1,7 +1,8 @@
 from lib.engine import s
 from lib.form_control import check_rules, is_email, is_phone
-from .permissions import get_ur_lico
+from .permissions import get_ur_lico, get_anna_manager
 from lib.core import exists_arg
+from lib.send_mes import send_mes
 
 def change_comp_order(R):
     errors=[]
@@ -9,7 +10,7 @@ def change_comp_order(R):
     rules=[
        [ (R['comp_id'] and str(R['comp_id']).isdigit()) ,'Не указан comp_id. обратитесь к разработчику'],
        #[ (R['phone']),'Телефон не указан'],
-       #[ is_phone(R['phone']),'Телефон указан не корректно' ],
+       [ is_phone(R['phone']),'Телефон указан не корректно' ],
        [ (R['email_for_notify']),'Email для оповещений не указан'],
        [ is_email(R['email_for_notify']),'Email для оповещений указан не корректно, укажите валидный email' ],
        [ (R['header']),'Заполните наименование компании'],

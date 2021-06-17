@@ -129,7 +129,7 @@ def get_list(**arg):
           if where: where+=' OR '
           where+=element['value_field']+' IN ('+','.join(values_array)+')'
 
-    if T=='filter_extend_select_from_table' and exists_arg(filter_table,element):
+    if T=='filter_extend_select_from_table' and exists_arg('filter_table',element):
       element['table']=element['filter_table']
 
     if not exists_arg('search_query',element):

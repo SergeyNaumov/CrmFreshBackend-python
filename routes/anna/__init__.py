@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+#from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter
 from lib.engine import s
 from lib.send_mes import send_mes
 from lib.form_control import check_rules, is_email, is_phone
@@ -13,7 +14,16 @@ from .action_subscribe import *
 from .change_reg_data import change_reg_data
 from .change_password import change_password
 
+from .download import router as download
+
 router = APIRouter()
+
+# скачивание xls и dbf
+router.include_router(download,prefix='/download')
+
+#@router.get('/download/action_plan')
+#def x():
+#    return {'ok':1}
 
 @router.get('/left-menu')
 def controller_left_menu():

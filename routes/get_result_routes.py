@@ -117,11 +117,15 @@ async def get_result(R: dict):
 
 
   output=process_result_list(form,R,result_list)
-
+  form.SEARCH_RESULT['log']=form.log
+  form.SEARCH_RESULT['output']=output
+  form.run_event('after_search')
   
-  if 1 : # not s['end'])
-      form.SEARCH_RESULT['log']=form.log
-      form.SEARCH_RESULT['output']=output
+  if form.plugin_output:
+    return form.plugin_output
+
+  else : # not s['end'])
+
       return {
               'success':(1,0)[len(form.errors)],
               'results':form.SEARCH_RESULT,

@@ -39,7 +39,7 @@ def get_apt_managers_ids(form,manager_id):
             apteka
         where id in ({",".join(ids)}) and manager_id is not null group by manager_id 
         ''',
-        debug=1,
+        #debug=1,
         massive=1
     )
     #return [str(x) for x in rez]

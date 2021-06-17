@@ -3,7 +3,6 @@ from lib.get_1_to_m_data import get_1_to_m_data
 from .get_values_for_select_from_table import get_values_for_select_from_table
 
 
-
 def get_in_ext_url(form,f):
   print('get_in_ext_url не готова')
 
@@ -63,8 +62,10 @@ def func_get_values(form):
         #  f['value']=''
 
       if form.action not in ['insert','update'] and exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
-         f['value']=exists_arg(f['name'],values);
-         f['values']=get_values_for_select_from_table(form,f)
+          f['value']=exists_arg(f['name'],values);
+          if not exists_arg('values',f) or not len(f['values']):
+            f['values']=get_values_for_select_from_table(form,f)
+            
       if f['type'] == '1_to_m':
 
         get_1_to_m_data(form,f)

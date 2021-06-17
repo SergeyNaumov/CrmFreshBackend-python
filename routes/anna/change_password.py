@@ -41,6 +41,7 @@ def change_password(R:dict):
                 to=R['login'],
                 subject='Изменение пароля в системе Анна',
                 message=f"""
+                    <p>Вы получили это письмо, потому что произошла смена пароля в учетной записи, новые данные для входа:</p>
                     Логин: {manager['login']}<br>
                     Новый пароль: {p1}
                 """
@@ -51,8 +52,8 @@ def change_password(R:dict):
             #anna_manager=get_anna_manager()
             subject=""
             message=""
-
-            if str(manager['type'])=="2":
+            
+            if manager['type']==2:
                 ur_lico_list=manager['ur_lico_list']
 
                 
@@ -71,12 +72,13 @@ def change_password(R:dict):
 
 
             #print('TYPE:',manager['type'],str(manager['type'])=="3")
-            if str(manager['type'])=="3":
+            if manager['type']==3:
                 
                 apteka=manager['apteka']
                 
 
                 if apteka:
+
                     subject=f"Представитель аптеки: {apteka['ur_address']} изменил пароль"
                     message=f"""
                         Только что {manager['name_f']} {manager['name_i']} {manager['name_i']} ({manager['login']}), представитель аптеки:
@@ -89,7 +91,7 @@ def change_password(R:dict):
                     
                     if is_email(ur_lico['email_for_notify']):
                         send_mes(
-                            to=apteka['email_for_notify'],
+                            to=ur_lico['email_for_notify'],
                             subject=subject,
                             message=message
                         )

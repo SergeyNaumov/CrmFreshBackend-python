@@ -14,7 +14,8 @@ def get_reg_data():
     if not len(errors):
         response['manager']=manager
         # Менеджер Анна
-        if str(manager['type'])=="1":
+        
+        if manager['type'] == 1:
             manager['ur_lico_list']=s.db.query(
                 query='''
                     SELECT

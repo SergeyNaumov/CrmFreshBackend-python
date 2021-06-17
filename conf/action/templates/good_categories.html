@@ -20,6 +20,8 @@
    table.goodlist td {border: 1px solid gray; padding: 2px 5px; }
    table.goodlist td.c {text-align: center;}
    table.goodlist tr.h td {text-align: left; font-weight: bold;}
+
+   .download_block {margin-top: 10px; margin-bottom: 10px;}
 </style>
 <div class="plans">
   {% if manager.type==2 %}
@@ -62,12 +64,19 @@
       {% if ov.subscribed_on_action%}
         План: {{p.plan}}<br>
         {{p.value_name}}: {{p.value}}
+        {% if p.reward_percent%}
+          <div>% бонуса: {{p.reward_percent}}</div>
+        {% endif%}
       {% endif %}
       
-      {% if p.reward_percent%}
-        <div>% бонуса: {{p.reward_percent}}</div>
-      {% endif%}
 
+
+      {% if ov.subscribed_on_action %}
+        <div class="download_block">
+          <a href="/backend/anna/download/action_plan/xls/{{p.id}}" target="_blank">скачать в xls</a> | 
+          <a href="/backend/anna/download/action_plan/dbf/{{p.id}}">скачать в dbf</a>
+        </div>
+      {% endif %}
       {% if(p.child|length) %}
         <table class="goodlist">
           <tr class="h">
