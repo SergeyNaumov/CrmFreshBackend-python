@@ -55,7 +55,7 @@ def goods_field(form,field):
 
 def action_filter_code(form,field,row):
   if row["a__id"]:
-    return f'<a href="/edit-form/action_plan/{row["a__id"]}" target="_blank">{row["a__header"]}</a>'
+    return f'<a href="/edit-form/action/{row["a__id"]}" target="_blank">{row["a__header"]}</a>'
   else:
     return ''
 

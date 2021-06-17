@@ -1,5 +1,7 @@
 from lib.engine import s
 from lib.core import exists_arg, date_to_rus
+from .header_before_code import header_before_code
+
 
 def get_fields():
     return [ 
@@ -7,10 +9,12 @@ def get_fields():
       'name':'header',
       'description':'Название',
       'type':'text',
-      'filter_code':header_filter_code,
+      #'filter_code':header_filter_code,
       'read_only':1,
       'filter_on':1,
-      'tab':'main'
+      'tab':'main',
+      # При выводе фильтров и при поиска превращаем данное текстовое поле в autocomplete
+      'before_code':header_before_code
     },
     {
       'name':'date_start',
@@ -74,9 +78,7 @@ def distrib_code(form,field):
     field['after_html']='<br>'.join(suppliers_lst)
   
   
-def header_filter_code(form,field,row):
 
-  return f'<a href="/edit-form/action/{row["wt__id"]}" target="_blank">{row["wt__header"]}</a>'
 
 def date_start_filter_code(form,field,row):
   return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"

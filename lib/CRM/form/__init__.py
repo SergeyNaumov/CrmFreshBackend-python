@@ -169,17 +169,32 @@ class Form():
   
   # запускаем before_code для всех полей
   def run_all_before_code(form): 
+    field_idx=0
     for field in form.fields:
       if 'before_code' in field:
+        
         #form.run_event(form,'before_code for '+f['name'],f)
         try:
-          field['before_code'](form=form,field=field)
+          new_field=field['before_code'](form=form,field=field)
+          if new_field:
+            # если в before_code подменили имя поля -- подменяем его и в fields_hash
+            if new_field['name'] != field['name']:
+              if field['name'] in form.fields_hash:
+                del form.fields_hash[field['name']] 
+              form.fields_hash[new_field['name']]=new_field
+              form.fields[field_idx]=new_field
+            
+
+            field=new_field
+          
         except AttributeError as e:
           form.errors.append(str(e))
         # except ValueError as e:
         #   form.errors.append(str(e))
         # finally:
         #   form.errors.append('Ошибка')
+
+      field_idx+=1
 
   def DeleteFile(form): return func_delete_file(form)
 

@@ -61,7 +61,11 @@ def func_get_values(form):
         #if not f['value']:
         #  f['value']=''
 
-      if form.action not in ['insert','update'] and exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
+      if form.action not in ['insert','update'] and (
+          exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']
+          or
+          f['type'] in ['select_from_table','filter_extend_select_from_table']
+        ):
           f['value']=exists_arg(f['name'],values);
           if not exists_arg('values',f) or not len(f['values']):
             f['values']=get_values_for_select_from_table(form,f)

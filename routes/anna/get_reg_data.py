@@ -73,8 +73,14 @@ def get_reg_data():
                     values=[c['id']] 
                 )
 
+                c['orders_change_apteka']=[]
+
+
+                apteka_ids_in_comp=[]
                 for a in c['apteka_list']:
                     apteka_ids.append(str(a['id']))
+                    apteka_ids_in_comp.append(str(a['id']))
+
                     if not a['apt_set_id']:
                         s.db.save(
                             table="apteka_settings",
@@ -84,32 +90,22 @@ def get_reg_data():
                         )
                         a['set1']=1
                         a['set2']=1
-            # s.db.get(
-            #     table='comp',
-            #     select_fields='*, 0 more',
-            #     where='manager_id = %s',
-            #     values=[s.manager['id']],
-            #     errors=errors
-            # )
-            response['orders_change_apteka']=[]
-            if len(apteka_ids):
-                
-                # Заявки на изменение данных, которые оставляли его аптеки:
-                response['orders_change_apteka']=s.db.query(
-                    query=f'''
-                        SELECT
-                            a.ur_address, o.id, o.registered
-                        FROM
-                            apteka a
-                            join order_change_account o ON a.manager_id=o.manager_id
-                        WHERE a.id IN ({','.join(apteka_ids)}) order by registered desc
-                        LIMIT 10 
+                if len(apteka_ids_in_comp):
+                    c['orders_change_apteka']=s.db.query(
+                        query=f'''
+                            SELECT
+                                a.ur_address, o.id, o.registered
+                            FROM
+                                apteka a
+                                join order_change_account o ON a.manager_id=o.manager_id
+                            WHERE a.id IN ({','.join(apteka_ids_in_comp)}) order by registered desc
+                            LIMIT 10 
 
-                    '''
-                )
-                for o in response['orders_change_apteka']:
-                    o['registered']=date_to_rus(str(o['registered']))
-                    #.replace('T',' ')
+                        '''
+                    )
+                    for o in c['orders_change_apteka']:
+                        o['registered']=date_to_rus(str(o['registered']))
+
                     
                 #print('orders:',response['orders_change_apteka'])
             # Представитель аптеки

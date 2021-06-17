@@ -128,7 +128,7 @@ def process_result_list(form,R,result_list):
         elif field['type_orig']=='in_ext_url':
           value=exists_arg('in_ext_url__ext_url',r)
         elif field['type_orig'] == 'datetime':
-          value=str(value)
+          value=date_to_rus(value)
         elif field['type_orig']=='date':
           
           if value:

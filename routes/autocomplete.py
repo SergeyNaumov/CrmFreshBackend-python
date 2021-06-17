@@ -143,8 +143,6 @@ def get_list(**arg):
       element['search_query']=element['search_query'].replace('<%like%>',like_val).replace('<%v%>',like_val)
     
 
-    print('search_query:',element['search_query'])
-      
     return form.db.query(
       query=element['search_query'],
       values=like_values

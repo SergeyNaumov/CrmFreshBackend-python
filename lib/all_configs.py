@@ -110,7 +110,7 @@ def read_config(**arg):
   
   #print('before_get_values:',form.fields[0])
   form.get_values()
-  print('after_get_values:',form.fields[0])
+  #print('after_get_values:',form.fields[0])
   
 
   #default_config_attr(form,arg)
