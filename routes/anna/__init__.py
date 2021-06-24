@@ -6,7 +6,7 @@ from lib.form_control import check_rules, is_email, is_phone
 from lib.core import exists_arg
 from .permissions import *
 from .reg_apteka_account import reg_apteka_account, change_apteka_account
-from .change_comp_order import change_comp_order
+from .change_comp_order import change_comp_order, change_on_notify
 from .change_apteka_order import change_apteka_order
 from .get_reg_data import get_reg_data, access_ur_lico_ok
 from .left_menu import left_menu
@@ -124,6 +124,11 @@ async def change_reg_data_controller(R:dict):
 @router.post('/change-comp-order')
 async def route_change_comp_order(R:dict):
     return change_comp_order(R)
+
+# ставим / снимаем галку у юрлица "уведомлять о подписке аптек"
+@router.get('/change-on-notify/{ur_lico_id}/{v}')
+async def route_change_on_notify(ur_lico_id:int,v:int):
+    return change_on_notify(ur_lico_id,v)
 
 @router.post('/get-account-data')
 async def get_account_data(R:dict):

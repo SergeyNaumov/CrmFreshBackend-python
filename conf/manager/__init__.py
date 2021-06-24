@@ -21,7 +21,7 @@ class Config(Form):
         ]
         form.read_only=1
         form.events=events
-        form.explain=0
+        #form.explain=1
         form.cols=[
             [ # Колонка1
               {'description':'Общая информация','name':'main','hide':0},

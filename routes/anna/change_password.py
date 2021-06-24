@@ -39,7 +39,7 @@ def change_password(R:dict):
         if is_email(R['login']):
             send_mes(
                 to=R['login'],
-                subject='Изменение пароля в системе Анна',
+                subject='Изменение пароля в системе АннА',
                 message=f"""
                     <p>Вы получили это письмо, потому что произошла смена пароля в учетной записи, новые данные для входа:</p>
                     Логин: {manager['login']}<br>
@@ -47,7 +47,7 @@ def change_password(R:dict):
                 """
             )
         #print('manager:',manager)
-        # Если это не менеджер Анна -- отправляем менеджеру Анна
+        # Если это не менеджер АннА -- отправляем менеджеру АннА
         if str(manager['type'])!="1" and exists_arg('ma_email',manager):
             #anna_manager=get_anna_manager()
             subject=""

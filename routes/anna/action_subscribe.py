@@ -110,8 +110,8 @@ def action_subscribe_apteka(action_id:int,apteka_id:int):
 
     
 
-    print('ur_lico:',ur_lico)
-    print('ur_lico_manager:',ur_lico_manager)
+    #print('ur_lico:',ur_lico)
+    #print('ur_lico_manager:',ur_lico_manager)
     
     if str(manager_data['type']) != '3':
         errors.append('Вы не являетесь представителем аптеки')
@@ -139,7 +139,7 @@ def action_subscribe_apteka(action_id:int,apteka_id:int):
         )
 
         
-        if exists_arg('email',ur_lico_manager):
+        if exists_arg('email',ur_lico_manager) and ur_lico['subscribe']:
             
 
             subject=f"{s.env['host']} Подписка на мероприятие:{action['header']} от {ur_lico['header']}"
@@ -150,14 +150,16 @@ def action_subscribe_apteka(action_id:int,apteka_id:int):
                 {action['header']}
             '''
 
+
+
             send_mes(
                 to=ur_lico_manager['email'],
                 subject=subject,
                 message=message
             )
 
-            print('subject:',subject)
-            print('message:',message)
+            #print('subject:',subject)
+            #print('message:',message)
 
     else:
         success=0

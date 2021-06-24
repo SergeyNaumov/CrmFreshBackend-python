@@ -31,12 +31,12 @@ def get_fields():
       'type':'text',
       'filter_on':1
     },
-    # {
-    #   'description':'Телефон',
-    #   'type':'text',
-    #   'name':'phone',
-    #   'filter_on':1
-    # },
+    {
+      'description':'Телефон',
+      'type':'text',
+      'name':'phone',
+      'filter_on':1
+    },
     # {
     #   'description':'Представитель юридического лица',
     #   'name':'manager_id',

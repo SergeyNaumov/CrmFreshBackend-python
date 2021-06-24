@@ -10,7 +10,7 @@ class Config(Form):
         
         form.title='Отчёты онлайн'
         form.not_edit=1
-        #form.explain=1
+        form.explain=1
         form.read_only=1
         form.make_delete=0
         form.QUERY_SEARCH_TABLES=[
@@ -19,9 +19,9 @@ class Config(Form):
             {'table':'action','alias':'act','link':'p.action_id=act.id','left_join':1},
             {'table':'action_plan','alias':'ap','link':'ap.action_id=act.id','left_join':1,'not_add_in_select_fields':1},
             {'table':'action_plan_supplier','alias':'aps','link':'aps.action_plan_id=ap.id','left_join':1,'not_add_in_select_fields':1},
-            {'table':'supplier','alias':'s2','link':'s2.id=aps.supplier_id','left_join':1,'not_add_in_select_fields':1},
+            #{'table':'supplier','alias':'s2','link':'s2.id=aps.supplier_id','left_join':1,'not_add_in_select_fields':1},
             {'table':'apteka','alias':'a','link':'wt.apteka_id = a.id','left_join':1},
-            {'table':'supplier','alias':'s','link':'wt.supplier_id = s.id','left_join':1},
+            #{'table':'supplier','alias':'s','link':'wt.supplier_id = s.id','left_join':1},
         ]
         form.GROUP_BY='wt.id'
         form.events=events

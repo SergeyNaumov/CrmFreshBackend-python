@@ -137,7 +137,7 @@ def change_reg_data(R:dict):
         send_mes(
             to=manager['login'],
             subject=subject,
-            message=message_manager_anna
+            message=message
         )
         print('send_to (account):',manager['login'])
 

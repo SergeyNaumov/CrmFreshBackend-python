@@ -1,4 +1,4 @@
-from lib.anna.get_apt_list import get_apt_list_ids
+from lib.anna.get_apt_list import get_apt_list_ids, apt_list_id_for_apt
 from lib.CRM.plugins.search.xlsx import go as init_search_plugin
 
 def events_permissions(form):
@@ -8,6 +8,12 @@ def events_permissions(form):
     
     apt_list_ids=get_apt_list_ids(form, form.manager['id'])
     form.manager['apt_list_ids']=apt_list_ids
+    
+
+  elif form.manager['type']==3:
+    form.manager['apt_list_ids']=apt_list_id_for_apt(form,form.manager['id'])
+    
+
   for f in form.fields:
     f['read_only']=1
   
@@ -43,15 +49,17 @@ def before_search(form):
   qs['query_count']=query_count
   sf=form.query_search['SELECT_FIELDS']
   
-  sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
+  #sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
   sf.append('ap.header ap__header')
-  if form.manager['type']==2:
+  if form.manager['type'] in (2,3):
     form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
     
-  
-  # для аптеки делаем ограничение
-  if form.manager['type']==3:
-    form.query_search['WHERE'].append(f"wt.apteka_id={form.manager['id']}")
+  print(form.query_search['WHERE'])
+  # # для аптеки делаем ограничение
+  # if form.manager['type']==3:
+    
+  #   form.query_search['WHERE'].append(f"wt.apteka_id={form.manager['id']}")
+
   form.out_before_search=''
   #form.explain=1
 

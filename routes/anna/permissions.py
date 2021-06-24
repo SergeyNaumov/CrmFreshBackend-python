@@ -94,42 +94,47 @@ def get_manager_data(manager_id=0,errors=[]):
     if manager:
 
       if manager['type']==3: # Если это аптека
-        manager['apteka']=s.db.query(
-          query='''
-            select
-              a.*
-            from
-              apteka a
-            where a.manager_id=%s
-          ''',
-          values=[manager_id],
-          onerow=1
-        )
-        print('apteka:',manager['apteka'])
-        if exists_arg('ur_lico_id',manager['apteka']):
-          ur_lico=get_ur_lico(manager['apteka']['ur_lico_id'])
+          # если это аптека -- менеджер аптеки -- это менеджер юрлица
+          manager['apteka']=s.db.query(
+            query='''
+              select
+                a.*
+              from
+                apteka a
+              where a.manager_id=%s
+            ''',
+            values=[manager_id],
+            onerow=1
+          )
+        
+          if manager['apteka'] and exists_arg('ur_lico_id',manager['apteka']):
+            ur_lico=get_ur_lico(manager['apteka']['ur_lico_id'])
           
-          # для аптеки менеджер AннA берётся из юрлица
-          if exists_arg('ma_id',ur_lico):
-            for attr in ['ma_id', 'ma_name_f', 'ma_name_i', 'ma_name_o', 'ma_email', 'ma_phone']:
-              manager[attr]=ur_lico[attr]
+            # для аптеки менеджер AннA берётся из юрлица
+            if exists_arg('ma_id',ur_lico):
+              for attr in ['ma_id', 'ma_name_f', 'ma_name_i', 'ma_name_o', 'ma_email', 'ma_phone']:
+                manager[attr]=ur_lico[attr]
 
-          manager['ur_lico']=ur_lico
+              manager['ur_lico']=ur_lico
 
           
 
       if manager['type']==2:
         manager['ur_lico_list']=s.db.query(
-        query="""
-            SELECT
-                ul.id, ul.header
-            from
-                ur_lico_manager ulm
-                join ur_lico ul ON ulm.ur_lico_id=ul.id
-            WHERE ulm.manager_id=%s
-        """,
-        values=[manager_id],
-    )
+          query="""
+              SELECT
+                  ul.id, ul.header
+              from
+                  ur_lico_manager ulm
+                  join ur_lico ul ON ulm.ur_lico_id=ul.id
+              WHERE ulm.manager_id=%s
+          """,
+          values=[manager_id],
+        )
+        ur_lico_hash={}
+        for u in manager['ur_lico_list']:
+          ur_lico_hash[u['id']]=1
+        manager['ur_lico_hash']=ur_lico_hash
 
     return manager
 

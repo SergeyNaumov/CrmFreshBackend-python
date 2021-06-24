@@ -33,7 +33,7 @@ def get_reg_data():
                 query="""
                     SELECT
                         wt.*, 0 more, concat(m.name_f,' ',m.name_i,' ',m.name_o)  ma_fio, m.email ma_email,
-                        m.phone ma_phone
+                        m.phone ma_phone, subscribe
                     FROM
                         ur_lico_manager ulm
                         join ur_lico wt ON wt.id=ulm.ur_lico_id
@@ -62,12 +62,14 @@ def get_reg_data():
                             m.name_f m_name_f, m.name_i m_name_i, m.name_o m_name_o,
                             m.phone m_phone,
                             apt_set.apteka_id apt_set_id, apt_set.set1, apt_set.set2,
+
                             0 saved_s1, 0 saved_s2,
                             0 edit_form 
                         from 
                             apteka wt
                             LEFT JOIN manager m ON m.id=wt.manager_id
                             LEFT JOIN apteka_settings apt_set ON apt_set.apteka_id=wt.id
+                            
                         where wt.ur_lico_id=%s
                     """,
                     values=[c['id']] 
@@ -110,14 +112,28 @@ def get_reg_data():
                 #print('orders:',response['orders_change_apteka'])
             # Представитель аптеки
         if manager['type'] == 3:
-                
-            response['apt_list']=s.db.get(
-                table='apteka',
-                select_fields='*, 0 more',
-                where='manager_id = %s',
-                values=[s.manager['id']],
-                errors=errors
+            
+
+
+            response['apt_list']=s.db.query(
+                query='''
+                    SELECT
+                        a.*, 0 more, ul.header ul_header, ul.phone ul_phone
+                    FROM
+                        apteka a
+                        LEFT JOIN ur_lico ul on ul.id=a.ur_lico_id
+                    WHERE a.manager_id=%s
+                ''',
+                values=[s.manager['id']]
             )
+
+            # s.db.get(
+            #     table='apteka',
+            #     select_fields='*, 0 more',
+            #     where='manager_id = %s',
+            #     values=[s.manager['id']],
+            #     errors=errors
+            # )
     response['errors']=errors
     if len(errors): response['success']=0
     return response

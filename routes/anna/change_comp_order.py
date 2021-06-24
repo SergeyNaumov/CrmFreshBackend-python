@@ -1,6 +1,6 @@
 from lib.engine import s
 from lib.form_control import check_rules, is_email, is_phone
-from .permissions import get_ur_lico, get_anna_manager
+from .permissions import get_ur_lico, get_anna_manager,get_manager_data
 from lib.core import exists_arg
 from lib.send_mes import send_mes
 
@@ -48,3 +48,15 @@ def change_comp_order(R):
         success=0
 
     return {'success':success,'errors':errors}
+
+def change_on_notify(ur_lico_id,v):
+    manager=get_manager_data()
+    if v: v=1
+    else: v=0
+    if ur_lico_id in manager['ur_lico_hash']:
+        s.db.query(
+            query="update ur_lico set subscribe=%s where id=%s",
+            debug=1,
+            values=[v,ur_lico_id]
+        )
+    return {'ok':1}

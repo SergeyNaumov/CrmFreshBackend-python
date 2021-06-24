@@ -44,3 +44,15 @@ def get_apt_managers_ids(form,manager_id):
     )
     #return [str(x) for x in rez]
     return rez
+
+def apt_list_id_for_apt(form,manager_id):
+    rez=[]
+    apteka_id=form.db.query(
+      query='select id from apteka where manager_id=%s',
+      values=[manager_id],
+      onevalue=1
+    )
+    if apteka_id:
+        rez.append(str(apteka_id))
+    return rez
+

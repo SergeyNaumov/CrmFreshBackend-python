@@ -8,6 +8,7 @@ def events_permissions(form):
       form.read_only=0
     else:
       form.is_admin=0
+      form.make_delete=0
 
     if not ( str(form.manager['type']) == "1" ):
       form.errors.append('доступ запрещён!')
