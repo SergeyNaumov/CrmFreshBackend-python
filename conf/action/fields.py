@@ -16,19 +16,29 @@ def get_fields():
       # При выводе фильтров и при поиска превращаем данное текстовое поле в autocomplete
       'before_code':header_before_code
     },
+    # {
+    #   'name':'date_start',
+    #   'description':'Начало подписки',
+    #   'type':'date',
+    #   'tab':'main',
+    #   'filter_on':1,
+    #   'filter_code':date_start_filter_code
+    # },
     {
-      'name':'date_start',
-      'description':'Начало подписки',
-      'type':'date',
-      'tab':'main',
-      'filter_on':1,
-      'filter_code':date_start_filter_code
-    }, 
+        'name':'date_start',
+        'description':'Начало подписки',
+        'type':'yearmon',
+        'filter_on':1,
+        'filter_type':'eq',
+        'not_process':1,
+        'filter_code':date_start_filter_code
+    },
     {
       'name':'date_stop',
       'description':'Окончание подписки',
-      'type':'date',
-      'default_off':1,
+      'type':'yearmon',
+      'filter_type':'eq',
+      'not_process':1,
       'tab':'main',
       'filter_code':date_stop_filter_code, # в результатах поиска это поле превращается в подписку
       'filter_on':1
@@ -235,7 +245,7 @@ def good_categories(form,field):
       manager=form.manager,
       ur_lico_subscribe=form.ur_lico_subscribe
     )
-    form.run_js=form.template('./conf/action/templates/good_categories.js')
+    form.javascript['edit_form']=form.template('./conf/action/templates/good_categories.js')
     
 
 def date_stop_before_code(form,field):

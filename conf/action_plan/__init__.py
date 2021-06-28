@@ -5,22 +5,24 @@ from .events import events
 
 class Config(Form):
     events=events
-    def __init__(self,arg):
+    def __init__(form,arg):
+        
         super().__init__(arg) 
         
-        self.title='Планы акций'
-        #self.explain=1
-        self.read_only=1
-        self.make_delete=0
-        self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'},
-            {'table':'action','alias':'a','link':'wt.action_id=a.id','left_join':1},
-            # Производителя убрал по просьбе Тани
-            #{'table':'manufacturer','alias':'man','link':'wt.manufacturer_id=man.id','left_join':1},
+        form.title='Планы акций'
+        form.explain=0
+        form.read_only=1
+        form.make_delete=0
+        form.work_table='action'
+        form.not_edit=1
+        form.QUERY_SEARCH_TABLES=[
+            {'table':form.work_table,'alias':'wt'},
+
         ]
-        self.events=events
-        self.filters_groups=[]
-        self.on_filters=[
+        form.events=events
+        form.filters_groups=[]
+        form.GROUP_BY='wt.id'
+        #form.on_filters=[
             # {
             #     'name':'address'
             # },
@@ -28,9 +30,18 @@ class Config(Form):
             #     'name':'f_date',
             #     #'value':["2020-01-01","2020-01-02"]
             # },
+        #]
+        form.javascript['edit_form']=form.template('./js/Chart.bundle.min.js')
+        form.javascript['edit_form']+=form.template('./conf/action_plan/templates/edit_form.js')
+        
+
+        form.tabs=[
+            {'description':'Группы товаров','name':'goods'},
+            {'description':'Прогнозный бонус','name':'pr_bonus'},
+            {'description':'Разрешённые дистрибьюторы','name':'distrib'},
         ]
-        self.search_on_load=1
-        self.fields=get_fields()
+        form.search_on_load=0
+        form.fields=get_fields()
 
 """
 create table test(

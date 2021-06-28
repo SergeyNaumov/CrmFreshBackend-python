@@ -1,151 +1,198 @@
-def goods_field(form,field):
-  s=form.self()
-  if(form.id):
-    good_list=s.db.query(query='''
-      SELECT
-        g.header, g.showcase, g.price, g.code, g.percent
-      from 
-        action_plan_good ag
-        JOIN good g ON ag.good_id=g.id
-      WHERE ag.action_plan_id=%s
-
-      ''',
-      values=[form.id]
-    )
-    result=''
-    if len(good_list):
-      result='''
-        <style>
-          table.goodlist{
-            border-collapse: collapse
-          }
-          table.goodlist td {border: 1px solid gray; padding: 2px; }
-          table.goodlist td.c {text-align: center;}
-          table.goodlist tr.h td {text-align: left; font-weight: bold;}
-          
-        </style>
-        <p>Для товаров:</p>
-        <table class="goodlist">
-          <tr class="h">
-            <td>Наименование</td>
-            <td>Витрина</td>
-            <td>Сип-цена</td>
-            <td>Штрих код товара</td>
-            <td>Начисления<br> по бонусу</td>
-          </tr>
-      '''
-
-
-      for g in good_list:
-        g['showcase']='да' if g['showcase'] else 'нет'
-        result+=f"""
-          <tr >
-            <td>{g['header']}</td>
-            <td class="c">{g['showcase']}</td>
-            <td class="c">{g['price']}</td>
-            <td class="c">{g['code']}</td>
-            <td class="c">{g['percent']}%</td>
-            
-          </tr>
-        """
-      result+='</table>'
-
-    field['after_html']=result
-
-
-def action_filter_code(form,field,row):
-  if row["a__id"]:
-    return f'<a href="/edit-form/action/{row["a__id"]}" target="_blank">{row["a__header"]}</a>'
-  else:
-    return ''
-
-
+from lib.engine import s
+from lib.core import exists_arg, date_to_rus
+from .header_before_code import header_before_code
+from .good_categories import good_categories
+from .pr_bonus import pr_bonus
 def get_fields():
     return [ 
-    # {
-    #   'name':'action_id',
-    #   'description':'Акция',
-    #   'type':'select_from_table',
-    #   'header_field':'header',
-    #   'value_field':'id',
-    #   'table':'action',
-    #   'read_only':1,
-    #   'filter_on':1
-    # },
     {
       'name':'header',
-      'description':'Наименование акции',
+      'description':'Название',
       'type':'text',
-      'filter_code':action_filter_code,
-      'filter_on':1
-    }, 
-    # # Производителя убрал по просьбе Тани
-    # {
-    #   'name':'manufacturer_id',
-    #   'description':'Производитель',
-    #   'type':'select_from_table',
-    #   'header_field':'header',
-    #   'value_field':'id',
-    #   'table':'manufacturer',
-    #   'tablename':'man',
-    #   'read_only':1,
-    #   'filter_on':1
-    # },
-    {
-      'name':'begin_date',
-      'description':'Дата начала',
-      'type':'date',
-      'default_off':1,
-      'filter_on':1
-    },
-    {
-      'name':'end_date',
-      'description':'Дата окончания',
-      'type':'date',
-      'default_off':1,
-      'filter_on':1
+      #'filter_code':header_filter_code,
+      'read_only':1,
+      'filter_on':1,
+      'tab':'main',
+      # При выводе фильтров и при поиска превращаем данное текстовое поле в autocomplete
+      'before_code':header_before_code
     },
     # {
-    #   'name':'plan',
-    #   'description':'План',
-    #   'type':'select_values',
-    #   'values':[
-    #     {'v':'1','d':'суммовой'},
-    #     {'v':'2','d':'колличественный'},
-    #     {'v':'3','d':'только процент за любые закупки'},
-    #   ],
-    #   'default_off':1,
-    #   'filter_on':1
-    # },
-    # {
-    #   'name':'value',
-    #   'description':'сумма или количество',
-    #   'type':'text',
-    #   'filter_type':'range',
-    #   'default_off':1,
-    #   'filter_on':1
-    # },
-    # {
-    #   'name':'reward_percent',
-    #   'description':'% вознаграждения (для суммовой акции)',
-    #   'type':'text',
-    #   'filter_type':'range',
-    #   'default_off':1,
-    #   'filter_on':1
-    # },
-    # {
-    #   'name':'allgood',
-    #   'description':'Для всех товаров',
-    #   'type':'checkbox',
-    #   'default_off':1,
-    #   'filter_on':1
+    #   'name':'date_start',
+    #   'description':'Начало подписки',
+    #   'type':'date',
+    #   'tab':'main',
+    #   'filter_on':1,
+    #   'filter_code':date_start_filter_code
     # },
     {
-      'description':'Товары',
+        'name':'date_start',
+        'description':'Начало подписки',
+        'type':'yearmon',
+        'filter_on':1,
+        'filter_type':'eq',
+        'not_process':1,
+        'filter_code':date_start_filter_code
+    },
+    {
+      'name':'date_stop',
+      'description':'Окончание подписки',
+      'type':'yearmon',
+      'filter_type':'eq',
+      'not_process':1,
+      'tab':'main',
+      'filter_code':date_stop_filter_code, # в результатах поиска это поле превращается в подписку
+      'filter_on':1
+    },
+    # {
+    #   'name':'good_categories',
+    #   'description':'Группы товаров',
+    #   'type':'accordion',
+    #   'tab':'goods',
+    #   # Запрос для вывода заголовках аккордиона
+    #   'headers_query':'SELECT id,header from action_plan where action_id=<id>',
+      
+    # },
+    {
+      'name':'good_categories',
       'type':'code',
-      'name':'goods',
-      'code':goods_field,
-      'after_html':'html'
+      'tab':'goods',
+      'description':'категории товаров',
+      'code':good_categories
+    },
+    {
+      'name':'prognoz_bonus',
+      'type':'code',
+      'tab':'pr_bonus',
+      'description':'Информация о бонусах',
+      'code':pr_bonus
+    },
+    {
+      'name':'distrib',
+      'description':'Разрешённые дистрибьюторы',
+      'type':'code',
+      'tab':'distrib',
+      'code':distrib_code
     }
-
 ]
+
+
+def distrib_code(form,field):
+  if form.script == 'edit_form' and form.action=='edit':
+    #form.pre(form.manager)
+    suppliers_lst=form.db.query(
+      query='''
+        select
+          s.header
+        from
+          action_plan ap
+          LEFT JOIN action_plan_supplier aps ON aps.action_plan_id=ap.id
+          LEFT JOIN supplier s ON s.id = aps.supplier_id
+        WHERE ap.action_id=%s and s.id is not null GROUP BY s.id ORDER BY s.header 
+      ''',
+      massive=1,
+      values=[form.id]
+    )
+    field['after_html']='<br>'.join(suppliers_lst)
+  
+  
+
+
+def date_start_filter_code(form,field,row):
+  return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"
+
+def date_stop_filter_code(form,field,row):
+  
+
+
+
+  if str(form.manager['type'])=='2': # Юридическое лицо
+    #form.pre(row)
+    # получаем списки подписанных и отправивших запрос на акцию юрлиц
+    if not exists_arg('subscribed_ur_lico_id',row): row['subscribed_ur_lico_id']=''
+    if not exists_arg('subscribed_apteka_id',row): row['subscribed_apteka_id']=''
+
+    if not exists_arg('requested_ur_lico_id',row): row['requested_ur_lico_id']=''
+    
+    row['subscribed_apteka_id']=row['subscribed_apteka_id'].split('|')
+    row['subscribed_ur_lico_id']=row['subscribed_ur_lico_id'].split('|')
+    row['requested_ur_lico_id']=row['requested_ur_lico_id'].split('|')
+    #form.pre(row['subscribed_apteka_id'])
+    #ur_lico_subscribe='[{"id":"1","name":"ЗАО лекарствснаб","v":"0"},{"id":"2","name":"ФЕРЕЙН","v":"1"},{"id":"3","name":"ООО Ихтиандр","v":"2"}]'
+    ur_lico_subscribe=[]
+    
+
+    for u in form.manager['ur_lico_list']:
+      
+      need_append=False
+      
+      if not exists_arg('ur_lico_id',form.query_hash):
+        need_append=True
+      elif exists_arg('ur_lico_id',form.query_hash) and len(form.query_hash['ur_lico_id']):
+        # В том случае, когда мы фильтруем по юрлицам -- выводим информацию о подписке только по тем юрлицам, по которым ищем
+        if u['id'] in form.query_hash['ur_lico_id']:
+          need_append=True
+        else:
+          need_append=False
+      v=0
+      if str(u['id']) in row['subscribed_ur_lico_id']: v=2 # подписанных
+      elif str(u['id']) in row['requested_ur_lico_id']: v=1 # отправил запрос на подписку
+      else: v=0
+      
+      if need_append:
+        # u['apt_ids'] -- id-шники аптек для конкретного юрлица
+        #form.pre({
+        #  'u_apt_ids':u['apt_ids'],
+        #  'subscribed_apteka_id':row['subscribed_apteka_id'],
+        #  'cnt_apt':len(list(set(u['apt_ids']) & set(row['subscribed_apteka_id'])))
+        #})
+        ur_lico_subscribe.append({
+          'id':u['id'],
+          'action_id':row['wt__id'],
+          'v':str(v),
+          'name':u['name'],
+          'apt_cnt':len(list(set(u['apt_ids']) & set(row['subscribed_apteka_id'])))
+        })
+
+    #form.pre(['subscribe',ur_lico_subscribe])
+    # Количество подписанных аптек
+    apteka_subscribe=0
+    ur_lico_subscribe=s.to_json(ur_lico_subscribe)
+    
+    if (row['apteka_id_list']):
+      apteka_subscribe=len(row['apteka_id_list'].split('|'))
+    return f'<div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{ur_lico_subscribe}|{apteka_subscribe}</div>'
+
+
+  elif str(form.manager['type'])=='3': # Аптека
+    # subscribe_status: 0 - не подписна ; 1 - отправлен запрос на участие ; 2- подписана
+    if not exists_arg('subscribed_apteka_id',row): row['subscribed_apteka_id']=''
+    row['subscribed_apteka_id']=row['subscribed_apteka_id'].split('|')
+    if not exists_arg('requested_apteka_id',row): row['requested_apteka_id']=''
+    row['requested_apteka_id']=row['requested_apteka_id'].split('|')
+
+    apteka_subscribe=[]
+
+    for a in form.manager['apteka_list']:
+      v=0
+      if str(a['id']) in row['subscribed_apteka_id']: v=2
+      if str(a['id']) in row['requested_apteka_id']: v=1
+      apteka_subscribe.append({'id':a['id'],'v':str(v),'name':a['name']})
+    apteka_subscribe=s.to_json(apteka_subscribe)
+
+    return f'<div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{apteka_subscribe}</div>'
+
+    #form.pre(apteka_subscribe)
+
+    #form.pre(row)
+    subscribe_status=0
+    return subscribe_status
+    # else:
+  return ''
+
+  
+
+    
+
+def date_stop_before_code(form,field):
+  print()
+  #form.pre({'script':form.script})

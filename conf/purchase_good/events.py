@@ -32,6 +32,18 @@ def events_permissions(form):
 
 def before_search(form):
   qs=form.query_search
+  sf=qs['SELECT_FIELDS']
+  #if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
+  #  form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
+
+
+  
+  
+  #sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
+  sf.append('ap.header ap__header')
+  if form.manager['type'] in (2,3):
+    form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
+    
   query_count='''
     select
       count(*) cnt
@@ -41,24 +53,10 @@ def before_search(form):
       LEFT JOIN action  act ON p.action_id=act.id
       LEFT JOIN apteka a ON wt.apteka_id = a.id
     '''
-  if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
-    form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
 
   if len(qs['WHERE']):
     query_count+=' WHERE '+' AND '.join(qs['WHERE'])
   qs['query_count']=query_count
-  sf=form.query_search['SELECT_FIELDS']
-  
-  #sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
-  sf.append('ap.header ap__header')
-  if form.manager['type'] in (2,3):
-    form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
-    
-  print(form.query_search['WHERE'])
-  # # для аптеки делаем ограничение
-  # if form.manager['type']==3:
-    
-  #   form.query_search['WHERE'].append(f"wt.apteka_id={form.manager['id']}")
 
   form.out_before_search=''
   #form.explain=1

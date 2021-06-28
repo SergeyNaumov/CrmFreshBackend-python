@@ -99,5 +99,5 @@ def process_edit_form(**arg):
       'cols':form.cols,
       'tabs':form.tabs,
       'config':form.config,
-      'run_js':form.run_js if form.run_js else '' 
+      'javascript':form.javascript['edit_form'] if form.javascript['edit_form'] else '' 
     }

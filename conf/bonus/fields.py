@@ -1,4 +1,4 @@
-
+import os.path
 
 
 
@@ -9,7 +9,8 @@ def get_fields():
       'description':'Файл',
       'type':'text',
       'read_only':1,
-      'filter_on':1
+      'filter_on':1,
+      'filter_code':file_filter_code
     },
     {
       'name':'number',
@@ -58,3 +59,11 @@ def get_fields():
     }
 
 ]
+def file_filter_code(form,field,row):
+  if row['wt__file'] and os.path.exists('./files/Akt/'+row['wt__file']):
+    return f'''
+      <a href="{'/files/Akt/'+row['wt__file']}" target="_blank">{row['wt__file']}</a>
+    '''
+  else:
+    return row['wt__file']+' <small>файл отсутствует</small>'
+  

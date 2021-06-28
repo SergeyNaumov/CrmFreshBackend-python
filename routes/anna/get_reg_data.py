@@ -92,6 +92,9 @@ def get_reg_data():
                         )
                         a['set1']=1
                         a['set2']=1
+
+                c['subscribe_actions']=[] # список акций, на которые подписаны аптеки
+
                 if len(apteka_ids_in_comp):
                     c['orders_change_apteka']=s.db.query(
                         query=f'''
@@ -107,6 +110,22 @@ def get_reg_data():
                     )
                     for o in c['orders_change_apteka']:
                         o['registered']=date_to_rus(str(o['registered']))
+
+
+                    # Список акций, на которые подписаны аптеки юрлица
+                    c['subscribe_actions']=s.db.query(
+                        query=f'''
+                            select
+                                a.id, a.header, a.date_start, a.date_stop
+                            from
+                                action a
+                                join action_apteka aa ON aa.action_id=a.id
+                            WHERE
+                                a.date_stop>=curdate() and aa.apteka_id in ( {','.join(apteka_ids_in_comp) } )
+                            group by a.id order by a.header 
+                        '''
+
+                    )
 
                     
                 #print('orders:',response['orders_change_apteka'])

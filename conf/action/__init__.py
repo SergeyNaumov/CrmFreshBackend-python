@@ -35,7 +35,7 @@ class Config(Form):
             #{'description':'Общая информация','name':'main'},
             {'description':'Разрешённые дистрибьюторы','name':'distrib'},
         ]
-        form.search_on_load=1
+        form.search_on_load=0
         form.fields=get_fields()
 
 """

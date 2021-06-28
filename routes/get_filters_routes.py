@@ -60,6 +60,7 @@ async def get_filters_controller(config: str):
 
     if f['type'] in ('date','time','datetime','daymon','yearmon') and not exists_arg('filter_type',f) : 
       f['range']=1
+      #print(f['name'],f)
     
     if exists_arg('filter_type',f) and f['filter_type'] == 'range':
       f['range']=1
