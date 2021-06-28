@@ -1,0 +1,48 @@
+<div>
+      <style>
+        .prognoz_bonus_select {
+            border: 1px solid gray; padding :3px; min-width: 300px;
+            margin-bottom: 30px;
+          }
+          .d_container {display: inline-block;}
+      </style>
+      Выберите юридическое лицо: <select class="prognoz_bonus_select" onchange="window.select_bonus_ur_lico(this.value)">
+        {% for b in bonus_list %}
+        <option value="{{b.ur_lico_id}}">{{b.header}}</option>
+        {% endfor%}
+      </select>
+      
+      {% for b in bonus_list %}
+      <div id="bonus_ur_lico{{b.ur_lico_id}}" class="prognoz_bonus_item" {% if loop.index>1%} style="display: none;"{%endif%}> 
+        <div><b>{{b.header}}</b></div>
+        <div style="padding-left: 20px; margin-bottom: 20px;">
+            <div>Кол-во аптек: {{b.cnt_apt}}</div>
+            <div>сумма закупки в sip-ценах: {{b.price}}</div>
+            <div>процент выполнения: {{b.percent_complete}}</div>
+            <div>текущий бонус: {{b.current_bonus}}</div>
+            <div>процент выполнения при сохранении темпа закупки: {{b.percent_progress}}</div>
+            <div>бонус при сохранении темпа закупки: {{b.bonus_progress}}</div>
+            <div>остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{b.other_distrib_sum}}</div>
+            <div>упущенная выгода (общая сумма, сколько недополучили): {{b.lost_profit}}</div>
+            <div>осталось выполнить в %: {{b.left_to_complete_percent}}</div>
+            <div>кол-во закупки: {{b.buy_cnt}}</div>
+
+            <div class="d_container">
+                 <canvas class="diagramm"
+                  data-values="{{b.percent_complete}},{{b.left_to_complete_percent}}" 
+                  data-labels="процент выполнения|осталось выполнить"
+                  data-description="диаграмма выполнения"
+                  width="500" height="200"></canvas>
+            </div>
+            <div class="d_container">
+                 <canvas class="diagramm"
+                  data-values="{{b.price}},{{b.other_distrib_sum}}" 
+                  data-labels="разрешённые дистрибьютеры|остальные дистрибьютеры"
+                  data-description="дистрибьютеры"
+                  width="500" height="200"></canvas>
+            </div>
+
+        </div>
+      </div>
+      {% endfor %}
+</div>
