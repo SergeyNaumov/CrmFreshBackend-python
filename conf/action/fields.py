@@ -198,7 +198,7 @@ def good_categories(form,field):
         FROM
           action_plan ap
           LEFT JOIN manufacturer man ON man.id = ap.manufacturer_id
-        WHERE action_id=%s
+        WHERE ap.end_date>=curdate() and action_id=%s
       ''',
       values=[form.id]
     )
