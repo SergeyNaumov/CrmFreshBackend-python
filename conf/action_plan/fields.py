@@ -2,6 +2,7 @@ from lib.engine import s
 from lib.core import exists_arg, date_to_rus
 from .header_before_code import header_before_code
 from .good_categories import good_categories
+from .good_categories2 import good_categories2 
 from .pr_bonus import pr_bonus
 def get_fields():
     return [ 
@@ -58,6 +59,54 @@ def get_fields():
       'tab':'goods',
       'description':'категории товаров',
       'code':good_categories
+    },
+    {
+      'name':'good_categories2',
+      'type':'code',
+      'tab':'goods',
+      'description':'категории товаров',
+      'code':good_categories2,
+      'data':[]
+      # 'data':[
+      #   {
+      #     'header':'Заголовок1',
+      #     'content':[
+      #       {'type':'html','body':'<p>Это абзац</p>'},
+      #       {'type':'html','body':'<p>Это второй абзац</p>'},
+      #       {
+      #         'type':'table',
+      #         'table':{
+      #           'headers':[
+      #             {
+      #               'h':'столбец1',
+      #               'tooltip':{
+      #                 'header':'Заголовок для подсказки',
+      #                 'body':'подсказка'
+      #               }
+      #             },
+      #             {'h':'столбец2'},
+      #             {'h':'столбец3'}
+      #           ],
+      #           'data':[
+      #             ['Иванов','1','i2'],
+      #             ['Абрамович','8','d6'],
+      #             ['Яшин','800','9'],
+      #             ['Петров','136','9'],
+      #             ['Сидоров','518','d6'],
+      #           ]
+      #         }
+      #       }
+      #     ]
+      #   },
+        
+      #   {
+      #     'header':'Заголовок2',
+      #     'content':[
+
+      #     ]
+      #   },
+        
+      # ]
     },
     {
       'name':'prognoz_bonus',

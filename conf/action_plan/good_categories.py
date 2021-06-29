@@ -54,7 +54,7 @@ def good_categories(form,field):
 
     #form.pre(plan_list)
     field['after_html']=form.template(
-      './conf/action/templates/good_categories.html',
+      './conf/action_plan/templates/good_categories.html',
       plan_list=plan_list,
       ov=form.ov,
       manager=form.manager,

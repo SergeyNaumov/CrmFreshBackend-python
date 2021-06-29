@@ -1,11 +1,13 @@
 <div>
       <style>
+
         .prognoz_bonus_select {
             border: 1px solid gray; padding :3px; min-width: 300px;
             margin-bottom: 30px;
           }
           .d_container {display: inline-block;}
       </style>
+      <p style="color: red;"><b>Внимание! данные обновляются с задержкой в 1-2 дня</b></p>
       Выберите юридическое лицо: <select class="prognoz_bonus_select" onchange="window.select_bonus_ur_lico(this.value)">
         {% for b in bonus_list %}
         <option value="{{b.ur_lico_id}}">{{b.header}}</option>
@@ -25,19 +27,20 @@
             <div>остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{b.other_distrib_sum}}</div>
             <div>упущенная выгода (общая сумма, сколько недополучили): {{b.lost_profit}}</div>
             <div>осталось выполнить в %: {{b.left_to_complete_percent}}</div>
+            <div>осталось выполнить в рублях: {{b.left_to_complete_rub}}</div>
             <div>кол-во закупки: {{b.buy_cnt}}</div>
 
             <div class="d_container">
                  <canvas class="diagramm"
                   data-values="{{b.percent_complete}},{{b.left_to_complete_percent}}" 
-                  data-labels="процент выполнения|осталось выполнить"
+                  data-labels="процент выполнения ({{b.percent_complete}})%|осталось выполнить ({{b.left_to_complete_percent}})%"
                   data-description="диаграмма выполнения"
                   width="500" height="200"></canvas>
             </div>
             <div class="d_container">
                  <canvas class="diagramm"
                   data-values="{{b.price}},{{b.other_distrib_sum}}" 
-                  data-labels="разрешённые дистрибьютеры|остальные дистрибьютеры"
+                  data-labels="разрешённые дистрибьютеры ({{b.price}})|остальные дистрибьютеры ({{b.other_distrib_sum}})"
                   data-description="дистрибьютеры"
                   width="500" height="200"></canvas>
             </div>

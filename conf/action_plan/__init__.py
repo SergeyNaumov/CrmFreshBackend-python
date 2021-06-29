@@ -37,7 +37,7 @@ class Config(Form):
 
         form.tabs=[
             {'description':'Группы товаров','name':'goods'},
-            {'description':'Прогнозный бонус','name':'pr_bonus'},
+            {'description':'<span style="color: red;">Прогнозный бонус</span>','name':'pr_bonus','tab_style':'color: red;'},
             {'description':'Разрешённые дистрибьюторы','name':'distrib'},
         ]
         form.search_on_load=0

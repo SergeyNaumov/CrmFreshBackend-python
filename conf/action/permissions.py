@@ -200,7 +200,7 @@ def filter_ur_lico(form):
            'value_field':'id',
            'tablename':'aul',
            'where':'id in ('+','.join(form.manager['ur_lico_ids'])+')',
-           'filter_on':1,
+           #'filter_on':1,
            'not_process':1
          }
       )

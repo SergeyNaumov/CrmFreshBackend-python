@@ -48,77 +48,7 @@
   <h2 >Группы товаров</h2>
   
   
-  {% for p in plan_list%}
-    <div class="catheader">
-      <a href="#" id="toggle{{p.id}}" data-id="{{p.id}}">
-      {%if p.child|length>0%}
-        <b>{{p.header}}</b>
-      {%else%}
-        {{p.header}}
-      {%endif%}
-      </a>
-      ({{p.begin_date}} - {{p.end_date}})
-      
-    </div>
-    <div id="plan{{p.id}}" style="display: none;" class="more">
-      {% if ov.subscribed_on_action%}
-        План: {{p.plan}}<br>
-        {{p.value_name}}: {{p.value}}
-        {% if p.reward_percent%}
-          <div>% бонуса: {{p.reward_percent}}</div>
-        {% endif%}
-      {% endif %}
-      
 
-
-      {% if ov.subscribed_on_action %}
-        <div class="download_block">
-          <a href="/backend/anna/download/action_plan/xls/{{p.id}}" target="_blank">скачать в xls</a> | 
-          <a href="/backend/anna/download/action_plan/dbf/{{p.id}}">скачать в dbf</a>
-        </div>
-      {% endif %}
-      {% if(p.child|length) %}
-        <table class="goodlist">
-          <tr class="h">
-            <td>Штрих код товара</td>
-            <td>Наименование</td>
-            {% if ov.subscribed_on_action %}
-              <td>Витрина <a href="#" class="popup_vitrina">?</a></td>
-            {% endif %}
-            <td>Сип-цена</td>
-            {% if not p.reward_percent and ov.subscribed_on_action%}
-            <td>Начисления<br> по бонусу
-              <a href="#" class="popup_bonus">?</a>
-            </td>
-            {% endif %}
-          </tr>
-        
-        {% for g in p.child %}
-          <tr >
-            <td class="c">{{g.code}}</td>
-            <td>{{g.header}}</td>
-            {% if ov.subscribed_on_action %}
-              <td class="c">{{g.showcase}}</td>
-            {% endif %}
-            <td class="c">
-              {% if g.price == '0' %}
-                закупочная цена
-              {% else %}
-                {{g.price}}
-              {% endif %}
-              
-            </td>
-            {% if not p.reward_percent and ov.subscribed_on_action%}
-              <td class="c">{{g.percent}}%</td>
-            {% endif%}
-            
-          </tr>
-        {% endfor%}
-        </table>
-      {% endif%}
-
-    </div>
-  {% endfor %}
 
 </div>
 {%else%}

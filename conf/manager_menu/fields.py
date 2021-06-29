@@ -1,7 +1,7 @@
-def before_code_type(**arg):
-  form=arg['form']
-  field=arg['field']
-  if not field['value']:
+def before_code_type(form,field):
+  #print('form:',form)
+  #print('field:',field)
+  if not 'value' in field or not field['value']:
     field['value']='vue'
 
 

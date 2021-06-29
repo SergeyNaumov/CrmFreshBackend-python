@@ -60,10 +60,33 @@ def get_fields():
 
 ]
 def file_filter_code(form,field,row):
-  if row['wt__file'] and os.path.exists('./files/Akt/'+row['wt__file']):
-    return f'''
-      <a href="{'/files/Akt/'+row['wt__file']}" target="_blank">{row['wt__file']}</a>
-    '''
-  else:
-    return row['wt__file']+' <small>файл отсутствует</small>'
+  arr=row['wt__file'].split('.')
+  
+  if len(arr)>1:
+    #form.pre('len:'+str(len(arr)))
+    #form.pre(arr)
+    if row['wt__file'] and os.path.exists('./files/Akt/'+row['wt__file']):
+      return f'''
+        <a href="{'/files/Akt/'+row['wt__file']}" target="_blank">{row['wt__file']}</a>
+      '''
+    else: # Если не найден файл -- пробуем найти с другим расширением (файлы у нас только с расширением jpg и pdf)
+      ext=arr[-1]
+      if ext=='jpg':
+        ext='pdf'
+      elif ext=='pdf':
+        ext='jpg'
+      
+      #form.pre(''.join(arr))
+      del arr[-1]
+      
+      filename='.'.join(arr)+'.'+ext
+      #form.pre(filename)
+      if filename and os.path.exists('./files/Akt/'+filename):
+        #form.pre('find changed'+filename)
+        return f'''<a href="{'/files/Akt/'+filename}" target="_blank">{filename}</a>'''
+      #form.pre(ext)
+    
+  return row['wt__file']+' <small>файл отсутствует</small>'
+
+    
   
