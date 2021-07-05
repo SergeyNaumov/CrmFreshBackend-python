@@ -5,7 +5,25 @@ def events_permissions(form):
   #form.pre('zzz')
   filter_ur_lico(form)
   #print('action:',form.action)
-  #print('script:',form.script)
+  #form.pre(form.script)
+  
+  # Фильтр для юрлиц
+  if form.script in ['admin_table'] and form.manager['type']==2:
+    #form.QUERY_SEARCH_TABLES.append(
+    #  {'t':'action_ur_lico','a':'aul','l':'wt.id=aul.action_id','lj':1}
+    #)
+    form.explain=1
+    form.fields.append(
+        {
+          'description':'Подписанные мероприятия',#'только те маркетинговые мероприятия, на которые я подписан',
+          'type':'checkbox',
+          'name':'only_subscribe',
+          'not_process':1,
+          'filter_code':filter_code_subscribe,
+          'filter_on':1
+        }
+    )
+
   if form.id:
     #form.ov=form.db.query(
     #  query='select * from action where id=%s',
@@ -14,6 +32,7 @@ def events_permissions(form):
     #)
 
     form.ov=get_old_values(form)
+    if not form.ov: return
     #form.pre(form.ov)
 
     if form.ov:
@@ -206,3 +225,8 @@ def filter_ur_lico(form):
       )
      # print(f"script: {form.script}")
       #form.pre(form.fields)
+
+
+def filter_code_subscribe(form,field,row):
+  pass
+  #form.pre(row)

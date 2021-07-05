@@ -1,8 +1,9 @@
 from lib.engine import s
 from lib.core import exists_arg, date_to_rus
 from .header_before_code import header_before_code
-
-
+from .good_categories import good_categories 
+#from .pr_bonus import pr_bonus
+from .subscribes import subscribes
 def get_fields():
     return [ 
     {
@@ -53,12 +54,68 @@ def get_fields():
       
     # },
     {
-      'name':'good_categories',
+      'name':'subscribes',
+      'type':'code',
+      'tab':'goods',
+      'description':'Подписки',
+      'code':subscribes
+    },
+    {
+      'name':'good_categories2',
       'type':'code',
       'tab':'goods',
       'description':'категории товаров',
-      'code':good_categories
+      'code':good_categories,
+      'data':[]
+      # 'data':[
+      #   {
+      #     'header':'Заголовок1',
+      #     'content':[
+      #       {'type':'html','body':'<p>Это абзац</p>'},
+      #       {'type':'html','body':'<p>Это второй абзац</p>'},
+      #       {
+      #         'type':'table',
+      #         'table':{
+      #           'headers':[
+      #             {
+      #               'h':'столбец1',
+      #               'tooltip':{
+      #                 'header':'Заголовок для подсказки',
+      #                 'body':'подсказка'
+      #               }
+      #             },
+      #             {'h':'столбец2'},
+      #             {'h':'столбец3'}
+      #           ],
+      #           'data':[
+      #             ['Иванов','1','i2'],
+      #             ['Абрамович','8','d6'],
+      #             ['Яшин','800','9'],
+      #             ['Петров','136','9'],
+      #             ['Сидоров','518','d6'],
+      #           ]
+      #         }
+      #       }
+      #     ]
+      #   },
+        
+      #   {
+      #     'header':'Заголовок2',
+      #     'content':[
+
+      #     ]
+      #   },
+        
+      # ]
     },
+    # {
+    #   'name':'prognoz_bonus',
+    #   'type':'code',
+    #   'tab':'pr_bonus',
+    #   'description':'Информация о бонусах',
+    #   'code':pr_bonus,
+    #   'data':[]
+    # },
     {
       'name':'distrib',
       'description':'Разрешённые дистрибьюторы',
@@ -184,68 +241,7 @@ def date_stop_filter_code(form,field,row):
 
   
 
-def good_categories(form,field):
-  #'Здесь будет какая-то инфа'
 
-  if form.id:
-
-    plan_list=form.db.query(
-      query='''
-        SELECT
-          ap.id,ap.header,ap.begin_date,ap.end_date,ap.value,ap.reward_percent,ap.allgood,plan,
-          man.header manufacturer, ap.manufacturer_id
-
-        FROM
-          action_plan ap
-          LEFT JOIN manufacturer man ON man.id = ap.manufacturer_id
-        WHERE ap.end_date>=curdate() and action_id=%s
-      ''',
-      values=[form.id]
-    )
-    plan_ids=[]
-    plan_dict={}
-    for p in plan_list:
-      plan_ids.append( str(p['id']) )
-      p['child']=[]
-      p['begin_date']=date_to_rus(p['begin_date'])
-      p['end_date']=date_to_rus(p['end_date'])
-      plan_dict[p['id']]=p
-      if p['plan'] == 1:
-        p['plan']='суммовой'
-        p['value_name']='Сумма от'
-      elif p['plan'] == 2:
-        p['plan']='количественный'
-        p['value_name']='Кол-во'
-      elif p['plan'] == 3:
-        p['plan']='только процент за любые закупки'
-        p['value_name']='Выплачиваемый процент'
-    
-
-    if len(plan_ids):
-      good_list=form.db.query(query='''
-        SELECT
-          ag.action_plan_id plan_id, g.header,
-          if(g.showcase='0','нет','да') showcase,
-          g.price, g.code, g.percent
-        from 
-          action_plan_good ag
-          JOIN good g ON ag.good_id=g.id
-        WHERE ag.action_plan_id in ('''+','.join(plan_ids)+')',
-        
-      )
-
-      for g in good_list:
-        plan_dict[g['plan_id']]['child'].append(g)
-
-    #form.pre(plan_list)
-    field['after_html']=form.template(
-      './conf/action/templates/good_categories.html',
-      plan_list=plan_list,
-      ov=form.ov,
-      manager=form.manager,
-      ur_lico_subscribe=form.ur_lico_subscribe
-    )
-    form.javascript['edit_form']=form.template('./conf/action/templates/good_categories.js')
     
 
 def date_stop_before_code(form,field):

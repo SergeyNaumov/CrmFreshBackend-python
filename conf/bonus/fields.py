@@ -7,8 +7,9 @@ def get_fields():
     {
       'name':'file',
       'description':'Файл',
-      'type':'text',
-      'read_only':1,
+      'filedir':'./files/Akt',
+      'type':'file',
+      #'read_only':1,
       'filter_on':1,
       'filter_code':file_filter_code
     },
@@ -29,7 +30,8 @@ def get_fields():
       'name':'accept',
       'description':'Подписан',
       'type':'checkbox',
-      'filter_on':1
+      'filter_on':1,
+      'filter_code':accept_filter_code
     },
     {
       'description':'Оплачен',
@@ -59,9 +61,41 @@ def get_fields():
     }
 
 ]
+def accept_filter_code(form,field,row):
+  if 0 and row['wt__accept']:
+    return 'акт подписан'
+  else:
+    return {
+      'before_html':'не подписан',
+      'title':'Отправка акта',
+      'id':row['wt__id'],
+      'config':'bonus',
+      'name':'file',
+      'type':'form',
+      'style':'margin-top: 20px;',
+
+      'spoiler':'загрузить',
+      'fields':[
+        {
+          'description':'Файл акта',
+          'name':'attach',
+          'filedir':'/files/bonus_order',
+          'type':'file'
+        },
+        {
+          'description':'Комментарий',
+          'name':'comment',
+          'type':'textarea'
+        }
+      ],
+      # url заменить
+      'url':f'/backend/anna/bonus/order/{row["wt__id"]}',
+      'value':''
+    }
 def file_filter_code(form,field,row):
   arr=row['wt__file'].split('.')
-  
+
+
   if len(arr)>1:
     #form.pre('len:'+str(len(arr)))
     #form.pre(arr)
@@ -85,8 +119,8 @@ def file_filter_code(form,field,row):
         #form.pre('find changed'+filename)
         return f'''<a href="{'/files/Akt/'+filename}" target="_blank">{filename}</a>'''
       #form.pre(ext)
-    
-  return row['wt__file']+' <small>файл отсутствует</small>'
+
+  #return row['wt__file']+' <small>файл отсутствует</small>'
 
     
   

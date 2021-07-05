@@ -285,6 +285,8 @@ class FreshDB():
 
     def query(self, **arg):
       self.error_str=''
+      self.connect.ping()  # reconnecting mysql
+      
       if exists_arg('onevalue',arg):
         cur = self.connect.cursor()
       else:

@@ -1,6 +1,6 @@
 
 
-
+#from lib.anna.get_apt_list import get_apt_list
 
 def get_fields():
     return [ 
@@ -11,12 +11,12 @@ def get_fields():
       'read_only':1,
       'filter_on':1
     },
-    {
-      'name':'header',
-      'description':'Наименование',
-      'type':'text',
-      'filter_on':1
-    }, 
+    # {
+    #   'name':'header',
+    #   'description':'Наименование',
+    #   'type':'text',
+    #   'filter_on':1
+    # }, 
     {
       'name':'inn',
       'description':'ИНН',
@@ -55,3 +55,4 @@ def get_fields():
     }
 
 ]
+

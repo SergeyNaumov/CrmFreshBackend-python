@@ -32,12 +32,14 @@ class Config(Form):
         
         form.tabs=[
             {'description':'Группы товаров','name':'goods'},
-            #{'description':'Общая информация','name':'main'},
             {'description':'Разрешённые дистрибьюторы','name':'distrib'},
         ]
         form.search_on_load=0
         form.fields=get_fields()
-
+        # для построения графиков
+        #form.javascript['edit_form']=form.template('./js/Chart.bundle.min.js')
+        form.javascript['edit_form']+=form.template('./conf/action/templates/edit_form.js')
+        #form.pre(form.javascript['edit_form'])
 """
 create table test(
     id int primary key auto_increment,

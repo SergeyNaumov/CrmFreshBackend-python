@@ -31,6 +31,8 @@ def get_old_values(form):
         onerow=1,
         values=[form.id]
     )
+    if not ov: return
+    ov['subscribed_on_action']=0
     if ov['subscribed_ur_lico_id']:
       ov['subscribed_ur_lico_id']=ov['subscribed_ur_lico_id'].split(',')
     else:
@@ -70,6 +72,7 @@ def get_old_values(form):
 
     if len(ov['subscribed_ur_lico_id']):
       ov['subscribed_on_action']=1
+
   else:
     ov=form.db.query(
       query='select * from action where id=%s',

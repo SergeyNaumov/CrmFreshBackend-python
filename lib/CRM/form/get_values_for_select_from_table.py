@@ -64,7 +64,8 @@ def get_values_for_select_from_table(form,f):
       return lst
     
     if not len(lst): lst=[]
-    lst.insert(0,{'v':'0','d':'выберите значение'})
+    if form.script not in ('admin_table','find_objects'):
+      lst.insert(0,{'v':'0','d':'выберите значение'})
     # else:
     #   _list.append({'v':'0','d':'выберите значение'})
 

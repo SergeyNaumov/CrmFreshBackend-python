@@ -31,17 +31,18 @@ class Config(Form):
             #     #'value':["2020-01-01","2020-01-02"]
             # },
         #]
-        form.javascript['edit_form']=form.template('./js/Chart.bundle.min.js')
-        form.javascript['edit_form']+=form.template('./conf/action_plan/templates/edit_form.js')
+        #form.javascript['edit_form']=form.template('./js/Chart.bundle.min.js')
+        #form.javascript['edit_form']+=form.template('./conf/action_plan/templates/edit_form.js')
         
 
-        form.tabs=[
-            {'description':'Группы товаров','name':'goods'},
-            {'description':'<span style="color: red;">Прогнозный бонус</span>','name':'pr_bonus','tab_style':'color: red;'},
-            {'description':'Разрешённые дистрибьюторы','name':'distrib'},
-        ]
+        # form.tabs=[
+        #     {'description':'Группы товаров','name':'goods'},
+        #     {'description':'<span style="color: red;">Прогнозный бонус</span>','name':'pr_bonus','tab_style':'color: red;'},
+        #     {'description':'Разрешённые дистрибьюторы','name':'distrib'},
+        # ]
         form.search_on_load=0
         form.fields=get_fields()
+
 
 """
 create table test(

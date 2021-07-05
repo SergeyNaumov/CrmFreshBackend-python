@@ -15,11 +15,15 @@ from .change_reg_data import change_reg_data
 from .change_password import change_password
 
 from .download import router as download
+from .bonus import router as bonus
 
 router = APIRouter()
 
 # скачивание xls и dbf
 router.include_router(download,prefix='/download')
+
+# Загрузка формы из бонуса
+router.include_router(bonus,prefix='/bonus')
 
 #@router.get('/download/action_plan')
 #def x():

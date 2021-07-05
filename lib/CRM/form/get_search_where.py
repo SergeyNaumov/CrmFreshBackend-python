@@ -22,8 +22,8 @@ def get_search_where(form,query):
   for q in query:
       name,values=q
       
-      #if not name in form.fields_hash:
-      #  continue
+      if not name in form.fields_hash:
+        continue
       
       f=form.fields_hash[name]
 
