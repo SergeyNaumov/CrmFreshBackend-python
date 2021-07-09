@@ -4,14 +4,59 @@ def events_permissions(form):
   for f in form.fields:
     f['read_only']=1
 
+  if form.manager['type']==1: # Для сотрудников АннА добавляем фильтр "Юридическое лицо"
+    form.QUERY_SEARCH_TABLES.append(
+      {'t':'ur_lico','a':'u','l':'wt.partner_id=u.id','lj':1}
+    )
+    form.fields.append(
+      {
+        'description':'Юридическое лицо',
+        'type':'select_from_table',
+        'name': 'partner_id',
+        'table':'ur_lico',
+        'header_field':'header',
+        'value_field':'id',
+        'tablename':'u',
+        'filter_on':1,
+        'autocomplete':1
+      }
+    )
+
 def before_search(form):
-  form.out_before_search.append('<h2 class="subheadling mb-2">История начисления бонусов</h2>')
-  #form.pre(form.query_search['WHERE'])
+
+  qs=form.query_search
+  #form.pre(qs['WHERE'])
+
+
+
 
   if form.manager['type']==2:
     #form.explain=1
     ur_lico_ids=get_ul_list_ids(form,form.manager['id'])
     form.query_search['WHERE'].append(f"partner_id in ({','.join(ur_lico_ids)})")
+
+  
+  query_summ=f'''
+    SELECT
+      sum(summ)
+    FROM
+      {" ".join(qs['TABLES'])}
+  '''
+
+  if len(qs['WHERE']):
+    query_summ+=' WHERE '+' AND '.join(qs['WHERE'])
+  
+  total_bonus=form.db.query(
+    query=query_summ,
+    onevalue=1
+  )
+
+  form.out_before_search.append(f'''
+    <h2 class="subheadling mb-2">История начисления бонусов</h2>
+    <p>Вы можете подписать акт через ЭДО. Для этого вам необходимо ознакомиться с <a href="/files/const/template_edo.doc">шаблоном для подключения ЭДО</a></p>
+    <p>Заработанный бонус за всё время: {total_bonus} руб</p>
+
+  ''')
 
 events={
   'permissions':[

@@ -1,26 +1,53 @@
 
 # Возвращает список аптек
 def get_apt_list(form,manager_id):
-    return form.db.query(
-        query="""
-            SELECT
-                wt.*, 0 more, concat(m.name_f,' ',m.name_i,' ',m.name_o)  ma_fio, m.email ma_email,
-                m.phone ma_phone
-            FROM
-                ur_lico_manager ulm
-                join apteka wt ON wt.ur_lico_id=ulm.ur_lico_id
-                left join manager m ON wt.anna_manager_id=m.id
-            WHERE
-                ulm.manager_id=%s
+    manager=form.db.get(table='manager',where='id=%s',values=[manager_id],onerow=1)
+    if manager['type']==3:
+        return [
+            form.db.query(
+                query='''
+                    SELECT
+                        wt.*, 0 more, concat(m.name_f,' ',m.name_i,' ',m.name_o)  ma_fio, m.email ma_email,
+                        m.phone ma_phone
+                    FROM
+                        ur_lico_manager ulm
+                        join apteka wt ON wt.ur_lico_id=ulm.ur_lico_id
+                        left join manager m ON wt.anna_manager_id=m.id
+                    WHERE
+                        wt.manager_id=%s
+                ''',
+                values=[manager_id],
+                onerow=1,
+                errors=form.errors
+            )
+        ]
+    else:
+        return form.db.query(
+            query="""
+                SELECT
+                    wt.*, 0 more, concat(m.name_f,' ',m.name_i,' ',m.name_o)  ma_fio, m.email ma_email,
+                    m.phone ma_phone
+                FROM
+                    ur_lico_manager ulm
+                    join apteka wt ON wt.ur_lico_id=ulm.ur_lico_id
+                    left join manager m ON wt.anna_manager_id=m.id
+                WHERE
+                    ulm.manager_id=%s
 
-        """,
-        errors=form.errors,
-        values=[manager_id]
-    )
+            """,
+            errors=form.errors,
+            values=[manager_id]
+        )
 
-def get_apt_list_ids(form,manager_id):
+def get_apt_list_ids(form,manager_id=0):
+    if not manager_id:
+        manager_id=form.manager['id']
     res_lst=[]
+    lst=[]
+    
+
     lst=get_apt_list(form,manager_id)
+
     for a in lst:
         res_lst.append(str(a['id']))
     

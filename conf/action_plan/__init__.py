@@ -13,7 +13,6 @@ class Config(Form):
         form.explain=0
         form.read_only=1
         form.make_delete=0
-        form.work_table='action'
         form.not_edit=1
         form.QUERY_SEARCH_TABLES=[
             {'table':form.work_table,'alias':'wt'},

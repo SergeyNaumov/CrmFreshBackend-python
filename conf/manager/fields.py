@@ -115,12 +115,19 @@ def get_fields():
       'tab':'permissions'
     },
     { 
-      'description':'Имеет доступ в систему',
-      'name':'enabled',
+      'description':'Доступ к просмотру прогнозного бонуса за прошлый квартал',
+      'name':'show_old_plans',
       'type':'checkbox',
       'tab':'permissions',
-      'before_code':enabled_before_code
+      #'before_code':enabled_before_code
     },
+    # { 
+    #   'description':'Имеет доступ в систему',
+    #   'name':'enabled',
+    #   'type':'checkbox',
+    #   'tab':'permissions',
+    #   'before_code':enabled_before_code
+    # },
     {
       'name':'type',
       'description':'Тип учётной записи',

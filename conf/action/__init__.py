@@ -34,7 +34,7 @@ class Config(Form):
             {'description':'Группы товаров','name':'goods'},
             {'description':'Разрешённые дистрибьюторы','name':'distrib'},
         ]
-        form.search_on_load=0
+        form.search_on_load=1
         form.fields=get_fields()
         # для построения графиков
         #form.javascript['edit_form']=form.template('./js/Chart.bundle.min.js')

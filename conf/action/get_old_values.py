@@ -1,5 +1,5 @@
 from lib.core import exists_arg
-
+from lib.anna.get_apt_list import get_apt_list_ids
 def get_old_values(form):
   ov={}
   form.ur_lico_subscribe=[]
@@ -72,13 +72,36 @@ def get_old_values(form):
 
     if len(ov['subscribed_ur_lico_id']):
       ov['subscribed_on_action']=1
+  elif form.manager['type']==3:
+    form.manager['apt_list_ids']=get_apt_list_ids(form)
+    #form.pre(form.manager['apt_list_ids'])
 
+    ov=form.db.query(
+        query='''
+          select
+            wt.*
+          from
+            action wt
+            LEFT JOIN action_apteka as aa ON aa.action_id=wt.id and aa.apteka_id
+          where wt.id=%s
+        ''',
+        values=[form.id],
+        onerow=1
+      )
+    ov['subscribed_on_action']=0
   else:
     ov=form.db.query(
-      query='select * from action where id=%s',
+      query='''
+        select
+          wt.*
+        from
+          action wt
+        where wt.id=%s
+      ''',
       values=[form.id],
       onerow=1
     )
+    ov['subscribed_on_action']=0
     ov['subscribed_ur_lico_id']=[]
     ov['requested_ur_lico_id']=[]
     ov['subscribed_apteka_id']=[]

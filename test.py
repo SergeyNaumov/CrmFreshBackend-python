@@ -1,6 +1,7 @@
 # для тестирования
-from lib.core import is_wt_field,random_filename;
+from lib.core import cnt_days_period;
 import time,random,re
+print(cnt_days_period('2021-04-06','2021-06-25'))
 def from_datetime_get_date(dt):
   rez=re.search('^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2}:\d{2})?$',dt)
   if rez: return rez[1]
@@ -20,13 +21,6 @@ def from_datetime_get_date(dt):
   if rez:
     return rez[0]
   return False
-
-def print_console_error(text):
-  print("\033[31m {}" .format(text),"\033[0m")
-
-print('обычный текст')
-print_console_error('Ошибка')
-print('обычный текст')
 
 # f={
 #   'name': 'status',

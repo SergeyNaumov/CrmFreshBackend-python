@@ -62,7 +62,7 @@ def get_fields():
 
 ]
 def accept_filter_code(form,field,row):
-  if 0 and row['wt__accept']:
+  if row['wt__accept']:
     return 'акт подписан'
   else:
     return {
