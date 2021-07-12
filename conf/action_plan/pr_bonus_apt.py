@@ -55,6 +55,7 @@ def pr_bonus_apt(form,field):
         total_percent_complete=0
         total_left_to_complete_percent=0
         total_percent_progress=0
+        total_earned_bonus=0
 
         for b in bonus_list:
 
@@ -73,6 +74,7 @@ def pr_bonus_apt(form,field):
                     остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {b['other_distrib_sum']}<br>
                     упущенная выгода (общая сумма, сколько недополучили): {b['lost_profit']}<br>
                     осталось выполнить в %: {b['left_to_complete_percent']}<br>
+                    заработанный бонус: {b['earned_bonus']}<br>
                     {total_left_to_complete_label}: {b['left_to_complete_rub']}<br>
                     
                 '''
@@ -89,6 +91,7 @@ def pr_bonus_apt(form,field):
                     остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {b['other_distrib_sum']}<br>
                     упущенная выгода (общая сумма, сколько недополучили): {b['lost_profit']}<br>
                     осталось выполнить в %: {b['left_to_complete_percent']}<br>
+                    заработанный бонус: {b['earned_bonus']}<br>
                     {total_left_to_complete_label}: {b['left_to_complete_rub']}<br>
                     
                 '''
@@ -144,7 +147,7 @@ def pr_bonus_apt(form,field):
             total_other_distrib_sum+=b['other_distrib_sum']
             total_buy_cnt+=b['buy_cnt']
             total_left_to_complete_rub+=b['left_to_complete_rub']
-            
+            total_earned_bonus+=b['earned_bonus']
             # Процент выполнения = сумма закупки в сип-ценах / план
             if total_plan:
                 total_percent_complete = int(100 * (total_price / total_plan))
@@ -203,6 +206,7 @@ def pr_bonus_apt(form,field):
                     Остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {total_other_distrib_sum}<br>
                     Бонус при сохранении темпа закупки: {total_bonus_progress}<br>
                     Осталось выполнить в %: {total_left_to_complete_percent}<br>
+                    Заработанный бонус: {total_earned_bonus}<br>
                     {total_left_to_complete_label}: {total_left_to_complete_rub}<br>
                     
                 '''
@@ -218,6 +222,7 @@ def pr_bonus_apt(form,field):
                     Остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {total_other_distrib_sum}<br>
                     Бонус при сохранении темпа закупки: {total_bonus_progress}<br>
                     Осталось выполнить в %: {total_left_to_complete_percent}<br>
+                    Заработанный бонус: {total_earned_bonus}<br>
                     {total_left_to_complete_label}: {total_left_to_complete_rub}<br>
                     
                 '''

@@ -43,13 +43,13 @@ def good_categories(form,field):
       p['end_date']=date_to_rus(p['end_date'])
       #plan_dict[p['id']]=p
       if p['plan'] == 1:
-        p['plan']='суммовой'
+        p['plan_label']='суммовой'
         p['value_name']='Сумма от'
       elif p['plan'] == 2:
-        p['plan']='количественный'
+        p['plan_label']='количественный'
         p['value_name']='Кол-во'
       elif p['plan'] == 3:
-        p['plan']='только процент за любые закупки'
+        p['plan_label']='только процент за любые закупки'
         p['value_name']='Выплачиваемый процент'
     
 
@@ -169,7 +169,8 @@ def good_categories(form,field):
         })
 
       if form.manager['type']==1 or form.ov['subscribed_on_action']:
-        body=f'''План: {p['plan']}<br>'''
+        body=f'''План: {p['plan_label']}<br>'''
+        #form.pre(p['plan'])
         if p['plan'] != 3:
           body+=f'''{p['value_name']}: {p['value']}<br>'''
 
