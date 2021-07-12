@@ -8,11 +8,11 @@ def events_permissions(form):
   #form.pre(form.script)
   
   # Фильтр для юрлиц
-  if form.script in ['admin_table'] and form.manager['type']==2:
+  if form.script in ['admin_table'] and form.manager['type'] in (2,3):
     #form.QUERY_SEARCH_TABLES.append(
     #  {'t':'action_ur_lico','a':'aul','l':'wt.id=aul.action_id','lj':1}
     #)
-    form.explain=1
+    #form.explain=1
     form.fields.append(
         {
           'description':'Подписанные мероприятия',#'только те маркетинговые мероприятия, на которые я подписан',
@@ -80,7 +80,7 @@ def events_permissions(form):
   if form.script=='find_objects':
     
     # Представитель ЮЛ, кнопки подписки
-    if str(form.manager['type'])=='2': 
+    if form.manager['type']==2: 
       
       
 
@@ -129,9 +129,9 @@ def events_permissions(form):
       )
 
 
-    elif str(form.manager['type'])=='3': # аптека
+    elif form.manager['type']==3: # аптека
 
-      form.explain=1
+      
       form.javascript['find_objects']=form.template(
         './conf/action/templates/find_objects_apteka.js',
       )

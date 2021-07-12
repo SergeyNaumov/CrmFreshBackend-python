@@ -54,6 +54,6 @@ def gen_query_search(form):
         else:
           query_count = ' SELECT count(*) cnt from ' + TABLES + WHERE + GROUP + HAVING
       
+      #print('query:',query)
       #print('query_count:',query_count)
-
   return query, query_count

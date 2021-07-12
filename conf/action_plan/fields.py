@@ -61,5 +61,6 @@ def plan_info(form,field):
       <h3>Информация о плане за {period['querter']} квартал {period['year']} </h3>
       План: { plan_name }<br>
       {value_name}: {ov['value']}
+      <p style="color: red;">данные обновляются с задержкой 1-2 дня</p>
     </div>
   '''

@@ -187,8 +187,9 @@ def get_search_where(form,query):
       else:
         map_rezult=[]
         for v in values:
-          if v and type(v) is 'str' and v.isnumeric():
-            map_rezult.append(v)
+          if v and type(v) is 'str':
+            if v.isnumeric():
+              map_rezult.append(v)
 
         if len(map_rezult):
           WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')

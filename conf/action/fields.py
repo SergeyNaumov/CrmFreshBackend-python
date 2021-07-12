@@ -58,6 +58,7 @@ def get_fields():
       'type':'code',
       'tab':'goods',
       'description':'Подписки',
+
       'code':subscribes
     },
     {

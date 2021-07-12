@@ -77,7 +77,6 @@ async def get_filters_controller(config: str):
 
   make_create=1
   if form.not_create: make_create=0
-  print('script:',form.script, 'search_plugin: ',form.search_plugin)
   return {
     'success':1,
     'title':form.title,

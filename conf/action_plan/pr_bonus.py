@@ -7,6 +7,8 @@ def pr_bonus(form,field):
     total_left_to_complete_label='Осталось выполнить в рублях'
     if form.ov['plan']==2:
         total_left_to_complete_label='Осталось выполнить в шт'
+    label_plan='План для юридического лица'
+
     if form.id and form.manager['type'] in [1,2]:
 
         field['before_html']='<h2 style="margin-top: 20px; margin-bottom: 10px;">Прогнозный бонус по юридическим лицам</h2>'
@@ -25,6 +27,7 @@ def pr_bonus(form,field):
             )
             #form.pre(bonus_list)
     elif form.id and form.manager['type']==3:
+        label_plan='План для аптеки'
         if len(form.manager['apt_list_ids']):
             bonus_list=form.db.query(
                 query=f"""
@@ -67,10 +70,12 @@ def pr_bonus(form,field):
         for b in bonus_list:
             # параметр "кол-во закупки" нужно поставить после суммы закупки в сип ценах, если план у нас суммовой и перед суммой в сип ценах если план количественный.
             body_text=''
+            if form.manager['type'] !=3:
+                body_text=f'Кол-во аптек: {b["cnt_apt"]}<br>'
+
             if form.ov['plan'] in (1,3): # Суммовой
                 body_text=f'''
-                    Кол-во аптек: {b['cnt_apt']}<br>
-                    План для юридического лица: {b['plan']}<br>
+                    {label_plan}:: {b['plan']}<br>
                     сумма закупки в sip-ценах: {b['price']}<br>
                     кол-во закупки: {b['buy_cnt']}<br>
                     процент выполнения: {b['percent_complete']}<br>
@@ -85,8 +90,8 @@ def pr_bonus(form,field):
                 '''
             elif form.ov['plan']==2: # Количественный
                 body_text=f'''
-                    Кол-во аптек: {b['cnt_apt']}<br>
-                    План для юридического лица: {b['plan']}<br>
+                    
+                    {label_plan}: {b['plan']}<br>
                     кол-во закупки: {b['buy_cnt']}<br>
                     сумма закупки в sip-ценах: {b['price']}<br>
                     процент выполнения: {b['percent_complete']}<br>
@@ -197,6 +202,16 @@ def pr_bonus(form,field):
 
         if len(bonus_list) > 1:
             body_text=''
+            total_bonus=0
+            '''
+                - если процент выполнения<99, то выводим значение 0 
+                - процент выполнения  или > или =99, то выводим  данные из строки "текущий бонус" 
+                это мы можем сейчас сделать?
+            '''
+            if total_percent_progress>=99:
+                total_bonus=total_current_bonus
+            
+
             # параметр "кол-во закупки" нужно поставить после суммы закупки в сип ценах, если план у нас суммовой и перед суммой в сип ценах если план количественный.
             if form.ov['plan'] in (1,3): # Суммовой
                 body_text=f'''
@@ -206,6 +221,7 @@ def pr_bonus(form,field):
                     Сумма закупки в sip-ценах: {total_price}<br>
                     Процент выполнения: {total_percent_complete}<br>
                     Текущий бонус: {total_current_bonus}<br>
+                    Итоговой бонус: {total_bonus}<br>
                     Процент выполнения при сохранении темпов закупки: {total_percent_progress}<br>
                     Остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {total_other_distrib_sum}<br>
                     Бонус при сохранении темпа закупки: {total_bonus_progress}<br>
@@ -219,6 +235,7 @@ def pr_bonus(form,field):
                     Количество закупки: {total_buy_cnt}<br>
                     Процент выполнения: {total_percent_complete}<br>
                     Текущий бонус: {total_current_bonus}<br>
+                    Итоговой бонус: {total_bonus}<br>
                     Процент выполнения при сохранении темпов закупки: {total_percent_progress}<br>
                     Остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {total_other_distrib_sum}<br>
                     Бонус при сохранении темпа закупки: {total_bonus_progress}<br>

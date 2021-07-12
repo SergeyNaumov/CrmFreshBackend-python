@@ -1,3 +1,5 @@
+#from .conf.action.header_before_code import header_before_code
+
 def get_fields():
     return [ 
       {
@@ -132,7 +134,11 @@ def action_filter_code(form,field,row):
     return f'''<a href="/edit-form/action/{row['act__id']}" target="_blank">{row['act__header']}</a>'''
   return ''
 def suppliers_filter_code(form,field,row):
-  return row['suppliers2']
+  #form.pre(row)
+  if 'suppliers2' in row:
+    return row['suppliers2']
+  else:
+    return ''
 
 def action_before_code(form,field):
   

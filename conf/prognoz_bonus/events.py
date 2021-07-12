@@ -7,7 +7,21 @@ def events_permissions(form):
   if form.manager['type']!=1: # Для сотрудников АннА добавляем фильтр "Юридическое лицо"
     form.errors.append('Доступ запрещён')
     return
-    
+  if form.manager['type']==1:
+    form.fields.append(
+      {
+        'description':'Менеджер АннА',
+        'name':'manager_id',
+        'type':'filter_extend_select_from_table',
+        'db_name':'id',
+        'table':'manager',
+        'filter_on':1,
+        'where':'type=1',
+        'header_field':'name',
+        'value_field':'id',
+        'tablename':'m'
+      }
+    )
   if form.script=='edit_form' and form.id:
 
     

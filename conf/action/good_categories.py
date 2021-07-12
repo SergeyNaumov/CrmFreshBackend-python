@@ -143,7 +143,7 @@ def good_categories(form,field):
         header_links.append({
           'url':f"/edit_form/action_plan/{p['id']}?prev=1",
           'header':f'прогнозный бонус ({prev_period["querter"]} квартал {prev_period["year"]})',
-          #'style':'color: red;'
+          'style':'color: red;'
         })
         #  +=f'''<a href="" target="blank" style="color: red;">прогнозный бонус (тек)</a>'''
         #header_data_item+=f'''<a href="/edit_form/action_plan/{p['id']}" target="blank">прогнозный бонус (предыдущий квартал)</a>'''
@@ -190,10 +190,12 @@ def good_categories(form,field):
         })
 
     field['data']=accordion_data
+    field['before_html']=''
     if len(table_data):
-      field['before_html']='<h2 style="margin-top: 20px;">Группы товаров</h2>'
+      field['before_html']+='<h2 style="margin-top: 20px;">Группы товаров</h2>'
     else:
-      field['before_html']='<p style="margin-top: 20px; color: red;">Группы товаров отсутствуют</p>'
+      field['before_html']+='<p style="margin-top: 20px; color: red;">Группы товаров отсутствуют</p>'
+
 
     #form.javascript['edit_form']+=form.template('./conf/action/templates/good_categories.js')
 def exists_prognoz_bonus(form,action_plan_id,period):

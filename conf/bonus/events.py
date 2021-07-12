@@ -42,21 +42,24 @@ def before_search(form):
     FROM
       {" ".join(qs['TABLES'])}
   '''
+  values=[]
 
   if len(qs['WHERE']):
     query_summ+=' WHERE '+' AND '.join(qs['WHERE'])
-  
+    values=qs['VALUES']
+
   total_bonus=form.db.query(
     query=query_summ,
-    onevalue=1
+    onevalue=1,
+    values=values
   )
 
-  form.out_before_search.append(f'''
-    <h2 class="subheadling mb-2">История начисления бонусов</h2>
-    <p>Вы можете подписать акт через ЭДО. Для этого вам необходимо ознакомиться с <a href="/files/const/template_edo.doc">шаблоном для подключения ЭДО</a></p>
-    <p>Заработанный бонус за всё время: {total_bonus} руб</p>
+  # form.out_before_search.append(f'''
+  #   <h2 class="subheadling mb-2">История начисления бонусов</h2>
+  #   <p>Вы можете подписать акт через ЭДО. Для этого вам необходимо ознакомиться с <a href="/files/const/template_edo.doc">шаблоном для подключения ЭДО</a></p>
+  #   <p>Заработанный бонус за всё время: {total_bonus} руб</p>
 
-  ''')
+  # ''')
 
 events={
   'permissions':[

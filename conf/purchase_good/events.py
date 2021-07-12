@@ -38,8 +38,17 @@ def before_search(form):
 
 
   
-  
-  #sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
+  #form.explain=1
+  if 'priority_sort' in form.R['params']:
+    ps=form.R['params']['priority_sort']
+    if len(ps)==2:
+      if ps[0]=='suppliers':
+        qs['ORDER']=[f's2.header {ps[1]}']
+    #form.pre(form.R['params']['priority_sort'])
+
+
+#  form.pre(form.query_search)
+  sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
   sf.append('ap.header ap__header')
   if form.manager['type'] in (2,3):
     form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
@@ -58,11 +67,12 @@ def before_search(form):
     query_count+=' WHERE '+' AND '.join(qs['WHERE'])
   qs['query_count']=query_count
 
-  form.out_before_search=''
+  #form.out_before_search=''
+  #form.out_before_search.append('<h2>Данные по закупкам отображаются по всем поставщикам</h2>')
   #form.explain=1
 
 events={
-  'before_search':before_search,
+  'before_search':[before_search],
   'permissions':[
       events_permissions
   ],

@@ -21,8 +21,9 @@ class Config(Form):
             {'t':'action','a':'a','l':'wt.action_id=a.id'},
             {'t':'action_plan','a':'ap','l':'ap.id=wt.action_plan_id'},
             {'t':'ur_lico','a':'u','l':'u.id=wt.ur_lico_id'},
-            
-        ]
+            {'t':'manager','a':'m','l':'u.anna_manager_id=m.id','lj':1}
+        ]   
+        form.GROUP_BY='wt.id'
         form.events=events
         form.filters_groups=[]
         form.on_filters=[

@@ -17,12 +17,12 @@ def get_fields():
     #   'type':'text',
     #   'filter_on':1
     # }, 
-    {
-      'name':'inn',
-      'description':'ИНН',
-      'type':'text',
-      'filter_on':1
-    },
+    # {
+    #   'name':'inn',
+    #   'description':'ИНН',
+    #   'type':'text',
+    #   'filter_on':1
+    # },
     {
       'name':'ur_address',
       'description':'Юридический адрес',

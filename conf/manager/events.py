@@ -31,9 +31,9 @@ def events_permissions(form):
       #  {'v':3,'d':'Представитель аптеки'},
       
       # Сотрудник компании "Анна", может изменять только суперадмин
-
+      #form.pre(form.manager)
       # Сотрудник компании Анна(1) может вносить изменения в аккаунт (2,3)
-      if (ov['type']=="2" or ov['type']=="3") and form.manager['type']==1: 
+      if (ov['type']==2 or ov['type']==3) and form.manager['type']==1: 
         form.read_only=0
 
       

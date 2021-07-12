@@ -64,6 +64,8 @@ def get_fields():
 def accept_filter_code(form,field,row):
   if row['wt__accept']:
     return 'акт подписан'
+  elif form.manager['type']!=2:
+    return 'акт не подписан'
   else:
     return {
       'before_html':'не подписан',
@@ -120,7 +122,7 @@ def file_filter_code(form,field,row):
         return f'''<a href="{'/files/Akt/'+filename}" target="_blank">{filename}</a>'''
       #form.pre(ext)
 
-  #return row['wt__file']+' <small>файл отсутствует</small>'
+  return row['wt__file']+' <small>файл отсутствует</small>'
 
     
   

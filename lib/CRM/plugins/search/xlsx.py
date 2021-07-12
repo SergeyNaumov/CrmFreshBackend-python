@@ -11,6 +11,11 @@ config={
     'title':'сохранить в xls'
 }
 
+
+def before_search(form):
+    if form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
+        
+        form.not_perpage=1
 def after_search(form):
     if form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
         filename=form.config+'_'+form.manager['login']+'.xlsx'
@@ -68,6 +73,8 @@ def go(form):
     elif form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
         if not len(form.events['after_search']):
             form.events['after_search'].append(after_search)
+        if form.events['before_search']:
+            form.events['before_search'].append(before_search)
     #else:
     #    print('not_active after_search!')
         #form.pre({'R':form.R})

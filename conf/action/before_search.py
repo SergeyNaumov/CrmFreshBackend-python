@@ -14,7 +14,7 @@ def before_search(form):
 
   #form.pre(query_apt_count)
   form.query_search['WHERE'].append('wt.date_stop>=curdate()')
-  if str(form.manager['type'])=='2':
+  if form.manager['type']==2:
 
     if len(form.manager['ur_lico_list']):
       qs['SELECT_FIELDS'].append('group_concat(distinct aul.ur_lico_id SEPARATOR "|") subscribed_ur_lico_id')
@@ -36,12 +36,28 @@ def before_search(form):
               # только неподписанные
               qs['WHERE'].append(f'''aul.ur_lico_id is null''')
 
-  if str(form.manager['type'])=='3': # для представителя аптеки
+      
+      
+
+
+
+  if form.manager['type']==3: # для представителя аптеки
     if len(form.manager['apteka_list']):
       qs['SELECT_FIELDS'].append('group_concat(distinct aa.apteka_id SEPARATOR "|" ) subscribed_apteka_id')
       qs['SELECT_FIELDS'].append('group_concat(distinct aar.apteka_id SEPARATOR "|" ) requested_apteka_id')
   
-  
+    if 'only_subscribe' in on_filters_hash:
+
+        if(1 in on_filters_hash['only_subscribe'] and not (0 in on_filters_hash['only_subscribe'])):
+            # Ищем только подписанные
+            #form.pre('where:'+where)
+            #qs['WHERE'].append(f'''aul.ur_lico_id IN ({','.join(form.manager['ur_lico_ids'])})''')
+            qs['WHERE'].append(f'''aa.apteka_id is not null''')
+    
+        elif(0 in on_filters_hash['only_subscribe'] and not (1 in on_filters_hash['only_subscribe'])):
+            # только неподписанные
+            qs['WHERE'].append(f'''aa.apteka_id is null''')
+
   if 'date_start' in on_filters_hash and on_filters_hash['date_start']:
     qs['WHERE'].append(
       f'''wt.date_start>="{on_filters_hash['date_start']}-01"'''

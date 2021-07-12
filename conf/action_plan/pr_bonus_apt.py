@@ -32,6 +32,7 @@ def pr_bonus_apt(form,field):
     else:
         return
     if len(bonus_list):
+
         # field['after_html']=form.template(
         #   './conf/action/templates/prognoz_bonus.html',
         #   bonus_list=bonus_list
@@ -56,12 +57,13 @@ def pr_bonus_apt(form,field):
         total_percent_progress=0
 
         for b in bonus_list:
+
             # параметр "кол-во закупки" нужно поставить после суммы закупки в сип ценах, если план у нас суммовой и перед суммой в сип ценах если план количественный.
             body_text=''
             if form.ov['plan'] in (1,3): # Количественный
                 body_text=f'''
                     Кол-во аптек: {b['cnt_apt']}<br>
-                    План для юридического лица: {b['plan']}<br>
+                    План для аптеки: {b['plan']}<br>
                     сумма закупки в sip-ценах: {b['price']}<br>
                     кол-во закупки: {b['buy_cnt']}<br>
                     процент выполнения: {b['percent_complete']}<br>
@@ -77,7 +79,7 @@ def pr_bonus_apt(form,field):
             elif form.ov['plan']==2: # Суммовой
                 body_text=f'''
                     Кол-во аптек: {b['cnt_apt']}<br>
-                    План для юридического лица: {b['plan']}<br>
+                    План для аптеки: {b['plan']}<br>
                     кол-во закупки: {b['buy_cnt']}<br>
                     сумма закупки в sip-ценах: {b['price']}<br>
                     процент выполнения: {b['percent_complete']}<br>
