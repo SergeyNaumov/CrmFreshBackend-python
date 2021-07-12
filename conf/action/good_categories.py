@@ -23,7 +23,7 @@ def good_categories(form,field):
     plan_list=form.db.query(
       query='''
         SELECT
-          ap.id,ap.header,ap.begin_date,ap.end_date,ap.value,ap.reward_percent,ap.allgood,plan,
+          ap.id,concat(ap.header,'-',ap.id) header,ap.begin_date,ap.end_date,ap.value,ap.reward_percent,ap.allgood,plan,
           man.header manufacturer, ap.manufacturer_id
 
         FROM
@@ -35,12 +35,13 @@ def good_categories(form,field):
     )
     plan_ids=[]
     plan_dict={}
+    good_list=[]
     for p in plan_list:
       plan_ids.append( str(p['id']) )
       p['child']=[]
       p['begin_date']=date_to_rus(p['begin_date'])
       p['end_date']=date_to_rus(p['end_date'])
-      plan_dict[p['id']]=p
+      #plan_dict[p['id']]=p
       if p['plan'] == 1:
         p['plan']='суммовой'
         p['value_name']='Сумма от'
@@ -64,11 +65,17 @@ def good_categories(form,field):
         WHERE ag.action_plan_id in ('''+','.join(plan_ids)+')',
         
       )
+      #form.pre(good_list)
+      #for g in good_list:
+      #    plan_dict[g['plan_id']]['child'].append(g)
 
+    for p in plan_list:
       for g in good_list:
-        plan_dict[g['plan_id']]['child'].append(g)
+        if g['plan_id']==p['id']:
+          #form.pre(f"""{g['header']} append to {p['header']} """)
+          p['child'].append(g)
 
-    #print('plan_list:',plan_list)
+    #form.pre(plan_list)
     field['type']='accordion'
 
     # собираем аккордион
@@ -77,7 +84,7 @@ def good_categories(form,field):
     table_headers=[{'h':'Штрих код товара'},{'h':'Наименование'}]
     table_data=[]
 
-    if form.ov['subscribed_on_action']:
+    if form.ov['subscribed_on_action'] or form.manager['type']==1:
       table_headers.append({
         'h':'Витрина',
         'tooltip':{
@@ -88,7 +95,7 @@ def good_categories(form,field):
     
     table_headers.append({'h':'Сип-цена'})
     # not p['reward_percent'] and 
-    if form.ov['subscribed_on_action']:
+    if form.ov['subscribed_on_action'] or form.manager['type']==1:
       table_headers.append({
         'h':'Начисления<br> по бонусу',
         'tooltip':{
@@ -99,13 +106,13 @@ def good_categories(form,field):
 
 
     for p in plan_list:
-      
+      table_data=[]
       #form.pre({'p':p})
       for g in p['child']:
         table_tr=[]
         table_tr.append(g['code']) # код
         table_tr.append(g['header']) # наименование
-        if form.ov['subscribed_on_action']: # витрина
+        if form.ov['subscribed_on_action'] or form.manager['type']==1: # витрина
           table_tr.append(g['showcase'])
 
         if g['price']==0:
@@ -113,7 +120,7 @@ def good_categories(form,field):
         else:
           table_tr.append(g['price'])
 
-        if not p['reward_percent'] and form.ov['subscribed_on_action']:
+        if form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action']):
           table_tr.append(g['percent'])
 
         table_data.append(table_tr)
@@ -161,11 +168,10 @@ def good_categories(form,field):
             'body':f'''<p>{' | '.join(pb_links)}</p>'''
         })
 
-      if form.ov['subscribed_on_action']:
-        body=f'''
-          План: {p['plan']}<br>
-          {p['value_name']}: {p['value']}<br>
-        '''
+      if form.manager['type']==1 or form.ov['subscribed_on_action']:
+        body=f'''План: {p['plan']}<br>'''
+        if p['plan'] != 3:
+          body+=f'''{p['value_name']}: {p['value']}<br>'''
 
         if p['reward_percent']:
           body+=f'% бонуса: {p["reward_percent"]}<br>'

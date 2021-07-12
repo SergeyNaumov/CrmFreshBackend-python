@@ -103,6 +103,20 @@ def get_fields():
         'filter_on':1,
         'before_code':apteka_id_before_code
       },
+      {
+        'description':'Юр. лицо',
+        'name':'ur_lico_id',
+        #'autocomplete':1,
+        'type':'filter_extend_select_from_table',
+        'table':'ur_lico',
+        'tablename':'ul',
+        'header_field':'header',
+        'value_field':'id',
+        'db_name':'id',
+        'filter_on':1,
+        'before_code':ur_lico_id_before_code
+      },
+
       # {
       #   'description':'Поставщик',
       #   'autocomplete':1,
@@ -125,6 +139,14 @@ def apteka_id_before_code(form,field):
     field['where']=f' id in ({ ",".join(form.manager["apt_list_ids"]) }) '
     del(field['autocomplete'])
     
+def ur_lico_id_before_code(form,field):
+  if form.manager['type']==2:
+    field['autocomplete']=0
+    if len(form.manager["apt_list_ids"]):
+      #form.pre(form.manager)
+      field['where']=f' id in ({ ",".join(form.manager["ur_lico_ids"]) }) '
+
+    del(field['autocomplete'])
 
 def dates_filter_code(form,field,row):
   return f"{row['act__date_start']} ... {row['act__date_stop']}"

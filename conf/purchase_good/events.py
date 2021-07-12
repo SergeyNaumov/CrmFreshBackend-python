@@ -1,6 +1,6 @@
 from lib.anna.get_apt_list import get_apt_list_ids, apt_list_id_for_apt
 from lib.CRM.plugins.search.xlsx import go as init_search_plugin
-
+from lib.anna.get_ul_list import get_ul_list_ids
 def events_permissions(form):
   
   init_search_plugin(form)
@@ -8,7 +8,7 @@ def events_permissions(form):
     
     apt_list_ids=get_apt_list_ids(form, form.manager['id'])
     form.manager['apt_list_ids']=apt_list_ids
-    
+    form.manager['ur_lico_ids']=get_ul_list_ids(form,form.manager['id'])
 
   elif form.manager['type']==3:
     form.manager['apt_list_ids']=apt_list_id_for_apt(form,form.manager['id'])
@@ -61,6 +61,7 @@ def before_search(form):
       LEFT JOIN purchase p ON p.id=wt.purchase_id
       LEFT JOIN action  act ON p.action_id=act.id
       LEFT JOIN apteka a ON wt.apteka_id = a.id
+      LEFT JOIN ur_lico ul ON a.ur_lico_id=ul.id
     '''
 
   if len(qs['WHERE']):

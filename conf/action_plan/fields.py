@@ -41,26 +41,26 @@ def plan_info(form,field):
   ov=form.ov
   plan_name=''
   value_name=''
-
+  plan_data=''
   if ov['plan']==1:
-    plan_name='Суммовой'
-    value_name='Сумма от'
+    plan_data+=f'План: Cуммовой<br>Сумма от: {ov["value"]}<br>'
+
 
   elif ov['plan']==2:
-    plan_name='Колличественный'
-    value_name='Кол-во'
+    plan_data+=f'План: колличественный<br>Кол-во: {ov["value"]}<br>'
 
   elif ov['plan']==3:
-    plan_name='Только % за любые закупки'
-    value_name='Выплачиваемый процент'
+    #form.pre(ov)
+    plan_data+=f'План: только % за любые закупки<br>Выплачиваемый процент: {ov["reward_percent"]}<br>'
+
   
   period=form.ov['period']
 
   field['after_html']=f'''
     <div style='margin-bottom: 20px;'>
       <h3>Информация о плане за {period['querter']} квартал {period['year']} </h3>
-      План: { plan_name }<br>
-      {value_name}: {ov['value']}
+      {plan_data}
+      
       <p style="color: red;">данные обновляются с задержкой 1-2 дня</p>
     </div>
   '''
