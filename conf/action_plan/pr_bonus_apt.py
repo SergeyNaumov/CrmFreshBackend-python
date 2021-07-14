@@ -8,9 +8,9 @@ def pr_bonus_apt(form,field):
     field['before_html']='<h2 style="margin-top: 20px; margin-bottom: 10px;">Прогнозный бонус по аптекам</h2>'
     # Данное поле только для аптек
     bonus_list=[]
-    total_left_to_complete_label='Осталось выполнить в рублях'
+    total_left_to_complete_label='осталось выполнить в рублях'
     if form.ov['plan']==2:
-        total_left_to_complete_label='Осталось выполнить в шт'
+        total_left_to_complete_label='осталось выполнить в шт'
     
     
 
@@ -60,41 +60,50 @@ def pr_bonus_apt(form,field):
         for b in bonus_list:
 
             # параметр "кол-во закупки" нужно поставить после суммы закупки в сип ценах, если план у нас суммовой и перед суммой в сип ценах если план количественный.
-            body_text=''
-            if form.ov['plan'] in (1,3): # Количественный
-                body_text=f'''
-                    Кол-во аптек: {b['cnt_apt']}<br>
-                    План для аптеки: {b['plan']}<br>
-                    сумма закупки в sip-ценах: {b['price']}<br>
-                    кол-во закупки: {b['buy_cnt']}<br>
-                    процент выполнения: {b['percent_complete']}<br>
-                    текущий бонус: {b['current_bonus']}<br>
-                    процент выполнения при сохранении темпа закупки: {b['percent_progress']}<br>
-                    бонус при сохранении темпа закупки: {b['bonus_progress']}<br>
-                    остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {b['other_distrib_sum']}<br>
-                    упущенная выгода (общая сумма, сколько недополучили): {b['lost_profit']}<br>
-                    осталось выполнить в %: {b['left_to_complete_percent']}<br>
-                    заработанный бонус: {b['earned_bonus']}<br>
-                    {total_left_to_complete_label}: {b['left_to_complete_rub']}<br>
+            body_text=f'''
+                
+            '''
+
+            body_text=form.template(
+                './conf/action_plan/templates/pr_bonus_apt.html',
+                ov=form.ov,
+                total_left_to_complete_label=total_left_to_complete_label,
+                b=b
+            )
+
+            # if form.ov['plan'] in (1,3): # Количественный
+            #     body_text=f'''
                     
-                '''
-            elif form.ov['plan']==2: # Суммовой
-                body_text=f'''
-                    Кол-во аптек: {b['cnt_apt']}<br>
-                    План для аптеки: {b['plan']}<br>
-                    кол-во закупки: {b['buy_cnt']}<br>
-                    сумма закупки в sip-ценах: {b['price']}<br>
-                    процент выполнения: {b['percent_complete']}<br>
-                    текущий бонус: {b['current_bonus']}<br>
-                    процент выполнения при сохранении темпа закупки: {b['percent_progress']}<br>
-                    бонус при сохранении темпа закупки: {b['bonus_progress']}<br>
-                    остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {b['other_distrib_sum']}<br>
-                    упущенная выгода (общая сумма, сколько недополучили): {b['lost_profit']}<br>
-                    осталось выполнить в %: {b['left_to_complete_percent']}<br>
-                    заработанный бонус: {b['earned_bonus']}<br>
-                    {total_left_to_complete_label}: {b['left_to_complete_rub']}<br>
                     
-                '''
+            #         сумма закупки в sip-ценах: {b['price']}<br>
+            #         кол-во закупки: {b['buy_cnt']}<br>
+            #         процент выполнения: {b['percent_complete']}<br>
+            #         текущий бонус: {b['current_bonus']}<br>
+            #         процент выполнения при сохранении темпа закупки: {b['percent_progress']}<br>
+            #         бонус при сохранении темпа закупки: {b['bonus_progress']}<br>
+            #         остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {b['other_distrib_sum']}<br>
+            #         упущенная выгода (общая сумма, сколько недополучили): {b['lost_profit']}<br>
+            #         осталось выполнить в %: {b['left_to_complete_percent']}<br>
+            #         заработанный бонус: {b['earned_bonus']}<br>
+            #         {total_left_to_complete_label}: {b['left_to_complete_rub']}<br>
+                    
+            #     '''
+            # elif form.ov['plan']==2: # Суммовой
+            #     body_text=f'''
+            #         План для аптеки: {b['plan']}<br>
+            #         кол-во закупки: {b['buy_cnt']}<br>
+            #         сумма закупки в sip-ценах: {b['price']}<br>
+            #         процент выполнения: {b['percent_complete']}<br>
+            #         текущий бонус: {b['current_bonus']}<br>
+            #         процент выполнения при сохранении темпа закупки: {b['percent_progress']}<br>
+            #         бонус при сохранении темпа закупки: {b['bonus_progress']}<br>
+            #         остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {b['other_distrib_sum']}<br>
+            #         упущенная выгода (общая сумма, сколько недополучили): {b['lost_profit']}<br>
+            #         осталось выполнить в %: {b['left_to_complete_percent']}<br>
+            #         заработанный бонус: {b['earned_bonus']}<br>
+            #         {total_left_to_complete_label}: {b['left_to_complete_rub']}<br>
+                    
+            #     '''
             
             accordion_item={
                 'header':b['header'],
