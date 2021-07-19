@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <title></title>
+        <style>
+            body {margin: 50px; text-align: center;}
+        </style>
+    </head>
+    <p>подождите, пока dbf будет готов</p>
+    <div id='progress'></div>
+    <script>
+        var daemon_id={{daemon_id}}
+        var progress='';
+        function check_ready(){
+                fetch('/backend/anna/download/action_plan/dbf-ready/'+daemon_id, {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    
+                })
+                .then((response)=> {
+                    response.json().then(function(data) {
+                        
+                        if(data.success){
+                            location.href='/backend/files/dbf_daemon/'+daemon_id+'.dbf'
+                        }
+                        // if(data.success){
+                        //     self.clear_fields();
+                        //     $('#modal_send_request').jmodal('hide');
+                        //     $('#modal_thanks').jmodal('show');
+                        // }else{
+                        //     for(let e of data.errors){
+                        //         self.error[e]='РїРѕР»Рµ РЅРµ Р·Р°РїРѕР»РЅРµРЅРѕ РёР»Рё Р·Р°РїРѕР»РЅРµРЅРѕ РЅРµРІРµСЂРЅРѕ'
+                        //     }
+                        //     self.init_capcha();
+                        // }
+                    });
+                });
+
+        }
+        var int1=setInterval(
+            ()=>{
+                progress+='.'
+                if(progress.length>100){
+                    progress=''
+                }
+                document.getElementById('progress').innerHTML=progress
+            },
+            300
+        )
+        var int2=setInterval(
+            ()=>{
+                check_ready()
+            },
+            1000
+        )
+    </script>
+</html>
