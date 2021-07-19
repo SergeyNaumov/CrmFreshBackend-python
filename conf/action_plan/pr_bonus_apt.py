@@ -2,7 +2,6 @@ def pr_bonus_apt(form,field):
     # form.id -- action.id
     #form.pre(form.manager['ur_lico_ids'])
     #form.pre(form.manager['apt_list_ids'])
-    
     if form.manager['type'] not in [1,2]:
         return
     field['before_html']='<h2 style="margin-top: 20px; margin-bottom: 10px;">Прогнозный бонус по аптекам</h2>'
@@ -63,7 +62,7 @@ def pr_bonus_apt(form,field):
             body_text=f'''
                 
             '''
-
+            
             body_text=form.template(
                 './conf/action_plan/templates/pr_bonus_apt.html',
                 ov=form.ov,

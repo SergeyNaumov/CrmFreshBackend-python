@@ -7,7 +7,7 @@
  </div>
  <div style="margin-top: 20px; margin-bottom: 20px; border: 1px solid gray; padding: 20px; border-radius: 5px;">
      <div>
-        Маркетинговое мероприятие: <a href="/edit_form/action/{{action.id}}" target="_blank">{{action.header}}</a>
+        Маркетинговое мероприятие: <a href="/edit_form/action/{{action.id}}" >{{action.header}}</a>
      </div>
      {%if action_plan.plan==1%}
     <div>
@@ -22,21 +22,37 @@
     {%elif action_plan.plan==3%}
     <div>
         План: только процент за любые закупки<br>
-        Выплачиваемый процент: {{action_plan.value}}
+        {%if action_plan.value>0%}
+            Выплачиваемый процент: {{action_plan.value}}
+        {%endif%}
     </div>
     {%endif%}
     Кол-во аптек: {{ov.cnt_apt}}<br>
-    План для юридического лица: {{ov.plan}}<br>
+    {%if action_plan.plan!=3%}
+        План для юридического лица: {{ov.plan}}<br>
+    {%endif%}
     Кол-во закупки: {{ov.buy_cnt}}<br>
-    Сумма закупки в sip-ценах: {{ov.price}}<br>
-    Процент выполнения: {{ov.percent_complete}}<br>
+    {%if ov.plan==1 or ov.plan==3%}
+        Сумма закупки в sip-ценах:
+    {%else%}
+        Сумма закупки:
+    {%endif%}
+     {{ov.price}}<br>
+    {%if action_plan.plan!=3%}
+        Процент выполнения: {{ov.percent_complete}}<br>
+    {%endif%}
     Текущий бонус: {{ov.current_bonus}}<br>
     Процент выполнения при сохранении темпа закупки: {{ov.percent_progress}}<br>
     Бонус при сохранении темпа закупки: {{ov.bonus_progress}}<br>
     Остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{ov.other_distrib_sum}}<br>
     Упущенная выгода (общая сумма, сколько недополучили): {{ov.lost_profit}}<br>
-    Осталось выполнить в %: {{ov.left_to_complete_percent}}<br>
-    {%if left_to_complete_percent%}
-    {{total_left_to_complete_label}}: {{ov.left_to_complete_rub}}<br>
+    {%if action_plan.plan!=3 and ov.left_to_complete_percent>0%}
+        
+            Осталось выполнить в %: {{ov.left_to_complete_percent}}<br>
+        
     {%endif%}
+    {%if left_to_complete_percent%}
+            {{total_left_to_complete_label}}: {{ov.left_to_complete_rub}}<br>
+    {%endif%}
+    
 </div>

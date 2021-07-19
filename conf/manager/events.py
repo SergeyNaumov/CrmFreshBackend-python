@@ -38,6 +38,11 @@ def events_permissions(form):
 
       
 
+def before_search(form):
+  qs=form.query_search
+  #form.pre(qs['SELECT_FIELDS'])
+  qs['SELECT_FIELDS'].append('group_concat(u.header SEPARATOR "; ") ur_lico_list')
+  #form.explain=1
 
 def events_before_code(form):
     pass
@@ -50,6 +55,7 @@ events={
       events_permissions
     
   ],
+  'before_search':before_search,
   'before_delete':before_delete,
   'before_code':events_before_code
 }

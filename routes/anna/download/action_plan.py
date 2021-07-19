@@ -4,9 +4,12 @@ from fastapi.responses import StreamingResponse
 from io import BytesIO
 import urllib
 from UliPlot.XLSX import auto_adjust_xlsx_column_width
+from fastapi.responses import HTMLResponse
+from jinja2 import Template
 
 #import dbf
 #from simpledbf import Dbf5
+
 
 
 
@@ -76,6 +79,40 @@ def action_plan(format,id):
         }
         return StreamingResponse(output, headers=headers)
     if format=='dbf':
-        table = dbf.Table('temptable', 'name C(30); age N(3,0); birth D')
-        return {'outdbf':1}
+        
+        daemon_id=db.save(
+            table='dbf_daemon',
+            data={
+                'action_plan_id':id
+            }
+        )
+        
+        t=Template(
+            open('./routes/anna/download/templates/dbf_loader.html').read()
+        )
+        
+        html_content=t.render(
+            daemon_id=daemon_id
+        )
+        
+        return HTMLResponse(content=html_content, status_code=200)
+
     #return {'format':format,'id':id,'result':'ok'}
+
+def dbf_ready(id):
+    db=s.db
+    r=db.getrow(
+        table='dbf_daemon',
+        id=id,
+        debug=1
+    )
+    
+    if r:
+        r['success']=1
+        return r
+    else:
+        r['success']=0
+        r['error']='ошибка при формировании dbf'
+    return r
+
+#def dbf_download(id):

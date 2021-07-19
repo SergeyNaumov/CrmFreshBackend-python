@@ -182,7 +182,17 @@ def get_fields():
 
        'tab':'main'
     },
+    {
+      'description':'Юр.лицо',
+      'type':'filter_extend_select_from_table',
+      'name':'ur_lico_id',
 
+      'table':'ur_lico',
+      'header_field':'header',
+      'value_field':'id',
+      'tablename':'ulm',
+      'filter_code':ur_lico_id_filter_code
+    },
     # Юридические лица
     {
       'description':'Юридические лица',
@@ -205,7 +215,9 @@ def get_fields():
     },
 
 ]
-
+def ur_lico_id_filter_code(form,field,row):
+  return row["ur_lico_list"]
+  
 def anna_manager_id_filter_code(form,field,row):
   if row['ma__id']:
     return row['ma__name_f']+' '+row['ma__name_i']+row['ma__name_o']

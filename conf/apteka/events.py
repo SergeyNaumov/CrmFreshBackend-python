@@ -12,10 +12,12 @@ def events_permissions(form):
         'tablename':'ul',
         'table':'ur_lico',
         'multiple':1,
+        'table':'ur_lico',
         'type':'select_from_table',
         'header_field':'header',
         'value_field':'id',
-        'filter_on':1
+        'filter_on':1,
+        #'filter_code':ur_lico_id_filter_code
       }
     )
     form.QUERY_SEARCH_TABLES.append({'table':'ur_lico','alias':'ul','link':'ul.id=wt.ur_lico_id','left_join':1})
@@ -33,12 +35,15 @@ def events_permissions(form):
       form.fields.append({
         'description':'Юридическое лицо',
         'type':'select_from_table',
+        'tablename':'ul',
         'table':'ur_lico',
         'header_field':'header',
         'value_field':'id',
         'name':'ur_lico_id',
-        'where':f"id in ({','.join(form.manager['ul_ids'])})"
+        'where':f"id in ({','.join(form.manager['ul_ids'])})",
+        #'filter_code':ur_lico_id_filter_code
       })
+      form.QUERY_SEARCH_TABLES.append({'table':'ur_lico','alias':'ul','link':'ul.id=wt.ur_lico_id','left_join':1})
 
   # 
 
@@ -72,3 +77,6 @@ events={
       before_search
   ]
 }
+
+# def ur_lico_id_filter_code(form,field,row):
+#   form.pre(row)

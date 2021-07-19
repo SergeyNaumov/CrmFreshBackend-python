@@ -13,12 +13,12 @@ class Config(Form):
         form.work_table='manager' 
         form.QUERY_SEARCH_TABLES=[
             {'table':form.work_table,'alias':'wt'},
-            {
-                'table':'manager','alias':'ma','link':'wt.anna_manager_id=ma.id','left_join':1, 
-                #'for_fields':['anna_manager_id']
-            }
+            {'t':'manager','a':'ma','l':'wt.anna_manager_id=ma.id','lj':1},
+            {'t':'ur_lico_manager','a':'ulm','l':'ulm.manager_id=wt.id','lj':1},
+            {'t':'ur_lico','a':'u','l':'u.id=ulm.ur_lico_id','lj':1}
             # 
         ]
+        form.GROUP_BY='wt.id'
         form.read_only=1
         form.events=events
         #form.explain=1

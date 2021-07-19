@@ -83,3 +83,24 @@ def apt_list_id_for_apt(form,manager_id):
         rez.append(str(apteka_id))
     return rez
 
+
+def get_all_ids_for_aptcomp(form,apteka_id):
+    # получит все id-шники аптек в рамках этого же юрлица
+    res=form.db.query(
+        query='''
+            SELECT
+                a2.id
+            from
+                apteka a1
+                join apteka a2 ON a2.ur_lico_id=a1.ur_lico_id
+            WHERE a1.id=%s
+        ''',
+        massive=1,
+        values=[apteka_id]
+    )
+
+    res2=[]
+    for r in res:
+        res2.append(str(r))
+    #form.pre(res2)
+    return res2

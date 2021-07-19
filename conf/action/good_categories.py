@@ -23,7 +23,7 @@ def good_categories(form,field):
     plan_list=form.db.query(
       query='''
         SELECT
-          ap.id,concat(ap.header,'-',ap.id) header,ap.begin_date,ap.end_date,ap.value,ap.reward_percent,ap.allgood,plan,
+          ap.id,ap.header,ap.begin_date,ap.end_date,ap.value,ap.reward_percent,ap.allgood,plan,
           man.header manufacturer, ap.manufacturer_id
 
         FROM
@@ -115,7 +115,7 @@ def good_categories(form,field):
         if form.ov['subscribed_on_action'] or form.manager['type']==1: # витрина
           table_tr.append(g['showcase'])
 
-        if g['price']==0:
+        if g['price']==0 or g['price']=='0':
           table_tr.append('закупочная цена')
         else:
           table_tr.append(g['price'])
@@ -177,9 +177,11 @@ def good_categories(form,field):
         if p['reward_percent']:
           body+=f'% бонуса: {p["reward_percent"]}<br>'
 
+        #backend_url='http://dev-crm.test/backend'
+        backend_url='/backend'
         body+=f'''<div class="download_block">
-          <a href="/backend/anna/download/action_plan/xls/{p['id']}" target="_blank">скачать в xls</a>
-          <!--  |  <a href="/backend/anna/download/action_plan/dbf/{{p.id}}">скачать в dbf</a>-->
+          <a href="{backend_url}/anna/download/action_plan/xls/{p['id']}" target="_blank">скачать в xls</a>
+           |  <a href="{backend_url}/anna/download/action_plan/dbf/{p['id']}"  target="_blank">скачать в dbf</a>
         </div>'''
         data_item['content'].append({'type':'html','body':body})
 

@@ -14,7 +14,8 @@ class Config(Form):
         self.not_create=1
         self.make_delete=False
         self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'}
+            {'t':self.work_table,'a':'wt'},
+            {'t':'manager','a':'m','l':'wt.manager_id=m.id','lj':1}
         ]
         self.events=events
         self.filters_groups=[]

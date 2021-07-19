@@ -35,15 +35,21 @@ def get_fields():
     },
     {
       'description':'Оплачен',
-      'type':'checkbox',
+      'type':'select_values',
       'name':'paid_status',
+      'values':[
+         {'v':1,'d':'оплачен'},
+         {'v':2,'d':'в работе'},
+         {'v':3,'d':'не подписан'},
+       ],
       'filter_on':1
     },
     {
       'description':'Сумма оплаты',
       'name':'summ',
       'type':'text',
-      'filter_on':1
+      'filter_on':1,
+#      'filter_code':summ_filter_code
 
     },
     {
@@ -62,6 +68,7 @@ def get_fields():
 
 ]
 def accept_filter_code(form,field,row):
+  #return row['wt__accept']
   if row['wt__accept']:
     return 'акт подписан'
   elif form.manager['type']!=2:
@@ -125,4 +132,5 @@ def file_filter_code(form,field,row):
   return row['wt__file']+' <small>файл отсутствует</small>'
 
     
-  
+#def summ_filter_code(form,field,row):
+#  form.pre(row['wt__summ'])

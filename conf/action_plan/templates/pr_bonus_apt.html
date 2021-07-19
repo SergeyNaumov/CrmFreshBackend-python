@@ -1,6 +1,12 @@
 план для аптеки: {{b.plan}}<br>
 {%if ov.plan==1 or ov.plan==3%}
-    сумма закупки в sip-ценах: {{b.price}}<br>
+    {%if ov.total_good_price>0%}
+        сумма закупки в sip-ценах: 
+    {%else%}
+        сумма закупки:
+    {%endif%}
+    {{b.price}}<br>
+
     кол-во закупки: {{b.buy_cnt}}<br>
     процент выполнения: {{b.percent_complete}}<br>
     текущий бонус: {{b.current_bonus}}<br>
@@ -9,14 +15,23 @@
     
 {%else%} <!-- суммовой --->
     кол-во закупки: {{b.buy_cnt}}<br>
-    сумма закупки в sip-ценах: {{b.price}}<br>
+    {%if ov.total_good_price>0%}
+        сумма закупки в sip-ценах: 
+    {%else%}
+        сумма закупки:
+    {%endif%}
+    {{b.price}}<br>
     процент выполнения: {{b.percent_complete}}<br>
     текущий бонус: {{b.current_bonus}}<br>
     процент выполнения при сохранении темпа закупки: {{b.percent_progress}}<br>
 {%endif%}
 
 остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{b.other_distrib_sum}}<br>
-осталось выполнить в %: {{b.left_to_complete_percent}}<br>
+{%if b.left_to_complete_percent>0%}
+    осталось выполнить в %: {{b.left_to_complete_percent}}<br>
+{%endif%}
 заработанный бонус: {{b.earned_bonus}}<br>
-{{total_left_to_complete_label}}: {{b.left_to_complete_rub}}<br>
+{%if b.left_to_complete_rub>0%}
+    {{total_left_to_complete_label}}: {{b.left_to_complete_rub}}<br>
+{%endif%}
 

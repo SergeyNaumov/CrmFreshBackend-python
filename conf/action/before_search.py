@@ -1,3 +1,4 @@
+from lib.core import exists_arg
 def before_search(form):
   
   # Для представителя юридического лица выводим информацию подписанных юридических лицах, а также о тех,
@@ -13,7 +14,7 @@ def before_search(form):
 
 
   #form.pre(query_apt_count)
-  form.query_search['WHERE'].append('wt.date_stop>=curdate()')
+  qs['WHERE'].append('wt.date_stop>=curdate()')
   if form.manager['type']==2:
 
     if len(form.manager['ur_lico_list']):
@@ -67,7 +68,12 @@ def before_search(form):
     qs['WHERE'].append(
       f'''wt.date_stop<="{on_filters_hash['date_stop']}-31"'''
     )
+  
+  #form.pre(form.query_search)
 
+  if exists_arg('date_start',on_filters_hash) and exists_arg('date_stop',on_filters_hash) and on_filters_hash['date_stop']<on_filters_hash['date_start']:
+    form.errors.append('неправильно задан период')
+    
   #if 'date_stop' in on_filters_hash and on_filters_hash['date_stop']:
   #  qs['WHERE'].append(f'wt.date_stop>="{on_filters_hash['date_stop']}-01" and wt.date_stop<="{on_filters_hash['date_stop']}-31" ')
 

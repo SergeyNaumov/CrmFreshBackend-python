@@ -32,10 +32,12 @@ def get_filters():
       'type':'select_from_table',
       'table':'action',
       'tablename':'a',
-      'header_field':'header',
+      'header_field':'concat(header," (",date_start,"..",date_stop,")")',
       'value_field':'id',
-      'where':'date_stop>=curdate()',
-      'autocomplete':1,
+      #'where':'date_stop>=curdate()',
+      #'autocomplete':1,
+      #'autocomplete_start_loaded':1,
+      'filter_code':action_id_filter_code,
       'filter_on':1
     },
 
@@ -46,6 +48,9 @@ def ur_lico_id_filter_code(form,field,row):
   return f'''
     {row['u__header']}<br>
     <small><a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a></small>'''
+
+def action_id_filter_code(form,field,row):
+  return f'{row["a__header"]} ({row["a__date_start"]}..{row["a__date_stop"]})'
 
 def period_id_filter_code(form,field,row):
   #form.pre(row)

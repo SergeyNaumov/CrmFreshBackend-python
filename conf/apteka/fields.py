@@ -4,13 +4,13 @@
 
 def get_fields():
     return [ 
-    {
-      'name':'registered',
-      'description':'Дата создания',
-      'type':'date',
-      'read_only':1,
-      'filter_on':1
-    },
+    # {
+    #   'name':'registered',
+    #   'description':'Дата создания',
+    #   'type':'date',
+    #   'read_only':1,
+    #   'filter_on':1
+    # },
     # {
     #   'name':'header',
     #   'description':'Наименование',
@@ -40,19 +40,20 @@ def get_fields():
       'name':'manager_id',
       'type':'select_from_table',
       'table':'manager',
+      'tablename':'m',
       'header_field':'name',
       'value_field':'id',
       'where':'type=3'
     },
-    {
-      'description':'Менеджер компании Анна',
-      'name':'anna_manager_id',
-      'type':'select_from_table',
-      'table':'manager',
-      'header_field':'name',
-      'value_field':'id',
-      'where':'type=1'
-    }
+    # {
+    #   'description':'Менеджер компании Анна',
+    #   'name':'anna_manager_id',
+    #   'type':'select_from_table',
+    #   'table':'manager',
+    #   'header_field':'name',
+    #   'value_field':'id',
+    #   'where':'type=1'
+    # }
 
 ]
 

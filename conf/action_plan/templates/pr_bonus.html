@@ -5,7 +5,13 @@
 {{label_plan}}: {{b.plan}}<br>
 
 {%if ov.plan==1 or ov.plan==3%}
-    сумма закупки в sip-ценах: {{b.price}}<br>
+    {%if ov.total_good_price>0%}
+        сумма закупки в sip-ценах: 
+    {%else%}
+        сумма закупки:
+    {%endif%}
+    {{b.price}}<br>
+
     кол-во закупки: {{b.buy_cnt}}<br>
 {%else%} <!-- суммовой --->
     кол-во закупки: {{b.buy_cnt}}<br>
@@ -19,18 +25,26 @@
     текущий бонус: {{b.current_bonus}}<br>
 {%endif%}
 процент выполнения при сохранении темпа закупки: {{b.percent_progress}}<br>
-{%if b.percent_complete>=100%}
-    бонус при сохранении темпа закупки: {{b.bonus_progress}}<br>
-{%endif%}
+
+бонус при сохранении темпа закупки: {{b.bonus_progress}}<br>
+
 остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{b.other_distrib_sum}}<br>
 упущенная выгода (общая сумма, сколько недополучили): {{b.lost_profit}}<br>
-осталось выполнить в %: {{b.left_to_complete_percent}}<br>
+{%if b.left_to_complete_percent>0%}
+    осталось выполнить в %: {{b.left_to_complete_percent}}<br>
+{%endif%}
 {%if b.percent_complete>=100%}
-    заработанный бонус: {{b.earned_bonus}}<br>
+    заработанный бонус: 
+        {%if multi%}
+            {{b.current_bonus}}
+        {%else%}
+            {{b.earned_bonus}}
+        {%endif%}
+        <br>
 {%endif%}
 
-{%if b.percent_complete>0%}
-    {%if ov.plan=='2'%}
+{%if b.left_to_complete_percent>0%}
+    {%if ov.plan==1%}
         осталось выполнить в рублях:
     {%else%}
         осталось выполнить в штуках:
@@ -38,4 +52,5 @@
 
     {{b.left_to_complete_rub}}<br>
 {%endif%}
+<br>
 
