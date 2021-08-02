@@ -9,11 +9,11 @@ def get_cur_period(form,prev=0):
   #mon=1
 
   if prev:
-    if mon==1:
+    if mon<4:
       mon=12
       year-=1
     else:
-      mon-=1
+      mon-=3
   
   querter_begin_day=str(year)+'-01-01'
   querter_end_day=str(year)+'-03-31'
@@ -36,6 +36,8 @@ def get_cur_period(form,prev=0):
     querter=4
     querter_begin_day=str(year)+'-10-01'
     querter_end_day=str(year)+'-12-31'
+
+  
   #print(querter_begin_day,cur_date())
   period=form.db.query(
     query='SELECT * from prognoz_bonus_period where year=%s and querter=%s',

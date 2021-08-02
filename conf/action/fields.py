@@ -143,7 +143,10 @@ def distrib_code(form,field):
       massive=1,
       values=[form.id]
     )
-    field['after_html']='<br>'.join(suppliers_lst)
+    if len(suppliers_lst):
+      field['after_html']='<br>'.join(suppliers_lst)
+    else:
+      field['after_html']=f'<p>В расчет принимаются закупки от всех дистрибьюторов</p>'
   
   
 

@@ -3,7 +3,7 @@ from lib.core import exists_arg
 def get_old_values(form):
   ov={}
   form.ur_lico_subscribe=[]
-
+  
   #print('apt_list_ids:',form.manager['apt_list_ids'])
   if form.manager['type']==2:
     apt_list_ids=','.join(form.manager['apt_list_ids'])
@@ -31,6 +31,7 @@ def get_old_values(form):
         onerow=1,
         values=[form.id]
     )
+
     if ov['subscribed_ur_lico_id']:
       ov['subscribed_ur_lico_id']=ov['subscribed_ur_lico_id'].split(',')
     else:
@@ -48,7 +49,7 @@ def get_old_values(form):
     
 
 
-
+    
 
     #print('ov:',ov)
     for u in form.manager['ur_lico_list']:
@@ -80,4 +81,6 @@ def get_old_values(form):
     ov['requested_ur_lico_id']=[]
     ov['subscribed_apteka_id']=[]
   
+  
+
   return ov

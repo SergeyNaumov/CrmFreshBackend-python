@@ -16,7 +16,9 @@ class Config(Form):
             {'table':form.work_table,'alias':'wt'},
             #{'table':'manager','alias':'m1','link':'wt.manager_id=m1.id','left_join':1},
             {'table':'manager','alias':'m2','link':'wt.anna_manager_id=m2.id','left_join':1},
-            {'table':'apteka','alias':'a','link':'a.ur_lico_id=wt.id'}
+            {'table':'apteka','alias':'a','link':'a.ur_lico_id=wt.id'},
+            {'t':'ur_lico_manager','a':'ulm','l':'ulm.ur_lico_id=wt.id','lj':1},
+            {'t':'manager','a':'m1','l':'ulm.manager_id=m1.id','lj':1},
         ]
         form.events=events
         form.filters_groups=[]

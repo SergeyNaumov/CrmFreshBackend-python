@@ -1,12 +1,17 @@
 from lib.anna.get_ul_list import get_ul_list_ids
 
 def events_permissions(form):
+  
   for f in form.fields:
     f['read_only']=1
 
-  if form.manager['type']!=1: # Для сотрудников АннА добавляем фильтр "Юридическое лицо"
+  if form.manager['type']==3: # Для сотрудников АннА добавляем фильтр "Юридическое лицо"
     form.errors.append('Доступ запрещён')
     return
+  
+  if form.manager['type']==2:
+    form.manager['ur_lico_ids']=get_ul_list_ids(form,form.manager['id'])
+
   if form.manager['type']==1:
     form.fields.append(
       {
@@ -38,6 +43,7 @@ def events_permissions(form):
       values=[form.id],
       onerow=1
     )
+
     if ov['action_id']:
       ov['action']=form.db.query(
         query="SELECT * from action where id = %s",
@@ -86,7 +92,7 @@ def events_permissions(form):
           values=[m['id']]
         )
 
-        #form.pre(m)
+      
     
     if ov['period_id']:
       ov['period']=form.db.query(
@@ -116,7 +122,8 @@ def events_permissions(form):
 def before_search(form):
 
   qs=form.query_search
-
+  if form.manager['type']==2:
+    qs['WHERE'].append(f"wt.ur_lico_id in ({','.join(form.manager['ur_lico_ids'])})")
 
 events={
   'permissions':[

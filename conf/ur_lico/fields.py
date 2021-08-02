@@ -62,6 +62,17 @@ def get_fields():
       'filter_code':filter_code_anna_manager_id,
       'filter_on':1
     },
+    {
+      'description':'Представитель юридического лица',
+      'name':'manager_id',
+      'type':'filter_extend_text',
+      'tablename':'m1',
+      'db_name':'func::concat(login," ",name," ",name_f," ",name_i," ",name_o)',
+      'table':'manager',
+      'not_process':1,
+      'where':'type=2',
+      'filter_code':filter_code_manager_id
+    }
 ]
 
 # def before_code_anna_manager_id(form,field):
@@ -70,7 +81,10 @@ def get_fields():
 #   )
 
 #   form.pre(field)
-
+def filter_code_manager_id(form,field,row):
+  return row['pred_ul']
+  
+  #f"{row['m1__login']}<br>{row['m1__name_f']} {row['m1__name_i']} {row['m1__name_o']}"
 def filter_code_anna_manager_id(form,field,row):
   return f'''{row['m2__name_f']} {row['m2__name_i']} {row['m2__name_o']}'''
 def filter_code_header(form,field,row):

@@ -3,8 +3,10 @@ from lib.anna.get_ul_list import get_ul_list_ids
 from lib.anna.get_cur_period import get_cur_period
 from lib.anna.get_apt_list import get_apt_list_ids, get_all_ids_for_aptcomp
 def permissions(form):
+  params={}
   
-  params=form.R['cgi_params']
+  if 'cgi_params' in form.R:
+    params=form.R['cgi_params']
   form.manager['ur_lico_ids']=[]
   form.manager['apt_list_ids']=[]
 
@@ -32,11 +34,16 @@ def permissions(form):
       form.manager['apteka_settings']={
         'set1':1,'set2':1
       }
+    # form.manager['apteka_settings']={
+    #   'set1':1,'set2':1
+    # }
+    #form.pre(form.manager['apteka_settings'])
     if form.manager['apteka_settings']['set2']:
       form.manager['apt_list_ids']=get_all_ids_for_aptcomp(form,apteka_id)
 
-    #form.pre(form.manager)
-    #apteka_settings
+   
+  
+
 
   if form.script=='edit_form' and form.id and form.action =='edit':
     form.ov=form.db.query(
@@ -61,13 +68,34 @@ def permissions(form):
 
       if 'prev' in params:
         form.ov['period']=get_cur_period(form,1)
+        #form.pre(form.ov['period'])
       else:
         form.ov['period']=get_cur_period(form)
     
     if form.ov:
       form.title='Маркетинговое мероприятие '+form.ov['header']
-    #form.pre(form.ov)
+      # смотрим сколько разных процентных ставой для товаров
+      form.ov['goods_cnt_percent']=form.db.query(
+        query='''
+          SELECT
+            count(*)
+          from (
+            SELECT
+              *
+            FROM 
+              action_plan_good apg
+              join good g on apg.good_id=g.id
+            WHERE
+              apg.action_plan_id=%s
+            GROUP BY g.percent
+          ) x
+          
+        ''',
+        values=[form.id],
+        onevalue=1
+      )
 
+    
   
 
 events={

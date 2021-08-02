@@ -81,33 +81,34 @@ def good_categories(form,field):
     # собираем аккордион
     accordion_data=[]
 
-    table_headers=[{'h':'Штрих код товара'},{'h':'Наименование'}]
+
+
     table_data=[]
-
-    if form.ov['subscribed_on_action'] or form.manager['type']==1:
-      table_headers.append({
-        'h':'Витрина',
-        'tooltip':{
-          'header':'Витрина',
-          'body':'По условиям контракта, товар должен быть выложен на полке'
-        }
-      })
-    
-    table_headers.append({'h':'Сип-цена'})
-    # not p['reward_percent'] and 
-    if form.ov['subscribed_on_action'] or form.manager['type']==1:
-      table_headers.append({
-        'h':'Начисления<br> по бонусу',
-        'tooltip':{
-          'header':'Бонус',
-          'body':'% бонуса зависит от закупленного товара. Каждый товар имеет свой % бонуса'
-        }
-      })
-
-
     for p in plan_list:
+      table_headers=[{'h':'Штрих код товара'},{'h':'Наименование'}]
+    
+
+      if form.ov['subscribed_on_action'] or form.manager['type']==1:
+        table_headers.append({
+          'h':'Витрина',
+          'tooltip':{
+            'header':'Витрина',
+            'body':'По условиям контракта, товар должен быть выложен на полке'
+          }
+        })
+    
+      table_headers.append({'h':'Сип-цена'})
+      #form.pre(form.ov)
+      if p['plan'] !=3 and (form.ov['subscribed_on_action'] or form.manager['type']==1):
+        table_headers.append({
+          'h':'Начисления<br> по бонусу',
+          'tooltip':{
+            'header':'Бонус',
+            'body':'% бонуса зависит от закупленного товара. Каждый товар имеет свой % бонуса'
+        }
+      })
       table_data=[]
-      #form.pre({'p':p})
+      #form.pre({'p':})
       for g in p['child']:
         table_tr=[]
         table_tr.append(g['code']) # код
@@ -120,7 +121,7 @@ def good_categories(form,field):
         else:
           table_tr.append(g['price'])
 
-        if form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action']):
+        if p['plan'] !=3 and (form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action'])):
           table_tr.append(g['percent'])
 
         table_data.append(table_tr)
@@ -167,7 +168,7 @@ def good_categories(form,field):
             'type':'html',
             'body':f'''<p>{' | '.join(pb_links)}</p>'''
         })
-
+      
       if form.manager['type']==1 or form.ov['subscribed_on_action']:
         body=f'''План: {p['plan_label']}<br>'''
         #form.pre(p['plan'])
@@ -175,7 +176,7 @@ def good_categories(form,field):
           body+=f'''{p['value_name']}: {p['value']}<br>'''
 
         if p['reward_percent']:
-          body+=f'% бонуса: {p["reward_percent"]}<br>'
+          body+=f'бонус: {p["reward_percent"]}%<br>'
 
         #backend_url='http://dev-crm.test/backend'
         backend_url='/backend'

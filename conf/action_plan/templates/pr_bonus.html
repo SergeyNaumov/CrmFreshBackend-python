@@ -1,11 +1,15 @@
+
 {%if manager.type != 3%}
     кол-во аптек: {{b.cnt_apt}}<br>
 {%endif%}
 
-{{label_plan}}: {{b.plan}}<br>
+{%if ov.plan !=3 %}
+    {{label_plan}}: {{b.plan}}<br>
+{%endif%}
 
 {%if ov.plan==1 or ov.plan==3%}
     {%if ov.total_good_price>0%}
+
         сумма закупки в sip-ценах: 
     {%else%}
         сумма закупки:
@@ -15,42 +19,61 @@
     кол-во закупки: {{b.buy_cnt}}<br>
 {%else%} <!-- суммовой --->
     кол-во закупки: {{b.buy_cnt}}<br>
-    сумма закупки в sip-ценах: {{b.price}}<br>
+    {%if ov.total_good_price>0%}
+        сумма закупки в sip-ценах:
+    {%else%}
+        сумма закупки:
+    {%endif%}
+    {{b.price}}<br>
 {%endif%}
 {#
     Если выполнение % больше или равно 100, то выводить заработанный бонус и бонус при сохранении темпа закупки. Если выполнение % менее 100, то выводить текущий бонус и бонус при сохранении темпа закупки
 #}
-процент выполнения: {{b.percent_complete}}<br>
-{%if b.percent_complete<100%}
+
+{%if ov.plan !=3 %}
+    процент выполнения: {{b.percent_complete}}<br>
+{%endif%}
+
+{%if b.percent_complete<100 or ov.plan==3%}
     текущий бонус: {{b.current_bonus}}<br>
 {%endif%}
-процент выполнения при сохранении темпа закупки: {{b.percent_progress}}<br>
+
+{%if ov.plan!=3%}
+    процент выполнения при сохранении темпа закупки: {{b.percent_progress}}<br>
+{%endif%}
 
 бонус при сохранении темпа закупки: {{b.bonus_progress}}<br>
 
 остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{b.other_distrib_sum}}<br>
 упущенная выгода (общая сумма, сколько недополучили): {{b.lost_profit}}<br>
-{%if b.left_to_complete_percent>0%}
-    осталось выполнить в %: {{b.left_to_complete_percent}}<br>
-{%endif%}
-{%if b.percent_complete>=100%}
-    заработанный бонус: 
-        {%if multi%}
-            {{b.current_bonus}}
-        {%else%}
-            {{b.earned_bonus}}
-        {%endif%}
-        <br>
+
+{%if ov.plan !=3 %}
+    {%if b.left_to_complete_percent>=100%}
+        осталось выполнить в %: 0.00<br>
+    {%else%}
+        осталось выполнить в %: {{b.left_to_complete_percent}}<br>
+    {%endif%}
 {%endif%}
 
-{%if b.left_to_complete_percent>0%}
+{%if multi and b.percent_complete<100%}
+    заработанный бонус: {{b.current_bonus}}<br>
+{%else%}
+    {%if b.percent_complete>=100 or ov.plan==3%}
+        заработанный бонус: {{b.earned_bonus}}<br>
+    {%endif%}
+        
+{%endif%}
+
+
+{%if b.left_to_complete_percent>0 and ov.plan!=3%}
     {%if ov.plan==1%}
         осталось выполнить в рублях:
     {%else%}
-        осталось выполнить в штуках:
+        осталось выполнить в упаковках:
     {%endif%}
 
     {{b.left_to_complete_rub}}<br>
 {%endif%}
 <br>
+
 

@@ -33,8 +33,8 @@ def events_permissions(form):
 def before_search(form):
   qs=form.query_search
   sf=qs['SELECT_FIELDS']
-  #if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
-  #  form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
+  if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
+    form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
 
 
   

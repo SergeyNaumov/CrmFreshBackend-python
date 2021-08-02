@@ -48,8 +48,7 @@ def get_fields():
       'description':'Сумма оплаты',
       'name':'summ',
       'type':'text',
-      'filter_on':1,
-#      'filter_code':summ_filter_code
+      'filter_on':1
 
     },
     {
@@ -132,5 +131,4 @@ def file_filter_code(form,field,row):
   return row['wt__file']+' <small>файл отсутствует</small>'
 
     
-#def summ_filter_code(form,field,row):
-#  form.pre(row['wt__summ'])
+  

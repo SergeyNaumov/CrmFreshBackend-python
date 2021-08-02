@@ -25,9 +25,10 @@ def pr_bonus(form,field):
                     WHERE
                         period_id=%s and pb.action_plan_id=%s and pb.ur_lico_id in ({','.join(form.manager['ur_lico_ids'])})
                 """,
-                values=[form.ov['period']['id'],form.id]
+                values=[form.ov['period']['id'],form.id],
+            
             )
-            #form.pre(bonus_list)
+
     elif form.id and form.manager['type']==3:
         label_plan='План для аптеки'
         if len(form.manager['apt_list_ids']):
@@ -44,6 +45,7 @@ def pr_bonus(form,field):
                 values=[form.ov['period']['id'],form.id]
             )
     else:
+
         return
     if len(bonus_list):
         # field['after_html']=form.template(
@@ -258,6 +260,11 @@ def pr_bonus(form,field):
             if total['percent_progress']>=99:
                 total['bonus']=total['current_bonus']
             
+            if form.ov.plan==1:
+                total['current_bonus']=total['plan']-total['price']
+            else:
+                total['current_bonus']=total['plan']-total['buy_cnt']
+
             body_text=form.template(
                 './conf/action_plan/templates/pr_bonus.html',
                 ov=form.ov,
@@ -307,9 +314,13 @@ def pr_bonus(form,field):
                 
             #     body_text+=f"""{total_left_to_complete_label}: {total_left_to_complete_rub}<br>"""
             
+            header_total='* Сводные данные по всем юридическим лицам'
+            if form.manager['type']==3:
+                header_total='* Сводные данные по всем аптекам'
+            
             accordion_data.insert(0,
                 {
-                    'header':'* Сводные данные по всем юридическим лицам',
+                    'header':header_total,
                     'content':[
 
                         {

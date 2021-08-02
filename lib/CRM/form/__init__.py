@@ -42,6 +42,7 @@ class Form():
     self.search_links=[]
     self.log=[]
     self.errors=[]
+    self.R={}
     self.before_filters_html=[]
     self.on_filters=[]
     self.default_find_filter=[]

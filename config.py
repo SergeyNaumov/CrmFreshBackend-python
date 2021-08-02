@@ -46,7 +46,8 @@ config={
 
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','asus-tarusa'],
-    'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+    
+    #'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
     #'manager_id':243, # Менеджер Анна с множеством юрлиц
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)
     #'manager_id': 141, # dir1@digitalstrateg.ru Кнейжиц Игорь Владимирович, Представитель юридического лица
@@ -55,5 +56,6 @@ config={
     #'manager_id':144, # Представитель артеки: apt2@digitalstrateg.ru
     #'manager_id':248, # представитель аптеки (с подпиской на акции mandarin149@yandex.ru)
     #'manager_id':246, # tifilatova@bk.ru
+    'manager_id':183, # dimy@comch.ru (представитель химфарм)
   }
 }

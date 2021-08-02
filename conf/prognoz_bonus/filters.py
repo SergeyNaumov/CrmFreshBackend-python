@@ -14,7 +14,8 @@ def get_filters():
       'value_field':'id',
       'autocomplete':1,
       'filter_on':1,
-      'filter_code':ur_lico_id_filter_code
+      'filter_code':ur_lico_id_filter_code,
+      'before_code':ur_lico_id_before_code
     },
     {
       'description':'Период',
@@ -43,6 +44,10 @@ def get_filters():
 
 
   ]
+def ur_lico_id_before_code(form,field):
+  if form.manager['type']==2:
+    field['where']=f''' id in ({','.join(form.manager['ur_lico_ids'])})'''
+    field['autocomplete']=0
 
 def ur_lico_id_filter_code(form,field,row):
   return f'''
@@ -59,3 +64,5 @@ def period_id_before_code(form,field):
     field['values']=form.db.query(
       query="select id v,concat(year,' ',querter,' квартал') d from prognoz_bonus_period order by date_begin"
     )
+
+
