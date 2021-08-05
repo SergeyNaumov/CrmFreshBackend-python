@@ -13,11 +13,11 @@ def good_categories(form,field):
   cur_period=get_cur_period(form)
   prev_period=get_cur_period(form,1)
 
-  #form.pre([cur_priod,prev_period])
-
   #period_id=form.db.query(
   #  query='SELECT id from prognoz_bonus_period where '
   #)
+
+  #form.pre([cur_period,prev_period])
   if form.id and form.ov:
 
     plan_list=form.db.query(
@@ -29,9 +29,9 @@ def good_categories(form,field):
         FROM
           action_plan ap
           LEFT JOIN manufacturer man ON man.id = ap.manufacturer_id
-        WHERE  action_id=%s ORDER BY ap.end_date desc
+        WHERE  action_id=%s and ap.begin_date>=%s ORDER BY ap.end_date desc
       ''',
-      values=[form.id]
+      values=[form.id, prev_period['date_begin']]
     )
     plan_ids=[]
     plan_dict={}
@@ -49,7 +49,7 @@ def good_categories(form,field):
         p['plan_label']='количественный'
         p['value_name']='Кол-во'
       elif p['plan'] == 3:
-        p['plan_label']='только процент за любые закупки'
+        p['plan_label']='% за любые закупки'
         p['value_name']='Выплачиваемый процент'
     
 

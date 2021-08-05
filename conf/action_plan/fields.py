@@ -42,7 +42,8 @@ def plan_info(form,field):
   plan_name=''
   value_name=''
   plan_data=''
-  #form.pre(ov)
+  if len(form.errors):
+    return 
   if ov['plan']==1:
     plan_data+=f'План: Cуммовой<br>Сумма от: {ov["value"]}<br>'
     if ov["reward_percent"]:
@@ -54,7 +55,7 @@ def plan_info(form,field):
       plan_data+=f'Бонус: {ov["reward_percent"]}%<br>'
   elif ov['plan']==3:
     #form.pre(ov)
-    plan_data+=f'План: только % за любые закупки<br>Бонус: {ov["reward_percent"]}%<br>'
+    plan_data+=f'План: % за любые закупки<br>Бонус: {ov["reward_percent"]}%<br>'
 
   
   period=form.ov['period']

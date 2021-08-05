@@ -8,7 +8,7 @@ class Config(Form):
     def __init__(form,arg):
         super().__init__(arg) 
         
-        form.title='Запросы на подписку от юридических лиц'
+        form.title='Запросы на подписку от аптек'
         #form.explain=1
         form.read_only=1
         form.not_edit=1

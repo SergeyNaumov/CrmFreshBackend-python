@@ -22,15 +22,17 @@
     {%endif%}
     {{b.price}}<br>
     
-    {%if ov.plan!=3%}
-        процент выполнения: {{b.percent_complete}}<br>
-    {%endif%}
+
 
 
 
 {%endif%}
 
-{%if b.percent_complete<100%}
+{%if ov.plan!=3%}
+    процент выполнения: {{b.percent_complete}}<br>
+{%endif%}
+
+{%if b.percent_complete<100 and ov.plan!=3%}
     текущий бонус: {{b.current_bonus}}<br>
 {%endif%}
 
@@ -48,7 +50,7 @@
     {%endif%}
 {%endif%}
 
-{%if b.percent_complete>=100 %}
+{%if b.percent_complete>=100 or ov.plan==3%}
     заработанный бонус: {{b.earned_bonus}}<br>
 {%endif%}
 

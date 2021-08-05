@@ -28,14 +28,18 @@ def get_fields():
       'description':'Аптека',
       'type':'select_from_table',
       'table':'apteka',
-      'header_field':'header',
+      'header_field':'ur_address',
       'value_field':'id',
+      'before_code':apteka_before_code,
       'filter_code':apteka_filter_code,
       'tablename':'apt',
       'filter_on':1
     },
 ]
 
+def apteka_before_code(form,field):
+  if form.manager['type']==2:
+    field['where']='id in ('+','.join(form.manager['apt_list_ids'])+')'
 
 def action_filter_code(form,field,row):
   return f"<a href='/edit-form/action/{row['a__id']}' target='blank'>{row['a__header']}</a>"

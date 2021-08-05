@@ -41,14 +41,27 @@ async def autocomplete(config:str,R: dict):
           field=f
     else:
       field=form.get_field(name)
-      #print('FIELD',field)
-  else:
-    errors.append('не указан term')
+      
+
+  else: # нет поиска по строке, вывозим по depend_where (зависимый фильтр)
+    
+    name,sub_name=get_name_and_ext(name)
+    if sub_name:
+      errors.append('не указан term')
+    else:
+      field=form.get_field(name)
+      if 'depend_where' in field:
+        pass
+      else:
+        errors.append('не указан term')
+    
+    
 
   if not field:
     errors.append(f'field_name: {name} not found')
   else:
     result_list=get_list(
+      errors=errors,
       form=form,
       name=name,
       element=field,
@@ -66,6 +79,8 @@ def get_list(**arg):
   element=arg['element']
   like_values=[]
   where=''
+  if arg['errors']:
+    return []
 
   work_table=''
   if not exists_arg('value',arg):
@@ -111,7 +126,12 @@ def get_list(**arg):
 
     if exists_arg('where', element):
       where+=element['where']
+    if exists_arg('depend_where',element):
+      if where:
+        where+=' AND '
+      where+=element['depend_where']
 
+    #print('WHERE:',where)
     if like_val:
       if where:
         where=where+' AND '

@@ -7,6 +7,8 @@ def pr_bonus(form,field):
     #form.pre({'total_good_price':total_good_price})
 
     total_left_to_complete_label='осталось выполнить в рублях'
+    if len(form.errors):
+      return 
     if form.ov['plan']==2:
         total_left_to_complete_label='осталось выполнить в шт'
     label_plan='план для юридического лица'
@@ -260,7 +262,7 @@ def pr_bonus(form,field):
             if total['percent_progress']>=99:
                 total['bonus']=total['current_bonus']
             
-            if form.ov.plan==1:
+            if form.ov['plan']==1:
                 total['current_bonus']=total['plan']-total['price']
             else:
                 total['current_bonus']=total['plan']-total['buy_cnt']

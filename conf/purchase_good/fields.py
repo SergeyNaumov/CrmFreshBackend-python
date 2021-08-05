@@ -22,10 +22,15 @@ def get_fields():
       },
       {
         'description':'Группа товаров',
-        'type':'filter_extend_text',
-        'name':'action_plan_header',
+        'type':'filter_extend_select_from_table',
+        'table':'action_plan',
+        'name':'action_plan_id',
+        'header_field':'header',
+        'value_field':'id',
         'tablename':'ap',
-        'db_name':'header',
+        'autocomplete':1,
+        'depend_filter':['action_id'], # фильтр зависит от указанных
+        'before_code':action_plan_id_before_code,
         'filter_on':1,
       },
       {
@@ -77,7 +82,7 @@ def get_fields():
         'description':'Закуплено товаров, шт',
         'name':'cnt',
         'type':'text',
-#        'filter_on':1,
+        'filter_on':1,
       },
       {
         'description':'Сумма',
@@ -135,9 +140,9 @@ def get_fields():
 def apteka_id_before_code(form,field):
   # для юридического лица выводим только те аптеки, которые закреплены за ним
   if form.manager['type']==2:
-    field['autocomplete']=0
+    #field['autocomplete']=1
     field['where']=f' id in ({ ",".join(form.manager["apt_list_ids"]) }) '
-    del(field['autocomplete'])
+    #del(field['autocomplete'])
     
 def ur_lico_id_before_code(form,field):
   if form.manager['type']==2:
@@ -190,3 +195,16 @@ def action_before_code(form,field):
 
 
     #form.pre(form.manager['type'])
+
+def action_plan_id_before_code(form,field):
+  # Делаем так, чтобы автокомлит-фильтр "план акции" зависел от фильтра "акции" (добавляем depend_where)
+  if form.script=='autocomplete':
+    if 'filters_values' in form.R and form.R['filters_values'] and 'action_id' in form.R['filters_values']:
+      actions=form.R['filters_values']['action_id']
+      ids=[]
+      if len(actions):
+        for action_id in actions:
+          ids.append(str(action_id))
+        if len(ids):
+          field['depend_where']='action_id in ('+','.join(ids)+')'
+        

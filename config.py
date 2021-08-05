@@ -52,10 +52,10 @@ config={
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)
     #'manager_id': 141, # dir1@digitalstrateg.ru Кнейжиц Игорь Владимирович, Представитель юридического лица
     #'manager_id': 211, # pavlik-libra5@mail.ru, Представитель юридического лица
-    #'manager_id':228, # (в подчинении 3 аптеки) realko2-z@mail.ru, Представитель юридического лица
+    'manager_id':228, # (в подчинении 3 аптеки) realko2-z@mail.ru, Представитель юридического лица
     #'manager_id':144, # Представитель артеки: apt2@digitalstrateg.ru
     #'manager_id':248, # представитель аптеки (с подпиской на акции mandarin149@yandex.ru)
     #'manager_id':246, # tifilatova@bk.ru
-    'manager_id':183, # dimy@comch.ru (представитель химфарм)
+    #'manager_id':183, # dimy@comch.ru (представитель химфарм)
   }
 }

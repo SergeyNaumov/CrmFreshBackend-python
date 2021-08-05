@@ -95,6 +95,9 @@ def permissions(form):
         onevalue=1
       )
 
+    else:
+      form.errors.append('Ссылка устарела')
+
     
   
 
