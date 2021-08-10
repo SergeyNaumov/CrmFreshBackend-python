@@ -68,9 +68,10 @@ def good_categories(form,field):
       #form.pre(good_list)
       #for g in good_list:
       #    plan_dict[g['plan_id']]['child'].append(g)
-
+    show_percent=0
     for p in plan_list:
       for g in good_list:
+        if g['percent']>0: show_percent=1
         if g['plan_id']==p['id']:
           #form.pre(f"""{g['header']} append to {p['header']} """)
           p['child'].append(g)
@@ -99,7 +100,7 @@ def good_categories(form,field):
     
       table_headers.append({'h':'Сип-цена'})
       #form.pre(form.ov)
-      if p['plan'] !=3 and (form.ov['subscribed_on_action'] or form.manager['type']==1):
+      if p['plan'] !=3 and show_percent and (form.ov['subscribed_on_action'] or form.manager['type']==1):
         table_headers.append({
           'h':'Начисления<br> по бонусу',
           'tooltip':{
@@ -121,7 +122,7 @@ def good_categories(form,field):
         else:
           table_tr.append(g['price'])
 
-        if p['plan'] !=3 and (form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action'])):
+        if p['plan'] !=3 and show_percent and (form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action'])):
           table_tr.append(g['percent'])
 
         table_data.append(table_tr)

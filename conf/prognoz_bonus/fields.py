@@ -42,6 +42,8 @@ def prognoz_bonus(form,field):
 def charts_before_code(form,field):
     #if form.manager['type']!=1: return
     ov=form.ov
+    if ov['action_plan']['plan']==3:
+      return ''
     data=[
         {
             'header':'Посмотреть Диаграммы',

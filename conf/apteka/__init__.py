@@ -13,6 +13,7 @@ class Config(Form):
         self.read_only=1
         self.not_create=1
         self.make_delete=False
+        self.not_edit=1
         self.QUERY_SEARCH_TABLES=[
             {'t':self.work_table,'a':'wt'},
             {'t':'manager','a':'m','l':'wt.manager_id=m.id','lj':1}

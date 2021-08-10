@@ -55,9 +55,21 @@
     {%endif%}
 {%endif%}
 
-{%if multi and b.percent_complete<100%}
-    заработанный бонус: {{b.current_bonus}}<br>
+{%if multi%}
+    
+    {%if b.percent_complete>=100%}
+        {%if ov.plan==3%}
+            заработанный бонус: 
+            {{b.earned_bonus}}
+        {%else%}
+            заработанный бонус: 
+            {{b.current_bonus}}
+        {%endif%}
+        <br>
+    {%endif%}
+    
 {%else%}
+
     {%if b.percent_complete>=100 or ov.plan==3%}
         заработанный бонус: {{b.earned_bonus}}<br>
     {%endif%}

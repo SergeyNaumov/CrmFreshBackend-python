@@ -62,6 +62,7 @@ def before_search(form):
       LEFT JOIN action  act ON p.action_id=act.id
       LEFT JOIN apteka a ON wt.apteka_id = a.id
       LEFT JOIN ur_lico ul ON a.ur_lico_id=ul.id
+      LEFT JOIN action_plan ap ON ap.action_id=act.id
     '''
 
   if len(qs['WHERE']):

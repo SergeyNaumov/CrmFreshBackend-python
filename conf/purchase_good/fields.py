@@ -25,6 +25,7 @@ def get_fields():
         'type':'filter_extend_select_from_table',
         'table':'action_plan',
         'name':'action_plan_id',
+        'db_name':'id',
         'header_field':'header',
         'value_field':'id',
         'tablename':'ap',

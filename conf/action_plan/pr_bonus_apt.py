@@ -122,6 +122,15 @@ def pr_bonus_apt(form,field):
 
                     '''
                     },
+
+
+                ]
+
+            }
+            if form.ov['plan']!=3:
+
+            
+                accordion_item['content'].append(
                     {
                         'type':'chart',
                         'subtype':'circle',
@@ -132,23 +141,22 @@ def pr_bonus_apt(form,field):
                         'height':200,
                         #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-                    },
-                    {
-                        'type':'chart',
-                        'subtype':'circle',
-                        'description':'дистрибьютеры',
-                        'labels':[f"""разрешённые дистрибьютеры ({b['price']})""",f"""остальные дистрибьютеры ({b['other_distrib_sum']})"""],
-                        'values':[b['price'],b['other_distrib_sum']],
-                        'width':320,
-                        'height':200,
-                        #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
+                    }
+                )
+            accordion_item['content'].append(
+                {
+                    'type':'chart',
+                    'subtype':'circle',
+                    'description':'дистрибьютеры',
+                    'labels':[f"""разрешённые дистрибьютеры ({b['price']})""",f"""остальные дистрибьютеры ({b['other_distrib_sum']})"""],
+                    'values':[b['price'],b['other_distrib_sum']],
+                    'width':320,
+                    'height':200,
+                    #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-                    },
-                ]
-
-            }
+                }
+            )
             accordion_data.append(accordion_item)
-
             # вычисления для сводных данных
             total_cnt_apt+=b['cnt_apt']
             total_plan+=b['plan']

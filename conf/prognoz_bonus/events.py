@@ -120,7 +120,10 @@ def events_permissions(form):
 
 
 def before_search(form):
-
+  # для менеджера Анна фильтр "Юридическое лицо" обязателен
+  if form.manager['type']==1 and not ('ur_lico_id' in form.query_hash):
+    form.errors.append('Фильтр "Юридическое лицо" обязателен')
+  
   qs=form.query_search
   if form.manager['type']==2:
     qs['WHERE'].append(f"wt.ur_lico_id in ({','.join(form.manager['ur_lico_ids'])})")

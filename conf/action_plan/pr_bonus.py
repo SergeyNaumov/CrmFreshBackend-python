@@ -170,6 +170,16 @@ def pr_bonus(form,field):
 
                             '''
                             },
+
+                        ]
+
+                    }
+
+                    # диаграммы добавляем только к планам, отличным от "% за любые закупки"
+
+                    if form.ov['plan']!=3:
+
+                        accordion_item['content'].append(
                             {
                                 'type':'chart',
                                 'subtype':'circle',
@@ -180,21 +190,23 @@ def pr_bonus(form,field):
                                 'height':200,
                                 #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-                            },
-                            {
-                                'type':'chart',
-                                'subtype':'circle',
-                                'description':'дистрибьютеры',
-                                'labels':[f"""разрешённые дистрибьютеры ({b['price']})""",f"""остальные дистрибьютеры ({b['other_distrib_sum']})"""],
-                                'values':[b['price'],b['other_distrib_sum']],
-                                'width':320,
-                                'height':200,
-                                #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
+                            }
+                        )
 
-                            },
-                        ]
+                    accordion_item['content'].append(
+                        {
+                            'type':'chart',
+                            'subtype':'circle',
+                            'description':'дистрибьютеры',
+                            'labels':[f"""разрешённые дистрибьютеры ({b['price']})""",f"""остальные дистрибьютеры ({b['other_distrib_sum']})"""],
+                            'values':[b['price'],b['other_distrib_sum']],
+                            'width':320,
+                            'height':200,
+                            #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-                    }
+                        }
+                    )
+                    
                     accordion_data.append(accordion_item)
 
             # вычисления для сводных данных
@@ -212,7 +224,7 @@ def pr_bonus(form,field):
             if total['plan']:
                 total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
                 
-
+                #form.pre(f'''100 * ({total['price']} / {total['plan']} )''')
                 '''     
                 form.ov['period']['querter_begin_days'] -- кол-во дней, прошедших с начала квартала, включая сегодняшний
                 form.ov['period']['querter_total_days'] -- кол-во дней в квартале
@@ -223,8 +235,8 @@ def pr_bonus(form,field):
                 кол-во дней в квартале / план на квартал в рублях или упаковках
                 ''' 
                 querter_begin_days=int(form.ov['period']['querter_begin_days'])
-                querter_total_days=int(form.ov['period']['querter_total_days'])
-                
+                querter_total_days=int(form.ov['period']['querter_total_days'])+1
+                #form.pre(form.ov['period'])
                 if form.ov['period']['prev']:
                     querter_begin_days=querter_total_days
 
@@ -232,7 +244,7 @@ def pr_bonus(form,field):
                 if form.ov['plan'] in (1,3): # Суммовой
                     
                     #print('total_plan:',total_plan)
-                    #form.pre(f'100*({total_price}/{querter_begin_days} * {querter_total_days}/{total_plan})')
+                    #form.pre(f'''100*({total['price']}/{querter_begin_days} * {querter_total_days}/{total['plan']})''')
                     total['percent_progress']=round( 100*(total['price']/querter_begin_days * querter_total_days/ int(total['plan']) ),2 )
                     
                 elif form.ov['plan']==2: # Количественный
@@ -263,7 +275,9 @@ def pr_bonus(form,field):
                 total['bonus']=total['current_bonus']
             
             if form.ov['plan']==1:
-                total['current_bonus']=total['plan']-total['price']
+                pass
+                #form.pre(str(total['plan'])+'-'+str(total['price']) )
+                #total['current_bonus']=total['plan']-total['price']
             else:
                 total['current_bonus']=total['plan']-total['buy_cnt']
 
@@ -335,6 +349,14 @@ def pr_bonus(form,field):
                             </div>
                         ''',
                     },
+
+
+                ]
+
+            })
+
+            if form.ov['plan']!=3:
+                accordion_data[0]['content'].append(
                     {
                         'type':'chart',
                         'subtype':'circle',
@@ -346,21 +368,22 @@ def pr_bonus(form,field):
                         #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
                     },
-                    {
-                        'type':'chart',
-                        'subtype':'circle',
-                        'description':'дистрибьютеры',
-                        'labels':[f"""разрешённые дистрибьютеры ({total['price']})""",f"""остальные дистрибьютеры ({total['other_distrib_sum']})"""],
-                        'values':[total['price'],total['other_distrib_sum']],
-                        'width':320,
-                        'height':200,
-                        #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
+                )
 
-                    }
-                ]
+            accordion_data[0]['content'].append(
+                {
+                    'type':'chart',
+                    'subtype':'circle',
+                    'description':'дистрибьютеры',
+                    'labels':[f"""разрешённые дистрибьютеры ({total['price']})""",f"""остальные дистрибьютеры ({total['other_distrib_sum']})"""],
+                    'values':[total['price'],total['other_distrib_sum']],
+                    'width':320,
+                    'height':200,
+                    #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-            })
-        
+                }
+            )
+
         field['data']=accordion_data
 
     else:
