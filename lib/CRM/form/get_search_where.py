@@ -197,7 +197,7 @@ def get_search_where(form,query):
       else:
         map_rezult=[]
         for v in values:
-          if v and type(v) is 'str':
+          if v and type(v)=='str':
             if v.isnumeric():
               map_rezult.append(v)
 
