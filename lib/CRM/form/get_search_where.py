@@ -54,7 +54,7 @@ def get_search_where(form,query):
 
       if f['type'] not in ['1_to_m','memo'] and not exists_arg('not_order',f):
           o,operable_fld='',''
-
+          #print('F:',f)
           if f['type'] in ['date','datetime','filter_extend_date','filter_extend_datetime']:
               operable_fld=table+'.'+db_name
               o=operable_fld+" desc"
@@ -159,7 +159,7 @@ def get_search_where(form,query):
 
           WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+','.join(user_id)+') )')
 
-      elif f['type'] in ['select_from_table','filter_extend_select_from_table','select_values']:
+      elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
         if type(values) is int or type(values) is str:
           values=[values]
         if type(values) is list:
