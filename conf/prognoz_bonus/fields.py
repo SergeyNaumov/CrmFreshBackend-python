@@ -26,7 +26,6 @@ def prognoz_bonus(form,field):
   if form.ov['action_plan']['plan']==2:
     total_left_to_complete_label='Осталось выполнить в штуках'
 
-  #form.pre(form.ov['managers'])
   ov=form.ov
   field['after_html']=form.template(
     f'./conf/{form.work_table}/templates/prognoz_bonus.html',

@@ -71,6 +71,7 @@ def get_search_where(form,query):
           elif f['type']=='in_ext_url':
               operable_fld='in_ext_url.ext_url'
               o=operable_fld
+
           else:
               func=get_func(f)
               if func :
@@ -184,6 +185,15 @@ def get_search_where(form,query):
           # my @values = grep /^\d+$/, @{$values};
           if len(values):
             WHERE.append('('+f['tablename']+'.'+f['relation_table_id']+' IN ('+','.join(values)+')')
+      elif f['type']=='file':
+          if values==1: # файл существует
+            WHERE.append(f'''(wt.{f['name']}<>"") ''')
+          elif values==2: # файл отсутствует
+            WHERE.append(f'''(wt.{f['name']}="") ''')
+
+
+          
+
       else:
         map_rezult=[]
         for v in values:
