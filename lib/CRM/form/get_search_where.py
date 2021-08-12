@@ -160,7 +160,7 @@ def get_search_where(form,query):
           WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+','.join(user_id)+') )')
 
       elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
-        if type(values) is int or type(values) is str:
+        if type(values) is int or type(values)=='str':
           values=[values]
         if type(values) is list:
           map_rezult=[]
