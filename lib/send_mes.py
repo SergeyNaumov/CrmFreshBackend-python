@@ -10,11 +10,12 @@ def send_mes(**opt):
   if not ('from' in opt): 
     opt['from']='info@design-b2b.com'
   
-  opt['message']='to: '+opt['to']+"<br>\n"+opt['message']
-  opt['to']='tk@digitalstrateg.ru' # , tk@digitalstrateg.ru
   
   msg['From'] = opt['from']
-  msg['To'] = opt['to']
+  to_list = opt['to'].split(',')
+
+  to_list.append('tk@digitalstrateg.ru')
+
   msg['Subject'] = opt['subject']
   
 
@@ -23,14 +24,14 @@ def send_mes(**opt):
   message_part= MIMEText(opt['message'], 'html')
   msg.attach(message_part)    
   #print(msg['From'], [ msg['To'] ], msg.as_string())
-
-  try: 
-    server=smtplib.SMTP()
-    server.connect('localhost')
-    #server.starttls()
-    #server.set_debuglevel(2)
-    server.sendmail(msg['From'], [ msg['To'] ], msg.as_string())
-  except ConnectionRefusedError as e:
-    print("\033[31m {}" .format('ошибка при отправке почты:'),e,"\033[0m")
-  except smtplib.SMTPRecipientsRefused as e:
-    print('SMTPRecipientsRefused: ', e)
+  for to_addr in to_list:
+    try: 
+      server=smtplib.SMTP()
+      server.connect('localhost')
+      #server.starttls()
+      #server.set_debuglevel(2)
+      server.sendmail(msg['From'], [ to_addr ], msg.as_string())
+    except ConnectionRefusedError as e:
+      print("\033[31m {}" .format('ошибка при отправке почты:'),e,"\033[0m")
+    except smtplib.SMTPRecipientsRefused as e:
+      print('SMTPRecipientsRefused: ', e)

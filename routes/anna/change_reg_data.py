@@ -116,7 +116,7 @@ def change_reg_data(R:dict):
         if manager['type']==2: # гер
             send_mes(
                 to=manager['ma_email'],
-                subject=f"Изменение регистрационных",
+                subject=f"Изменение регистрационных данных ",
                 message=message_manager_anna
             )
         
