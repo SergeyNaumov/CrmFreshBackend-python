@@ -1,5 +1,5 @@
 import os.path
-
+from lib.core import date_to_rus
 
 
 def get_fields():
@@ -56,7 +56,8 @@ def get_fields():
       'description':'Дата оплаты',
       'type':'date',
       'default_off':1,
-      'filter_on':1
+      'filter_on':1,
+      'filter_code':paid_date_filter_code
     },
     {
       'name':'id',
@@ -131,4 +132,9 @@ def file_filter_code(form,field,row):
   return row['wt__file']+' <small>файл отсутствует</small>'
 
     
+def paid_date_filter_code(form,field,row):
+  if row['wt__paid_date']=='0000-00-00':
+    return '-'
+  else:
+    return date_to_rus(row['wt__paid_date'])
   

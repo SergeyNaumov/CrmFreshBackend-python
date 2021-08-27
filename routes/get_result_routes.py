@@ -46,7 +46,10 @@ async def get_result(R: dict):
 
   for values in R['query']:
     form.query_search['on_filters_hash'][values[0]]=values[1]
-  
+
+  # если требуется подменить фильтры
+  form.run_event('before_search_tables')
+
   form.get_search_tables(R['query'])
   
   form.get_search_where(R['query'])

@@ -66,9 +66,8 @@ def permissions(form):
         onevalue=1
       )
 
-      if 'prev' in params:
+      if 'prev' in params and int(params['prev']):
         form.ov['period']=get_cur_period(form,1)
-        #form.pre(form.ov['period'])
       else:
         form.ov['period']=get_cur_period(form)
     

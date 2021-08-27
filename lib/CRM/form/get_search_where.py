@@ -54,7 +54,7 @@ def get_search_where(form,query):
 
       if f['type'] not in ['1_to_m','memo'] and not exists_arg('not_order',f):
           o,operable_fld='',''
-
+          #print('F:',f)
           if f['type'] in ['date','datetime','filter_extend_date','filter_extend_datetime']:
               operable_fld=table+'.'+db_name
               o=operable_fld+" desc"
@@ -71,6 +71,7 @@ def get_search_where(form,query):
           elif f['type']=='in_ext_url':
               operable_fld='in_ext_url.ext_url'
               o=operable_fld
+
           else:
               func=get_func(f)
               if func :
@@ -158,8 +159,8 @@ def get_search_where(form,query):
 
           WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+','.join(user_id)+') )')
 
-      elif f['type'] in ['select_from_table','filter_extend_select_from_table','select_values']:
-        if type(values) is int or type(values) is str:
+      elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
+        if type(values) is int or type(values)=='str':
           values=[values]
         if type(values) is list:
           map_rezult=[]
@@ -184,10 +185,19 @@ def get_search_where(form,query):
           # my @values = grep /^\d+$/, @{$values};
           if len(values):
             WHERE.append('('+f['tablename']+'.'+f['relation_table_id']+' IN ('+','.join(values)+')')
+      elif f['type']=='file':
+          if values==1: # файл существует
+            WHERE.append(f'''(wt.{f['name']}<>"") ''')
+          elif values==2: # файл отсутствует
+            WHERE.append(f'''(wt.{f['name']}="") ''')
+
+
+          
+
       else:
         map_rezult=[]
         for v in values:
-          if v and type(v) is 'str':
+          if v and type(v)=='str':
             if v.isnumeric():
               map_rezult.append(v)
 
