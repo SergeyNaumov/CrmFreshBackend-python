@@ -158,6 +158,20 @@ def get_search_where(form,query):
         if user_id:
 
           WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+','.join(user_id)+') )')
+      elif f['type'] in ['checkbox','filter_extend_checkbox']:
+        if type(values) is list:
+          map_rezult=[]
+          for v in values:
+            if (type(v) is int) or (type(values) is str):
+              if type(v) is int: v=str(v)
+              if v.isnumeric():
+                map_rezult.append(v)
+          
+          if len(map_rezult):
+            if f['type']=='filter_extend_checkbox':
+              WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')
+            else:
+              WHERE.append(' (wt.'+db_name+' IN ('+','.join(map_rezult)+'))')
 
       elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
         if type(values) is int or type(values)=='str':

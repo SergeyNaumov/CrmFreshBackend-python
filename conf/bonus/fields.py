@@ -48,7 +48,8 @@ def get_fields():
       'description':'Сумма оплаты',
       'name':'summ',
       'type':'text',
-      'filter_on':1
+      
+      #'filter_on':1
 
     },
     {

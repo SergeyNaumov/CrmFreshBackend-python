@@ -77,11 +77,19 @@ function draw_diagramm(canvas_el){
 
 }
 function draw_all_diagrams(){
+  // if( !('Chart' not in window)){
+  //   let target = document.getElementsByTagName("head");
+  //   let newScript = document.createElement("script");
+  //   let url = "/js/Chart.bundle.min.js";
+  //   newScript.src = url;
+  //   target[0].appendChild(newScript);
+  // }
+
   setTimeout(
     ()=>{
       let items=document.querySelectorAll('.prognoz_bonus_item')
       if(items.length){
-        console.log('рисуем')
+        //console.log('рисуем')
         for(let i of items){
             let canvas_el=i.querySelectorAll('.diagramm')
             for(let c of canvas_el){
@@ -92,7 +100,7 @@ function draw_all_diagrams(){
         }
       }
       else{
-        console.log('пробуем ещё')
+        //console.log('пробуем ещё')
         draw_all_diagrams()
       }
     },500)

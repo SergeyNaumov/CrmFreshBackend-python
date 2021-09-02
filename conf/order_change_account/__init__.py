@@ -15,7 +15,9 @@ class Config(Form):
         self.read_only=1
 
         self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'}
+            {'table':self.work_table,'alias':'wt'},
+            {'t':'manager','a':'m','l':'wt.manager_id=m.id','lj':1},
+            {'t':'apteka','a':'apt','l':'wt.manager_id=apt.manager_id','lj':1}
         ]
         self.events=events
         self.filters_groups=[]

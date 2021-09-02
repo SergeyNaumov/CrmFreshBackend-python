@@ -18,6 +18,7 @@ class Config(Form):
             {'table':self.work_table,'alias':'wt'}
         ]
         self.events=events
+        self.not_order=1
         self.filters_groups=[]
         self.on_filters=[
             # {

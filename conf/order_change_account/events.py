@@ -14,6 +14,8 @@ def events_permissions(form):
         if not len(managers_ids):
           managers_ids=['0']
 
+
+
         form.manager['managers_ids']=[str(x) for x in managers_ids]
         
         if form.script == 'edit_form':
@@ -38,7 +40,7 @@ def before_search(form):
   #form.query_search.
   if form.manager['type']==2:
     form.query_search['WHERE'].append(
-      f"manager_id in ({ ','.join(form.manager['managers_ids']) })"
+      f"wt.manager_id in ({ ','.join(form.manager['managers_ids']) },{form.manager['id']})"
     )
     #form.explain=1
   #form.pre({'manager':form.manager})

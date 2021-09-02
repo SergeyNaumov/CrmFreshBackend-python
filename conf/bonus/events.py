@@ -25,8 +25,8 @@ def events_permissions(form):
 def before_search(form):
 
   qs=form.query_search
-  #form.pre(qs['WHERE'])
-
+  #form.pre(qs)
+  qs['ORDER']=['date_create desc']
 
 
 
