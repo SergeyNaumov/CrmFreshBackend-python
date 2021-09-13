@@ -1,8 +1,11 @@
 def func_set_orig_types(form):
   for f in form.fields:
-    if not 'type' in f:
-      print('Отсутствует type: ',f)
-    T=f['type']
+    if 'type' in f:
+      T=f['type']
+    else:
+      form.errors.append(f"не указан type у поля {f['description']} ({f['name']}) ")
+      f['type']=''
+      continue
     #if f['type'].startswith('filter_'):
     #  continue
     #if f['type'] in ['text','textarea']

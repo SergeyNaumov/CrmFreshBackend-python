@@ -33,7 +33,8 @@ def get_fields():
       'description':'Телефон',
       'type':'text',
       'name':'phone',
-      'filter_on':1
+      'allready_out_on_result':1,
+      #'filter_on':1
     },
     {
       'description':'Представитель аптеки',
@@ -44,6 +45,15 @@ def get_fields():
       'header_field':'name',
       'value_field':'id',
       'where':'type=3'
+    },
+    {
+      'description':'Телефон представителя аптеки',
+      'type':'filter_extend_text',
+      'name':'manager_phone',
+      'tablename':'m',
+      'db_name':'phone',
+      'allready_out_on_result':1,
+      #'filter_on':1
     },
     # {
     #   'description':'Менеджер компании Анна',

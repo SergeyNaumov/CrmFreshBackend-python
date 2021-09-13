@@ -22,6 +22,13 @@ def events_permissions(form):
       }
     )
 
+    # Принудительно выводим в результатах
+#    if form.script=='find_objects':
+
+    #  form.R['query'].append(['summ',''])
+      #form.R
+    #form.pre([form.script, form.R])
+
 def before_search(form):
 
   qs=form.query_search
@@ -29,6 +36,9 @@ def before_search(form):
   qs['ORDER']=['date_create desc']
 
 
+  #form.pre(qs)
+  # имитируем включенный фильтр суммы:
+  #qs['on_filters_hash']['summ']=[]
 
   if form.manager['type']==2:
     #form.explain=1

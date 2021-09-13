@@ -10,24 +10,25 @@ def events_permissions(form):
     return
   
   if form.manager['type']==3:
+    form.manager['apteka_settings']={
+      'set1':1,'set2':1
+    }
     form.manager['apt_list_ids']=get_apt_list_ids(form)
     
     if len(form.manager['apt_list_ids']):
       apteka_id=form.manager['apt_list_ids'][0]
-      form.manager['apteka_settings']=form.db.query(
+      apteka_settings=form.db.query(
         query='select set1,set2 from apteka_settings where apteka_id=%s',
         values=[apteka_id],
         onerow=1
       )
-      
-    else:
-      form.manager['apteka_settings']={
-        'set1':1,'set2':1
-      }
+      if apteka_settings: form.manager['apteka_settings']=apteka_settings
+
+
 
     if form.manager['apteka_settings']['set2']:
-      form.manager['apt_list_ids']=get_all_ids_for_aptcomp(form,apteka_id)
-
+      form.manager['apt_list_ids']=get_apt_list_ids(form)
+      #print('apt_list_ids:',form.manager['apt_list_ids'])
     
 
   if form.manager['type']==1:
@@ -79,7 +80,7 @@ def events_permissions(form):
     
     if ov['apteka_id']:
       ov['apteka']=form.db.query(
-        query="SELECT *,ur_address header from apteka where id = %s",
+        query="SELECT id,inn,ur_lico_id,ur_address header from apteka where id = %s",
         values=[ov['apteka_id']],
         onerow=1
       )
@@ -141,7 +142,9 @@ def before_search(form):
 
   qs=form.query_search
   if form.manager['type']==3:
-    qs['WHERE'].append(f"wt.apteka_id in ({','.join(form.manager['apt_list_ids'])})")
+    
+    #qs['WHERE'].append(f"wt.apteka_id in ({','.join(form.manager['apt_list_ids'])})")
+    qs['WHERE'].append(f"u.manager_id = {form.manager['id']}")
 
 events={
   'permissions':[

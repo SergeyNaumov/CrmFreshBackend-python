@@ -15,6 +15,7 @@ def get_fields():
       'description':'Диаграммы',
       'type':'accordion',
       'name':'charts',
+
       'before_code':charts_before_code,
     }
 
@@ -45,7 +46,8 @@ def charts_before_code(form,field):
       return ''
     data=[
         {
-            'header':'Посмотреть Диаграммы',
+            'header':'Диаграммы',
+            'open':1,
             'content':[
                 {
                     'type':'chart',
@@ -55,6 +57,7 @@ def charts_before_code(form,field):
                     'values':[ov['percent_complete'],ov['left_to_complete_percent']],
                     'width':320,
                     'height':200,
+                    
                 },
                 {
                     'type':'chart',
@@ -64,6 +67,7 @@ def charts_before_code(form,field):
                     'values':[ov['price'],ov['other_distrib_sum']],
                     'width':320,
                     'height':200,
+
                     #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
                 },

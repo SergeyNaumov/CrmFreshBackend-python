@@ -10,11 +10,12 @@ class Config(Form):
         
         form.title='Запросы на подписку от юридических лиц'
         #form.explain=1
-        form.read_only=1
-        form.not_edit=1
+        form.read_only=0
+        form.not_edit=0
         form.not_create=1
         form.make_delete=False
-        form.work_table_id='action_id,ur_lico_id'
+        #form.work_table_id='action_id,ur_lico_id'
+        form.work_table_id='id'
         form.QUERY_SEARCH_TABLES=[
             {'table':form.work_table,'alias':'wt'},
             {'table':'action','alias':'a','link':'a.id=wt.action_id'},

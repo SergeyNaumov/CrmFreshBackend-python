@@ -17,42 +17,36 @@ def get_fields():
       # При выводе фильтров и при поиска превращаем данное текстовое поле в autocomplete
       'before_code':header_before_code
     },
-    # {
-    #   'name':'date_start',
-    #   'description':'Начало подписки',
-    #   'type':'date',
-    #   'tab':'main',
-    #   'filter_on':1,
-    #   'filter_code':date_start_filter_code
-    # },
     {
-        'name':'date_start',
-        'description':'Начало подписки',
+        'name':'date_subscribe',
+        'description':'Даты подписки',
         'type':'yearmon',
         'filter_on':1,
-        'filter_type':'eq',
+        'filter_type':'range',
         'not_process':1,
-        'filter_code':date_start_filter_code
+        'filter_code':date_subscribe_filter_code
     },
-    {
-      'name':'date_stop',
-      'description':'Окончание подписки',
-      'type':'yearmon',
-      'filter_type':'eq',
-      'not_process':1,
-      'tab':'main',
-      'filter_code':date_stop_filter_code, # в результатах поиска это поле превращается в подписку
-      'filter_on':1
-    },
+
     # {
-    #   'name':'good_categories',
-    #   'description':'Группы товаров',
-    #   'type':'accordion',
-    #   'tab':'goods',
-    #   # Запрос для вывода заголовках аккордиона
-    #   'headers_query':'SELECT id,header from action_plan where action_id=<id>',
-      
+    #     'name':'date_start',
+    #     'description':'Начало подписки',
+    #     'type':'yearmon',
+    #     'filter_on':1,
+    #     'filter_type':'eq',
+    #     'not_process':1,
+    #     'filter_code':date_start_filter_code
     # },
+    # {
+    #   'name':'date_stop',
+    #   'description':'Окончание подписки',
+    #   'type':'yearmon',
+    #   'filter_type':'eq',
+    #   'not_process':1,
+    #   'tab':'main',
+    #   'filter_code':date_stop_filter_code, # в результатах поиска это поле превращается в подписку
+    #   'filter_on':1
+    # },
+
     {
       'name':'subscribes',
       'type':'code',
@@ -150,6 +144,8 @@ def distrib_code(form,field):
   
   
 
+def date_subscribe_filter_code(form,field,row):
+  return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"
 
 def date_start_filter_code(form,field,row):
   return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"

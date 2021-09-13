@@ -12,7 +12,8 @@ def events_permissions(form):
 
   elif form.manager['type']==3:
     form.manager['apt_list_ids']=apt_list_id_for_apt(form,form.manager['id'])
-    
+    form.remove_field('apteka_id')
+    form.remove_field('ur_lico_id')
 
   for f in form.fields:
     f['read_only']=1
@@ -50,9 +51,10 @@ def before_search(form):
 #  form.pre(form.query_search)
   sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
   sf.append('ap.header ap__header')
-  if form.manager['type'] in (2,3):
+  if form.manager['type']==2: # in (2,3):
     form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
-    
+  elif form.manager['type']==3:
+    form.query_search['WHERE'].append(f'''a.manager_id = {form.manager['id']}''')
   query_count='''
     select
       count(*) cnt

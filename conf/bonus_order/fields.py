@@ -37,6 +37,13 @@ def get_fields():
       'header_field':'header',
       'value_field':'id',
 
+    },
+    {
+      'description':'Дата и время добавления',
+      'name':'registered',
+      'type':'datetime',
+      'defaul_off':1,
+      'filter_on':1
     }
 
 ]

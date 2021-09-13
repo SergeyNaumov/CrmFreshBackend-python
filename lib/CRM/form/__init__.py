@@ -12,6 +12,7 @@ from .run_event import run_event as func_run_event
 from .upload_file import upload_file as func_upload_file
 from .delete_file import delete_file as func_delete_file
 from .template import template as func_template
+import copy
 
 
 class Form():
@@ -199,7 +200,8 @@ class Form():
 
   def DeleteFile(form): return func_delete_file(form)
 
-  def pre(form,data): form.log.append(data)
+  def pre(form,data):
+    form.log.append(copy.deepcopy(data))
 
   # для отладки
   def field_names(form):

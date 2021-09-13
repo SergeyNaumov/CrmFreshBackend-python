@@ -14,11 +14,13 @@ class Config(Form):
         form.not_edit=1
         form.not_create=1
         form.make_delete=False
-        form.work_table_id='action_id,apteka_id'
+        #form.work_table_id='action_id,apteka_id'
+        form.work_table_id='id'
         form.QUERY_SEARCH_TABLES=[
-            {'table':form.work_table,'alias':'wt'},
-            {'table':'action','alias':'a','link':'a.id=wt.action_id'},
-            {'table':'apteka','alias':'apt','link':'apt.id=wt.apteka_id'},
+            {'t':form.work_table,'a':'wt'},
+            {'t':'action','a':'a','l':'a.id=wt.action_id'},
+            {'t':'apteka','a':'apt','l':'apt.id=wt.apteka_id'},
+            {'t':'ur_lico','a':'ul','l':'apt.ur_lico_id=ul.id'}
         ]
 
         form.events=events

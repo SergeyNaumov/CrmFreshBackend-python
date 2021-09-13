@@ -12,8 +12,10 @@ def before_search(form):
     where=' WHERE '+where
 
 
+  #form.pre(form.R)
+  if not ('id' in qs['on_filters_hash']):
+    form.errors.append('Фильтр "Название" обязателен')
 
-  #form.pre(query_apt_count)
   qs['WHERE'].append('wt.date_stop>=curdate()')
   if form.manager['type']==2:
 
@@ -59,15 +61,27 @@ def before_search(form):
             # только неподписанные
             qs['WHERE'].append(f'''aa.apteka_id is null''')
 
-  if 'date_start' in on_filters_hash and on_filters_hash['date_start']:
-    qs['WHERE'].append(
-      f'''wt.date_start>="{on_filters_hash['date_start']}-01"'''
-    )
+  
+  if 'date_subscribe' in on_filters_hash:
+    date_subscribe=on_filters_hash['date_subscribe']
+    #form.pre(date_subscribe)
+    if date_subscribe[0]:
+      qs['WHERE'].append(
+       f'''wt.date_start>="{date_subscribe[0]}-01"'''
+     )
+    if date_subscribe[1]:
+      qs['WHERE'].append(
+       f'''wt.date_stop<="{date_subscribe[1]}-01"'''
+     )
+  # if 'date_start' in on_filters_hash and on_filters_hash['date_start']:
+  #   qs['WHERE'].append(
+  #     f'''wt.date_start>="{on_filters_hash['date_start']}-01"'''
+  #   )
 
-  if 'date_stop' in on_filters_hash and on_filters_hash['date_stop']:
-    qs['WHERE'].append(
-      f'''wt.date_stop<="{on_filters_hash['date_stop']}-31"'''
-    )
+  # if 'date_stop' in on_filters_hash and on_filters_hash['date_stop']:
+  #   qs['WHERE'].append(
+  #     f'''wt.date_stop<="{on_filters_hash['date_stop']}-31"'''
+  #   )
   
   #form.pre(form.query_search)
 

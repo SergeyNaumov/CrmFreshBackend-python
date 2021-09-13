@@ -57,7 +57,7 @@ def process_result_list(form,R,result_list):
       #print(name,'=>',value)
       if not exists_arg('type_orig',type):
         field['type_orig']=field['type']
-
+      
       if field['type_orig'] in ['filter_extend_select_values', 'select_values']:
           values_finded=0
           for v in field['values']:
@@ -95,6 +95,7 @@ def process_result_list(form,R,result_list):
           value=('нет','да')[value]
 
         elif field['type_orig'] in ['select_from_table','filter_extend_select_from_table']:
+          
           if exists_arg('make_change_in_search',field):
             type='select'
             value=r[tbk+'__'+field['value_field']]

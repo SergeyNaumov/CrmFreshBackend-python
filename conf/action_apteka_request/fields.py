@@ -35,6 +35,29 @@ def get_fields():
       'tablename':'apt',
       'filter_on':1
     },
+    {
+      'description':'Юр. лицо',
+      'type':'filter_extend_select_from_table',
+      'name':'ur_lico_id',
+      'db_name':'id',
+      'table':'ur_lico',
+      'tablename':'ul',
+      'header_field':'header',
+      'value_field':'id',
+      'db_name':'header',
+      #'filter_code':ur_lico_id_filter_code
+
+    },
+    {
+      'description':'Статус',
+      'type':'select_values',
+      'name':'status',
+      'filter_on':1,
+      'values':[
+        {'v':'1','d':'В работе'},
+        {'v':'2','d':'В закрыто'},
+      ]
+    }
 ]
 
 def apteka_before_code(form,field):
@@ -46,3 +69,6 @@ def action_filter_code(form,field,row):
 
 def apteka_filter_code(form,field,row):
   return f"<a href='/edit-form/apteka/{row['apt__id']}' target='blank'>{row['apt__ur_address']}</a>"
+
+def ur_lico_id_filter_code(form,field,row):
+  return row['ul__header']

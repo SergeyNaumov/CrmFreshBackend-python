@@ -26,6 +26,9 @@ async def get_result(R: dict):
   else:
     page=1
 
+
+    #form.pre(f)
+
   if exists_arg('params',R):
     params=R['params']
   
@@ -43,10 +46,20 @@ async def get_result(R: dict):
     'card_format':form.card_format,
     'selects':{}
   }
+  
+  for f in form.fields:
+   if exists_arg('allready_out_on_result',f):
+     form.R['query'].append([f['name'],""])
+     form.query_search['on_filters_hash'][f['name']]=""
 
   for values in R['query']:
     form.query_search['on_filters_hash'][values[0]]=values[1]
 
+  
+  # 
+
+
+  
   # если требуется подменить фильтры
   form.run_event('before_search_tables')
 

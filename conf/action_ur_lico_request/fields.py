@@ -20,6 +20,7 @@ def get_fields():
       'value_field':'id',
       'tablename':'a',
       'autocomple':1,
+      'read_only':1,
       'filter_code':action_filter_code,
       'filter_on':1
     }, 
@@ -32,8 +33,19 @@ def get_fields():
       'value_field':'id',
       'filter_code':ur_lico_filter_code,
       'tablename':'ul',
+      'read_only':1,
       'filter_on':1
     },
+    {
+      'description':'Статус',
+      'type':'select_values',
+      'name':'status',
+      'filter_on':1,
+      'values':[
+        {'v':'1','d':'В работе'},
+        {'v':'2','d':'В закрыто'},
+      ]
+    }
 ]
 
 

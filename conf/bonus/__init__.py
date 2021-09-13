@@ -15,7 +15,8 @@ class Config(Form):
         self.not_create=1
         self.not_edit=1
         self.QUERY_SEARCH_TABLES=[
-            {'table':self.work_table,'alias':'wt'}
+            {'t':self.work_table,'a':'wt'},
+            {'t':'bonus_order','a':'bo','l':'wt.id=bo.bonus_id'}
         ]
         self.events=events
         self.not_order=1

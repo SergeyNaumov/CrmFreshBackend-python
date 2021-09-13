@@ -7,6 +7,16 @@ def get_fields():
       'read_only':1,
       'filter_on':1
     },
+    {
+      'description':'Статус заявки',
+      'name':'status',
+      'type':'select_values',
+      'values':[
+        {'v':1,'d':'В работе'},
+        {'v':2,'d':'Закрыта'},
+      ]
+
+    },
 
     # {
     #   'name':'firm',

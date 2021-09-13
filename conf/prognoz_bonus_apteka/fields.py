@@ -15,6 +15,7 @@ def get_fields():
       'description':'Диаграммы',
       'type':'accordion',
       'name':'charts',
+      'open':1,
       'before_code':charts_before_code,
     }
 
@@ -26,8 +27,8 @@ def prognoz_bonus(form,field):
   if form.ov['action_plan']['plan']==2:
     total_left_to_complete_label='Осталось выполнить в штуках'
 
-  #form.pre(form.ov['managers'])
   ov=form.ov
+  
   field['after_html']=form.template(
     f'./conf/{form.work_table}/templates/prognoz_bonus.html',
     ov=ov,
@@ -45,6 +46,7 @@ def charts_before_code(form,field):
     data=[
         {
             'header':'Посмотреть Диаграммы',
+            'open':1,
             'content':[
                 {
                     'type':'chart',

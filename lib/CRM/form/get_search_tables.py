@@ -61,7 +61,7 @@ def get_search_tables(form,query):
       
       if not exists_arg('not_add_in_select_fields', t):
         desc = form.db.query(
-          query = 'desc '+t['table'],
+          query = f"desc {t['table']}",
           errors=form.log
         )
         if desc:

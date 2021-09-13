@@ -53,10 +53,22 @@ def get_fields():
       'filter_on':1
     },
     {
+      'description':'Фамилия',
+      'type':'text',
+      'name':'name_f',
+      'filter_on':1
+    },
+    {
       'description':'Имя',
       'type':'text',
-      'name':'name',
+      'name':'name_i',
       'filter_on':1
-    }
+    },
+    {
+      'description':'Отчество',
+      'type':'text',
+      'name':'name_o',
+      'filter_on':1
+    },
 
 ]

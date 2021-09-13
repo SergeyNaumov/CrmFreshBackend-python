@@ -17,6 +17,8 @@ def get_func(value):
 
   if value and isinstance(value,str):
     rez=re.search('func:\((.+)\)',value)
+    if not rez:
+      rez=re.search('func:(.+)',value)
     if rez: return rez[1]
   return ''
 

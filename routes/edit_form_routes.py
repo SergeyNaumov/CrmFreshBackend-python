@@ -39,7 +39,7 @@ async def update_form(config: str,id: int,R: dict):
 async def work_form(config:str,id:int,R:dict):
   action=''
   values=None
-  
+
   if 'action' in R:
     action=R['action']
   else:

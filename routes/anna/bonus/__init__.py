@@ -9,7 +9,7 @@ from lib.send_mes import send_mes
 router = APIRouter()
 @router.post('/order/{bonus_id}')
 async def x(bonus_id: int, R:dict): # attach: UploadFile = File(...)
-#    print('R:',R)
+    print('R:',R)
     form_errors={}
     errors=[]
 

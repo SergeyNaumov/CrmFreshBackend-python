@@ -3,8 +3,7 @@
 def get_apt_list(form,manager_id):
     manager=form.db.get(table='manager',where='id=%s',values=[manager_id],onerow=1)
     if manager['type']==3:
-        return [
-            form.db.query(
+        r=form.db.query(
                 query='''
                     SELECT
                         wt.*, 0 more, concat(m.name_f,' ',m.name_i,' ',m.name_o)  ma_fio, m.email ma_email,
@@ -19,8 +18,10 @@ def get_apt_list(form,manager_id):
                 values=[manager_id],
                 onerow=1,
                 errors=form.errors
-            )
-        ]
+        )
+        if(r): return [r]
+        return []
+        
     else:
         return form.db.query(
             query="""
@@ -47,12 +48,12 @@ def get_apt_list_ids(form,manager_id=0):
     
 
     lst=get_apt_list(form,manager_id)
-
     for a in lst:
+        
         res_lst.append(str(a['id']))
     
-    if not len(res_lst):
-        res_lst=['0']
+
+    
 
     return res_lst
 
@@ -69,7 +70,8 @@ def get_apt_managers_ids(form,manager_id):
         #debug=1,
         massive=1
     )
-    #return [str(x) for x in rez]
+    if len(rez)==0:
+        rez.append('0')
     return rez
 
 def apt_list_id_for_apt(form,manager_id):
