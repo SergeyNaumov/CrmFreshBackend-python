@@ -2,6 +2,9 @@
 config={
   'title':'CRM АннА',
   'copyright':'copyright 2005 - {{cur_year}}',
+   'bottom_menu': [
+      {'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}
+   ],
   'encrypt_method':'mysql_sha2',
   'use_project':False,
   'system_email':'svcomplex@gmail.com',
@@ -20,7 +23,7 @@ config={
     },
   },
   'controllers':{
-    #'left_menu':'/left-menu'
+
     'left_menu':'/anna/left-menu'
   },
   'docpack':{
@@ -52,12 +55,12 @@ config={
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)
     #'manager_id': 141, # dir1@digitalstrateg.ru Кнейжиц Игорь Владимирович, Представитель юридического лица
     #'manager_id': 211, # pavlik-libra5@mail.ru, Представитель юридического лица
-    'manager_id':228, # (в подчинении 3 аптеки) realko2-z@mail.ru, Представитель юридического лица
+    #'manager_id':228, # (в подчинении 3 аптеки) realko2-z@mail.ru, Представитель юридического лица
     #'manager_id':144, # Представитель артеки: apt2@digitalstrateg.ru
     #'manager_id':248, # представитель аптеки (с подпиской на акции mandarin149@yandex.ru)
     #'manager_id':246, # tifilatova@bk.ru
     #'manager_id':183, # dimy@comch.ru (представитель химфарм)
-    #'manager_id':259, # представитель аптеки himfarm5@kvmail.ru 
+    'manager_id':259, # представитель аптеки himfarm5@kvmail.ru 
     
   }
 
