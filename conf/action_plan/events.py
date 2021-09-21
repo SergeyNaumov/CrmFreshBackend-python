@@ -22,6 +22,10 @@ def permissions(form):
   if form.manager['type']==3:
     form.manager['apt_list_ids']=get_apt_list_ids(form)
 
+    form.manager['apteka_settings']={
+     'set1':0,'set2':0
+    }
+    
     if len(form.manager['apt_list_ids']):
       apteka_id=form.manager['apt_list_ids'][0]
       form.manager['apteka_settings']=form.db.query(
@@ -30,10 +34,8 @@ def permissions(form):
         onerow=1
       )
       
-    else:
-      form.manager['apteka_settings']={
-        'set1':1,'set2':1
-      }
+    
+
     # form.manager['apteka_settings']={
     #   'set1':1,'set2':1
     # }

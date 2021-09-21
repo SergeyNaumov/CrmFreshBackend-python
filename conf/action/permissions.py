@@ -6,7 +6,23 @@ def events_permissions(form):
   filter_ur_lico(form)
   #print('action:',form.action)
   #form.pre(form.script)
-  
+  if form.manager['type']==3:
+    apteka_id=form.db.query(
+      query=f"select id from apteka where manager_id={form.manager['id']}",onevalue=1
+    )
+    
+    apteka_settings={
+      'id':apteka_id,
+      'set1':0,'set2':0
+    }
+    if apteka_id:
+      apteka_settings=form.db.query(
+       query=f'select apteka_id id, set1,set2 from apteka_settings where apteka_id=%s',
+       values=[apteka_id],
+       onerow=1
+      )
+    form.manager['apteka_settings']=apteka_settings
+
   # Фильтр для юрлиц
   if form.script in ['admin_table'] and form.manager['type'] in (2,3):
     #form.QUERY_SEARCH_TABLES.append(

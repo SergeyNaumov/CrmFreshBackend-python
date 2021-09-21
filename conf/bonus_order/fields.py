@@ -44,6 +44,16 @@ def get_fields():
       'type':'datetime',
       'defaul_off':1,
       'filter_on':1
+    },
+    {
+      'description':'Статус',
+      'name':'status',
+      'type':'select_values',
+      'filter_on':1,
+      'values':[
+        {'v':1,'d':'в работе'},
+        {'v':2,'d':'обработан'},
+      ]
     }
 
 ]

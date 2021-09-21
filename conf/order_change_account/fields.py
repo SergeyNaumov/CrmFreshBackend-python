@@ -67,10 +67,10 @@ def get_fields():
 def filter_code_type(form,field,row):
 
   if row['m__type']==2:
-    return f'''представитель юрлица'''
+    return f'''представитель юрлица: <u>{row['ul__header']}</u>'''
   
   if row['m__type']==3:
-    return f'''представитель аптеки: {row['apt__ur_address']}'''
+    return f'''представитель аптеки: <u>{row['apt__ur_address']}</u>'''
 
   
   return 'менеджер АннА'

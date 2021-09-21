@@ -1,8 +1,11 @@
 from lib.anna.get_ul_list import get_ul_list_ids
 
 def events_permissions(form):
-  for f in form.fields:
-    f['read_only']=1
+  if form.manager['type']!=1:
+    form.not_edit=1
+    form.read_only=1
+    for f in form.fields:
+      f['read_only']=1
 
 def before_search_tables(form):
   qs=form.query_search

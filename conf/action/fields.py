@@ -144,13 +144,13 @@ def distrib_code(form,field):
   
   
 
+#def date_subscribe_filter_code(form,field,row):
+#  return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"
+
+#def date_start_filter_code(form,field,row):
+#  return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"
+
 def date_subscribe_filter_code(form,field,row):
-  return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"
-
-def date_start_filter_code(form,field,row):
-  return f"{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop']) }"
-
-def date_stop_filter_code(form,field,row):
   
 
 
@@ -210,7 +210,9 @@ def date_stop_filter_code(form,field,row):
     
     if (row['apteka_id_list']):
       apteka_subscribe=len(row['apteka_id_list'].split('|'))
-    return f'<div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{ur_lico_subscribe}|{apteka_subscribe}</div>'
+    return f'''
+      {date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop'])}
+      <div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{ur_lico_subscribe}|{apteka_subscribe}</div>'''
 
 
   elif str(form.manager['type'])=='3': # Аптека
@@ -229,7 +231,8 @@ def date_stop_filter_code(form,field,row):
       apteka_subscribe.append({'id':a['id'],'v':str(v),'name':a['name']})
     apteka_subscribe=s.to_json(apteka_subscribe)
 
-    return f'<div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{apteka_subscribe}</div>'
+    return f'''{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop'])}
+      <div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{apteka_subscribe}</div>'''
 
     #form.pre(apteka_subscribe)
 

@@ -74,7 +74,7 @@ def get_fields():
 
     {
       'name':'name',
-      'description':'Полное имя',
+      'description':'ФИО',
       'type':'text',
       'tab':'main',
       'value':'Тестовый пользователь',
@@ -83,30 +83,30 @@ def get_fields():
       ],
       'filter_on':1
     },
-    {
-      'name':'name_f',
-      'description':'Фамилия',
-      'type':'text',
-      'tab':'main',
-      'filter_on':1,
-      'frontend':{'ajax':{'name':'name','timeout':300}}
-    },
-    {
-      'name':'name_i',
-      'description':'Имя',
-      'type':'text',
-      'tab':'main',
-      'filter_on':1,
-      'frontend':{'ajax':{'name':'name'}}
-    },
-    {
-      'name':'name_o',
-      'description':'Отчество',
-      'type':'text',
-      'tab':'main',
-      'filter_on':1,
-      'frontend':{'ajax':{'name':'name'}}
-    },
+    # {
+    #   'name':'name_f',
+    #   'description':'Фамилия',
+    #   'type':'text',
+    #   'tab':'main',
+    #   'filter_on':1,
+    #   'frontend':{'ajax':{'name':'name','timeout':300}}
+    # },
+    # {
+    #   'name':'name_i',
+    #   'description':'Имя',
+    #   'type':'text',
+    #   'tab':'main',
+    #   'filter_on':1,
+    #   'frontend':{'ajax':{'name':'name'}}
+    # },
+    # {
+    #   'name':'name_o',
+    #   'description':'Отчество',
+    #   'type':'text',
+    #   'tab':'main',
+    #   'filter_on':1,
+    #   'frontend':{'ajax':{'name':'name'}}
+    # },
     {
       'description':'Зарегистрирован',
       'type':'datetime',

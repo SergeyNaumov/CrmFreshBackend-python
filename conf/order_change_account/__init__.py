@@ -12,13 +12,16 @@ class Config(Form):
         self.explain=0
         self.make_delete=0
         self.not_create=1
-        self.read_only=1
+        self.read_only=0
 
         self.QUERY_SEARCH_TABLES=[
             {'table':self.work_table,'alias':'wt'},
             {'t':'manager','a':'m','l':'wt.manager_id=m.id','lj':1},
-            {'t':'apteka','a':'apt','l':'wt.manager_id=apt.manager_id','lj':1}
+            {'t':'apteka','a':'apt','l':'wt.manager_id=apt.manager_id','lj':1},
+            {'t':'ur_lico_manager','a':'ulm','l':'ulm.manager_id=m.id','lj':1},
+            {'t':'ur_lico','a':'ul','l':'ulm.ur_lico_id=ul.id','lj':1},
         ]
+        self.GROUP='wt.id'
         self.events=events
         self.filters_groups=[]
         self.on_filters=[

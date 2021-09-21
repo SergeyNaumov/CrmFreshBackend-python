@@ -10,6 +10,10 @@ def events_permissions(form):
     return
   
   if form.manager['type']==3:
+    
+    if form.script=='admin_table': # для аптеки скрываем фильтр "аптека", чтобы не маячил, но включаем его искусственно в before_search
+      form.remove_field('apteka_id')
+
     form.manager['apteka_settings']={
       'set1':1,'set2':1
     }
@@ -142,6 +146,11 @@ def before_search(form):
 
   qs=form.query_search
   if form.manager['type']==3:
+
+    #qs['on_filters_hash']['apteka_id']=[]
+    #form.R['query'].append(["action_id",[]])
+    #form.pre(qs)
+
     
     #qs['WHERE'].append(f"wt.apteka_id in ({','.join(form.manager['apt_list_ids'])})")
     qs['WHERE'].append(f"u.manager_id = {form.manager['id']}")

@@ -13,10 +13,16 @@ def good_categories(form,field):
   cur_period=get_cur_period(form)
   prev_period=get_cur_period(form,1)
 
-  #period_id=form.db.query(
-  #  query='SELECT id from prognoz_bonus_period where '
-  #)
+  
+  set1=True # True -- показываем график выболнения плана (apteka_settings.set1)
+  set2=True
 
+  if form.manager['type']==3:
+    set1=form.manager['apteka_settings']['set1']
+    set2=form.manager['apteka_settings']['set2']
+
+
+  #form.pre(form.manager)
   #form.pre([cur_period,prev_period])
   if form.id and form.ov:
 
@@ -136,10 +142,8 @@ def good_categories(form,field):
       pb_links=[]
       header_links=[]
 
-      if exists_prognoz_bonus(form,p['id'],cur_period):
-        #pb_links.append(
-        #    f'''<a href="/edit_form/action_plan/{p['id']}" target="blank" style="color: red;">Посмотреть прогнозный бонус</a></b>'''
-        #)
+      if set1 and exists_prognoz_bonus(form,p['id'],cur_period):
+        # !!!!!
         header_links.append({
           'url':f"/edit_form/action_plan/{p['id']}",
           'header':'прогнозный бонус (текуший)',
@@ -147,7 +151,7 @@ def good_categories(form,field):
         })
       #form.pre(form.manager)
 
-      if (cur_period['querter_begin_days']<=14 or form.manager['show_old_plans']) and exists_prognoz_bonus(form,p['id'],prev_period):
+      if set1 and (cur_period['querter_begin_days']<=14 or form.manager['show_old_plans']) and exists_prognoz_bonus(form,p['id'],prev_period):
         
         header_links.append({
           'url':f"/edit_form/action_plan/{p['id']}?prev=1",

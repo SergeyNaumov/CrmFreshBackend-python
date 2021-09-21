@@ -19,7 +19,7 @@ class Config(Form):
             {'t':'bonus_order','a':'bo','l':'wt.id=bo.bonus_id'}
         ]
         self.events=events
-        self.not_order=1
+        self.not_order=0
         self.filters_groups=[]
         self.on_filters=[
             # {

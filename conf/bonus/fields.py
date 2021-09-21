@@ -60,12 +60,12 @@ def get_fields():
       'filter_on':1,
       'filter_code':paid_date_filter_code
     },
-    {
-      'name':'id',
-      'description':'Поставщики',
-      'type':'filter_extend_checkbox',
-      
-    }
+    #{
+    #  'name':'id',
+    #  'description':'Поставщики',
+    #  'type':'filter_extend_checkbox',
+    #  
+    #}
 
 ]
 def accept_filter_code(form,field,row):

@@ -47,6 +47,8 @@ def get_filters():
 
 def apteka_id_before_code(form,field):
   if form.manager['type']==3:
+    field['allready_out_on_result']=1
+    field['filter_on']=0
     field['where']=f'id in ({",".join(form.manager["apt_list_ids"])})'
     field['autocomplete']=0
     #form.pre(field)

@@ -24,10 +24,13 @@ def get_fields():
 def prognoz_bonus(form,field):
   #if form.manager['type']!=1: return
   total_left_to_complete_label='Осталось выполнить в рублях'
+  
   if form.ov['action_plan']['plan']==2:
     total_left_to_complete_label='Осталось выполнить в штуках'
 
+
   ov=form.ov
+
   field['after_html']=form.template(
     f'./conf/{form.work_table}/templates/prognoz_bonus.html',
     ov=ov,

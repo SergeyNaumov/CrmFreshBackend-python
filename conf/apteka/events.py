@@ -2,7 +2,9 @@ from lib.anna.get_apt_list import get_apt_list_ids
 from lib.anna.get_ul_list import get_ul_list_ids
 def events_permissions(form):
   
-
+  if form.script=='admin_table':
+   form.remove_field('phone');
+   form.remove_field('manager_phone');
   # Для менеджера Анна делаем возможность фильтровать по юридическому лицу
   if form.manager['type']==1:
     form.fields.append(

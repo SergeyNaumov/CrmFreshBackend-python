@@ -33,9 +33,10 @@ def before_search(form):
 
   qs=form.query_search
   #form.pre(qs)
-  qs['ORDER']=['date_create desc']
-
-
+  
+  #form.pre()
+  if not len(qs['ORDER']):
+    qs['ORDER']=['date_create desc']
   #form.pre(qs)
   # имитируем включенный фильтр суммы:
   #qs['on_filters_hash']['summ']=[]

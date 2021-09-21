@@ -12,7 +12,13 @@ def pr_bonus(form,field):
     if form.ov['plan']==2:
         total_left_to_complete_label='осталось выполнить в шт'
     label_plan='план для юридического лица'
-
+    set1=1
+    set2=1
+    if form.manager['type']==3:
+        set1=form.manager['apteka_settings']['set1']
+        set2=form.manager['apteka_settings']['set2']
+        
+      
     if form.id and form.manager['type'] in [1,2]:
 
         field['before_html']='<h2 style="margin-top: 20px; margin-bottom: 10px;">Прогнозный бонус по юридическим лицам</h2>'
@@ -116,7 +122,9 @@ def pr_bonus(form,field):
                         label_plan=label_plan,
                         total_left_to_complete_label=total_left_to_complete_label,
                         #total_good_price=total_good_price,
-                        b=b
+                        b=b,
+                        set1=set1,
+                        set2=set2
                     )
         #            if form.manager['type'] !=3:
         #                body_text=f'Кол-во аптек: {b["cnt_apt"]}<br>'
@@ -332,28 +340,29 @@ def pr_bonus(form,field):
             
             header_total='* Сводные данные по всем юридическим лицам'
             if form.manager['type']==3:
-                header_total='* Сводные данные по всем аптекам'
+                header_total='* Сводные данные по всем аптекам!!'
             
-            accordion_data.insert(0,
-                {
-                    'header':header_total,
-                    'content':[
+            if form.manager['type']!=3: # для аптек просили убрать прогнозный бонус по всем аптекам
+                accordion_data.insert(0,
+                    {
+                        'header':header_total,
+                        'content':[
 
-                        {
-                        'type':'html',
-                        'body':f'''
-                            <div style="margin-top: 20px; margin-bottom: 20px; border: 1px solid gray; padding: 20px; border-radius: 4px;">
-                                <h2>Сводные данные по всем юрлицам</h2>
-                                <br>
-                                {body_text}
-                            </div>
-                        ''',
-                    },
+                            {
+                            'type':'html',
+                            'body':f'''
+                                <div style="margin-top: 20px; margin-bottom: 20px; border: 1px solid gray; padding: 20px; border-radius: 4px;">
+                                    <h2>Сводные данные по всем юрлицам</h2>
+                                    <br>
+                                    {body_text}
+                                </div>
+                            ''',
+                        },
 
 
-                ]
+                    ]
 
-            })
+                })
 
             if form.ov['plan']!=3:
                 accordion_data[0]['content'].append(

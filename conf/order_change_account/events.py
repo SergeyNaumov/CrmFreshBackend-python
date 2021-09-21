@@ -6,7 +6,7 @@ def events_permissions(form):
     if form.manager['type'] == 1: # менеджер АннА
       pass
     elif form.manager['type']==2: # представитель юр.лица
-      #form.pre(form.script)
+        form.read_only=1
         
         
         # получаем id-шники менеджеров, которые привязаны к аптекам данного юрлица:
