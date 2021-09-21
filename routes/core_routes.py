@@ -149,7 +149,10 @@ async def startpage():
   CY=cur_year()
 
   del manager['password']
-  return {
+
+
+
+  response={
     'title':config['title'],
     'copyright':config['copyright'].replace('{{cur_year}}',CY),
     'left_menu_controller':s.config['controllers']['left_menu'],
@@ -157,6 +160,11 @@ async def startpage():
     'success': not len(errors),
     'manager':manager
   }
+  
+  if 'bottom_menu' in config:
+    response['bottom_menu']=config['bottom_menu']
+  
+  return response
 
 # get-events
 @router.get('/get-events')
