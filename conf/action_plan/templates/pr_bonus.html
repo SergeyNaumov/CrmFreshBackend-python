@@ -2,9 +2,10 @@
 {%if manager.type != 3%}
     кол-во аптек: {{b.cnt_apt}}<br>
 {%endif%}
-
-{%if ov.plan !=3 %}
-    {{label_plan}}: {{b.plan}}<br>
+{%if set1%}
+    {%if ov.plan !=3 %}
+        {{label_plan}}: {{b.plan}}<br>
+    {%endif%}
 {%endif%}
 
 {%if ov.plan==1 or ov.plan==3%}
