@@ -57,7 +57,7 @@ def before_search(form):
     form.query_search['WHERE'].append(f'''a.manager_id = {form.manager['id']}''')
   query_count='''
     select
-      count(*) cnt
+      wt.id
     from
       purchase_good wt
       LEFT JOIN purchase p ON p.id=wt.purchase_id
@@ -69,8 +69,10 @@ def before_search(form):
 
   if len(qs['WHERE']):
     query_count+=' WHERE '+' AND '.join(qs['WHERE'])
+  query_count+='GROUP BY wt.id'
+  query_count=f'''select count(*) cnt from ({query_count}) x'''
   qs['query_count']=query_count
-
+  #form.pre(query_count)
   #form.out_before_search=''
   #form.out_before_search.append('<h2>Данные по закупкам отображаются по всем поставщикам</h2>')
   #form.explain=1

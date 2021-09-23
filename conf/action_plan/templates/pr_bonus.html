@@ -36,7 +36,7 @@
 {%endif%}
 
 {%if b.percent_complete<100 and ov.plan!=3%}
-    текущий бонус: {{b.current_bonus}}<br>
+    текущий бонус: {{b.current_bonus}} <small>(бонус выплачивается при выполнении плана)</small><br>
 {%endif%}
 
 {%if ov.plan!=3%}

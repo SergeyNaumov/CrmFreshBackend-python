@@ -20,6 +20,7 @@ class Config(Form):
             {'t':'apteka','a':'apt','l':'wt.manager_id=apt.manager_id','lj':1},
             {'t':'ur_lico_manager','a':'ulm','l':'ulm.manager_id=m.id','lj':1},
             {'t':'ur_lico','a':'ul','l':'ulm.ur_lico_id=ul.id','lj':1},
+            {'t':'ur_lico','a':'ul2','l':'apt.ur_lico_id=ul2.id','lj':1},
         ]
         self.GROUP='wt.id'
         self.events=events

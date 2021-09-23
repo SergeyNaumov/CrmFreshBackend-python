@@ -54,6 +54,14 @@ def get_fields():
         {'v':1,'d':'в работе'},
         {'v':2,'d':'обработан'},
       ]
+    },
+    {
+      'description':'Номер акта',
+      'type':'filter_extend_text',
+      'filter_type':'range',
+      'name':'number',
+      'tablename':'b',
+      'filter_on':1,
     }
 
 ]

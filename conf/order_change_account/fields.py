@@ -70,7 +70,7 @@ def filter_code_type(form,field,row):
     return f'''представитель юрлица: <u>{row['ul__header']}</u>'''
   
   if row['m__type']==3:
-    return f'''представитель аптеки: <u>{row['apt__ur_address']}</u>'''
+    return f'''представитель аптеки: <u>{row['apt__ur_address']}</u><br><small>({row['ul2__header']})</small>'''
 
   
   return 'менеджер АннА'

@@ -25,10 +25,12 @@
         {%endif%}
     </div>
     {%endif%}
+    <!-- Для аптек не отображаем
     Кол-во аптек: {{ov.cnt_apt}}<br>
     {%if action_plan.plan!=3%}
         План для юридического лица: {{ov.plan}}<br>
     {%endif%}
+    -->
     Кол-во закупки: {{ov.buy_cnt}}<br>
     {%if ov.plan==1 or ov.plan==3%}
         Сумма закупки в sip-ценах:
