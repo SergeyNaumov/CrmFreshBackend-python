@@ -21,6 +21,7 @@ class Config(Form):
         form.GROUP_BY='wt.id'
         form.read_only=1
         form.events=events
+        form.not_create=1
         #form.explain=1
         form.cols=[
             [ # Колонка1
