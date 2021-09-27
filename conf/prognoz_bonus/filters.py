@@ -18,6 +18,13 @@ def get_filters():
       'before_code':ur_lico_id_before_code
     },
     {
+      'description':'Выводить сводные данные',
+      'type':'checkbox',
+      'name':'out_action',
+      'filter_on':1,
+      'not_process':1
+    },
+    {
       'description':'Период',
       'name':'period_id',
       'tablename':'pbp',
@@ -50,9 +57,15 @@ def ur_lico_id_before_code(form,field):
     field['autocomplete']=0
 
 def ur_lico_id_filter_code(form,field,row):
+  
+
+  links=[f'''<a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a>''']
+  
+  if (1 in form.query_search['on_filters_hash']['out_action']):
+    links.append(f'''<a href="/edit-form/action/{row['a__id']}" target="_blank">сводные данные</a>''')
+
   return f'''
-    {row['u__header']}<br>
-    <small><a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a></small>'''
+    {row['u__header']}<br> <small>{ ' | '.join(links) }</small>'''
 
 def action_id_filter_code(form,field,row):
   return f'{row["a__header"]} ({row["a__date_start"]}..{row["a__date_stop"]})'

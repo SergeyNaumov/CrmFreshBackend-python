@@ -1,11 +1,11 @@
-
+from lib.engine import s
+from lib.core import exists_arg, date_to_rus
 from .get_old_values import get_old_values
 
 def events_permissions(form):
   #form.pre('zzz')
   filter_ur_lico(form)
-  #print('action:',form.action)
-  #form.pre(form.script)
+  
   if form.manager['type']==3:
     apteka_id=form.db.query(
       query=f"select id from apteka where manager_id={form.manager['id']}",onevalue=1
@@ -23,12 +23,26 @@ def events_permissions(form):
       )
     form.manager['apteka_settings']=apteka_settings
 
+
+
   # Фильтр для юрлиц
-  if form.script in ['admin_table'] and form.manager['type'] in (2,3):
+  if form.script in ['admin_table', 'find_objects'] and form.manager['type'] in (2,3):
     #form.QUERY_SEARCH_TABLES.append(
     #  {'t':'action_ur_lico','a':'aul','l':'wt.id=aul.action_id','lj':1}
     #)
     #form.explain=1
+    form.fields.append(
+      {
+          'name':'date_subscribe',
+          'description':'Даты подписки',
+          'type':'yearmon',
+          'filter_on':1,
+          'filter_type':'range',
+          'not_process':1,
+          'filter_code':date_subscribe_filter_code
+      }
+    )
+    
     form.fields.append(
         {
           'description':'Подписанные мероприятия',#'только те маркетинговые мероприятия, на которые я подписан',
@@ -246,3 +260,96 @@ def filter_ur_lico(form):
 def filter_code_subscribe(form,field,row):
   pass
   #form.pre(row)
+
+
+def date_subscribe_filter_code(form,field,row):
+  
+
+
+
+  if str(form.manager['type'])=='2': # Юридическое лицо
+    #form.pre(row)
+    # получаем списки подписанных и отправивших запрос на акцию юрлиц
+    if not exists_arg('subscribed_ur_lico_id',row): row['subscribed_ur_lico_id']=''
+    if not exists_arg('subscribed_apteka_id',row): row['subscribed_apteka_id']=''
+
+    if not exists_arg('requested_ur_lico_id',row): row['requested_ur_lico_id']=''
+    
+    row['subscribed_apteka_id']=row['subscribed_apteka_id'].split('|')
+    row['subscribed_ur_lico_id']=row['subscribed_ur_lico_id'].split('|')
+    row['requested_ur_lico_id']=row['requested_ur_lico_id'].split('|')
+    #form.pre(row['subscribed_apteka_id'])
+    #ur_lico_subscribe='[{"id":"1","name":"ЗАО лекарствснаб","v":"0"},{"id":"2","name":"ФЕРЕЙН","v":"1"},{"id":"3","name":"ООО Ихтиандр","v":"2"}]'
+    ur_lico_subscribe=[]
+    
+
+    for u in form.manager['ur_lico_list']:
+      
+      need_append=False
+      
+      if not exists_arg('ur_lico_id',form.query_hash):
+        need_append=True
+      elif exists_arg('ur_lico_id',form.query_hash) and len(form.query_hash['ur_lico_id']):
+        # В том случае, когда мы фильтруем по юрлицам -- выводим информацию о подписке только по тем юрлицам, по которым ищем
+        if u['id'] in form.query_hash['ur_lico_id']:
+          need_append=True
+        else:
+          need_append=False
+      v=0
+      if str(u['id']) in row['subscribed_ur_lico_id']: v=2 # подписанных
+      elif str(u['id']) in row['requested_ur_lico_id']: v=1 # отправил запрос на подписку
+      else: v=0
+      
+      if need_append:
+        # u['apt_ids'] -- id-шники аптек для конкретного юрлица
+        #form.pre({
+        #  'u_apt_ids':u['apt_ids'],
+        #  'subscribed_apteka_id':row['subscribed_apteka_id'],
+        #  'cnt_apt':len(list(set(u['apt_ids']) & set(row['subscribed_apteka_id'])))
+        #})
+        ur_lico_subscribe.append({
+          'id':u['id'],
+          'action_id':row['wt__id'],
+          'v':str(v),
+          'name':u['name'],
+          'apt_cnt':len(list(set(u['apt_ids']) & set(row['subscribed_apteka_id'])))
+        })
+
+    #form.pre(['subscribe',ur_lico_subscribe])
+    # Количество подписанных аптек
+    apteka_subscribe=0
+    ur_lico_subscribe=s.to_json(ur_lico_subscribe)
+    
+    if (row['apteka_id_list']):
+      apteka_subscribe=len(row['apteka_id_list'].split('|'))
+    return f'''
+      {date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop'])}
+      <div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{ur_lico_subscribe}|{apteka_subscribe}</div>'''
+
+
+  elif str(form.manager['type'])=='3': # Аптека
+    # subscribe_status: 0 - не подписна ; 1 - отправлен запрос на участие ; 2- подписана
+    if not exists_arg('subscribed_apteka_id',row): row['subscribed_apteka_id']=''
+    row['subscribed_apteka_id']=row['subscribed_apteka_id'].split('|')
+    if not exists_arg('requested_apteka_id',row): row['requested_apteka_id']=''
+    row['requested_apteka_id']=row['requested_apteka_id'].split('|')
+
+    apteka_subscribe=[]
+
+    for a in form.manager['apteka_list']:
+      v=0
+      if str(a['id']) in row['subscribed_apteka_id']: v=2
+      if str(a['id']) in row['requested_apteka_id']: v=1
+      apteka_subscribe.append({'id':a['id'],'v':str(v),'name':a['name']})
+    apteka_subscribe=s.to_json(apteka_subscribe)
+
+    return f'''{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop'])}
+      <div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{apteka_subscribe}</div>'''
+
+    #form.pre(apteka_subscribe)
+
+    #form.pre(row)
+    subscribe_status=0
+    return subscribe_status
+    # else:
+  return ''

@@ -45,12 +45,12 @@ def plan_info(form,field):
   if len(form.errors):
     return 
   if ov['plan']==1:
-    plan_data+=f'План: Cуммовой<br>Сумма от: {ov["value"]}<br>'
+    plan_data+=f'План: Cуммовой<br>Сумма от: {ov["value"]} <small>в квартал на одну аптеку</small><br>'
     if ov["reward_percent"]:
       plan_data+=f'Бонус: {ov["reward_percent"]}%<br>'
 
   elif ov['plan']==2:
-    plan_data+=f'План: колличественный<br>Кол-во: {ov["value"]}<br>'
+    plan_data+=f'План: колличественный<br>Кол-во: {ov["value"]} <small>в квартал на одну аптеку</small><br>'
     if ov["reward_percent"]:
       plan_data+=f'Бонус: {ov["reward_percent"]}%<br>'
   elif ov['plan']==3:

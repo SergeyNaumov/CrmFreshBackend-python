@@ -11,6 +11,9 @@ def events_permissions(form):
   
   if form.manager['type']==2:
     form.manager['ur_lico_ids']=get_ul_list_ids(form,form.manager['id'])
+  
+  if form.script == 'find_objects':
+    form.remove_field('out_action')
 
   if form.manager['type']==1 and form.script in ('admin_table','find_objects'):
     form.fields.append(

@@ -21,7 +21,7 @@ from config import config
 
 
 crm_read=config['connects']['crm_read']
-crm_write=config['connects']['crm_read']
+crm_write=config['connects']['crm_write']
 
 #print('connect_read!')
 db_read=FreshDB(
@@ -37,4 +37,7 @@ db_write=FreshDB(
   password=crm_write['password'],
   host=crm_write['host'],
 )
+db_write.query(query="set sql_mode=''")
 db=db_write
+
+

@@ -176,8 +176,11 @@ def good_categories(form,field):
       
       if form.manager['type']==1 or form.ov['subscribed_on_action']:
         body=f'''План: {p['plan_label']}<br>'''
-        #form.pre(p['plan'])
-        if p['plan'] != 3:
+        
+        if p['plan'] in (1,2):
+          body+=f'''{p['value_name']}: {p['value']} <small>в квартал на одну аптеку</small><br>'''
+
+        elif p['plan'] != 3:
           body+=f'''{p['value_name']}: {p['value']}<br>'''
 
         if p['reward_percent']:

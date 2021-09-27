@@ -42,6 +42,7 @@ async def x(bonus_id: int, R:dict): # attach: UploadFile = File(...)
         success=0
 
     if success:
+
         # Сохраняем форму
         insert_id=s.db.save(
             table='bonus_order',
@@ -73,7 +74,9 @@ async def x(bonus_id: int, R:dict): # attach: UploadFile = File(...)
                     to=manager['ma_email'],
                     subject=f"отправка акта с сайта {s.env['host']} {manager['ma_name_f']} {manager['ma_name_i']} {manager['ma_name_o']}",
                     message=f"""
-                            <p>{manager['name_f']} {manager['name_i']} {manager['name_o']}<br>
+                        Акт №{bonus['number']}<br>
+                        <p>{manager['name_f']} {manager['name_i']} {manager['name_o']}<br>
+                        
                         Юридическое лицо: {bonus['ur_lico']}<br>
                         <a href="https://{s.env["host"]}/files/bonus_order/{filename}">файл акта</a>
                     """

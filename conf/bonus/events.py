@@ -64,13 +64,12 @@ def before_search(form):
     onevalue=1,
     values=values
   )
-
-  # form.out_before_search.append(f'''
-  #   <h2 class="subheadling mb-2">История начисления бонусов</h2>
-  #   <p>Вы можете подписать акт через ЭДО. Для этого вам необходимо ознакомиться с <a href="/files/const/template_edo.doc">шаблоном для подключения ЭДО</a></p>
-  #   <p>Заработанный бонус за всё время: {total_bonus} руб</p>
-
-  # ''')
+  if not total_bonus: total_bonus=0
+  form.out_before_search.append(f'''
+    <h2 class="subheadling mb-2">История начисления бонусов</h2>
+    <p>Вы можете подписать акт через ЭДО. Для этого вам необходимо ознакомиться с <a href="/files/const/template_edo.doc">шаблоном для подключения ЭДО</a></p>
+    <p>Заработанный бонус за всё время: {total_bonus} руб</p>
+  ''')
 
 events={
   'permissions':[
