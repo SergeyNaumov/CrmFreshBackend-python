@@ -14,6 +14,7 @@ class Config(Form):
         self.make_delete=0
         self.not_create=1
         self.not_edit=1
+        self.GROUP_BY='wt.id'
         self.QUERY_SEARCH_TABLES=[
             {'t':self.work_table,'a':'wt'},
             {'t':'bonus_order','a':'bo','l':'wt.id=bo.bonus_id'}
