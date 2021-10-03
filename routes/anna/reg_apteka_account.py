@@ -89,8 +89,8 @@ def change_apteka_account(R):
 
         R['email']=R['login']
         values=[R['login'], R['name_f'], R['name_i'], R['name_i'], R['email'],R['phone']]
-        values.append(R['manager_id'])
-        where=' where id=%s'
+        
+        
         
         update_query=f'''
               UPDATE manager set
@@ -101,12 +101,17 @@ def change_apteka_account(R):
           update_query=update_query+', password=sha2(%s,256)'
           values.append(R['password'])
 
+        where=' where id=%s'
+        values.append(R['manager_id'])
+
         s.db.query(
             query=update_query+where,
             values=values,
             errors=errors,
             debug=1
         )
+
+
         if R['password']:
           send_mes(
               to=R['login'],
