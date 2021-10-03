@@ -21,6 +21,8 @@ def events_permissions(form):
        values=[apteka_id],
        onerow=1
       )
+
+
     form.manager['apteka_settings']=apteka_settings
 
 
@@ -43,16 +45,16 @@ def events_permissions(form):
       }
     )
     
-    form.fields.append(
-        {
-          'description':'Подписанные мероприятия',#'только те маркетинговые мероприятия, на которые я подписан',
-          'type':'checkbox',
-          'name':'only_subscribe',
-          'not_process':1,
-          'filter_code':filter_code_subscribe,
-          'filter_on':1
-        }
-    )
+    # form.fields.append(
+    #     {
+    #       'description':'Подписанные мероприятия',#'только те маркетинговые мероприятия, на которые я подписан',
+    #       'type':'checkbox',
+    #       'name':'only_subscribe',
+    #       'not_process':1,
+    #       'filter_code':filter_code_subscribe,
+    #       'filter_on':1
+    #     }
+    # )
 
   if form.id:
     #form.ov=form.db.query(

@@ -39,11 +39,16 @@ def get_fields():
 
 def plan_info(form,field):
   ov=form.ov
+
   plan_name=''
   value_name=''
-  plan_data=''
+  
+  plan_data=f'''
+    
+  '''
   if len(form.errors):
     return 
+
   if ov['plan']==1:
     plan_data+=f'План: Cуммовой<br>Сумма от: {ov["value"]} <small>в квартал на одну аптеку</small><br>'
     if ov["reward_percent"]:
@@ -67,6 +72,8 @@ def plan_info(form,field):
 
   field['after_html']=f'''
     <div style='margin-bottom: 20px;'>
+      <a href="/edit_form/action/{ov['action_id']}">перейти в карточку маркетингового мероприятия</a><br><br>
+
       <h3>Информация о плане за {period['querter']} квартал {period['year']} </h3>
       {plan_data}
       {different_percentage}

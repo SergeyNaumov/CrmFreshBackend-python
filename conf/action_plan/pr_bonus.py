@@ -1,4 +1,5 @@
 def pr_bonus(form,field):
+
     # form.id -- action.id
     #form.pre(form.manager['ur_lico_ids'])
     #form.pre(form.manager['apt_list_ids'])
@@ -55,6 +56,7 @@ def pr_bonus(form,field):
     else:
 
         return
+
     if len(bonus_list):
         # field['after_html']=form.template(
         #   './conf/action/templates/prognoz_bonus.html',
@@ -201,19 +203,19 @@ def pr_bonus(form,field):
                             }
                         )
 
-                    accordion_item['content'].append(
-                        {
-                            'type':'chart',
-                            'subtype':'circle',
-                            'description':'дистрибьютеры',
-                            'labels':[f"""разрешённые дистрибьютеры ({b['price']})""",f"""остальные дистрибьютеры ({b['other_distrib_sum']})"""],
-                            'values':[b['price'],b['other_distrib_sum']],
-                            'width':320,
-                            'height':200,
-                            #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
+                        accordion_item['content'].append(
+                            {
+                                'type':'chart',
+                                'subtype':'circle',
+                                'description':'дистрибьютеры',
+                                'labels':[f"""разрешённые дистрибьютеры ({b['price']})""",f"""остальные дистрибьютеры ({b['other_distrib_sum']})"""],
+                                'values':[b['price'],b['other_distrib_sum']],
+                                'width':320,
+                                'height':200,
+                                #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-                        }
-                    )
+                            }
+                        )
                     
                     accordion_data.append(accordion_item)
 
@@ -289,6 +291,7 @@ def pr_bonus(form,field):
             else:
                 total['current_bonus']=total['plan']-total['buy_cnt']
 
+            #form.pre(form.ov)
             body_text=form.template(
                 './conf/action_plan/templates/pr_bonus.html',
                 ov=form.ov,
@@ -364,35 +367,35 @@ def pr_bonus(form,field):
 
                 })
 
-            if form.ov['plan']!=3:
-                accordion_data[0]['content'].append(
-                    {
-                        'type':'chart',
-                        'subtype':'circle',
-                        'description':'диаграмма выполнения',
-                        'labels':[f"""процент выполнения({total['percent_complete']})%""",f"""осталось выполнить ({total['left_to_complete_percent']})%"""],
-                        'values':[total['percent_complete'],total['left_to_complete_percent']],
-                        'width':320,
-                        'height':200,
-                        #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
+                if form.ov['plan']!=3:
+                    accordion_data[0]['content'].append(
+                        {
+                            'type':'chart',
+                            'subtype':'circle',
+                            'description':'диаграмма выполнения',
+                            'labels':[f"""процент выполнения({total['percent_complete']})%""",f"""осталось выполнить ({total['left_to_complete_percent']})%"""],
+                            'values':[total['percent_complete'],total['left_to_complete_percent']],
+                            'width':320,
+                            'height':200,
+                            #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-                    },
-                )
+                        },
+                    )
 
-            accordion_data[0]['content'].append(
-                {
-                    'type':'chart',
-                    'subtype':'circle',
-                    'description':'дистрибьютеры',
-                    'labels':[f"""разрешённые дистрибьютеры ({total['price']})""",f"""остальные дистрибьютеры ({total['other_distrib_sum']})"""],
-                    'values':[total['price'],total['other_distrib_sum']],
-                    'width':320,
-                    'height':200,
-                    #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
+                    accordion_data[0]['content'].append(
+                        {
+                            'type':'chart',
+                            'subtype':'circle',
+                            'description':'дистрибьютеры',
+                            'labels':[f"""разрешённые дистрибьютеры ({total['price']})""",f"""остальные дистрибьютеры ({total['other_distrib_sum']})"""],
+                            'values':[total['price'],total['other_distrib_sum']],
+                            'width':320,
+                            'height':200,
+                            #'style':'display: inline-block; max-width: 100%; width: 50%; border: 1px solid gray;'
 
-                }
-            )
-
+                        }
+                    )
+        #form.pre(accordion_data)
         field['data']=accordion_data
 
     else:

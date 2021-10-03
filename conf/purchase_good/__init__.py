@@ -16,7 +16,7 @@ class Config(Form):
         form.not_create=1
         form.QUERY_SEARCH_TABLES=[
             {'t':form.work_table,'a':'wt'},
-            {'t':'purchase','a':'p','link':'p.id=wt.purchase_id','left_join':1},
+            {'t':'purchase','a':'p','link':'p.id=wt.show ','left_join':1},
             {'t':'action','a':'act','link':'p.action_id=act.id','left_join':1},
             {'t':'action_plan','a':'ap','link':'ap.action_id=act.id','left_join':1,'not_add_in_select_fields':1},
             {'t':'action_plan_supplier','a':'aps','link':'aps.action_plan_id=ap.id','left_join':1,'not_add_in_select_fields':1},

@@ -17,7 +17,8 @@ def events_permissions(form):
     #form.pre(form.ov)
 
     if form.ov:
-      form.title='Маркетинговое мероприятие '+form.ov['header']
+      form.title=f'''Маркетинговое мероприятие {form.ov['header']}!<br><small>dkjskj</small>'''
+      
 
   new_fields=[]
   for f in form.fields:

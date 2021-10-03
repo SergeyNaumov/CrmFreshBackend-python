@@ -1,4 +1,4 @@
-from .permissions import events_permissions, filter_ur_lico
+from .permissions import events_permissions
 from .before_search import before_search
 
 

@@ -21,7 +21,7 @@
     </div>
     {%elif action_plan.plan==3%}
     <div>
-        План: только процент за любые закупки<br>
+        План: только % за любые закупки<br>
         {%if action_plan.value>0%}
             Выплачиваемый процент: {{action_plan.value}}
         {%endif%}
@@ -58,8 +58,8 @@
     {%if ov.percent_complete>=100 or action_plan.plan==3%}
         Заработанный бонус: {{ov.earned_bonus}}<br>
     {%endif%}
-
-    {%if left_to_complete_percent%}
+    
+    {%if action_plan.plan!=3 and ov.left_to_complete_percent%}
             {{total_left_to_complete_label}}: {{ov.left_to_complete_rub}}<br>
     {%endif%}
     

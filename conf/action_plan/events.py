@@ -74,7 +74,7 @@ def permissions(form):
         form.ov['period']=get_cur_period(form)
     
     if form.ov:
-      form.title='Маркетинговое мероприятие '+form.ov['header']
+      form.title=f'''Маркетинговое мероприятие {form.ov['header']}'''
       # смотрим сколько разных процентных ставой для товаров
       form.ov['goods_cnt_percent']=form.db.query(
         query='''

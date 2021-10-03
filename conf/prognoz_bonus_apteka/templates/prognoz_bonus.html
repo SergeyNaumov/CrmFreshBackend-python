@@ -1,3 +1,61 @@
+{%if manager.type==3%} <!-- для аптек -->
+ <div style="margin-top: 20px; margin-bottom: 20px; border: 1px solid gray; padding: 20px; border-radius: 5px;">
+     <div>
+        Аптека: {{ov.apteka.header}}
+     </div>
+     <div>
+        Маркетинговое мероприятие: <a href="/edit_form/action/{{action.id}}" >{{action.header}}</a>
+     </div>
+     {%if action_plan.plan==1%}
+    <div>
+        План: Суммовой<br>
+        Сумма от: {{action_plan.value}}
+    </div>
+    {%elif action_plan.plan==2%}
+    <div>
+        План: Количественный<br>
+        Кол-во: {{action_plan.value}}
+    </div>
+    {%elif action_plan.plan==3%}
+    <div>
+        План: только процент за любые закупки<br>
+        {%if action_plan.value>0%}
+            Выплачиваемый процент: {{action_plan.value}}
+        {%endif%}
+    </div>
+    {%endif%}
+    <!-- Для аптек не отображаем
+    Кол-во аптек: {{ov.cnt_apt}}<br>
+    {%if action_plan.plan!=3%}
+        План для юридического лица: {{ov.plan}}<br>
+    {%endif%}
+    -->
+    Кол-во закупки: {{ov.buy_cnt}}<br>
+    {%if ov.plan==1 or ov.plan==3%}
+        Сумма закупки в sip-ценах:
+    {%else%}
+        Сумма закупки:
+    {%endif%}
+     {{ov.price}}<br>
+    {%if action_plan.plan!=3%}
+        Процент выполнения: {{ov.percent_complete}}<br>
+    {%endif%}
+    
+    Процент выполнения при сохранении темпа закупки: {{ov.percent_progress}}<br>
+    
+    Остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{ov.other_distrib_sum}}<br>
+    
+    {%if action_plan.plan!=3 and ov.left_to_complete_percent>0%}
+        
+            Осталось выполнить в %: {{ov.left_to_complete_percent}}<br>
+        
+    {%endif%}
+    {%if left_to_complete_percent%}
+            {{total_left_to_complete_label}}: {{ov.left_to_complete_rub}}<br>
+    {%endif%}
+    
+</div>
+{%else%} <!-- для всех остальных -->
 
  
  <div style="margin-top: 20px; margin-bottom: 20px; border: 1px solid gray; padding: 20px; border-radius: 5px;">
@@ -56,3 +114,4 @@
     {%endif%}
     
 </div>
+{%endif%}

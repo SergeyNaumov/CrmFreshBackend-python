@@ -111,6 +111,8 @@ def events_permissions(form):
         onerow=1
       )
 
+
+
     # cgi_params={}
     
     # if 'cgi_params' in form.R:
@@ -128,6 +130,18 @@ def before_search(form):
     form.errors.append('Фильтр "Юридическое лицо" обязателен')
   
   qs=form.query_search
+
+  # берём периоды не старше чем 90*2 дней (2 квартала назад)
+  period_ids=form.db.query(
+    query='select id from prognoz_bonus_period where date_begin>=curdate()- interval 90*2 day',
+    massive=1,
+    str=1
+  )
+  if len(period_ids):
+    qs['WHERE'].append(f"wt.period_id IN ({ ','.join(period_ids) })")
+  
+
+  
   if form.manager['type']==2:
     qs['WHERE'].append(f"wt.ur_lico_id in ({','.join(form.manager['ur_lico_ids'])})")
 

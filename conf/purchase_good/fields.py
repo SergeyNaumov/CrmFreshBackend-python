@@ -107,7 +107,8 @@ def get_fields():
         'header_field':'ur_address',
         'value_field':'id',
         'filter_on':1,
-        'before_code':apteka_id_before_code
+        'before_code':apteka_id_before_code,
+        #'filter_code':apteka_filter_code
       },
       {
         'description':'Юр. лицо',
@@ -137,7 +138,8 @@ def get_fields():
 
     ]
 
-
+def apteka_filter_code(form,field,row):
+  return f'''{row['wt__id']} => {row['a__ur_address']}'''
 def apteka_id_before_code(form,field):
   # для юридического лица выводим только те аптеки, которые закреплены за ним
   if form.manager['type']==2:

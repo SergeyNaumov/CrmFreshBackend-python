@@ -28,7 +28,7 @@ def prognoz_bonus(form,field):
     total_left_to_complete_label='Осталось выполнить в штуках'
 
   ov=form.ov
-  
+  form.pre(form.manager)
   field['after_html']=form.template(
     f'./conf/{form.work_table}/templates/prognoz_bonus.html',
     ov=ov,
@@ -36,8 +36,8 @@ def prognoz_bonus(form,field):
     action=ov['action'],
     manager=ov['manager'],
     period=ov['period'],
-    total_left_to_complete_label=total_left_to_complete_label
-
+    total_left_to_complete_label=total_left_to_complete_label,
+    settings=ov['manager']['apteka_settings']
   )
   
 def charts_before_code(form,field):

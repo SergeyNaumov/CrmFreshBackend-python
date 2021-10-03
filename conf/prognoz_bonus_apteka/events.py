@@ -14,19 +14,29 @@ def events_permissions(form):
     if form.script=='admin_table': # для аптеки скрываем фильтр "аптека", чтобы не маячил, но включаем его искусственно в before_search
       form.remove_field('apteka_id')
 
-    form.manager['apteka_settings']={
-      'set1':1,'set2':1
-    }
+
     form.manager['apt_list_ids']=get_apt_list_ids(form)
     
     if len(form.manager['apt_list_ids']):
       apteka_id=form.manager['apt_list_ids'][0]
+
       apteka_settings=form.db.query(
         query='select set1,set2 from apteka_settings where apteka_id=%s',
         values=[apteka_id],
         onerow=1
       )
-      if apteka_settings: form.manager['apteka_settings']=apteka_settings
+      # for _test
+      apteka_settings={
+        'set1':1,'set2':1
+      }
+      #form.pre(apteka_settings)
+      if apteka_settings['set1'] or apteka_settings['set2']:
+        apteka_settings['out_prognoz_bonus']=1
+      else:
+        apteka_settings['out_prognoz_bonus']=0
+
+      if apteka_settings:
+        form.manager['apteka_settings']=apteka_settings
 
 
 
@@ -145,6 +155,15 @@ def events_permissions(form):
 def before_search(form):
 
   qs=form.query_search
+
+  # берём периоды не старше чем 90*2 дней (2 квартала назад)
+  period_ids=form.db.query(
+    query='select id from prognoz_bonus_period where date_begin>=curdate()- interval 90*2 day',
+    massive=1,
+    str=1
+  )
+  if len(period_ids):
+    qs['WHERE'].append(f"wt.period_id IN ({ ','.join(period_ids) })")
   if form.manager['type']==3:
 
     #qs['on_filters_hash']['apteka_id']=[]

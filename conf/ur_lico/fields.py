@@ -13,7 +13,7 @@ def get_fields():
     },
     {
       'name':'header',
-      'description':'Наименование',
+      'description':'Юридическое лицо',
       'type':'text',
       'filter_code':filter_code_header,
       #'make_change_in_search':1,

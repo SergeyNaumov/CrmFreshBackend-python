@@ -49,7 +49,7 @@ def before_search(form):
   
   query_summ=f'''
     SELECT
-      sum(summ)
+      sum(if(paid_status=1,summ,0))
     FROM
       {" ".join(qs['TABLES'])}
   '''
@@ -58,7 +58,7 @@ def before_search(form):
   if len(qs['WHERE']):
     query_summ+=' WHERE '+' AND '.join(qs['WHERE'])
     values=qs['VALUES']
-
+  
   total_bonus=form.db.query(
     query=query_summ,
     onevalue=1,

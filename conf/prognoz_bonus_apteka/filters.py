@@ -52,10 +52,14 @@ def apteka_id_before_code(form,field):
     field['where']=f'id in ({",".join(form.manager["apt_list_ids"])})'
     field['autocomplete']=0
     #form.pre(field)
+
 def apteka_id_filter_code(form,field,row):
-  return f'''
-    {row['u__ur_address']}<br>
-    <small><a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a></small>'''
+  out=row['u__ur_address']+"<br>"
+  #form.pre(form.manager['apteka_settings'])
+  if form.manager['type']==1 or (form.manager['type']==3 and form.manager['apteka_settings']['out_prognoz_bonus']):
+    out+=f'''<small><a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a></small>'''
+
+  return out
 
 def action_id_filter_code(form,field,row):
   return f'{row["a__header"]} ({row["a__date_start"]}..{row["a__date_stop"]})'
