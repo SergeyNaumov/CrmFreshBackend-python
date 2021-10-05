@@ -198,7 +198,7 @@ def get_search_where(form,query):
         else:
           # my @values = grep /^\d+$/, @{$values};
           if len(values):
-            WHERE.append('('+f['tablename']+'.'+f['relation_table_id']+' IN ('+','.join(values)+')')
+            WHERE.append(f'''({f['tablename']}.{f['relation_table_id']} IN ({','.join(values)}) )''')
       elif f['type']=='file':
           if values==1: # файл существует
             WHERE.append(f'''(wt.{f['name']}<>"") ''')

@@ -2,7 +2,7 @@ def get_fields():
     return [ 
     {
       'name':'registered',
-      'description':'Дата регистрации',
+      'description':'Дата создания',
       'type':'date',
       'read_only':1,
       'filter_on':1

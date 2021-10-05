@@ -12,7 +12,7 @@ def process_result_list(form,R,result_list):
     id_fields=form.work_table_id.split(',')
     for idf in id_fields:
       if 'wt__'+idf in r:
-        id_list.append(r['wt__'+idf])
+        id_list.append(str(r['wt__'+idf]))
       else:
         form.errors.append(f'Ошибка: поле "{idf}"" отсутствует в основной таблице но упомянуто в work_table_id')
 
@@ -24,19 +24,20 @@ def process_result_list(form,R,result_list):
           continue
 
         field=form.fields_hash[name]
+        print('id_list:',id_list)
         if field['type'] == 'multiconnect':
             multiconnect_arr=form.db.query(
-              query="""
+              query=f'''
                 SELECT
                     rst.{field['relation_save_table_id_worktable']} id,
                     group_concat(rt.{field['relation_table_header']} SEPARATOR ',') header
                 FROM
                     {field['relation_save_table']} rst
-                    join {field['relation_table']} rt ON (rt.{field['relation_table_id'] =rst.{field['relation_save_table_id_relation']})
+                    join {field['relation_table']} rt ON (rt.{field['relation_table_id']} =rst.{field['relation_save_table_id_relation']})
                 WHERE
-                    rst.{field['relation_save_table_id_worktable']} IN ( {','.join(id_list)} )
-                GROUP BY rst.{field['relation_save_table_id_worktable']
-              """
+                    rst.{field['relation_save_table_id_worktable']} IN ( {','.join(id_list) } )
+                GROUP BY rst.{field['relation_save_table_id_worktable']}
+              '''
             )
             if multiconnect_arr:
               for ma in multiconnect_arr: multiconnect_values[ma['id']]=ma['header']

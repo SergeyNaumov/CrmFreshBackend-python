@@ -132,6 +132,7 @@ def get_fields():
       'name':'type',
       'description':'Тип учётной записи',
       'type':'select_values',
+
       'tab':'permissions',
       'before_code':type_before_code,
       'values':[
@@ -161,6 +162,7 @@ def get_fields():
       'tree_use':1,
       'tree_table':'permissions',
       'name':'permissions',
+      'tablename':'p',
       'relation_table':'permissions',
       'relation_save_table':'manager_permissions',
       'relation_table_header':'header',

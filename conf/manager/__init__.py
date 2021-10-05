@@ -15,7 +15,9 @@ class Config(Form):
             {'table':form.work_table,'alias':'wt'},
             {'t':'manager','a':'ma','l':'wt.anna_manager_id=ma.id','lj':1},
             {'t':'ur_lico_manager','a':'ulm','l':'ulm.manager_id=wt.id','lj':1},
-            {'t':'ur_lico','a':'u','l':'u.id=ulm.ur_lico_id','lj':1}
+            {'t':'ur_lico','a':'u','l':'u.id=ulm.ur_lico_id','lj':1},
+            {'t':'manager_permissions','a':'mp','l':'mp.manager_id=wt.id','lj':1},
+            {'t':'permissions','a':'p','l':'p.id=mp.permissions_id','lj':1}
             # 
         ]
         form.GROUP_BY='wt.id'

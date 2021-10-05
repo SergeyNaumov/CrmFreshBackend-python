@@ -50,10 +50,9 @@ def gen_query_search(form):
       
       else:
         if len(qs['GROUP']):
-          query_count = 'SELECT count(*) cnt FROM (' + 'select wt.'+ form.work_table_id + ' FROM '+ TABLES + WHERE + GROUP + HAVING + ') x'
+          query_count = f'SELECT count(*) cnt FROM (select wt.{form.work_table_id } FROM {TABLES} {WHERE} {GROUP} {HAVING}) x'
         else:
           query_count = ' SELECT count(*) cnt from ' + TABLES + WHERE + GROUP + HAVING
       
       #print('query:',query)
-      #print('query_count:',query_count)
   return query, query_count
