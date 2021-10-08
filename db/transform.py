@@ -7,6 +7,7 @@ def tree_use_transform(list,table_id='id'):
     l['child']=[]
     list_hash[l[table_id]]=l
 
+  print('list_hash:',list_hash)
   for l in list:
 
     if exists_arg('parent_id',l):

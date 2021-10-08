@@ -16,10 +16,12 @@ from jinja2 import Template
 
 def action_plan(format,id):
     db=s.db
+    #print('id:',id)
     plan=db.getrow(
         table='action_plan',
-        id=id
+        where=f'id={id}'
     )
+    #print('plan:',plan)
 
     good_list=db.query(query='''
         SELECT
@@ -30,18 +32,22 @@ def action_plan(format,id):
           action_plan_good ag
           JOIN good g ON ag.good_id=g.id
         WHERE ag.action_plan_id = %s''',
-        values=[id]
+        values=[id],
+        debug=1
         
     )
     if format=='xls':
         action_plan=[]
         good=[]
         code=[]
-
+        numbers=[]
+        j=1
         for g in good_list:
+            numbers.append(j)
             action_plan.append(plan['header'])
             good.append(g['header'])
             code.append(g['code'])
+            j+=1
             # h1 -- наименование плана акции
             # h2 -- наименование товара
             # code -- код товара
@@ -52,12 +58,14 @@ def action_plan(format,id):
 
         # write_xls
         # Create a Pandas dataframe from the data.
+
         df = pd.DataFrame({
+            '№': numbers,
             'План акции': action_plan,
             'Наименование товара': good,
             'Код товара': code
         })
-
+        #print('df:',df)
         
         # Create a Pandas Excel writer using XlsxWriter as the engine.
         output = BytesIO()
@@ -65,17 +73,29 @@ def action_plan(format,id):
         writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
         # Convert the dataframe to an XlsxWriter Excel object.
-        df.to_excel(writer, sheet_name='Sheet1')
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
 
         # автоширина столбцоа
-        auto_adjust_xlsx_column_width(df, writer, sheet_name="Sheet1", margin=0)
+        auto_adjust_xlsx_column_width(df, writer, sheet_name="Sheet1", margin=1)
 
         # Close the Pandas Excel writer and output the Excel file.
+        
+        worksheet = writer.sheets['Sheet1']
+
+        for i, col in enumerate(df.columns):
+            # find length of column i
+            column_len = df[col].astype(str).str.len().max()
+            # Setting the length if the column header is larger
+            # than the max column value length
+            column_len = max(column_len, len(col)) + 2
+            # set the column length
+            worksheet.set_column(i, i, column_len)
         writer.save()
+
         output.seek(0)
         filename = urllib.parse.quote(plan['header']+".xlsx")
         headers = {
-            'Content-Disposition': f'''attachment; filename="{filename}"'''
+            'Content-Disposition': f'attachment; filename="{filename}"'
         }
         return StreamingResponse(output, headers=headers)
     if format=='dbf':

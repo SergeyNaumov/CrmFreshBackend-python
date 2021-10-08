@@ -48,7 +48,14 @@ def process_edit_form(**arg):
     values=values,
     script='edit_form'
   )
+  need_fields=[]
+  for f in form.fields:
+    if not('orig_type' in f) or not re.search(r'^filter_extend_',f['orig_type']):
+      need_fields.append(f)
+
+  form.fields=need_fields
   
+
   field=None
   if 'name' in R and R['name']:
     field=form.fields_hash[R['name']]

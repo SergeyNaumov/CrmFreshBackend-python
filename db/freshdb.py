@@ -6,7 +6,10 @@ from lib.core import print_console_error
 def rez_to_str(rez):
   if rez:
     for k in rez:
-      rez[k]=str(rez[k])
+      if not rez[k]: # Чтобы None не преобразовывалось в строку
+        rez[k]=''
+      else:
+        rez[k]=str(rez[k])
     
 def exists_arg(key,dict):
   if (key in dict) and dict[key]:
@@ -334,12 +337,13 @@ class FreshDB():
           else:
             try:
               rez=cur.fetchall()
+              
               if exists_arg('massive',arg):
                 rez=massive_transform(rez)
                 if exists_arg('str',arg):
                   rez = [str(item) for item in rez]
-              else:
-                if exists_arg('tree_use',arg): rez=tree_use_transform(rez)
+              elif exists_arg('tree_use',arg):
+                rez=tree_use_transform(rez)
 
 
 

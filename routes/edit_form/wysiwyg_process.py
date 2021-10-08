@@ -139,7 +139,14 @@ def wysiwyg_process(**arg):
 
     elif action=='upload':
         file=arg['file']
-        with open(form.manager['files_dir']+'/'+file.filename, "wb") as buffer:
+        
+        
+        full_path=f"{form.manager['files_dir']}/{file.filename}"
+        if arg['path']:
+            P= path[:0] + path[(0+1):] # удаляем начальный слэш
+            full_path=f"{form.manager['files_dir']}/{P}{file.filename}"
+
+        with open(full_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         file_list,error=get_file_list(path=path,errors=errors,form=form)

@@ -41,6 +41,7 @@ def get_search_where(form,query):
       if len(form.priority_sort) and form.priority_sort[0] == name:
         header['sorted']=form.priority_sort[1]
 
+
       form.SEARCH_RESULT['headers'].append(header)
 
       if exists_arg('not_process',f):
@@ -59,6 +60,8 @@ def get_search_where(form,query):
               operable_fld=table+'.'+db_name
               o=operable_fld+" desc"
 
+          elif f['type'] in ['multiconnect']:
+              operable_fld=table+'.'+f['relation_table_header']
 
           elif f['type'] in ['select_from_table','filter_extend_select_from_table']:
               func=get_func(f)
@@ -82,11 +85,12 @@ def get_search_where(form,query):
               o=operable_fld
 
           if len(form.priority_sort):
+              
               if form.priority_sort[0] == name:
                   desc_value=('','desc')[form.priority_sort[1] == 'desc']
                   form.query_search['ORDER'].append(operable_fld+' '+desc_value)
-          # else:
-          #     form.query_search['ORDER'].append(o)
+
+
 
       if not values or (isinstance(values,list) and not len(values)):
           continue

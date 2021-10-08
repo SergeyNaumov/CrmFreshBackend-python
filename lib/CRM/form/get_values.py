@@ -14,6 +14,7 @@ def func_get_values(form):
     
 
     if form.id:
+
       values=form.db.getrow(
         table=form.work_table,
         where=f'{form.work_table_id}=%s',

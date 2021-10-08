@@ -24,7 +24,6 @@ def process_result_list(form,R,result_list):
           continue
 
         field=form.fields_hash[name]
-        print('id_list:',id_list)
         if field['type'] == 'multiconnect':
             multiconnect_arr=form.db.query(
               query=f'''

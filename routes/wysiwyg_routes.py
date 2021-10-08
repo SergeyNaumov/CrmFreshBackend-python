@@ -18,7 +18,7 @@ async def wysiwyg_upload(
   file: UploadFile = File(...)
 ): # 
 
-
+  #print('path:',path)
   return wysiwyg_process(
     action='upload',
     path=path,

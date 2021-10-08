@@ -46,14 +46,14 @@ async def autocomplete(config:str,R: dict):
   else: # нет поиска по строке, вывозим по depend_where (зависимый фильтр)
     
     name,sub_name=get_name_and_ext(name)
-    if sub_name:
-      errors.append('не указан term')
-    else:
-      field=form.get_field(name)
-      if 'depend_where' in field:
-        pass
-      else:
-        errors.append('не указан term')
+    #if sub_name:
+    #  errors.append('не указан term')
+    #else:
+    field=form.get_field(name)
+    #if 'depend_where' in field:
+    #  pass
+    #else:
+    #  errors.append('не указан term')
     
     
 
