@@ -16,6 +16,7 @@ def get_fields():
       #   $login=~s{([^a-zA-Z\-_0-9\.\@]+)}{<span style="color: red;">$1</span>}gs;
       #   return $login;
       # },
+      'read_only':1,
       'unique':1,
       'regexp_rules':[
         '/.{5}/','длина логина должна быть не менее 5 символов',
@@ -44,6 +45,7 @@ def get_fields():
       'type':'text',
       'name':'phone',
       'tab':'main',
+      'read_only':1,
       # 'regexp_rules':[
       #     '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
       # ],
@@ -76,6 +78,7 @@ def get_fields():
       'name':'name',
       'description':'ФИО',
       'type':'text',
+      'read_only':1,
       'tab':'main',
       'value':'Тестовый пользователь',
       'regexp_rules':[
@@ -107,13 +110,13 @@ def get_fields():
     #   'filter_on':1,
     #   'frontend':{'ajax':{'name':'name'}}
     # },
-    {
-      'description':'Зарегистрирован',
-      'type':'datetime',
-      'name':'registered',
-      'read_only':1,
-      'tab':'permissions'
-    },
+    # {
+    #   'description':'Зарегистрирован',
+    #   'type':'datetime',
+    #   'name':'registered',
+    #   'read_only':1,
+    #   'tab':'permissions'
+    # },
     { 
       'description':'Доступ к просмотру прогнозного бонуса за прошлый квартал',
       'name':'show_old_plans',
@@ -131,6 +134,7 @@ def get_fields():
     {
       'name':'type',
       'description':'Тип учётной записи',
+      'read_only':1,
       'type':'select_values',
 
       'tab':'permissions',
@@ -142,11 +146,12 @@ def get_fields():
       ]
     },
     {
-      'description':'Менеджер компании Анна',
+      'description':'Менеджер компании АннА',
       'add_description':'для ',
       'name':'anna_manager_id',
+      'read_only':1,
       'type':'select_from_table',
-      'header_field':'concat(email," ",name_f," ",name_i," ",name_o)',
+      'header_field':'name',
       'where':'type=1',
       'table':'manager',
       'tablename':'ma',
@@ -171,11 +176,13 @@ def get_fields():
       'relation_save_table_id_worktable':'manager_id',
       'relation_save_table_id_relation':'permissions_id',
       'tab':'permissions',
+      #'not_order':1,
       'read_only':1
     },
     {
        'name':'email',
        'description':'Email',
+       'read_only':1,
        'type':'text',
         'replace':[
             ['\s+','']
@@ -188,11 +195,11 @@ def get_fields():
       'description':'Юр.лицо',
       'type':'filter_extend_select_from_table',
       'name':'ur_lico_id',
-
+      'db_name':'id',
       'table':'ur_lico',
       'header_field':'header',
       'value_field':'id',
-      'tablename':'ulm',
+      'tablename':'u',
       'filter_code':ur_lico_id_filter_code
     },
     # Юридические лица

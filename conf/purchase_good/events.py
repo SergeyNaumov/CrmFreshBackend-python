@@ -48,34 +48,82 @@ def before_search(form):
     #form.pre(form.R['params']['priority_sort'])
 
 
-#  form.pre(form.query_search)
+  #form.pre(form.query_search)
   sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
   sf.append('ap.header ap__header')
+  #form.pre(qs['GROUP'])
+  #form.pre(sf)
+  # Будем суммировать товары
+  qs['SELECT_FIELDS']=[
+      "wt.id wt__id",
+      "wt.purchase_id wt__purchase_id",
+      "wt.apteka_id wt__apteka_id",
+      "wt.supplier_id wt__supplier_id",
+      "wt.header wt__header",
+      "wt.code wt__code",
+      
+      "wt.action_plan_id wt__action_plan_id",
+      "p.id p__id",
+      "p.date p__date",
+      "p.action_id p__action_id",
+      "act.id act__id",
+      "act.header act__header",
+      "a.id a__id",
+      "a.header a__header",
+      "a.ur_address a__ur_address",
+      "a.subscribe a__subscribe",
+      "a.on_notify a__on_notify",
+      "a.key_from_1c a__key_from_1c",
+      "a.ur_lico_id a__ur_lico_id",
+      "ul.id ul__id",
+      "ul.header ul__header",
+      "ul.subscribe ul__subscribe",
+      "ul.key_from_1c ul__key_from_1c",
+      "ul.anna_manager_id ul__anna_manager_id",
+      "ul.phone ul__phone",
+      "ul.parent_id ul__parent_id",
+      "group_concat(s2.header SEPARATOR \", \") suppliers2",
+      "ap.header ap__header",
+      "ap.id ap__id",
+      'sum(wt.cnt) wt__cnt',
+      "sum(wt.summ) wt__summ",
+  ]
+
+  on_filter_hash=qs['on_filters_hash']
+  
+  if 'apteka_id' in on_filter_hash: # группируем по наименованию товара и по аптеки
+    qs['GROUP']=['ap.id, wt.header, a.id']
+  elif 'ur_lico_id' in on_filter_hash:
+    qs['GROUP']=['ap.id, wt.header, ul.id']
+  else:
+    qs['GROUP']=['ap.id, wt.header'] # , wt.header, ur_lico_id
+  
+  #form.pre(qs['GROUP'])
+
   if form.manager['type']==2: # in (2,3):
     form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
   elif form.manager['type']==3:
     form.query_search['WHERE'].append(f'''a.manager_id = {form.manager['id']}''')
-  query_count='''
-    select
-      wt.id
-    from
-      purchase_good wt
-      LEFT JOIN purchase p ON p.id=wt.purchase_id
-      LEFT JOIN action  act ON p.action_id=act.id
-      LEFT JOIN apteka a ON wt.apteka_id = a.id
-      LEFT JOIN ur_lico ul ON a.ur_lico_id=ul.id
-      LEFT JOIN action_plan ap ON ap.action_id=act.id
-    '''
+  # query_count='''
+  #   select
+  #     wt.id
+  #   from
+  #     purchase_good wt
+  #     JOIN purchase p ON p.id=wt.purchase_id
+  #     JOIN action  act ON p.action_id=act.id
+  #     JOIN action_plan ap ON ap.action_id=act.id and wt.action_plan_id=ap.id
+  #     LEFT JOIN apteka a ON wt.apteka_id = a.id
+  #     LEFT JOIN ur_lico ul ON a.ur_lico_id=ul.id
+      
+  #   '''
 
-  if len(qs['WHERE']):
-    query_count+=' WHERE '+' AND '.join(qs['WHERE'])
-  query_count+='GROUP BY wt.id'
-  query_count=f'''select count(*) cnt from ({query_count}) x'''
-  qs['query_count']=query_count
+  #if len(qs['WHERE']):
+  #  query_count+=' WHERE '+' AND '.join(qs['WHERE'])
+  #query_count+='GROUP BY wt.id'
+  #query_count=f'''select count(*) cnt from ({query_count}) x'''
+  #qs['query_count']=query_count
   #form.pre(query_count)
-  #form.out_before_search=''
-  #form.out_before_search.append('<h2>Данные по закупкам отображаются по всем поставщикам</h2>')
-  #form.explain=1
+
 
 events={
   'before_search':[before_search],

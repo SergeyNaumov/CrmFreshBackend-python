@@ -130,7 +130,14 @@ def before_search(form):
     form.errors.append('Фильтр "Юридическое лицо" обязателен')
   
   qs=form.query_search
+  if 'priority_sort' in form.R['params']:
+    if form.R['params']['priority_sort'][0]=='period_id' and form.R['params']['priority_sort'][1] in ('asc','','desc'):
 
+      qs['ORDER']=[f"pbp.date_begin "+form.R['params']['priority_sort'][1]]
+      
+  #form.explain=1
+  qs['SELECT_FIELDS'].append('if(pbp.date_end < curdate(),1,0) prev ')
+  
   # берём периоды не старше чем 90*2 дней (2 квартала назад)
   period_ids=form.db.query(
     query='select id from prognoz_bonus_period where date_begin>=curdate()- interval 90*2 day',

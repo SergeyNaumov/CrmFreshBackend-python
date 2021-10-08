@@ -27,6 +27,7 @@ def events_permissions(form):
   elif form.manager['type']==2:
     form.manager['ul_ids']=get_ul_list_ids(form,form.manager['id'])
     # Если у данного аккаунта менее 2-х юрлиц -- скрываем фильтры ИНН и наименование
+    form.manager['apt_list_ids']=get_apt_list_ids(form,form.manager['id'])
     if len(form.manager['ul_ids']) < 2:
       new_fields=[]
       for f in form.fields:
@@ -62,7 +63,7 @@ def before_search(form):
 
 
   if form.manager['type']==2:
-    apt_list_ids=get_apt_list_ids(form,form.manager['id'])
+    apt_list_ids=form.manager['apt_list_ids']
     if not len(apt_list_ids):
       apt_list_ids=['0']
 

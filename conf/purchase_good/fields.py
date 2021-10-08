@@ -98,19 +98,6 @@ def get_fields():
 #        'filter_on':1,
       },
       {
-        'description':'Аптека',
-        'name':'apteka_id',
-        #'autocomplete':1,
-        'type':'select_from_table',
-        'table':'apteka',
-        'tablename':'a',
-        'header_field':'ur_address',
-        'value_field':'id',
-        'filter_on':1,
-        'before_code':apteka_id_before_code,
-        #'filter_code':apteka_filter_code
-      },
-      {
         'description':'Юр. лицо',
         'name':'ur_lico_id',
         #'autocomplete':1,
@@ -123,6 +110,22 @@ def get_fields():
         'filter_on':1,
         'before_code':ur_lico_id_before_code
       },
+      {
+        'description':'Аптека',
+        'name':'apteka_id',
+        'autocomplete':1,
+        'type':'select_from_table',
+        'table':'apteka',
+        'tablename':'a',
+        'header_field':'ur_address',
+        'value_field':'id',
+        'filter_on':1,
+        'before_code':apteka_id_before_code,
+        'depend_filter':['ur_lico_id'],
+        
+        #'filter_code':apteka_filter_code
+      },
+
 
       # {
       #   'description':'Поставщик',
@@ -140,12 +143,7 @@ def get_fields():
 
 def apteka_filter_code(form,field,row):
   return f'''{row['wt__id']} => {row['a__ur_address']}'''
-def apteka_id_before_code(form,field):
-  # для юридического лица выводим только те аптеки, которые закреплены за ним
-  if form.manager['type']==2:
-    #field['autocomplete']=1
-    field['where']=f' id in ({ ",".join(form.manager["apt_list_ids"]) }) '
-    #del(field['autocomplete'])
+
     
 def ur_lico_id_before_code(form,field):
   if form.manager['type']==2:
@@ -161,8 +159,16 @@ def dates_filter_code(form,field,row):
 
 def action_filter_code(form,field,row):
   if row['act__id']:
-    return f'''<a href="/edit-form/action/{row['act__id']}" target="_blank">{row['act__header']}</a>'''
+    return f'''
+      <a href="/edit-form/action/{row['act__id']}" target="_blank">{row['act__header']}</a><br>
+    '''
+      # wt.id: {row['wt__id']}<br>
+      # action_plan_id: {row['ap__id']}<br>
+      # ur_lico_id: {row['ul__id']}<br>
+      # apteka_id: {row['wt__apteka_id']} {row['a__header']}
   return ''
+
+
 def suppliers_filter_code(form,field,row):
   #form.pre(row)
   if 'suppliers2' in row:
@@ -211,3 +217,22 @@ def action_plan_id_before_code(form,field):
         if len(ids):
           field['depend_where']='action_id in ('+','.join(ids)+')'
         
+
+def apteka_id_before_code(form,field):
+  # для юридического лица выводим только те аптеки, которые закреплены за ним
+  if form.manager['type']==2:
+    field['where']=f' id in ({ ",".join(form.manager["apt_list_ids"]) }) '
+    
+  
+  if form.script=='autocomplete':
+    if 'filters_values' in form.R and form.R['filters_values'] and 'ur_lico_id' in form.R['filters_values']:
+      ur_lico_lst=form.R['filters_values']['ur_lico_id']
+      print('ur_lico_lst:',ur_lico_lst)
+      ids=[]
+      if len(ur_lico_lst):
+        for ur_lico_id in ur_lico_lst:
+          ids.append(str(ur_lico_id))
+        if len(ids):
+          field['depend_where']='ur_lico_id in ('+','.join(ids)+')'
+  #if form.manager['type']==2:
+  #  field['where']=f' id in ({ ",".join(form.manager["apt_list_ids"]) }) '

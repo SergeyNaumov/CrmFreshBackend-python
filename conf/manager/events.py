@@ -34,7 +34,7 @@ def events_permissions(form):
       #form.pre(form.manager)
       # Сотрудник компании Анна(1) может вносить изменения в аккаунт (2,3)
       if (ov['type']==2 or ov['type']==3) and form.manager['type']==1: 
-        form.read_only=0
+        form.read_only=0 # -- запретили редактировать всем
 
       
 

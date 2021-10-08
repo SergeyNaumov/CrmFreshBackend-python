@@ -69,5 +69,5 @@ def period_id_filter_code(form,field,row):
   return f'{row["pbp__year"]}, {row["pbp__querter"]} квартал'
 def period_id_before_code(form,field):
     field['values']=form.db.query(
-      query="select id v,concat(year,' ',querter,' квартал') d from prognoz_bonus_period order by date_begin"
+      query="select id v,concat(year,' ',querter,' квартал') d from prognoz_bonus_period  where date_begin>=from_days(to_days(curdate())-180) order by date_begin"
     )

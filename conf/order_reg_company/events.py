@@ -18,8 +18,8 @@ def after_save(form):
 
 
 
-  if int(ov['accepted'])==0 and int(nv['accepted'])==1:
-    print('Включили галку!')
+  #if !ov['accepted'] and nv['accepted']==1:
+  #  print('Включили галку!')
 
 #def events_before_code(form):
     

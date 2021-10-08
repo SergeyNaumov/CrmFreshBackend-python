@@ -11,25 +11,51 @@ def get_fields():
       'read_only':1,
       'filter_on':1
     },
+
+    {
+      'description':'Юридическое лицо',
+      'name':'f_header',
+      'type':'filter_extend_select_from_table',
+      'header_field':'header',
+      'value_field':'id',
+      'autocomplete':1,
+      'table':'ur_lico',
+      'tablename':'wt',
+      'db_name':'id',
+      'before_code':before_code_header,
+      'filter_code':filter_code_header,
+      'filter_on':1
+    },
+    {
+      'description':'Юридический адрес',
+      'name':'f_ur_address',
+      'type':'filter_extend_select_from_table',
+      'header_field':'ur_address',
+      'value_field':'id',
+      'autocomplete':1,
+      'table':'ur_lico',
+      'tablename':'wt',
+      'db_name':'id',
+      'before_code':before_code_ur_address,
+      'filter_on':1
+    },
+
     {
       'name':'header',
       'description':'Юридическое лицо',
       'type':'text',
-      'filter_code':filter_code_header,
-      #'make_change_in_search':1,
-      'filter_on':1
+      #'filter_code':filter_code_header,
+      'not_filter':1,
+      #'autocomplete':1,
+      #'filter_on':1
     }, 
-    # {
-    #   'name':'inn',
-    #   'description':'ИНН',
-    #   'type':'text',
-    #   'filter_on':1
-    # },
+
     {
       'name':'ur_address',
       'description':'Юридический адрес',
       'type':'text',
-      'filter_on':1
+      'not_filter':1,
+      #'filter_on':1
     },
     {
       'description':'Телефон',
@@ -48,7 +74,7 @@ def get_fields():
     #   'where':'type=2'
     # },
     {
-      'description':'Менеджер компании Анна',
+      'description':'Менеджер компании АннА',
       'name':'anna_manager_id',
       'type':'select_from_table',
       'table':'manager',
@@ -74,6 +100,21 @@ def get_fields():
       'filter_code':filter_code_manager_id
     }
 ]
+
+def before_code_header(form,field):
+  where=''
+  #form.pre(form.manager)
+  field['values']=form.db.query(
+    query=f'select id v,header d from ur_lico where header order by header limit 50'
+  )
+
+def before_code_ur_address(form,field):
+  where=''
+  #form.pre(form.manager)
+  field['values']=form.db.query(
+    query=f'select id v,ur_address d from ur_lico where ur_address order by ur_address  limit 50'
+  )
+
 
 # def before_code_anna_manager_id(form,field):
 #   field['values']=form.db.query(

@@ -25,10 +25,11 @@ def events_permissions(form):
         values=[apteka_id],
         onerow=1
       )
-      # for _test
-      apteka_settings={
-        'set1':1,'set2':1
-      }
+      
+      if not apteka_settings:
+        apteka_settings={
+          'set1':0,'set2':0
+        }
       #form.pre(apteka_settings)
       if apteka_settings['set1'] or apteka_settings['set2']:
         apteka_settings['out_prognoz_bonus']=1
@@ -44,7 +45,8 @@ def events_permissions(form):
       form.manager['apt_list_ids']=get_apt_list_ids(form)
       #print('apt_list_ids:',form.manager['apt_list_ids'])
     
-
+ 
+  #form.pre(apteka_settings)
   if form.manager['type']==1:
     form.fields.append(
       {

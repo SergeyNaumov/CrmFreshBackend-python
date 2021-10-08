@@ -25,8 +25,14 @@ def get_fields():
     # },
     {
       'name':'ur_address',
+      'db_name':'id',
       'description':'Юридический адрес',
-      'type':'text',
+      'type':'filter_extend_select_from_table',
+      'table':'apteka',
+      'header_field':'ur_address',
+      'before_code':ur_address_before_code,
+      'value_field':'id',
+      'autocomplete':1,
       'filter_on':1
     },
     {
@@ -67,3 +73,14 @@ def get_fields():
 
 ]
 
+
+def ur_address_before_code(form,field):
+  if form.manager['type']==2:
+    #form.pre(form.manager['apt_list_ids'])
+    if len(form.manager['ul_ids']):
+      field['where']=f'''id in ({','.join(form.manager['apt_list_ids'])})'''
+    else:
+      field['where']='0'
+
+    #form.pre(field['where'])
+    

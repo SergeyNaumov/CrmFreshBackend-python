@@ -3,7 +3,7 @@ def get_fields():
     {
       'name':'registered',
       'description':'Дата и время заявки',
-      'type':'datetime',
+      'type':'date',
       'read_only':1,
       'filter_on':1
     },

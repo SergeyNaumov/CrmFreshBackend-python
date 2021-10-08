@@ -30,8 +30,8 @@ class Config(Form):
               {'description':'Общая информация','name':'main','hide':0},
             ],
             [
-              {'description':'Юридические лица','name':'comp','hide':1},
-              {'description':'Аптеки','name':'apteka','hide':1},
+              #{'description':'Юридические лица','name':'comp','hide':1},
+              #{'description':'Аптеки','name':'apteka','hide':1},
               {'description':'Права','name':'permissions','hide':0},
               
             ]

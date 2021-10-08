@@ -20,6 +20,7 @@ def get_filters():
     {
       'description':'Выводить сводные данные',
       'type':'checkbox',
+      'value':[1,'1'],
       'name':'out_action',
       'filter_on':1,
       'not_process':1
@@ -62,7 +63,7 @@ def ur_lico_id_filter_code(form,field,row):
   links=[f'''<a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a>''']
   
   if (1 in form.query_search['on_filters_hash']['out_action']):
-    links.append(f'''<a href="/edit-form/action/{row['a__id']}" target="_blank">сводные данные</a>''')
+    links.append(f'''<a href="/edit-form/action_plan/{row['ap__id']}?prev={row['prev']}" target="_blank">сводные данные</a>''')
 
   return f'''
     {row['u__header']}<br> <small>{ ' | '.join(links) }</small>'''
@@ -75,7 +76,7 @@ def period_id_filter_code(form,field,row):
   return f'{row["pbp__year"]}, {row["pbp__querter"]} квартал'
 def period_id_before_code(form,field):
     field['values']=form.db.query(
-      query="select id v,concat(year,' ',querter,' квартал') d from prognoz_bonus_period order by date_begin"
+      query="select id v,concat(year,' ',querter,' квартал') d from prognoz_bonus_period  where date_begin>=from_days(to_days(curdate())-180) order by date_begin"
     )
 
 
