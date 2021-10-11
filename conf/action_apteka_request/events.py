@@ -4,13 +4,21 @@ def events_permissions(form):
   
   for f in form.fields:
     f['read_only']=1
-
-  if form.manager['type'] in (1,2):
+  
+  if form.manager['type']==1:
     form.make_delete=1
+    form.manager['apt_list_ids']=[]
     form.read_only=0
+
+  
+
   
   if form.manager['type']==2:
+    form.make_delete=1
+    form.read_only=0
     form.manager['apt_list_ids']=get_apt_list_ids(form)
+
+  #form.pre(form.manager['apt_list_ids'])
 
 
   if form.id:
@@ -29,8 +37,11 @@ def events_permissions(form):
 def before_delete(form):
   #form.pre(form.manager['apt_list_ids'])
   #form.pre(form.ov['apteka_id'])
-  if not(str(form.ov['apteka_id']) in form.manager['apt_list_ids']):
+
+  if form.manager['type']!=1 and not(str(form.ov['apteka_id']) in form.manager['apt_list_ids']):
     form.errors.append(f'''Запрещено удалять данный запрос ''')
+
+  
 
 def before_search(form):
     qs=form.query_search

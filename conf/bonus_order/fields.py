@@ -16,17 +16,27 @@ def attach_before_code(form,field):
 
 
 def get_fields():
-    return [ 
+    return [
+    {
+      'description': 'Юридическое лицо',
+      'type':'code',
+      'name':'ur_lico',
+      'read_only':1,
+      #'after_html':'xjshjhsjhsjhsj'
+      'before_code': ur_lico_before_code
+    } ,
     {
       'name':'attach',
       'description':'Файл',
       'filedir':'./files/bonus_order',
       'type':'file',
+      'read_only':1,
       'before_code':attach_before_code,
       #'filter_on':1,
       'filter_code':attach_filter_code
 
     },
+
     {
       'description':'Юридическое лицо',
       'filter_on':1,
@@ -36,12 +46,13 @@ def get_fields():
       'table':'ur_lico',
       'header_field':'header',
       'value_field':'id',
-
+      
     },
     {
       'description':'Дата и время добавления',
       'name':'registered',
-      'type':'datetime',
+      'type':'date',
+      'read_only':1,
       'defaul_off':1,
       'filter_on':1
     },
@@ -65,3 +76,13 @@ def get_fields():
     }
 
 ]
+
+
+def ur_lico_before_code(form,field):
+  field['after_html']=f'''
+    <b>Акт №{form.ov['number']}</b><br>
+    Юридическое лицо: {form.ov['ur_lico']}<br>
+
+  '''
+  
+  #form.pre(field)
