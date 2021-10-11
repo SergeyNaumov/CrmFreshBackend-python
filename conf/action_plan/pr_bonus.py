@@ -346,9 +346,14 @@ def pr_bonus(form,field):
                 header_total='* Сводные данные по всем аптекам!!'
             
             if form.manager['type']!=3: # для аптек просили убрать прогнозный бонус по всем аптекам
+                open_summary=0
+                
+                if form.ov['open_summary']: open_summary=1
+
                 accordion_data.insert(0,
                     {
                         'header':header_total,
+                        'open':open_summary,
                         'content':[
 
                             {

@@ -67,8 +67,22 @@ def permissions(form):
         values=[form.id],
         onevalue=1
       )
+      form.ov['open_summary']=0
+      if ('open_summary' in params) and params['open_summary']=='1': # если этот параметр включен, тогда блок "Сводные данные по всем юридическим лицам" выводим открытым
+        form.ov['open_summary']=1
+        #form.pre(form.ov)
 
-      if 'prev' in params and int(params['prev']):
+      if 'prev' in params and len(params['prev'].split('-'))==2: #prev=2021-2  период указывается явно
+        period_arr=params['prev'].split('-')
+        #print('period_arr:',int(period_arr[0]), int(period_arr[1]))
+        form.ov['period']=form.db.query(
+          query="select * from prognoz_bonus_period where year=%s and querter=%s",values=[int(period_arr[0]), int(period_arr[1])],
+          onerow=1,
+          debug=1
+        )
+        #print('period:',form.ov['period'])
+        #get_cur_period(form)
+      elif 'prev' in params and int(params['prev']):
         form.ov['period']=get_cur_period(form,1)
       else:
         form.ov['period']=get_cur_period(form)
