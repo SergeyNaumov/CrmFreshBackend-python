@@ -17,27 +17,33 @@ def events_permissions(form):
 
     form.manager['apt_list_ids']=get_apt_list_ids(form)
     
-    if len(form.manager['apt_list_ids']):
-      apteka_id=form.manager['apt_list_ids'][0]
+    apteka_settings={
+      'set1':0,'set2':0
+    }
+    
+    if not len(form.manager['apt_list_ids']):
+      form.manager['apt_list_ids'].append('0')
+    
+    apteka_id=form.manager['apt_list_ids'][0]
 
-      apteka_settings=form.db.query(
-        query='select set1,set2 from apteka_settings where apteka_id=%s',
-        values=[apteka_id],
-        onerow=1
-      )
+    apteka_settings=form.db.query(
+      query='select set1,set2 from apteka_settings where apteka_id=%s',
+      values=[apteka_id],
+      onerow=1
+    )
       
-      if not apteka_settings:
-        apteka_settings={
-          'set1':0,'set2':0
-        }
-      #form.pre(apteka_settings)
-      if apteka_settings['set1'] or apteka_settings['set2']:
-        apteka_settings['out_prognoz_bonus']=1
-      else:
-        apteka_settings['out_prognoz_bonus']=0
+    if not apteka_settings:
+      apteka_settings={
+        'set1':0,'set2':0
+      }
+    #form.pre(apteka_settings)
+    if apteka_settings['set1'] or apteka_settings['set2']:
+      apteka_settings['out_prognoz_bonus']=1
+    else:
+      apteka_settings['out_prognoz_bonus']=0
 
-      if apteka_settings:
-        form.manager['apteka_settings']=apteka_settings
+    if apteka_settings:
+      form.manager['apteka_settings']=apteka_settings
 
 
 

@@ -31,8 +31,8 @@ async def get_filters_controller(config: str):
     # if(ref($f->{before_code}) eq 'CODE'){
     #   run_event(event=>$f->{before_code},description=>'before_code for '.$f->{name},form=>$form,arg=>$f);
     # }
-    #if exists_arg('filter_type',f):
-    #  f['filter']
+    if exists_arg('not_filter',f):
+      continue
     if f['type'] in ('password','code','1_to_m','hidden'): continue
 
     if f['type'] in ('textarea','filter_extend_text','text'):

@@ -1,5 +1,6 @@
 
 def events_permissions(form):
+  #form.read_only=1
   for f in form.fields:
     f['read_only']=1
 

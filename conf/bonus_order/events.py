@@ -2,6 +2,7 @@ from lib.anna.get_ul_list import get_ul_list_ids
 
 def events_permissions(form):
   if form.manager['type']!=1:
+    form.pre(form.manager['type'])
     form.not_edit=1
     form.read_only=1
     for f in form.fields:

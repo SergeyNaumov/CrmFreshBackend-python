@@ -79,10 +79,11 @@ def get_fields():
 
 
 def ur_lico_before_code(form,field):
-  field['after_html']=f'''
-    <b>Акт №{form.ov['number']}</b><br>
-    Юридическое лицо: {form.ov['ur_lico']}<br>
+  if form.id:
+    field['after_html']=f'''
+      <b>Акт №{form.ov['number']}</b><br>
+      Юридическое лицо: {form.ov['ur_lico']}<br>
 
-  '''
+    '''
   
   #form.pre(field)
