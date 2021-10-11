@@ -31,6 +31,7 @@ def func_get_values(form):
         if f['type']=='password':
           del values[f['name']]
 
+    #print('values:',values)
 
 
     for f in form.fields:
@@ -83,8 +84,10 @@ def func_get_values(form):
       if name in values:
         if values[name].isnumeric():
           values[name]=str(values[name])
-        f['value']=values[name]
-
+        if not(form.script == 'admin_table' and ('value' in f)):
+          f['value']=values[name]
+      
+      #print(form.script)
       # if 'before_code' in f:
       #   f['before_code'](form=form,field=f)  
 

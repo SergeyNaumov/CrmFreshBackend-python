@@ -20,9 +20,11 @@ def get_filters():
     {
       'description':'Выводить сводные данные',
       'type':'checkbox',
-      'value':[1,'1'],
+      'value':1,
       'name':'out_action',
       'filter_on':1,
+
+      'before_code':out_action_before_code,
       'not_process':1
     },
     {
@@ -80,3 +82,6 @@ def period_id_before_code(form,field):
     )
 
 
+def out_action_before_code(form,field):
+  field['value']=[1]
+  #print('in_before_code:',field['value'])

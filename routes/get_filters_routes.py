@@ -37,7 +37,6 @@ async def get_filters_controller(config: str):
 
     if f['type'] in ('textarea','filter_extend_text','text'):
       f['type']='text'
-
     elif f['type'] in ('select_values','filter_extend_select_values'):
       f['type']='select'
     
