@@ -20,7 +20,7 @@ def gen_query_search(form):
       query=form.QUERY_SEARCH
       
       if not form.not_perpage:
-        query=query+' LIMIT '+form.page+','+form.perpage
+        query=query + f' LIMIT { (page-1)*perpage  }, {form.perpage}'
   else:
       SELECT_FIELDS = ', '.join(qs['SELECT_FIELDS'])
       TABLES = "\n".join(qs['TABLES'])
@@ -43,16 +43,15 @@ def gen_query_search(form):
         query = query + ' ORDER BY '+', '.join(qs['ORDER'])
 
       if not form.not_perpage:
-        query = query + ' LIMIT '+str( (page-1)*perpage ) +', '+form.perpage
+        query = query + f' LIMIT { (page-1)*perpage  }, {form.perpage}'
 
-      if 'query_count' in qs:
-        query_count=qs['query_count']
+  if 'query_count' in qs:
+    query_count=qs['query_count']
+  else:
+    if len(qs['GROUP']):
+      query_count = f'SELECT count(*) cnt FROM (select wt.{form.work_table_id } FROM {TABLES} {WHERE} {GROUP} {HAVING}) x'
+    else:
+      query_count = ' SELECT count(*) cnt from ' + TABLES + WHERE + GROUP + HAVING
       
-      else:
-        if len(qs['GROUP']):
-          query_count = f'SELECT count(*) cnt FROM (select wt.{form.work_table_id } FROM {TABLES} {WHERE} {GROUP} {HAVING}) x'
-        else:
-          query_count = ' SELECT count(*) cnt from ' + TABLES + WHERE + GROUP + HAVING
-      
-      #print('query:',query)
+      print('query:',query)
   return query, query_count
