@@ -82,28 +82,104 @@ def before_search(form):
       "ul.anna_manager_id ul__anna_manager_id",
       "ul.phone ul__phone",
       "ul.parent_id ul__parent_id",
-      "group_concat(s2.header SEPARATOR \", \") suppliers2",
+      "group_concat(distinct s2.header SEPARATOR \", \") suppliers2",
       "ap.header ap__header",
       "ap.id ap__id",
-      'sum(wt.cnt) wt__cnt',
-      "sum(wt.summ) wt__summ",
+     # 'wt.cnt wt__cnt',
+     # "wt.summ wt__summ",
   ]
 
   on_filter_hash=qs['on_filters_hash']
   
   if 'apteka_id' in on_filter_hash: # группируем по наименованию товара и по аптеки
-    qs['GROUP']=['ap.id, wt.header, a.id']
+    qs['GROUP']=['a.id, wt.header']
   elif 'ur_lico_id' in on_filter_hash:
-    qs['GROUP']=['ap.id, wt.header, ul.id']
+    qs['GROUP']=['wt.header, ul.id']
   else:
-    qs['GROUP']=['ap.id, wt.header'] # , wt.header, ur_lico_id
+    qs['GROUP']=['wt.header'] # , wt.header, ur_lico_id
   
-  #form.pre(qs['GROUP'])
+  #form.pre(qs)
 
   if form.manager['type']==2: # in (2,3):
     form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
   elif form.manager['type']==3:
     form.query_search['WHERE'].append(f'''a.manager_id = {form.manager['id']}''')
+
+  # ДЛЯ ТОГО, чтобы кол-во считалось верно -- пишем свой запрос
+  WHERE=''
+  if len(qs['WHERE']):
+    WHERE=f' WHERE {" AND ".join(qs["WHERE"]) } '
+  
+  GROUP=''
+  if len(qs['GROUP']):
+    GROUP=f' GROUP BY {" ".join(qs["GROUP"]) } '
+  GROUP2=GROUP.replace('.','__')
+
+  ORDER=''
+  if len(qs['ORDER']):
+    ORDER=f' ORDER BY {", ".join(qs["ORDER"]) } '
+  ORDER2=ORDER.replace('.','__')
+
+
+  perpage=int(form.perpage)
+  page=int(form.page)
+  LIMIT=''
+  if not form.not_perpage:
+    LIMIT = f' LIMIT { (page-1)*perpage },{form.perpage}'
+  #form.pre({'LIMIT':LIMIT})
+
+
+  # Q=f'''
+  #    SELECT *, sum(wt__cnt) wt__cnt, sum(wt__summ) wt__summ
+  #    FROM
+  #     (
+  #        SELECT
+  #          {','.join(qs['SELECT_FIELDS'])}
+  #        FROM
+  #          {" ".join(qs['TABLES'])}
+  #        {WHERE}
+  #        {GROUP}
+  #        {ORDER}
+         
+  #    ) x
+  #    {GROUP2} {ORDER2}
+  #'''
+
+  Q=f'''
+
+
+         SELECT
+           {','.join(qs['SELECT_FIELDS'])}, sum(wt.cnt) wt__cnt, sum(wt.summ) wt__summ
+         FROM
+           {" ".join(qs['TABLES'])}
+         {WHERE}
+         {GROUP}
+         {ORDER}
+         
+
+  '''
+  form.QUERY_SEARCH=Q
+
+  qs['query_count']=f'''
+    SELECT
+      count(*) cnt
+    from
+    (
+      SELECT
+        wt.id
+      FROM
+        {" ".join(qs['TABLES'])}
+      {WHERE}
+      {GROUP}
+
+    ) x
+
+  '''
+  #form.pre(Q)
+  #form.pre(qs['query_count'])
+  #form.pre(Q)
+  #print('ORDER:', ORDER)
+  #print(form.QUERY_SEARCH)
   # query_count='''
   #   select
   #     wt.id

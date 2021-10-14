@@ -80,7 +80,6 @@ def get_fields():
       'type':'text',
       'read_only':1,
       'tab':'main',
-      'value':'Тестовый пользователь',
       'regexp_rules':[
           '/^.+$/','Полное имя обязательно для заполнения',
       ],

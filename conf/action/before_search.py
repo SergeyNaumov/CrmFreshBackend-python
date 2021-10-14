@@ -45,6 +45,7 @@ def before_search(form):
 
 
   if form.manager['type']==3: # для представителя аптеки
+    
     if len(form.manager['apteka_list']):
       qs['SELECT_FIELDS'].append('group_concat(distinct aa.apteka_id SEPARATOR "|" ) subscribed_apteka_id')
       qs['SELECT_FIELDS'].append('group_concat(distinct aar.apteka_id SEPARATOR "|" ) requested_apteka_id')
@@ -71,7 +72,7 @@ def before_search(form):
      )
     if date_subscribe[1]:
       qs['WHERE'].append(
-       f'''wt.date_stop<="{date_subscribe[1]}-01"'''
+       f'''wt.date_stop<="{date_subscribe[1]}-31"'''
      )
   # if 'date_start' in on_filters_hash and on_filters_hash['date_start']:
   #   qs['WHERE'].append(

@@ -1,7 +1,7 @@
 from lib.engine import s
 from lib.core import exists_arg, date_to_rus
 from .get_old_values import get_old_values
-
+#from lib.anna.get_apt_list import get_apt_list_ids
 def events_permissions(form):
   #form.pre('zzz')
   filter_ur_lico(form)
@@ -25,7 +25,8 @@ def events_permissions(form):
 
     form.manager['apteka_settings']=apteka_settings
 
-
+   #form.manager['apteka_list']=get_apt_list_ids(form,form.manager['id'])
+    #form.pre(form.manager['apteka_list'])
 
   # Фильтр для юрлиц
   if form.script in ['admin_table', 'find_objects'] and form.manager['type'] in (2,3):
@@ -269,7 +270,7 @@ def date_subscribe_filter_code(form,field,row):
 
 
 
-  if str(form.manager['type'])=='2': # Юридическое лицо
+  if form.manager['type']==2: # Юридическое лицо
     #form.pre(row)
     # получаем списки подписанных и отправивших запрос на акцию юрлиц
     if not exists_arg('subscribed_ur_lico_id',row): row['subscribed_ur_lico_id']=''
@@ -329,7 +330,7 @@ def date_subscribe_filter_code(form,field,row):
       <div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{ur_lico_subscribe}|{apteka_subscribe}</div>'''
 
 
-  elif str(form.manager['type'])=='3': # Аптека
+  elif form.manager['type']==3: # Аптека
     # subscribe_status: 0 - не подписна ; 1 - отправлен запрос на участие ; 2- подписана
     if not exists_arg('subscribed_apteka_id',row): row['subscribed_apteka_id']=''
     row['subscribed_apteka_id']=row['subscribed_apteka_id'].split('|')

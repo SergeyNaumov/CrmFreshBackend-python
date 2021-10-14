@@ -83,6 +83,7 @@ def get_fields():
         'description':'Закуплено товаров, шт',
         'name':'cnt',
         'type':'text',
+        'filter_type':'range',
         'filter_on':1,
       },
       {
@@ -158,10 +159,11 @@ def dates_filter_code(form,field,row):
   return f"{row['act__date_start']} ... {row['act__date_stop']}"
 
 def action_filter_code(form,field,row):
+  if ('plugin' in form.R) and form.R['plugin']=='search_xls' and row['act__id']:
+    return row['act__header']
+  
   if row['act__id']:
-    return f'''
-      <a href="/edit-form/action/{row['act__id']}" target="_blank">{row['act__header']}</a><br>
-    '''
+    return f'''<a href="/edit-form/action/{row['act__id']}" target="_blank">{row['act__header']}</a><br>'''
       # wt.id: {row['wt__id']}<br>
       # action_plan_id: {row['ap__id']}<br>
       # ur_lico_id: {row['ul__id']}<br>
