@@ -7,7 +7,10 @@ config={
    ],
   'encrypt_method':'mysql_sha2',
   'use_project':False,
+  
   'system_email':'svcomplex@gmail.com',
+  'system_url':'https://anna.crm-dev.ru/',
+
   'connects':{
     'crm_read':{
       'user':'crm',

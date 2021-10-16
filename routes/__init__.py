@@ -12,6 +12,7 @@ from .password import router as router_password
 from .ajax import router as router_ajax
 from .autocomplete import router as router_autocomplete
 from .documentation_routes import router as router_documentation
+from .video_routes import router as router_video
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
 from .anna import router as router_anna
@@ -38,6 +39,7 @@ router.include_router(router_edit_form)
 router.include_router(router_one_to_m)
 router.include_router(router_extend)
 router.include_router(router_documentation,prefix='/documentation')
+router.include_router(router_video,prefix='/VideoList')
 router.include_router(router_autocomplete,prefix='/autocomplete')
 router.include_router(router_anna,prefix='/anna')
 

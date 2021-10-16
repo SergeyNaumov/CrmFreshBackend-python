@@ -53,7 +53,7 @@ def after_search(form):
 
         
         df = pd.DataFrame(pandas_dataframe)
-        print(pandas_dataframe,"\n\n")
+        #print(pandas_dataframe,"\n\n")
         # 
         writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
         df.to_excel(writer, sheet_name='Sheet1', index=False)
@@ -90,8 +90,11 @@ def go(form):
         form.search_plugin.append(config)
 
     elif form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
-        if not len(form.events['after_search']):
-            form.events['after_search'].append(after_search)
+        if not('after_search' in form.events) or not len(form.events['after_search']):
+            form.events['after_search']=[after_search]
+        if not('before_search' in form.events):
+            form.events['before_search']=[]
+            
         if form.events['before_search']:
             form.events['before_search'].append(before_search)
     #else:

@@ -49,7 +49,7 @@ def get_fields():
       'name':'summ',
       'type':'text',
       'allready_out_on_result':1
-      #'filter_on':1
+      
 
     },
     {

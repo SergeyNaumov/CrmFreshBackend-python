@@ -7,6 +7,8 @@ def events_permissions(form):
    form.remove_field('manager_phone');
   # Для менеджера Анна делаем возможность фильтровать по юридическому лицу
   if form.manager['type']==1:
+    form.read_only=0
+    form.not_edit=0
     form.fields.append(
       {
         'name':'ur_lico_id',
@@ -22,7 +24,24 @@ def events_permissions(form):
         #'filter_code':ur_lico_id_filter_code
       }
     )
+    # Для менеджеров даём возможность привязывать к аптекам учётку
+    # if form.script=='edit_form' and form.id: 
+    #   ov=form.db.query(query="select * from apteka where id=%s",values=[form.id],onerow=1)
+    #   if ov:
+    #     form.pre(ov)
+    #     form.fields.append({
+    #        'description':'Учётная запись',
+    #        'type':'select_from_table',
+    #        'table':'manager',
+    #        'where':'type=3',
+    #        'name':'manager_id',
+    #        'order':'email',
+    #        'header_field':'concat(login," (",name,")")',
+    #        'value_field':'id'
+    #     })
+
     form.QUERY_SEARCH_TABLES.append({'table':'ur_lico','alias':'ul','link':'ul.id=wt.ur_lico_id','left_join':1})
+    
 
   elif form.manager['type']==2:
     form.manager['ul_ids']=get_ul_list_ids(form,form.manager['id'])
@@ -55,7 +74,7 @@ def events_permissions(form):
     form.errors.append('доступ запрещён!')
   
   for f in form.fields:
-    f['read_only']=1
+    if f['name'] != 'manager_id': f['read_only']=1
 
 
 def before_search(form):

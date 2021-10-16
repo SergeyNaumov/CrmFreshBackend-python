@@ -35,9 +35,11 @@ async def wysiwyg_upload(config:str): #
 
   return {
     'title':form.title,
+    'log':form.log,
     'errors':form.errors,
     'success':1,
-    'list':data_list
+    'list':data_list,
+    'links':form.links
   }
 
   

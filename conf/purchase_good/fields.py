@@ -85,6 +85,7 @@ def get_fields():
         'type':'text',
         'filter_type':'range',
         'filter_on':1,
+        'not_process':1
       },
       {
         'description':'Сумма',
@@ -173,10 +174,9 @@ def action_filter_code(form,field,row):
 
 def suppliers_filter_code(form,field,row):
   #form.pre(row)
-  if 'suppliers2' in row:
-    return row['suppliers2']
-  else:
-    return ''
+  
+  return form.suppliers[row['wt__id']]
+
 
 def action_before_code(form,field):
   

@@ -1,6 +1,6 @@
 from lib.CRM.form import Form
 from .fields import fields
-#from .events import events
+from .events import events
 
 
 class Config(Form):
@@ -8,7 +8,7 @@ class Config(Form):
     def __init__(self,arg):
         super().__init__(arg) 
         self.work_table='manager_menu' 
-        #self.events=events
+        self.events=events
         self.title='Пункты меню'
         self.sort=1
         self.tree_use=1

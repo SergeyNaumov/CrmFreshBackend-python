@@ -35,7 +35,7 @@ def get_values_for_select_from_table(form,f):
   if exists_arg('autocomplete',f):
     if exists_arg('value',f):
       if f['where']: f['where']+=' AND '
-      f['where']+=f['value_field']+'="'+f['value']+'"'
+      f['where']+=f"""{f['value_field']}="{f['value']}" """
     
     else:
       return []

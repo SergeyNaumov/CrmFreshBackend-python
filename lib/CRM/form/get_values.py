@@ -33,7 +33,8 @@ def func_get_values(form):
 
     #print('values:',values)
 
-
+    #form.pre(f"v1: {form.fields[5]['value']}")
+    #form.pre("action: "+form.action)
     for f in form.fields:
       #print('f:',f)
       #if f['type'] in ['date','datetime','text','textarea']:
@@ -41,7 +42,7 @@ def func_get_values(form):
 
 
       name=f['name']
-      #print(f)
+      
       if is_wt_field(f):
         #if name=='checkbox':
           #print('not name checkbox:', (not name in values) )
@@ -58,17 +59,18 @@ def func_get_values(form):
 
           
           
-
+      set_from_nv=True
+      if form.script=='edit_form' and (form.action in ('new')) and ('value' in f):
+        set_from_nv=False
       
-        #if not f['value']:
-        #  f['value']=''
-
+      #form.pre(f"{name}: {set_from_nv} ; value in f: {('value' in f)}")
       if form.action not in ['insert','update'] and (
           exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']
           or
           f['type'] in ['select_from_table','filter_extend_select_from_table']
         ):
-          f['value']=exists_arg(f['name'],values);
+
+          if set_from_nv:  f['value']=exists_arg(f['name'],values);
           if not exists_arg('values',f) or not len(f['values']):
             f['values']=get_values_for_select_from_table(form,f)
             
@@ -82,11 +84,12 @@ def func_get_values(form):
 
 
       if name in values:
-        if values[name].isnumeric():
-          values[name]=str(values[name])
-        if not(form.script == 'admin_table' and ('value' in f)):
-          f['value']=values[name]
-      
+          if values[name].isnumeric():
+            values[name]=str(values[name])
+          if set_from_nv and not(form.script == 'admin_table' and ('value' in f)):
+            f['value']=values[name]
+            
+    #form.pre(values) 
       #print(form.script)
       # if 'before_code' in f:
       #   f['before_code'](form=form,field=f)  
@@ -94,7 +97,7 @@ def func_get_values(form):
 
           
 
-      
+    #form.pre(f"v2: {form.fields[5]['value']}")
     form.values=values
     #print('GET_VALUES2:',values)
 

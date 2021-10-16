@@ -74,11 +74,14 @@ def read_config(**arg):
   config_class=configs[arg['config']]
   
   form=config_class(arg)
+
   form.s=s
   s.form=form
   
   form.config=arg['config']
   form.script=arg['script']
+
+
 
   if need_only_read(form): form.db=s.db_read
   else: form.db=s.db_write
@@ -101,15 +104,17 @@ def read_config(**arg):
   if not form.work_table: form.work_table=arg['config']
 
   form.run_event('permissions')
+
   form.default_config_attr(arg)
   form.set_orig_types()
   
   # Перенёс из routes.edit_form.process_edit_form.py
   #form.get_values()
   form.run_all_before_code()
-  
+
   #print('before_get_values:',form.fields[0])
   form.get_values()
+
   
   #print('after_get_values:',form.fields[0])
   

@@ -22,7 +22,7 @@ def get_apt_list(form,manager_id):
         if(r): return [r]
         return []
         
-    else:
+    elif manager['type']==2:
         return form.db.query(
             query="""
                 SELECT
@@ -39,6 +39,7 @@ def get_apt_list(form,manager_id):
             errors=form.errors,
             values=[manager_id]
         )
+    return []
 
 def get_apt_list_ids(form,manager_id=0):
     if not manager_id:

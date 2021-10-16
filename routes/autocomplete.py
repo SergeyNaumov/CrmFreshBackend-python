@@ -40,6 +40,7 @@ async def autocomplete(config:str,R: dict):
         if f['name'] == sub_name:
           field=f
     else:
+
       field=form.get_field(name)
       
 
@@ -54,8 +55,9 @@ async def autocomplete(config:str,R: dict):
     #  pass
     #else:
     #  errors.append('не указан term')
-    
-    
+  
+  if not('values' in R): R['values']=[]
+
 
   if not field:
     errors.append(f'field_name: {name} not found')

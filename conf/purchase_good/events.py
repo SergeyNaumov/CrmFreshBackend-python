@@ -38,6 +38,7 @@ def before_search(form):
     form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
 
 
+  #form.pre(qs)
   
   #form.explain=1
   if 'priority_sort' in form.R['params']:
@@ -49,8 +50,8 @@ def before_search(form):
 
 
   #form.pre(form.query_search)
-  sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
-  sf.append('ap.header ap__header')
+  #sf.append('group_concat(s2.header SEPARATOR ", ") suppliers2')
+  #sf.append('ap.header ap__header')
   #form.pre(qs['GROUP'])
   #form.pre(sf)
   # Будем суммировать товары
@@ -82,12 +83,14 @@ def before_search(form):
       "ul.anna_manager_id ul__anna_manager_id",
       "ul.phone ul__phone",
       "ul.parent_id ul__parent_id",
-      "group_concat(distinct s2.header SEPARATOR \", \") suppliers2",
+     
       "ap.header ap__header",
       "ap.id ap__id",
      # 'wt.cnt wt__cnt',
      # "wt.summ wt__summ",
   ]
+
+  # "group_concat(distinct s2.header SEPARATOR \", \") suppliers2",
 
   on_filter_hash=qs['on_filters_hash']
   
@@ -101,15 +104,39 @@ def before_search(form):
   #form.pre(qs)
 
   if form.manager['type']==2: # in (2,3):
-    form.query_search['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
+    qs['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
   elif form.manager['type']==3:
-    form.query_search['WHERE'].append(f'''a.manager_id = {form.manager['id']}''')
+    qs['WHERE'].append(f'''a.manager_id = {form.manager['id']}''')
+
+  #WHERE_CNT=[]
+
+  if 'cnt' in qs['on_filters_hash']:
+    cnt_val=qs['on_filters_hash']['cnt']
+    if cnt_val[0] and cnt_val[0].isdigit():
+      qs['WHERE'].append(f" wt.cnt>={cnt_val[0]}")
+    
+    if cnt_val[1] and cnt_val[1].isdigit():
+      qs['WHERE'].append(f" wt.cnt<={cnt_val[1]}")
+
+    #if len(WHERE_CNT):
+    #  WHERE_CNT=f"WHERE {' AND '.join(WHERE_CNT)}"
+    
+    if 'priority_sort' in  form.R['params']:
+      PS=form.R['params']['priority_sort']
+      if PS[0]=='cnt':
+        desc=''
+        if PS[1]=='desc': desc='desc'
+        qs['ORDER'].append(f"wt.cnt {desc}")
+      
 
   # ДЛЯ ТОГО, чтобы кол-во считалось верно -- пишем свой запрос
   WHERE=''
+
+
   if len(qs['WHERE']):
     WHERE=f' WHERE {" AND ".join(qs["WHERE"]) } '
-  
+  WHERE2=WHERE.replace('.','__')
+
   GROUP=''
   if len(qs['GROUP']):
     GROUP=f' GROUP BY {" ".join(qs["GROUP"]) } '
@@ -119,7 +146,7 @@ def before_search(form):
   if len(qs['ORDER']):
     ORDER=f' ORDER BY {", ".join(qs["ORDER"]) } '
   ORDER2=ORDER.replace('.','__')
-
+  
 
   perpage=int(form.perpage)
   page=int(form.page)
@@ -144,20 +171,26 @@ def before_search(form):
   #    ) x
   #    {GROUP2} {ORDER2}
   #'''
+  #form.explain=1
+
+    #form.pre(isinstance(cnt_val[1],str) )
+    #if(cnt_val[0].isgigit()):
+    #  form.pre(cnt_val[0])
+    
+    #if(cnt_val[1].isgigit()):
+    #  form.pre(cnt_val[1])
 
   Q=f'''
-
-
-         SELECT
-           {','.join(qs['SELECT_FIELDS'])}, sum(wt.cnt) wt__cnt, sum(wt.summ) wt__summ
-         FROM
-           {" ".join(qs['TABLES'])}
-         {WHERE}
-         {GROUP}
-         {ORDER}
-         
-
+  SELECT * FROM
+  (
+   SELECT
+     {','.join(qs['SELECT_FIELDS'])}, sum(wt.cnt) wt__cnt, sum(wt.summ) wt__summ
+   FROM
+     {" ".join(qs['TABLES'])}
+   {GROUP} 
+  ) x {WHERE2} {ORDER2}
   '''
+  #form.pre(Q)
   form.QUERY_SEARCH=Q
 
   qs['query_count']=f'''
@@ -171,40 +204,42 @@ def before_search(form):
         {" ".join(qs['TABLES'])}
       {WHERE}
       {GROUP}
-
     ) x
-
   '''
-  #form.pre(Q)
-  #form.pre(qs['query_count'])
-  #form.pre(Q)
-  #print('ORDER:', ORDER)
-  #print(form.QUERY_SEARCH)
-  # query_count='''
-  #   select
-  #     wt.id
-  #   from
-  #     purchase_good wt
-  #     JOIN purchase p ON p.id=wt.purchase_id
-  #     JOIN action  act ON p.action_id=act.id
-  #     JOIN action_plan ap ON ap.action_id=act.id and wt.action_plan_id=ap.id
-  #     LEFT JOIN apteka a ON wt.apteka_id = a.id
-  #     LEFT JOIN ur_lico ul ON a.ur_lico_id=ul.id
+
+  suppliers={}
+
+  query_supplier=f'''
+    SELECT
+      wt.id, group_concat(distinct s2.header SEPARATOR \", \") suppliers2
+    FROM
+      {" ".join(qs['TABLES'])}
+      LEFT JOIN action_plan_supplier aps ON aps.action_plan_id=ap.id
+      LEFT JOIN supplier s2 ON s2.id=aps.supplier_id
+    {WHERE}
+    {GROUP}
+  '''
+  # Собираем информацию о поставщиках
+  if ('suppliers' in qs['on_filters_hash']):
+      suppliers_list=form.db.query(
+        query=query_supplier,
+        values=form.query_search['VALUES'],
+        #debug=1
+      )
+      for s in suppliers_list:
+        suppliers[s['id']]=s['suppliers2']
       
-  #   '''
+      suppliers_list=None
+      form.suppliers=suppliers
 
-  #if len(qs['WHERE']):
-  #  query_count+=' WHERE '+' AND '.join(qs['WHERE'])
-  #query_count+='GROUP BY wt.id'
-  #query_count=f'''select count(*) cnt from ({query_count}) x'''
-  #qs['query_count']=query_count
-  #form.pre(query_count)
 
+def after_search(form):
+  form.pre(form.SEARCH_RESULT)
 
 events={
   'before_search':[before_search],
   'permissions':[
       events_permissions
   ],
-  'after_search':[]
+  #'after_search':[after_search]
 }

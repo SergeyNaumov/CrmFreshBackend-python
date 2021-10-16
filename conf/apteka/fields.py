@@ -48,9 +48,13 @@ def get_fields():
       'type':'select_from_table',
       'table':'manager',
       'tablename':'m',
-      'header_field':'name',
+      'read_only':1,
+      #'header_field':'name',
+      'header_field':'concat(login," (",name,")")',
       'value_field':'id',
-      'where':'type=3'
+      'where':'type=3',
+      'before_code':manager_id_before_code,
+      'filter_code':manager_id_filter_code
     },
     {
       'description':'Телефон представителя аптеки',
@@ -59,6 +63,7 @@ def get_fields():
       'tablename':'m',
       'db_name':'phone',
       'allready_out_on_result':1,
+      #'filter_code':manager_phone_filter_code
       #'filter_on':1
     },
     # {
@@ -72,7 +77,19 @@ def get_fields():
     # }
 
 ]
+def manager_id_before_code(form,field):
+  if form.script == 'find_objects':
+    field['header_field']='login'
 
+  if form.manager['type']==1:
+    field['read_only']=0
+
+
+def manager_id_filter_code(form,field,row):
+  if row['m__id']:
+    return f"{row['m__login']}<br><small>({row['m__name']})</small>"
+  else:
+    return '-'
 
 def ur_address_before_code(form,field):
   if form.manager['type']==2:

@@ -10,18 +10,20 @@ def form_update_or_insert(form):
           form.run_event('before_update')
       if form.action=='insert':
           form.run_event('before_insert')
-      if form.action in ['insert','update']:
+      if form.action in ('insert','update'):
           form.run_event('before_save')
-      form.save()
-      #print('ACTION:',form.action)
-      if form.action=='update':
+      
+      if not len(form.errors):
+        form.save()
+      
+        if form.action=='update':
           form.run_event('after_update')
 
-      if form.action=='insert':
+        if form.action=='insert':
           form.run_event('after_insert')
 
-      if form.action in ['insert','update']:
-        form.run_event('after_save')
+        if form.action in ['insert','update']:
+          form.run_event('after_save')
 
     return {
       'success':form.success(),
@@ -34,7 +36,7 @@ def process_edit_form(**arg):
   action=arg['action']
   config=arg['config']
   R=arg['R']
-  #print('GET_VALUES -1 ',action)
+  
   values=[]
   if 'values' in R:
     values=R['values']
@@ -48,7 +50,9 @@ def process_edit_form(**arg):
     values=values,
     script='edit_form'
   )
+
   need_fields=[]
+  
   for f in form.fields:
     if not('orig_type' in f) or not re.search(r'^filter_extend_',f['orig_type']):
       need_fields.append(f)
@@ -92,9 +96,11 @@ def process_edit_form(**arg):
     if form.action in ['new','edit']:
       if len(form.errors): form.read_only=1
     
-    form.edit_form_process_fields()
     
+    form.edit_form_process_fields()
+    #form.pre(form.fields[0]['value'])
     return {
+      'action':form.action,
       'title':form.title,
       'success':form.success(),
       'errors':form.errors,

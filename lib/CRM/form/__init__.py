@@ -81,6 +81,11 @@ class Form():
 
       self.edit_form_fields=[]
 
+    if script=='documentation':
+      self.links=[]
+    
+    if script=='video_list':
+      self.table_stat_open=''
 
     if script=='find_objects':
       self.QUERY_SEARCH=''

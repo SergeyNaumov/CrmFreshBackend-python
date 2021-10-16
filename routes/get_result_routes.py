@@ -85,7 +85,7 @@ async def get_result(R: dict):
   
   (query,query_count)=gen_query_search(form)
   
-  print('query:',query,"\n\nquery_count:",query_count)
+  #print('query:',query,"\n\nquery_count:",query_count)
   if query_count:
     total_count=form.db.query(
       query='select sum(cnt) from ('+query_count+') x',

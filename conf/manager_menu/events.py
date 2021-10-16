@@ -1,5 +1,6 @@
 def events_permission1(form):
-    print('perm1')
+    if form.manager['type']!=1:
+        form.errors.append('Доступ запрещён')
 
 def events_permission2(form):
     print('perm2')

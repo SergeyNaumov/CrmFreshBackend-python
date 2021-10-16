@@ -19,10 +19,13 @@ def exists_arg(key,dict):
 def get_func(value):
 
   if value and isinstance(value,str):
-    rez=re.search('func:\((.+)\)',value)
+    rez=re.match('func:\((.+)\)',value)
     if not rez:
-      rez=re.search('func:(.+)',value)
-    if rez: return rez[1]
+      rez=re.match('func:(.+)',value)
+    
+    if rez:
+      #print('value:',value,'rez:',rez[1])
+      return rez[1]
   return ''
 
 
@@ -398,7 +401,7 @@ class FreshDB():
             func=get_func(data[name])
             if func:
               insert_fields.append('`'+name+'`')
-              #insert_values.append(func)
+              insert_vopr.append(func)
               update_names.append('`'+name+'`='+func)
             else:
               insert_fields.append(name)
