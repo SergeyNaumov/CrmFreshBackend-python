@@ -19,10 +19,19 @@ def func_get_values(form):
         table=form.work_table,
         where=f'{form.work_table_id}=%s',
         values=[form.id],
-        str=1,
+        #str=1,
         log=form.log
       )
-      #print('GET_VALUES:',values)
+      
+      for v in values:
+        # Декодирую bites (такое счастье было в трейде)
+        if(type(values[v]) is bytes):
+          values[v]=values[v].decode('utf-8')
+        # перевожу в строку (чтобы не гадать с типами для select-ов)
+        if values[v] or values[v]==0:
+          values[v]=str(values[v])
+        else: values[v]=''
+
       if not values:
           form.errors.append(f'В инструменте {form.title} запись с id: {form.id} не найдена. Редактирование невозможно')
           return

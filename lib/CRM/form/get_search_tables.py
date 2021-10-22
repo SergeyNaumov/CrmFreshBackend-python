@@ -7,9 +7,9 @@ def adding_select_fields_in_desc(form,db_field,t):
   fld_on_query=t['alias']+'.'+db_field['Field']+' '+t['alias']+'__'+db_field['Field']
   if not exists_arg('select_fields', t):
     form.query_search['SELECT_FIELDS'].append(fld_on_query)
-
-  if exists_arg('select_fields', t) and exists_arg(field_name, t['select_fields']):
+  #if  t['alias']=='mg':
     
+  if exists_arg('select_fields', t) and (db_field['Field'] in t['select_fields']):
     form.query_search['SELECT_FIELDS'].append(fld_on_query)
 
     
@@ -48,9 +48,11 @@ def get_search_tables(form,query):
 
       if exists_arg('for_fields',t) :
         need_add_table = 0
+
         for fld_name in t['for_fields']:
+          
           if fld_name in form.query_search['on_filters_hash']:
-            need_add_table = 0
+            need_add_table = 1
             break
 
     else:
