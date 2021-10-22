@@ -7,7 +7,9 @@ config={
    ],
   'encrypt_method':'mysql_sha2',
   'use_project':False,
-  
+  'auth':{
+    'manager_table':'manager'
+  },
   'system_email':'svcomplex@gmail.com',
   'system_url':'https://anna.crm-dev.ru/',
 
@@ -29,6 +31,7 @@ config={
 
     'left_menu':'/anna/left-menu'
   },
+
   'docpack':{
     'user_table':'user',
     'docpack_foreign_key':'user_id'

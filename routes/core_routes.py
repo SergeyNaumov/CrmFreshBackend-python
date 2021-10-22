@@ -6,6 +6,9 @@ from lib.engine import s
 from lib.session import *
 
 router = APIRouter()
+@router.get('/test')
+async def test():
+  return {'okay':s.db.query(query="SELECT * from managers where login='naumov'",onerow=1)}
 # Главная
 @router.get('/mainpage')
 async def mainpage():
@@ -18,15 +21,15 @@ async def mainpage():
       onerow=1
     )
 
-    response['news_list']=s.db.query(
-      query='SELECT header,DATE_FORMAT(a.registered, "%e.%m.%y") registered,body from project_crm_news WHERE project_id=%s order by registered desc limit 5',
-      values=[s.project['id']]
-    )
+    #response['news_list']=s.db.query(
+    #  query='SELECT header,DATE_FORMAT(a.registered, "%e.%m.%y") registered,body from project_crm_news WHERE project_id=%s order by registered desc limit 5',
+    #  values=[s.project['id']]
+    #)
   else:
     
     response['manager']=s.db.getrow(
-      table="manager",
-      select_fields='id,login,name,position, concat("/edit-form/manager/",id) link',
+      table=config['auth']['manager_table'],
+      select_fields='id,login,name,"" position, concat("/edit-form/manager/",id) link',
       where='id=%s',
       values=[s.manager['id']],
       errors=response['errors'],
@@ -65,7 +68,7 @@ async def leftmenu():
       )
   else:
       manager=s.db.query(
-        query='select *,concat("/edit_form/manager/",id) link from manager where login=%s',
+        query=f"select *,concat('/edit_form/manager/',id) link from {config['auth']['manager_table']} where login=%s",
         values=[s.login],
         onerow=1,
       )
@@ -128,27 +131,27 @@ async def startpage():
   manager=None
   manager_menu_table=None
   left_menu=[]
+  if hasattr(s,'login'):
+    if(config['use_project']):
+        manager=s.db.query(
+          query='select *,concat("/edit_form/project_manager/",id) link from project_manager where project_id=%s and login=%s',
+          values=[s.project_id,s.login]
+        )
+        manager_menu_table='project_manager_menu'
 
-  if(config['use_project']):
-      manager=s.db.query(
-        query='select *,concat("/edit_form/project_manager/",id) link from project_manager where project_id=%s and login=%s',
-        values=[s.project_id,s.login]
-      )
-      manager_menu_table='project_manager_menu'
+    else:
 
+        manager=s.db.query(
+          query=f"select *,concat('/edit_form/manager/',id) link from {config['auth']['manager_table']} where login=%s",
+          values=[s.login],
+          onerow=1,
+        )
   else:
-
-      manager=s.db.query(
-        query='select *,concat("/edit_form/manager/",id) link from manager where login=%s',
-        values=[s.login],
-        onerow=1,
-      )
-      
+    errors.append('Ошибка авторизации')
       
       
   CY=cur_year()
-
-  del manager['password']
+  if manager and ('password' in manager): del manager['password']
 
 
 

@@ -22,11 +22,12 @@ async def wysiwyg_upload(config:str): #
   errors=[]
 
   data_list=form.db.query(
-    query=f'select * from {config} order by concat( if(parent_id is null,0,parent_id),"-",sort )' ,
+    query=f'select * from {config} order by sort' ,
     #debug=1,
     #table=config,
     #order='sort',
     #where='parent_id is null',
+
     errors=errors,
     tree_use=1
   )

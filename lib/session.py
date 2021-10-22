@@ -1,6 +1,7 @@
 from lib.core import exists_arg, gen_pas
 from db import db,db_read,db_write
 from config import config
+import base64
 
 def session_project_create(s): # создание сессии для проекта
   print('project_create')
@@ -103,36 +104,67 @@ def session_start(s,**arg):
   manager_table='manager'
   errors=[]
   s.use_project=config['use_project']
-  if config['use_project']:
-    session_table='project_session'
-    manager_table='project_manager'
+  manager={'login':'','id':False, 'password':''}
+  
+
+
+  if  config['auth']['type']=='env':
+    if 'authorization' in s.env:
+      auth=s.env['authorization']
+      login=base64.b64decode(auth.split(' ')[1]).decode('utf-8')
+      log_pas=login.split(':')
+      log=log_pas[0]
+      log2='naumov'
+      #print('spl:',type(log),type(log2),'log',)
+      #login=login.split(':')[0]
+      #login=login
+      #login=login.decode('utf-8')
+      if 'remote_user' in s.env:
+        m=s.db.query(
+          query=f"select * from {config['auth']['manager_table']} WHERE {config['auth']['login_field']} = %s ",
+          values=[log],
+          onerow=1,
+          debug=1
+        )
+        print('manager:',m)
+        if m:
+          manager=m
+  else:
+
+      
+      if config['use_project']:
+        session_table='project_session'
+        manager_table='project_manager'
+
+      
+      ok=s.db.query(
+        query='SELECT count(*) FROM '+session_table+' WHERE auth_id=%s and session_key=%s',
+        values=[user_id, key],
+        onevalue=1,
+        errors=errors
+      )
+      
+      if ok:
+          manager=s.db.query(
+            query='select * from '+manager_table+' where id=%s',
+            values=[user_id],
+            onerow=1,errors=errors
+          );
 
   
-  ok=s.db.query(
-    query='SELECT count(*) FROM '+session_table+' WHERE auth_id=%s and session_key=%s',
-    values=[user_id, key],
-    onevalue=1,
-    errors=errors
-  )
-  manager={'login':'','id':False}
-
-  if ok:
-      manager=s.db.query(
-        query='select * from '+manager_table+' where id=%s',
-        values=[user_id],
-        onerow=1,errors=errors
-      );
-
-      manager['id']=str(manager['id'])
-      if manager:
-        del manager['password']
-        s.manager=manager
-  
+  if manager:
+    manager['id']=str(manager['id'])
+    
+    del manager['password']
+    s.manager=manager
+      
   s._content={
     'success':1,
     'login':manager['login'],
-    'errors':errors
+    'errors':errors,
+    'env':s.env
   }
+
   if manager['login']:
     s.login=manager['login']
   else:
