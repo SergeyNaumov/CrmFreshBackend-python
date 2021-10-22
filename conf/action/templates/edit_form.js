@@ -1,3 +1,4 @@
+
 // Таб с прогнозными бонусами
 window.select_bonus_ur_lico=function(ur_lico_id){
     let items=document.querySelectorAll('.prognoz_bonus_item')
@@ -98,7 +99,7 @@ function draw_all_diagrams(){
     },500)
 }
 
-console.log('draw?')
+
 draw_all_diagrams()
 
 // for good categories
@@ -143,6 +144,7 @@ function ce(o){ // simple create element
   return false
 }
 function init_subscribe_links(){
+
   // инициализация ссылок "подписаться" для юрлица
   for(let a of document.querySelectorAll('a.ur_lico_subscribe_link')){
     a.onclick=()=>{
@@ -187,6 +189,7 @@ function init_subscribe_links(){
               )
     }
   }
+
 }
 
 function load_categories(){

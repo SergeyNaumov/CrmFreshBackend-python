@@ -5,6 +5,7 @@ from .get_old_values import get_old_values
 def events_permissions(form):
   #form.pre('zzz')
   filter_ur_lico(form)
+  form.ur_lico_subscribe=None
   
   if form.manager['type']==3:
     apteka_id=form.db.query(
@@ -58,6 +59,7 @@ def events_permissions(form):
     # )
 
   if form.id:
+
     #form.ov=form.db.query(
     #  query='select * from action where id=%s',
     #  values=[form.id],
@@ -65,6 +67,7 @@ def events_permissions(form):
     #)
 
     form.ov=get_old_values(form)
+
     if not form.ov: return
     #form.pre(form.ov)
 
@@ -157,7 +160,7 @@ def events_permissions(form):
       form.GROUP_BY='wt.id'
       #form.explain=1
 
-      form.javascript['find_objects']=form.template(
+      form.javascript['find_objects']="//find_objects_ur_lico.js\n"+form.template(
         './conf/action/templates/find_objects_ur_lico.js',
       )
 
@@ -165,7 +168,7 @@ def events_permissions(form):
     elif form.manager['type']==3: # аптека
 
       
-      form.javascript['find_objects']=form.template(
+      form.javascript['find_objects']="//find_objects_apteka.js\n"+form.template(
         './conf/action/templates/find_objects_apteka.js',
       )
       #form.pre(form.javascript)
@@ -345,6 +348,7 @@ def date_subscribe_filter_code(form,field,row):
       if str(a['id']) in row['requested_apteka_id']: v=1
       apteka_subscribe.append({'id':a['id'],'v':str(v),'name':a['name']})
     apteka_subscribe=s.to_json(apteka_subscribe)
+
 
     return f'''{date_to_rus(row['wt__date_start']) } - { date_to_rus(row['wt__date_stop'])}
       <div id="anna_subscr{row["wt__id"]}" class="subscibe_buttons">{apteka_subscribe}</div>'''

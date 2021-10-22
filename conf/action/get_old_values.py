@@ -1,7 +1,8 @@
 from lib.core import exists_arg
-from lib.anna.get_apt_list import get_apt_list_ids
+from lib.anna.get_apt_list import get_apt_list_ids, get_apt_list
 def get_old_values(form):
   ov={}
+  form.apteka_subscribe=[]
   form.ur_lico_subscribe=[]
 
   #print('apt_list_ids:',form.manager['apt_list_ids'])
@@ -73,22 +74,42 @@ def get_old_values(form):
     if len(ov['subscribed_ur_lico_id']):
       ov['subscribed_on_action']=1
   elif form.manager['type']==3:
+    
     form.manager['apt_list_ids']=get_apt_list_ids(form)
+    form.manager['apt_list']=get_apt_list(form)
+    apt_list_ids=form.manager['apt_list_ids']
     #form.pre(form.manager['apt_list_ids'])
-
+    #form.pre();
+    
     ov=form.db.query(
-        query='''
+        query=f'''
           select
-            wt.*
+            wt.*, 
+            if(group_concat( distinct aa.apteka_id),1,0) subscribed_apteka_id,
+            if(group_concat(distinct aa_r.apteka_id),1,0) requested_apteka_id
           from
             action wt
-            LEFT JOIN action_apteka as aa ON aa.action_id=wt.id and aa.apteka_id
-          where wt.id=%s
-        ''',
-        values=[form.id],
+            LEFT JOIN action_apteka_request as aa_r ON (aa_r.action_id=wt.id and aa_r.apteka_id in ({ ','.join(apt_list_ids) }))
+            LEFT  JOIN action_apteka as aa ON (wt.id=aa.action_id and aa.apteka_id in ({ ','.join(apt_list_ids) }))
+          where wt.id={form.id} group by wt.id 
+      ''',
+        debug=form.log,
         onerow=1
       )
+    ov['apteka_id']=form.manager['apteka_settings']['id']
+
+
+
+
     ov['subscribed_on_action']=0
+
+    
+
+
+
+      
+      
+
   else:
     ov=form.db.query(
       query='''

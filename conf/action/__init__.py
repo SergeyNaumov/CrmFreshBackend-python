@@ -39,7 +39,7 @@ class Config(Form):
         form.fields=get_fields()
         # для построения графиков
         #form.javascript['edit_form']=form.template('./js/Chart.bundle.min.js')
-        form.javascript['edit_form']+=form.template('./conf/action/templates/edit_form.js')
+        form.javascript['edit_form']+="// edit_form.js\n"+form.template('./conf/action/templates/edit_form.js')
         #form.pre(form.javascript['edit_form'])
 """
 create table test(

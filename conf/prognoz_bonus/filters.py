@@ -65,7 +65,11 @@ def ur_lico_id_filter_code(form,field,row):
   links=[f'''<a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a>''']
   
   if (1 in form.query_search['on_filters_hash']['out_action']):
-    links.append(f'''<a href="/edit-form/action_plan/{row['ap__id']}?open_summary=1&prev={row['prev']}" target="_blank">сводные данные</a>''')
+    url=f"/edit-form/action_plan/{row['ap__id']}?open_summary=1&prev={row['prev']}"
+    if form.manager['type']==1:
+      url+=f"&ur_lico_id={row['u__id']}"
+      
+    links.append(f'''<a href="{url}" target="_blank">сводные данные</a>''')
 
   return f'''
     {row['u__header']}<br> <small>{ ' | '.join(links) }</small>'''

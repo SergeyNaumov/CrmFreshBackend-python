@@ -1,7 +1,10 @@
 
 # Возвращает список аптек
-def get_apt_list(form,manager_id):
+def get_apt_list(form,manager_id=0):
+    if not manager_id:
+        manager_id=form.manager['id']
     manager=form.db.get(table='manager',where='id=%s',values=[manager_id],onerow=1)
+
     if manager['type']==3:
         r=form.db.query(
                 query='''
@@ -52,11 +55,9 @@ def get_apt_list_ids(form,manager_id=0):
     for a in lst:
         
         res_lst.append(str(a['id']))
-    
-
-    
-
     return res_lst
+
+
 
 def get_apt_managers_ids(form,manager_id):
     ids=get_apt_list_ids(form,manager_id)
@@ -107,3 +108,4 @@ def get_all_ids_for_aptcomp(form,apteka_id):
         res2.append(str(r))
     #form.pre(res2)
     return res2
+

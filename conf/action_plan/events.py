@@ -1,17 +1,25 @@
 from lib.core import  date_to_rus
-from lib.anna.get_ul_list import get_ul_list_ids
+from lib.anna.get_ul_list import get_ul_list_ids, get_ul_list_from_ur_lico_id
 from lib.anna.get_cur_period import get_cur_period
 from lib.anna.get_apt_list import get_apt_list_ids, get_all_ids_for_aptcomp
 def permissions(form):
   params={}
   
-  if 'cgi_params' in form.R:
-    params=form.R['cgi_params']
   form.manager['ur_lico_ids']=[]
   form.manager['apt_list_ids']=[]
 
+  if 'cgi_params' in form.R:
+    params=form.R['cgi_params']
+    # Если это менеджер АннА, и есть параметр ur_lico_id
+    if 'ur_lico_id' in params and form.manager['type']==1:
+      
+      form.manager['ur_lico_ids']=get_ul_list_from_ur_lico_id(form,params['ur_lico_id'])
+
+
+
   if form.script=='edit_form' and form.id and 'cgi_params' in form.R and 'manager_id' in form.R['cgi_params']:
     manager_id=form.R['cgi_params']['manager_id']
+
     form.manager['ur_lico_ids']=get_ul_list_ids(form,manager_id)
     form.manager['apt_list_ids']=get_apt_list_ids(form,manager_id)
 

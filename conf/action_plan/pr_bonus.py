@@ -164,9 +164,10 @@ def pr_bonus(form,field):
 
                     #if b['left_to_complete_percent']>0:
                     #    body_text+=f'''{total_left_to_complete_label}: {b['left_to_complete_rub']}<br>'''
-
+                    
                     accordion_item={
                         'header':b['header'],
+                        'open': (len(bonus_list)==1),
                         'content':[
 
                             {
@@ -348,7 +349,9 @@ def pr_bonus(form,field):
             if form.manager['type']!=3: # для аптек просили убрать прогнозный бонус по всем аптекам
                 open_summary=0
                 
-                if form.ov['open_summary']: open_summary=1
+                if form.ov['open_summary']:
+                    open_summary=1
+
 
                 accordion_data.insert(0,
                     {

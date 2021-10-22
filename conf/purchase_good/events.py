@@ -36,7 +36,20 @@ def before_search(form):
   sf=qs['SELECT_FIELDS']
   if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
     form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
-
+  
+  # Для сотрудников и юрлиц выводим подсказку
+  if form.manager['type'] in (1,2):
+      form.out_before_search.append(f'''
+        <div style="font-size: 0.9rem; max-width: 1000px; margin: 20px; text-align: justify;">
+        Для выдачи суммарных значений по закупленным товарам воспользуйтесь фильтрами:<br><br>
+        
+        -- для выдачи данных только по юридическому лицу, необходимо отключить фильтр «аптека» (убрать галку). В данном случае в результатах поиска количество закупленного одного и того же товара суммируется в рамках юридического лица.<br><br>
+        -- для выдачи данных по общей базе товаров, необходимо отключить фильтр «аптека» и «юр лицо» (убрать галку). В данном случае в результатах поиска количество закупленного одного и того же товара суммируется по общей базе.
+        
+        </div>
+        <hr>
+        <br>
+      ''')
 
   #form.pre(qs)
   
@@ -93,8 +106,8 @@ def before_search(form):
   # "group_concat(distinct s2.header SEPARATOR \", \") suppliers2",
 
   on_filter_hash=qs['on_filters_hash']
-  
-  if 'apteka_id' in on_filter_hash: # группируем по наименованию товара и по аптеки
+  #form.pre(on_filter_hash)
+  if form.manager['type']==3 or 'apteka_id' in on_filter_hash: # группируем по наименованию товара и по аптеки
     qs['GROUP']=['a.id, wt.header']
   elif 'ur_lico_id' in on_filter_hash:
     qs['GROUP']=['wt.header, ul.id']
@@ -106,17 +119,18 @@ def before_search(form):
   if form.manager['type']==2: # in (2,3):
     qs['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
   elif form.manager['type']==3:
-    qs['WHERE'].append(f'''a.manager_id = {form.manager['id']}''')
+    #form.pre(form.manager['apt_list_ids'])
+    qs['WHERE'].append(f'''wt.apteka_id in ({','.join(form.manager['apt_list_ids']) })''')
 
   #WHERE_CNT=[]
-
+  WHERE2=[]
   if 'cnt' in qs['on_filters_hash']:
     cnt_val=qs['on_filters_hash']['cnt']
     if cnt_val[0] and cnt_val[0].isdigit():
-      qs['WHERE'].append(f" wt.cnt>={cnt_val[0]}")
+      WHERE2.append(f" wt__cnt>={cnt_val[0]}")
     
     if cnt_val[1] and cnt_val[1].isdigit():
-      qs['WHERE'].append(f" wt.cnt<={cnt_val[1]}")
+      WHERE2.append(f" wt__cnt<={cnt_val[1]}")
 
     #if len(WHERE_CNT):
     #  WHERE_CNT=f"WHERE {' AND '.join(WHERE_CNT)}"
@@ -131,11 +145,16 @@ def before_search(form):
 
   # ДЛЯ ТОГО, чтобы кол-во считалось верно -- пишем свой запрос
   WHERE=''
-
-
   if len(qs['WHERE']):
     WHERE=f' WHERE {" AND ".join(qs["WHERE"]) } '
-  WHERE2=WHERE.replace('.','__')
+    #WHERE2=WHERE.replace('.','__')
+  if len(WHERE2):
+    WHERE2='WHERE '+(' AND '.join(WHERE2))
+  else:
+    WHERE2=''
+  
+
+
 
   GROUP=''
   if len(qs['GROUP']):
@@ -147,7 +166,7 @@ def before_search(form):
     ORDER=f' ORDER BY {", ".join(qs["ORDER"]) } '
   ORDER2=ORDER.replace('.','__')
   
-
+  #form.pre({'where':WHERE})
   perpage=int(form.perpage)
   page=int(form.page)
   LIMIT=''
@@ -171,7 +190,7 @@ def before_search(form):
   #    ) x
   #    {GROUP2} {ORDER2}
   #'''
-  #form.explain=1
+  
 
     #form.pre(isinstance(cnt_val[1],str) )
     #if(cnt_val[0].isgigit()):
@@ -179,7 +198,7 @@ def before_search(form):
     
     #if(cnt_val[1].isgigit()):
     #  form.pre(cnt_val[1])
-
+  #form.explain=1
   Q=f'''
   SELECT * FROM
   (
@@ -187,8 +206,8 @@ def before_search(form):
      {','.join(qs['SELECT_FIELDS'])}, sum(wt.cnt) wt__cnt, sum(wt.summ) wt__summ
    FROM
      {" ".join(qs['TABLES'])}
-   {GROUP} 
-  ) x {WHERE2} {ORDER2}
+   {WHERE} {GROUP} 
+  ) x  {WHERE2} {ORDER2}
   '''
   #form.pre(Q)
   form.QUERY_SEARCH=Q
@@ -206,7 +225,7 @@ def before_search(form):
       {GROUP}
     ) x
   '''
-
+  
   suppliers={}
 
   query_supplier=f'''
@@ -221,6 +240,7 @@ def before_search(form):
   '''
   # Собираем информацию о поставщиках
   if ('suppliers' in qs['on_filters_hash']):
+
       suppliers_list=form.db.query(
         query=query_supplier,
         values=form.query_search['VALUES'],
@@ -232,8 +252,9 @@ def before_search(form):
       suppliers_list=None
       form.suppliers=suppliers
 
-
+  
 def after_search(form):
+
   form.pre(form.SEARCH_RESULT)
 
 events={

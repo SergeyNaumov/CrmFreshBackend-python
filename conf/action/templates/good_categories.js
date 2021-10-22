@@ -83,6 +83,49 @@ function init_subscribe_links(){
               )
     }
   }
+  for(let a of document.querySelectorAll('a.apteka_subscribe_link')){
+    a.onclick=()=>{
+      let action_id=a.getAttribute('data-action_id')
+      let apteka_id=a.getAttribute('data-id')
+
+
+      let url='/anna/subscribe-action/'+action_id+'/apteka/'+apteka_id
+      window.app.$http.get(
+          window.BackendBase+url
+      ).then(
+          r=>{
+            let d=r.data
+            if(d.success){
+                    a.parentNode.insertBefore(
+                      ce({t:'span',html:'<span style="color: blue;">запрос отправлен</b></span>'}),
+                      a.nextSibling
+                    )
+                    a.innerHTML=''
+                  }
+                  else if(d.errors.length){
+                    //alert(d.errors[0])
+
+                    let error_div=ce({t:'div',html:'<span style="color: red;">'+d.errors[0]+'</b></span>'})
+                    error_div.setAttribute("id",'error-'+u.id)
+
+                    a.parentNode.insertBefore(
+                      error_div,
+                      a.nextSibling
+                    )
+                    setTimeout(
+                      ()=>{
+                        error_div.parentElement.removeChild(error_div)
+                      },
+                      500
+                    )
+                    
+                  }
+                }
+              ).catch(
+                ()=>{}
+              )
+    }
+  }
 }
 
 function load_categories(){

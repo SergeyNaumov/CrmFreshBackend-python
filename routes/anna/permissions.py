@@ -89,10 +89,10 @@ def get_manager_data(manager_id=0,errors=[]):
         onerow=1,
     )
     
-    manager['apteka']=None
+    
 
     if manager:
-
+      manager['apteka']=None
       if manager['type']==3: # Если это аптека
           # если это аптека -- менеджер аптеки -- это менеджер юрлица
           manager['apteka']=s.db.query(

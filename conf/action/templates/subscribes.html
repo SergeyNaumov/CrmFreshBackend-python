@@ -46,6 +46,21 @@
       
     {% endfor %}
   {% endif%}
+
+  {% if manager.type==3%}
+
+    
+      <b>Подписка на акцию: </b>
+      {%if ov.subscribed_apteka_id %} 
+        <span style="color: green;"><b>подписка оформлена</b></span>
+      {%elif ov.requested_apteka_id%}
+        <span style="color: blue;">запрос отправлен</b></span>
+      {%else%}
+        <a href="#" class="apteka_subscribe_link" data-action_id="{{ov.id}}" data-id="{{ov.apteka_id}}"><span style="color: red;">подписаться</span></a>
+      {%endif%}
+    <hr>
+    
+  {% endif%}
   
   
 </div>

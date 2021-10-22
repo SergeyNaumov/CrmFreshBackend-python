@@ -36,6 +36,7 @@ def subscribes(form,field):
         p['value_name']='Выплачиваемый процент'
     
 
+
     if len(plan_ids):
       good_list=form.db.query(query='''
         SELECT
@@ -58,6 +59,7 @@ def subscribes(form,field):
       plan_list=plan_list,
       ov=form.ov,
       manager=form.manager,
-      ur_lico_subscribe=form.ur_lico_subscribe
+      ur_lico_subscribe=form.ur_lico_subscribe,
+      apteka_subscribe=form.apteka_subscribe
     )
-    form.javascript['edit_form']=form.template('./conf/action/templates/good_categories.js')
+    form.javascript['edit_form']="// good_categories.js\n"+form.template('./conf/action/templates/good_categories.js')

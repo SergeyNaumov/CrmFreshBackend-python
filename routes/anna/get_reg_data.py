@@ -10,7 +10,8 @@ def get_reg_data():
     }
     errors=[]
     manager=get_manager_data(s.manager['id'],errors)
-    #print('MANAGER:',manager)
+    if not manager:
+        errors.append('Главная страница АннА, ошибка авторизации, обратитесь к разработчику')
     if not len(errors):
         response['manager']=manager
         # Менеджер Анна
