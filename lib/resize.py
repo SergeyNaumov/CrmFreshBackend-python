@@ -200,5 +200,6 @@ def resize_one(**arg):
   if grayscale:
     img = ImageOps.grayscale(img)
   #print('save:',to,'size: ',img.size)
-  img.save(to,quality=quality,optimize=optimize)
+  print(to,'quality:',quality,optimize)
+  img.save(to) # ,quality=quality,optimize=optimize
 

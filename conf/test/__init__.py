@@ -17,15 +17,15 @@ class Config(Form):
         self.explain=1
         self.cols=[
             [
-                {'description':'wysiwyg','name':'wysiwyg','hide':1},
-                {'description':'Простые типы данных','name':'plain'},
-                {'description':'Тэги','name':'tags','hide':1},
-                {'description':'Комментарии','name':'memo','hide':1},
+                #{'description':'wysiwyg','name':'wysiwyg','hide':1},
+                #{'description':'Простые типы данных','name':'plain'},
+                #{'description':'Тэги','name':'tags','hide':1},
+                {'description':'Комментарии','name':'memo','hide':0},
             ],
             [
-                {'description':'Файлы','name':'files','hide':0},
-                {'description':'Один ко многим','name':'one_to_m','hide':0},
-                {'description':'Дата, время и т.д.','name':'timing','hide':1},
+                #{'description':'Файлы','name':'files','hide':0},
+                #{'description':'Один ко многим','name':'one_to_m','hide':0},
+               # {'description':'Дата, время и т.д.','name':'timing','hide':1},
             ]
         ]
         self.filters_groups=[]

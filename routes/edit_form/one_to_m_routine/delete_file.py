@@ -9,7 +9,6 @@ def delete_file(form,field,child_field,one_to_m_id):
         WHERE
             {field['foreign_key']}={form.id} and {field['table_id']}={one_to_m_id}
   """
-  print('query:',query)
   oldfile=form.db.query(
     query=f"""
         SELECT

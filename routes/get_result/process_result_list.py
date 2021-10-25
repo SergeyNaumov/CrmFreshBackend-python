@@ -54,7 +54,7 @@ def process_result_list(form,R,result_list):
       db_name=exists_arg('db_name',field) or name
       value=exists_arg(tbl+'__'+db_name,r)
       #print('r=>',r)
-      #print(name,'=>',value)
+      print(name,'=>',value)
       if not exists_arg('type_orig',type):
         field['type_orig']=field['type']
       
@@ -71,6 +71,7 @@ def process_result_list(form,R,result_list):
         value=field['filter_code'](form=form,field=field,row=r)
         
       else:
+
         if field['type']=='memo':
           type='memo'
         
@@ -139,7 +140,7 @@ def process_result_list(form,R,result_list):
           if exists_arg('make_change_in_search',field):
             type='date'
           
-      if not exists_arg('make_change_in_search',field):
+      if not type in('memo') and not exists_arg('make_change_in_search',field):
         type='html'
 
       #print('name:',field['name'],' type:',type)
