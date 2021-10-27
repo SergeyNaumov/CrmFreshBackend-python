@@ -2,8 +2,10 @@ def permissions(form):
     
     if form.manager['type']==2:
         form.work_table='content_doc_ur_lico'
+        form.title='Руководство (для юридических лиц)'
     elif form.manager['type']==3:
         form.work_table='content_doc_apteka'
+        form.title='Руководство (для аптек)'
 
     if form.manager['type']==1:
         form.links=[
@@ -24,7 +26,7 @@ def permissions(form):
             }
 
         ]
-    #form.pre(form.links)
+    
 
 def events_before_code(form):
     pass

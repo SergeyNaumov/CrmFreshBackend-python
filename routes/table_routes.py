@@ -17,30 +17,29 @@ async def wysiwyg_upload(config:str): #
     config=config,
     #id=id,
     #values=values,
-    script='documentation'
+    script='table'
   )
   errors=[]
 
-  data_list=form.db.query(
-    query=f'select * from {form.work_table} order by sort' ,
-    #debug=1,
-    #table=config,
-    #order='sort',
-    #where='parent_id is null',
-
-    errors=errors,
-    tree_use=1
-  )
+  
 
   #for d in data_list:
-
+  data=[]
+  headers=form.headers
   return {
-    'title':form.title,
-    'log':form.log,
-    'errors':form.errors,
+    'form':{
+      'title':form.title,
+      'log':form.log,
+      'errors':form.errors,
+      'headers':headers,
+      'data':form.data,
+      'sort':form.sort,
+      'sort_desc':form.sort_desc
+    },
+
     'success':1,
-    'list':data_list,
-    'links':form.links
+
+    #'data':form.links
   }
 
   

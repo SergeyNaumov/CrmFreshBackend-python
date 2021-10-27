@@ -17,6 +17,21 @@ def events_permissions(form):
 
   for f in form.fields:
     f['read_only']=1
+
+  if form.script == 'admin_table':
+      # Для сотрудников и юрлиц выводим подсказку
+    if form.manager['type'] in (1,2):
+        form.before_filters_html.append(f'''
+          <div style="font-size: 0.9rem; max-width: 1000px; margin: 20px; text-align: justify;">
+          Для выдачи суммарных значений по закупленным товарам воспользуйтесь фильтрами:<br><br>
+          
+          -- для выдачи данных только по юридическому лицу, необходимо отключить фильтр «аптека» (убрать галку). В данном случае в результатах поиска количество закупленного одного и того же товара суммируется в рамках юридического лица.<br><br>
+          -- для выдачи данных по общей базе товаров, необходимо отключить фильтр «аптека» и «юр лицо» (убрать галку). В данном случае в результатах поиска количество закупленного одного и того же товара суммируется по общей базе.
+          
+          </div>
+          <hr>
+          <br>
+        ''')
   
   if form.script=='find_objects':
     fld=form.get_field('date_start')
@@ -37,19 +52,6 @@ def before_search(form):
   if not('action_id' in qs['on_filters_hash']) or not qs['on_filters_hash']['action_id']:
     form.errors.append('Нужно обязательно выбрать "Название маркетингового мероприятия"')
   
-  # Для сотрудников и юрлиц выводим подсказку
-  if form.manager['type'] in (1,2):
-      form.out_before_search.append(f'''
-        <div style="font-size: 0.9rem; max-width: 1000px; margin: 20px; text-align: justify;">
-        Для выдачи суммарных значений по закупленным товарам воспользуйтесь фильтрами:<br><br>
-        
-        -- для выдачи данных только по юридическому лицу, необходимо отключить фильтр «аптека» (убрать галку). В данном случае в результатах поиска количество закупленного одного и того же товара суммируется в рамках юридического лица.<br><br>
-        -- для выдачи данных по общей базе товаров, необходимо отключить фильтр «аптека» и «юр лицо» (убрать галку). В данном случае в результатах поиска количество закупленного одного и того же товара суммируется по общей базе.
-        
-        </div>
-        <hr>
-        <br>
-      ''')
 
   #form.pre(qs)
   
@@ -82,6 +84,8 @@ def before_search(form):
       "p.action_id p__action_id",
       "act.id act__id",
       "act.header act__header",
+      "act.date_start act__date_start",
+      "act.date_stop act__date_stop",
       "a.id a__id",
       "a.header a__header",
       "a.ur_address a__ur_address",

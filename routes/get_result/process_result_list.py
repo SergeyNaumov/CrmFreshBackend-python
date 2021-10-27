@@ -53,8 +53,6 @@ def process_result_list(form,R,result_list):
       tbl = exists_arg('tablename',field) or 'wt'
       db_name=exists_arg('db_name',field) or name
       value=exists_arg(tbl+'__'+db_name,r)
-      #print('r=>',r)
-      print(name,'=>',value)
       if not exists_arg('type_orig',type):
         field['type_orig']=field['type']
       
@@ -78,8 +76,6 @@ def process_result_list(form,R,result_list):
         elif field['type']=='multiconnect':
           type='multiconnect'
           if exists_arg(r['wt__'+form.work_table_id],multiconnect_values):
-            #print('ARG:',exists_arg('wt__'+form.work_table_id,r))
-            #print('multiconnect_values:',multiconnect_values)
             value=multiconnect_values[r['wt__'+form.work_table_id]]
           else: value=''
 
@@ -143,7 +139,6 @@ def process_result_list(form,R,result_list):
       if not type in('memo') and not exists_arg('make_change_in_search',field):
         type='html'
 
-      #print('name:',field['name'],' type:',type)
 
       if not value: value=''
       data.append({
@@ -165,7 +160,6 @@ def process_result_list(form,R,result_list):
 
     id_field=','.join(key_list)
     id_value=','.join(values_list)
-    #print('id_field:',id_field,'id_value:',values_list)
     output.append({'key':id_value,'data':data})
 
     #output.append({'key':r['wt__'+form.work_table_id],'data':data})

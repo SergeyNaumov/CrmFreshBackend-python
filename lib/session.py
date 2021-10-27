@@ -108,7 +108,7 @@ def session_start(s,**arg):
   
 
 
-  if  config['auth']['type']=='env':
+  if  exists_arg('type',config['auth']) and config['auth']['type']=='env':
     if 'authorization' in s.env:
       auth=s.env['authorization']
       login=base64.b64decode(auth.split(' ')[1]).decode('utf-8')

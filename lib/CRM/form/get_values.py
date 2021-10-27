@@ -20,6 +20,7 @@ def func_get_values(form):
         where=f'{form.work_table_id}=%s',
         values=[form.id],
         #str=1,
+        debug=1,
         log=form.log
       )
       

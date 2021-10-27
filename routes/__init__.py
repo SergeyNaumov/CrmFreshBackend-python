@@ -14,6 +14,7 @@ from .ajax import router as router_ajax
 from .autocomplete import router as router_autocomplete
 from .documentation_routes import router as router_documentation
 from .video_routes import router as router_video
+from .table_routes import router as router_table
 
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
@@ -43,6 +44,8 @@ router.include_router(router_memo,prefix='/memo')
 
 router.include_router(router_extend)
 router.include_router(router_documentation,prefix='/documentation')
+router.include_router(router_table,prefix='/table')
+
 router.include_router(router_video,prefix='/VideoList')
 
 

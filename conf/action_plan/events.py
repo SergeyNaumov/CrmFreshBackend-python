@@ -1,6 +1,6 @@
 from lib.core import  date_to_rus
 from lib.anna.get_ul_list import get_ul_list_ids, get_ul_list_from_ur_lico_id
-from lib.anna.get_cur_period import get_cur_period
+from lib.anna.get_cur_period import get_cur_period, get_period
 from lib.anna.get_apt_list import get_apt_list_ids, get_all_ids_for_aptcomp
 def permissions(form):
   params={}
@@ -79,8 +79,12 @@ def permissions(form):
       if ('open_summary' in params) and params['open_summary']=='1': # если этот параметр включен, тогда блок "Сводные данные по всем юридическим лицам" выводим открытым
         form.ov['open_summary']=1
         #form.pre(form.ov)
+      if 'period' in params and params['period']:
+        form.ov['period']=get_period(form,params['period'])
 
-      if 'prev' in params and len(params['prev'].split('-'))==2: #prev=2021-2  период указывается явно
+
+        print('period:',form.ov['period'])
+      elif 'prev' in params and len(params['prev'].split('-'))==2: #prev=2021-2  период указывается явно
         period_arr=params['prev'].split('-')
         #print('period_arr:',int(period_arr[0]), int(period_arr[1]))
         form.ov['period']=form.db.query(

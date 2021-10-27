@@ -51,9 +51,49 @@ def get_filters():
       'filter_code':action_id_filter_code,
       'filter_on':1
     },
+    {
+      'description':'% выполнения',
+      'name':'percent_progress',
+      'type':'text',
+      'filter_type':'range',
+      'filter_code':percent_progress_filter_code
+    },
+    {
+      'description':'осталось выполнить в %',
+      'name':'left_to_complete_percent',
+      'type':'text',
+      'filter_type':'range',
+      'filter_code':left_to_complete_percent_filter_code
+    },
+    {
+      'description':'осталось выполнить в рублях / штуках',
+      'name':'left_to_complete_rub',
+      'type':'text',
+      'filter_type':'range',
+      'filter_code':left_to_complete_rub_filter_code
+    },
 
 
   ]
+
+def left_to_complete_rub_filter_code(form,field,row):
+  if row['ap__plan']==3:
+    return 'выполнен'
+
+  ed='руб'
+  if row['ap__plan']==2: ed='шт'
+  return f"{row['wt__left_to_complete_rub']} {ed}"
+
+def left_to_complete_percent_filter_code(form,field,row):
+  if row['ap__plan']==3 or row['wt__left_to_complete_percent']>=100:
+    return '% за любые закупки'
+  return row['wt__left_to_complete_percent']
+
+def percent_progress_filter_code(form,field,row):
+  if row['ap__plan']==3:
+    return '% за любые закупки'
+  return row['wt__percent_progress']
+
 def ur_lico_id_before_code(form,field):
   if form.manager['type']==2:
     field['where']=f''' id in ({','.join(form.manager['ur_lico_ids'])})'''

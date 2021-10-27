@@ -1,5 +1,6 @@
-def get_ul_list_ids(form,manager_id):
-    
+def get_ul_list_ids(form,manager_id=0):
+    if not manager_id:
+        manager_id=form.manager['id']
     rez=form.db.query(
         query="select ur_lico_id from ur_lico_manager where manager_id=%s",
         values=[manager_id],
