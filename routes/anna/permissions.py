@@ -77,8 +77,8 @@ def get_manager_data(manager_id=0,errors=[]):
         query="""
             SELECT
                 wt.id,wt.login,wt.name_f,wt.name_i,wt.name_o,wt.name,wt.phone,wt.type,
-                ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, if(ma.email,ma.email,ma.login) ma_email, ma.phone ma_phone
-                
+                ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, if(ma.email,ma.email,ma.login) ma_email, ma.phone ma_phone,
+                wt.access_to_video, wt.access_to_conf
             FROM 
                 manager wt
                 LEFT JOIN manager ma ON wt.anna_manager_id=ma.id
@@ -93,6 +93,23 @@ def get_manager_data(manager_id=0,errors=[]):
 
     if manager:
       manager['apteka']=None
+      if manager['type']==2:
+        manager['ur_lico_list']=s.db.query(
+          query="""
+              SELECT
+                  ul.id, ul.header
+              from
+                  ur_lico_manager ulm
+                  join ur_lico ul ON ulm.ur_lico_id=ul.id
+              WHERE ulm.manager_id=%s
+          """,
+          values=[manager_id],
+        )
+        ur_lico_hash={}
+        for u in manager['ur_lico_list']:
+          ur_lico_hash[u['id']]=1
+        manager['ur_lico_hash']=ur_lico_hash
+
       if manager['type']==3: # Если это аптека
           # если это аптека -- менеджер аптеки -- это менеджер юрлица
           manager['apteka']=s.db.query(
@@ -117,24 +134,20 @@ def get_manager_data(manager_id=0,errors=[]):
 
               manager['ur_lico']=ur_lico
 
-          
-
-      if manager['type']==2:
-        manager['ur_lico_list']=s.db.query(
+      if manager['type']==4: # Фармацевт
+        manager['apteka']=s.db.query(
           query="""
-              SELECT
-                  ul.id, ul.header
-              from
-                  ur_lico_manager ulm
-                  join ur_lico ul ON ulm.ur_lico_id=ul.id
-              WHERE ulm.manager_id=%s
-          """,
-          values=[manager_id],
+            SELECT
+              a.*
+            FROM
+                apteka a 
+                join manager_pharmacist mp on mp.apteka_id=a.id
+            WHERE mp.id=%s""",
+          onerow=1,
+          values=[manager['id']]
         )
-        ur_lico_hash={}
-        for u in manager['ur_lico_list']:
-          ur_lico_hash[u['id']]=1
-        manager['ur_lico_hash']=ur_lico_hash
+
+
 
     return manager
 

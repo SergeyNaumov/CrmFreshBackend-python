@@ -25,6 +25,7 @@ def get_fields():
       'name':'password',
       'type':'password',
       'min_length':8,
+      #'before_code':password_before_code,
       'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
       'methods_send':[
         {
@@ -77,31 +78,7 @@ def get_fields():
       ],
       'filter_on':1
     },
-    {
-      'name':'type',
-      'description':'Тип учётной записи',
-      'type':'select_values',
-      'tab':'permissions',
-      'before_code':type_before_code,
-      'values':[
-        {'v':1,'d':'Сотрудник компании Анна'},
-        {'v':2,'d':'Представитель юридического лица'},
-        {'v':3,'d':'Представитель аптеки'},
-        {'v':4,'d':'Фармацевт'},
-      ]
-    },
-    {
-      'description':'Аптека',
-      'name':'apteka_id',
-      'tablename':'a',
-      'tab':'permissions',
-      'table':'apteka',
-      'not_process':1,
-      'type':'select_from_table',
-      'header_field':'ur_address',
-      'value_field':'id',
-      'before_code':apteka_id_before_code
-    },
+
     {
        'name':'email',
        'description':'Email',
@@ -144,7 +121,45 @@ def get_fields():
         }
       ]
     },
-
+    {
+      'name':'type',
+      'description':'Тип учётной записи',
+      'type':'select_values',
+      'tab':'permissions',
+      'before_code':type_before_code,
+      'values':[
+        {'v':1,'d':'Сотрудник компании Анна'},
+        {'v':2,'d':'Представитель юридического лица'},
+        {'v':3,'d':'Представитель аптеки'},
+        {'v':4,'d':'Фармацевт'},
+      ]
+    },
+    {
+      'description':'Аптека',
+      'name':'apteka_id',
+      'tablename':'a',
+      'tab':'permissions',
+      'table':'apteka',
+      'not_process':1,
+      'type':'select_from_table',
+      'header_field':'ur_address',
+      'value_field':'id',
+      'before_code':apteka_id_before_code
+    },
+    {
+      'description':'Доступ к видео',
+      'name':'access_to_video',
+      'type':'checkbox',
+      'tab':'permissions',
+      'before_code':access_to_video_bc
+    },
+    {
+      'description':'Доступ к конференциям',
+      'name':'access_to_conf',
+      'type':'checkbox',
+      'tab':'permissions',
+      'before_code':access_to_video_bc
+    },
 ]
 def ur_lico_id_filter_code(form,field,row):
   return row["ur_lico_list"]
@@ -156,7 +171,7 @@ def anna_manager_id_filter_code(form,field,row):
     return 'не указан'
 
 def send_mes():
-    print()
+    pass
 
 def password_method_send(new_password):
   send_mes()
@@ -197,11 +212,8 @@ def login_before_code(form,field):
 def apteka_id_before_code(form,field):
   #form.pre(f"BEFORE_CODE {form.ov['apteka_id']}")
   if form.action=='edit':
-    
-
     field['value']=form.ov['apteka_id']
-    print('R:',form.R)
-    print('value:',field['value'])
+
 
   if form.manager['type'] in (2,3): # Аптеке или юрлицу показываем только их аптеки
     apt_list_ids=form.manager['apt_list_ids']
@@ -215,7 +227,8 @@ def apteka_id_before_code(form,field):
         field['value']=apt_list_ids[0]
     else:
       field[where]=" 0 "
-  
+  #print('v:',form.ov['apteka_id'], ' field:',field)
+
   if form.manager['type']==1:
     field['autocomplete']=1
 
@@ -231,6 +244,9 @@ def type_before_code(form,field):
   if form.action!='insert':
     field['value']=4
     field['read_only']=1
+
+def access_to_video_bc(form,field):
+  if form.action=='new': field['value']=1
 
 
 def enabled_before_code(**arg):

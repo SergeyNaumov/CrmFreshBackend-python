@@ -61,7 +61,6 @@ def session_create(s,**arg):
         query='SELECT '+arg['auth_id_field']+' FROM '+arg['auth_table']+' WHERE '+arg['auth_log_field']+'=%s AND '+arg['auth_pas_field']+'=sha2(%s,256)'+add_where,
         values=[arg['login'],arg['password']],
         onevalue=True,
-        debug=0
       )
 
   else:
@@ -124,7 +123,6 @@ def session_start(s,**arg):
           query=f"select * from {config['auth']['manager_table']} WHERE {config['auth']['login_field']} = %s ",
           values=[log],
           onerow=1,
-          debug=1
         )
         print('manager:',m)
         if m:

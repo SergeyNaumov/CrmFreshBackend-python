@@ -82,6 +82,12 @@ fields=[
         'type':'checkbox',
         'tab':'advanced',
       },
+      {
+        'description':'Выводить для фармацевта',
+        'name':'out_pharm',
+        'type':'checkbox',
+        'tab':'advanced',
+      },
       # {
       #   'name': 'permissions',
       #   'description ': 'Права доступа',

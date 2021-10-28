@@ -23,7 +23,10 @@ def get_search_tables(form,query):
     # for f in form.fields:
     #   if 0 and f.type == 'in_ext_url':
     #      in_ext_url=f['in_url']
-  
+  if not len(form.QUERY_SEARCH_TABLES):
+    form.QUERY_SEARCH_TABLES=[
+      {'t':form.work_table,'a':'wt'}
+    ]
   aliases_on={'wt':1}
   for t in form.QUERY_SEARCH_TABLES:
     t_str=''

@@ -9,39 +9,29 @@ router = APIRouter()
 # , file: bytes = File(...), fileb: UploadFile = File(...)
 #, 
 # Загрузка файла в wysiwyg
-@router.get('/{config}')
-async def wysiwyg_upload(config:str): # 
+@router.get('/{config}/{id}')
+async def process_page(config:str,id:int): # 
 
   form=read_config(
     action='',
     config=config,
-    #id=id,
+    id=id,
     #values=values,
-    script='table'
+    script='page'
   )
-  errors=[]
-
-  
+  errors=form.errors
 
   #for d in data_list:
-  data=[]
-  headers=form.headers
+
   return {
     'form':{
-      'config':form.config,
       'title':form.title,
+      'blocks':form.blocks,
       'log':form.log,
       'errors':form.errors,
-      'headers':headers,
-      'data':form.data,
-      'sort':form.sort,
-      'links':form.links,
-      'sort_desc':form.sort_desc
     },
-
     'success':1,
 
-    #'data':form.links
   }
 
   

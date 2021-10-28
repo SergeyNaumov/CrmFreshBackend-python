@@ -70,7 +70,7 @@ def func_get_values(form):
           
           
       set_from_nv=True
-      if form.script=='edit_form' and (form.action in ('new')) and ('value' in f):
+      if form.script=='edit_form' and (form.action in ('new','edit')) and ('value' in f ):
         set_from_nv=False
       
       #form.pre(f"{name}: {set_from_nv} ; value in f: {('value' in f)}")

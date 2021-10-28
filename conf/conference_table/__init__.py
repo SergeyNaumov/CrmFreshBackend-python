@@ -9,7 +9,7 @@ class Config(Form):
 
         super().__init__(arg) 
         
-        form.title='Сводные данные'
+        form.title='Список конференций'
         form.not_edit=1
         form.explain=0
         #form.read_only=1
@@ -17,14 +17,15 @@ class Config(Form):
         #form.not_create=1
         form.events=events
         form.headers=[
-            {'h':'юр лицо', 'n':'ur_lico'},
-            {'h':'период','n':'querter'},
-            {'h':'маркетинговое мероприятие','n':'action'},
-            {'h':'%выполнения','n':'percent_complete'},
-            {'h':'осталось выполнить в %','n':'left_to_complete_percent'},
-            {'h':'осталось выполнить в рублях / штуках','n':'left_to_complete_rub'},
+            {'h':'Название конференции', 'n':'header'},
+            {'h':'Дата и время начала','n':'start'},
+            #{'h':'Ссылка на конференци','n':'link'},
+            #{'h':'Идентификатор конференции','n':'conf_id'},
+            #{'h':'Код доступа','n':'access_code'},
+            #{'h':'Комментарий','n':'comment'},
 
         ]
+        form.data=[]
         form.sort='ur_lico' # поле, по которому сортируем изначально
         form.sort_desc=False
         # form.data_query="""

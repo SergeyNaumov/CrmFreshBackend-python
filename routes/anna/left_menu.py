@@ -18,6 +18,8 @@ def left_menu():
     where='out_ur_lico=1'
   elif manager['type']==3: # Аптека
     where='out_apteka=1'
+  elif manager['type']==4: # Аптека
+    where='out_pharm=1'
 
   left_menu=s.db.query(
     query=f"""

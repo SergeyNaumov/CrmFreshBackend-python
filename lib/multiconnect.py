@@ -11,7 +11,6 @@ def get_values(form,field):
           {field["relation_save_table_id_worktable"]}=%s
       """,
       massive=1,
-      debug=1,
       values=[form.id],
       errors=form.id
     )

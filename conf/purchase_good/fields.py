@@ -164,7 +164,7 @@ def action_filter_code(form,field,row):
     return row['act__header']
   
   if row['act__id']:
-    return f'''<a href="/edit-form/action/{row['act__id']}" target="_blank">{row['act__header']}</a><br>'''
+    return f'''{row['wt__id']}<a href="/edit-form/action/{row['act__id']}" target="_blank">{row['act__header']}</a><br>'''
       # wt.id: {row['wt__id']}<br>
       # action_plan_id: {row['ap__id']}<br>
       # ur_lico_id: {row['ul__id']}<br>

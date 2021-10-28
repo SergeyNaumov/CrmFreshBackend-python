@@ -22,17 +22,17 @@ def permissions(form):
             
             if(ap.plan=3,
                 'percent',
-                wt.percent_progress
-            ) percent_progress,
+                wt.percent_complete
+            ) percent_complete,
 
             if(
-                ap.plan=3 or wt.left_to_complete_percent>=100,
+                ap.plan=3 or wt.percent_complete>=100,
                 'выполнен',
                 wt.left_to_complete_percent
             ) as left_to_complete_percent,
             
             if(
-                ap.plan=3,
+                ap.plan=3 or wt.percent_complete>=100,
                 'выполнен',
                 concat(wt.left_to_complete_rub,' ',if(ap.plan=2,'шт','руб'))
 
@@ -46,9 +46,9 @@ def permissions(form):
             join action a ON a.id=wt.action_id
             JOIN ur_lico ul ON wt.ur_lico_id=ul.id
         WHERE
-            wt.period_id={period_id} and  wt.ur_lico_id in ({','.join(ids)})
+            wt.period_id={period_id} and wt.ur_lico_id in ({','.join(ids)})
 
-    """
+    """ # 
     form.data=form.db.query(
         query=query,
         log=form.log,
@@ -57,8 +57,8 @@ def permissions(form):
     )
 
     for d in form.data:
-        if d['percent_progress']=='percent':
-            d['percent_progress']='% за любые закупки'
+        if d['percent_complete']=='percent':
+            d['percent_complete']='% за любые закупки'
         d['action']+=f" <small><a href='/edit-form/action_plan/{d['action_plan_id']}?open_summary=1' target='_blank'>сводные данные</a></small>"
         del d['action_plan_id']
         del d['period_id']

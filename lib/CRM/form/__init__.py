@@ -81,7 +81,7 @@ class Form():
 
       self.edit_form_fields=[]
 
-    if script=='documentation':
+    if script in ('documentation','table'):
       self.links=[]
     
     if script=='video_list':
@@ -89,6 +89,7 @@ class Form():
 
     if script=='find_objects':
       self.QUERY_SEARCH=''
+      self.QUERY_SEARCH_TABLES=[]
       self.query_search={
         'on_filters_hash':{},
         'SELECT_FIELDS':[],

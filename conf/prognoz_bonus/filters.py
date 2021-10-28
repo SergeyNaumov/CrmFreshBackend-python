@@ -53,10 +53,10 @@ def get_filters():
     },
     {
       'description':'% выполнения',
-      'name':'percent_progress',
+      'name':'percent_complete',
       'type':'text',
       'filter_type':'range',
-      'filter_code':percent_progress_filter_code
+      'filter_code':percent_complete_filter_code
     },
     {
       'description':'осталось выполнить в %',
@@ -85,14 +85,14 @@ def left_to_complete_rub_filter_code(form,field,row):
   return f"{row['wt__left_to_complete_rub']} {ed}"
 
 def left_to_complete_percent_filter_code(form,field,row):
-  if row['ap__plan']==3 or row['wt__left_to_complete_percent']>=100:
+  if row['ap__plan']==3 or row['wt__percent_complete']>=100:
     return '% за любые закупки'
   return row['wt__left_to_complete_percent']
 
-def percent_progress_filter_code(form,field,row):
+def percent_complete_filter_code(form,field,row):
   if row['ap__plan']==3:
     return '% за любые закупки'
-  return row['wt__percent_progress']
+  return row['wt__percent_complete']
 
 def ur_lico_id_before_code(form,field):
   if form.manager['type']==2:

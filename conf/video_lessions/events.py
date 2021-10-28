@@ -1,8 +1,10 @@
 def events_permission1(form):
     
     if form.script=='video_list':
-        pass
-        
+        #pass
+        if not form.manager['access_to_video']:
+            form.errors.append('Вам запрещён доступ к видеоматериалам')
+            return        
 
 
     else:

@@ -57,17 +57,19 @@ async def wysiwyg_upload(config:str): #
     #values=values,
     script='video_list'
   )
-  errors=[]
-  
-  data_list=form.db.query(
-    query=f'select * from {config} order by concat( if(parent_id is null,0,parent_id),"-",sort )' ,
-    #debug=1,
-    #table=config,
-    #order='sort',
-    #where='parent_id is null',
-    errors=errors,
-    tree_use=1
-  )
+  errors=form.errors
+  data_list=[]
+
+  if not len(errors):
+    data_list=form.db.query(
+      query=f'select * from {config} order by concat( if(parent_id is null,0,parent_id),"-",sort )' ,
+      #debug=1,
+      #table=config,
+      #order='sort',
+      #where='parent_id is null',
+      errors=errors,
+      tree_use=1
+    )
 
   #for d in data_list:
 

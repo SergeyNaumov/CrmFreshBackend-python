@@ -19,7 +19,7 @@ async def wysiwyg_upload(config:str): #
     #values=values,
     script='documentation'
   )
-  errors=[]
+  errors=form.errors
 
   data_list=form.db.query(
     query=f'select * from {form.work_table} order by sort' ,
