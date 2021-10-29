@@ -92,12 +92,17 @@ def manager_id_filter_code(form,field,row):
     return '-'
 
 def ur_address_before_code(form,field):
-  if form.manager['type']==2:
-    #form.pre(form.manager['apt_list_ids'])
-    if len(form.manager['ul_ids']):
-      field['where']=f'''id in ({','.join(form.manager['apt_list_ids'])})'''
-    else:
-      field['where']='0'
+  if form.script == 'edit_form':
+    field['type']='text'
+    field['orig_type']='text'
+    #form.pre(field)
+  else:
+    if form.manager['type']==2:
+      #form.pre(form.manager['apt_list_ids'])
+      if len(form.manager['ul_ids']):
+        field['where']=f'''id in ({','.join(form.manager['apt_list_ids'])})'''
+      else:
+        field['where']='0'
 
     #form.pre(field['where'])
     

@@ -5,6 +5,10 @@ import json
 from db import db,db_read,db_write
 from .session import *
 from config import config
+import os
+pwd=os.path.abspath(os.curdir)
+hostname=socket.gethostname()
+
 class Engine():
   def __init__(self,**arg):
     self.manager={}
@@ -32,24 +36,41 @@ class Engine():
     
     #self.cookies['User-Agent']=''
 
-    hostname=socket.gethostname()
+    
     #print('host:',hostname)
     # Если мы не логинимся -- проверяем сессию
     s.config=config
     s.use_project=config['use_project']
     if not(self.request.url.path in config['login']['not_login_access']):
-
-      if hostname in config['debug']['hosts']:
-        self.manager=db.getrow(
-          table="manager",
-          select_fields="id,login",
+      host_ok=not('hosts' in config['debug']) or (('hosts' in config['debug']) and  ( hostname in config['debug']['hosts'] ))
+      pwd_ok=not('pwd' in config['debug']) or (('pwd' in config['debug']) and  ( pwd in config['debug']['pwd'] ))
+      #print('pwd:',pwd)
+      #print('host_ok:',host_ok,' pwd_ok:',pwd_ok)
+      if host_ok and pwd_ok:
+        where='0'
+        values=[]
+        if 'manager_id' in config['debug']:
           where="id=%s",
           values=[config['debug']['manager_id']]
+
+        if 'login' in config['debug']:
+          where="login=%s"
+          values=[config['debug']['login']]
+
+        self.manager=db.getrow(
+          table=config['auth']['manager_table'],
+          select_fields="*",
+          where=where,
+          #debug=1,
+          values=values
         )
+
+       # print('manager:',self.manager)
         if self.manager:
           self.login=self.manager['login']
         else:
-          self.manager={'id':config['debug']['manager_id'],'name':'менеджер не найден'}
+          self.login='nonelogin'
+          self.manager={'id':0,'login':'nonelogin','name':'менеджер не найден'}
       else:
         #print('session start')
         session_start(self,encrypt_method=config['encrypt_method']);

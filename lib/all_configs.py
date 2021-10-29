@@ -110,11 +110,11 @@ def read_config(**arg):
   
   # Перенёс из routes.edit_form.process_edit_form.py
   #form.get_values()
-  form.run_all_before_code()
+  
   
 
   form.get_values()
-
+  form.run_all_before_code()
   
   #print('after_get_values:',form.fields[0])
   

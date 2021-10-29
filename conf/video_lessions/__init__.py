@@ -18,3 +18,4 @@ class Config(Form):
         form.default_find_filter='header'
         form.filters_groups=[]
         form.fields=fields
+        form.links=[]

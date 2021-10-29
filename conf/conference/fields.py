@@ -11,7 +11,8 @@ def link_filter_code(form,field,row):
   if row['wt__link']:
     return f"""<a href="{row['wt__link']}" target="_blank">{row['wt__link']}</a>"""
 
-fields=[ 
+def get_fields():
+  return [ 
       {
         'description':'Вкл',
         'type':'checkbox',
@@ -53,4 +54,4 @@ fields=[
         'type':'wysiwyg',
         'name':'comment',
       },
-]
+  ]

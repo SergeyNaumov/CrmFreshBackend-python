@@ -6,7 +6,14 @@ def events_permission1(form):
             form.errors.append('Вам запрещён доступ к видеоматериалам')
             return        
 
-
+        if form.manager['type']==1:
+            form.links=[
+                {
+                    'type':'url',
+                    'link':'/admin_tree/video_lessions',
+                    'description':'Редактирование видео'
+                },
+            ]
     else:
         # Редактировать дерево запрещаем всем кроме админа
         if form.manager['type']!=1:

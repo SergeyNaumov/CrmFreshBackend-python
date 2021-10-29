@@ -10,6 +10,10 @@ config={
   'auth':{
     'manager_table':'manager'
   },
+  'startpage':{ # указываем, какой компонент будет загружаться на главной странице
+    'type':'src',
+    'value':'/test.html',
+  },
   'system_email':'svcomplex@gmail.com',
   'system_url':'https://anna.crm-dev.ru/',
 
@@ -71,6 +75,11 @@ config={
 
     #'manager_id':275, # provizor-259-1
     
-  }
+  },
+  # Возможен дебаг по директории, в которой запущен сервер
+  # 'debug':{ # для отладки
+  #   'pwd':('/home/naumov/CrmFresh/frontend'),
+  #   'login':'akulov'    
+  # }
 
 }

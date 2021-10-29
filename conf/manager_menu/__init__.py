@@ -1,5 +1,5 @@
 from lib.CRM.form import Form
-from .fields import fields
+from .fields import get_fields
 from .events import events
 
 
@@ -33,7 +33,7 @@ class Config(Form):
         # ]
         self.filters_groups=[]
 
-        self.fields=fields
+        self.fields=get_fields()
 
 """
 create table test(

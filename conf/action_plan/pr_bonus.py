@@ -2,7 +2,7 @@ def pr_bonus(form,field):
 
     # form.id -- action.id
     #form.pre(form.manager['ur_lico_ids'])
-    #form.pre(form.manager['apt_list_ids'])
+    
     bonus_list=[]
 
     #form.pre({'total_good_price':total_good_price})
@@ -84,19 +84,8 @@ def pr_bonus(form,field):
             'earned_bonus':0
         }
         
-        # total_plan=0
-        # total_price=0
-        # total_current_bonus=0
-        # total_bonus_progress=0
-        # total_other_distrib_sum=0
-        # total_left_to_complete_rub=0
-        # total_buy_cnt=0
-        # total_percent_complete=0
-        # total_left_to_complete_percent=0
-        # total_percent_progress=0
-        # total_lost_profit=0
-        # total_earned_bonus=0
 
+        #form.pre(bonus_list)
         for b in bonus_list:
             # параметр "кол-во закупки" нужно поставить после суммы закупки в сип ценах, если план у нас суммовой и перед суммой в сип ценах если план количественный.
             if form.manager['type']==3 and form.manager['apteka_settings']['set1']==0:
@@ -292,7 +281,7 @@ def pr_bonus(form,field):
             else:
                 total['current_bonus']=total['plan']-total['buy_cnt']
 
-            #form.pre(form.ov)
+            
             body_text=form.template(
                 './conf/action_plan/templates/pr_bonus.html',
                 ov=form.ov,

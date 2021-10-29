@@ -67,7 +67,7 @@ def permissions(form):
         values=[form.id],
         onerow=1
     )
-    #form.pre(form.ov)
+    
     if form.ov:
       form.ov['period']={'id':''}
       form.ov['total_good_price']=form.db.query(

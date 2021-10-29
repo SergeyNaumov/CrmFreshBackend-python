@@ -222,6 +222,20 @@ def get_fields():
         }
       ]
     },
+    {
+      'description':'Доступ к видео',
+      'name':'access_to_video',
+      'type':'checkbox',
+      'tab':'permissions',
+      'before_code':access_to_video_bc
+    },
+    {
+      'description':'Доступ к конференциям',
+      'name':'access_to_conf',
+      'type':'checkbox',
+      'tab':'permissions',
+      'before_code':access_to_video_bc
+    },
 
 ]
 def ur_lico_id_filter_code(form,field,row):
@@ -263,3 +277,6 @@ def enabled_before_code(**arg):
   field=arg['field']
   if(form.action == 'new'):
     field['value']='1'
+
+def access_to_video_bc(form,field):
+  if form.action=='new': field['value']=1

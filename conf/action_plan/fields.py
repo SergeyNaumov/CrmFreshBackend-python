@@ -79,4 +79,5 @@ def plan_info(form,field):
       {different_percentage}
       <p style="color: red;">данные обновляются с задержкой 1-2 дня</p>
     </div>
+    
   '''

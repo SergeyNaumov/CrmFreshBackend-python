@@ -1,8 +1,6 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 
-
-
 router = APIRouter()
 
 
@@ -48,8 +46,8 @@ async def post_actions(config:str, R:dict): #
   }
 
 @router.get('/{config}')
-async def wysiwyg_upload(config:str): # 
-
+async def get_videos(config:str, limit: int = 0): # 
+  
   form=read_config(
     action='',
     config=config,
@@ -61,15 +59,21 @@ async def wysiwyg_upload(config:str): #
   data_list=[]
 
   if not len(errors):
-    data_list=form.db.query(
-      query=f'select * from {config} order by concat( if(parent_id is null,0,parent_id),"-",sort )' ,
-      #debug=1,
-      #table=config,
-      #order='sort',
-      #where='parent_id is null',
-      errors=errors,
-      tree_use=1
-    )
+    if limit:
+      data_list=form.db.query(
+        query=f'select * from {config} where parent_id is not null order by id desc limit {limit}'
+      )
+    else:
+      data_list=form.db.query(
+        query=f'select * from {config} order by concat( if(parent_id is null,0,parent_id),"-",sort )' ,
+        #debug=1,
+        #table=config,
+        #order='sort',
+        #where='parent_id is null',
+        
+        errors=errors,
+        tree_use=1
+      )
 
   #for d in data_list:
 
@@ -79,6 +83,7 @@ async def wysiwyg_upload(config:str): #
     'errors':form.errors,
     'success':1,
     'list':data_list,
+    'links':form.links,
     #'links':form.links
   }
 
