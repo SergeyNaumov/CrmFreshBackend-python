@@ -111,3 +111,16 @@ def func_get_values(form):
     #print('GET_VALUES2:',values)
 
 
+# Получаем значения для select_from_table, 1_to_m
+def func_get_fields_values(form):
+  form.set_orig_types()
+  for f in form.fields:
+    #print('name:',f['name'],f['type'])
+    if f['type'] == '1_to_m':
+      get_1_to_m_data(form,f)
+
+    elif f['type']=='get_in_ext_url':
+      get_in_ext_url(form,f)
+    elif exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table'] and (not exists_arg('values',f) or not len(f['values'])):
+      print('get_values')
+      f['values']=get_values_for_select_from_table(form,f)

@@ -4,7 +4,7 @@ from config import config
 import base64
 
 def session_project_create(s): # создание сессии для проекта
-  print('project_create')
+    pass
 
 def session_create(s,**arg):
 
@@ -124,7 +124,6 @@ def session_start(s,**arg):
           values=[log],
           onerow=1,
         )
-        print('manager:',m)
         if m:
           manager=m
   else:

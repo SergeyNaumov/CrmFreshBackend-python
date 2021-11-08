@@ -6,7 +6,7 @@ from .get_search_where import get_search_where
 from .default_config_attr import default_config_attr
 from .save_form import save_form
 from .edit_form_process_fields import edit_form_process_fields as func_edit_form_process_fields
-from .get_values import func_get_values
+from .get_values import func_get_values, func_get_fields_values
 from .set_orig_types import func_set_orig_types
 from .run_event import run_event as func_run_event
 from .upload_file import upload_file as func_upload_file
@@ -166,6 +166,9 @@ class Form():
 
   def get_values(form):
     func_get_values(form)
+  
+  def get_fields_values(form):
+    func_get_fields_values(form)
 
   def UploadFile(form):
     return func_upload_file(form)

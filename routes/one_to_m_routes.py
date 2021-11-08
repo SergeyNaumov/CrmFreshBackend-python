@@ -57,7 +57,7 @@ async def sort_slide(config:str,field_name:str,id:int,R:dict):
 # delete record
 @router.get('/1_to_m/delete/{config}/{field_name}/{id}/{one_to_m_id}')
 async def delete_record(config:str,field_name:str,id:int,one_to_m_id:int):
-  print('DELETE!')
+  #print('DELETE!')
   return process_one_to_m(
     config=config,
     field_name=field_name,

@@ -56,7 +56,6 @@ def change_on_notify(ur_lico_id,v):
     if ur_lico_id in manager['ur_lico_hash']:
         s.db.query(
             query="update ur_lico set subscribe=%s where id=%s",
-            debug=1,
             values=[v,ur_lico_id]
         )
     return {'ok':1}

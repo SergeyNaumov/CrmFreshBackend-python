@@ -75,7 +75,6 @@ async def change_set(R: dict):
         if exists:
             s.db.query(
                 query=f"UPDATE apteka_settings SET {field_name}=%s where apteka_id=%s""",
-                debug=1,
                 values=[R['value'],R['apteka_id']]
             )
         else:

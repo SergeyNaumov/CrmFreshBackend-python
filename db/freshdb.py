@@ -24,7 +24,6 @@ def get_func(value):
       rez=re.match('func:(.+)',value)
     
     if rez:
-      #print('value:',value,'rez:',rez[1])
       return rez[1]
   return ''
 

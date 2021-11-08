@@ -96,7 +96,7 @@ def change_reg_data(R:dict):
         ur_lico=manager['ur_lico']
         
         if exists_arg('email_for_notify',ur_lico) and is_email(ur_lico['email_for_notify']):
-            print('send_to (ur_lico):',ur_lico['email_for_notify'])
+            #print('send_to (ur_lico):',ur_lico['email_for_notify'])
             send_mes(
                 to=ur_lico['email_for_notify'],
                 subject=subject,
@@ -131,7 +131,7 @@ def change_reg_data(R:dict):
                 """
             )
 
-        print('send_to (anna manager):',manager['ma_email'])
+        #print('send_to (anna manager):',manager['ma_email'])
 
     if is_email(manager['login']):
         send_mes(
@@ -139,7 +139,7 @@ def change_reg_data(R:dict):
             subject=subject,
             message=message
         )
-        print('send_to (account):',manager['login'])
+        #print('send_to (account):',manager['login'])
 
     
     return {'success':success,'errors':errors}

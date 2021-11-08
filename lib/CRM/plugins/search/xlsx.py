@@ -96,6 +96,9 @@ def go(form):
             form.events['before_search']=[]
             
         if form.events['before_search']:
+            if hasattr(form.events['before_search'], '__call__' ): 
+                form.events['before_search']=[form.events['before_search']]
+            
             form.events['before_search'].append(before_search)
     #else:
     #    print('not_active after_search!')

@@ -38,7 +38,6 @@ def action_subscribe_ur_lico(action_id:int, ur_lico_id: int):
                 'action_id':action_id,
                 'ur_lico_id':ur_lico_id
             },
-            debug=1,
             errors=errors
         )
 

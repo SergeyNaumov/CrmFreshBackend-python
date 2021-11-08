@@ -90,7 +90,6 @@ def permissions(form):
         form.ov['period']=form.db.query(
           query="select * from prognoz_bonus_period where year=%s and querter=%s",values=[int(period_arr[0]), int(period_arr[1])],
           onerow=1,
-          debug=1
         )
         #print('period:',form.ov['period'])
         #get_cur_period(form)

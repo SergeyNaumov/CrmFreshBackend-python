@@ -6,6 +6,7 @@ def permissions(form):
     if not form.manager['access_to_conf']:
         form.errors.append('Вам запрещён доступ к конференциям')
         return
+    
     query=f"""
          SELECT 
             id, header, start,
@@ -15,6 +16,11 @@ def permissions(form):
         WHERE
             enabled=1 order by start desc
     """ #  , link, conf_id, access_code, comment
+    
+    if 'limit' in form.R and form.R['limit']:
+        query+=f" limit {form.R['limit']}"
+
+    #print(form.R)
 
     if form.manager['type']==1:
         form.links=[
@@ -24,6 +30,7 @@ def permissions(form):
                 'description':'Редактирование конференций'
             },
         ]
+    
 
     form.data=form.db.query(
         query=query,

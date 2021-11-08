@@ -16,8 +16,22 @@ class Config(Form):
         self.not_edit=1
         self.QUERY_SEARCH_TABLES=[
             {'t':self.work_table,'a':'wt'},
-            {'t':'manager','a':'m','l':'wt.manager_id=m.id'},
             {'t':'video_lessions','a':'v','l':'v.id=wt.video_id'},
+            {'t':'manager','a':'m','l':'wt.manager_id=m.id'},
+            
+            # Аптека
+            {'t':'apteka','a':'apt','l':'apt.manager_id=wt.manager_id','lj':1},
+            {'t':'ur_lico','a':'ul_apt','l':'ul_apt.id=apt.ur_lico_id','lj':1},
+            
+            # Юрлицо
+            {'t':'ur_lico_manager','a':'ulm','l':'ulm.manager_id=wt.manager_id','lj':1},
+            {'t':'ur_lico','a':'ul','l':'ul.id=ulm.ur_lico_id','lj':1},
+
+            # Фармацевт
+            {'t':'manager_pharmacist','a':'mph','l':'mph.id=wt.manager_id','lj':1},
+            {'t':'apteka','a':'pharm_apt','l':'pharm_apt.id=mph.apteka_id','lj':1},
+            {'t':'ur_lico','a':'pharm_ul','l':'pharm_ul.id=pharm_apt.ur_lico_id','lj':1},
+
         ]
         self.events=events
         self.filters_groups=[]

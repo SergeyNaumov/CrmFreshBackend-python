@@ -1,6 +1,11 @@
 def get_fields():
     return [ 
     {
+      'name':'info',
+      'type':'code',
+      'code':info_code
+    },
+    {
       'name':'registered',
       'description':'Дата и время заявки',
       'type':'date',
@@ -63,6 +68,11 @@ def get_fields():
     },
 
 ]
+
+def info_code(form,field):
+  out='';
+  out+=f"<b>Юридическое лицо:</b>"
+  field['after_html']=out
 
 def filter_code_type(form,field,row):
 

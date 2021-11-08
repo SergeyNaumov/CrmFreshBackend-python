@@ -8,7 +8,7 @@ def events_permissions(form):
     elif form.manager['type']==2: # представитель юр.лица
         form.read_only=1
         
-        
+        #form.remove_field()
         # получаем id-шники менеджеров, которые привязаны к аптекам данного юрлица:
         managers_ids=get_apt_managers_ids(form,form.manager['id'])
         if not len(managers_ids):
@@ -33,6 +33,15 @@ def events_permissions(form):
 
     else:
       form.errors.append('доступ запрещён!')
+
+    if form.id:
+      form.ov=form.db.query(
+        query=f"""
+          SELECT
+          FROM
+
+        """
+      )
 
 def before_search(form):
   

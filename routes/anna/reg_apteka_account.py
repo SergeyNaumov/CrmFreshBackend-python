@@ -29,7 +29,6 @@ def reg_apteka_account(R):
 
         apt_manager_id=s.db.save(
             table="manager",
-            debug=1,
             data=R,
             errors=errors
         )
@@ -37,14 +36,12 @@ def reg_apteka_account(R):
           s.db.query(
             query="UPDATE manager set password=sha2(%s,256) WHERE id=%s",
             values=[R['password'], apt_manager_id],
-            #debug=1,
             errors=errors
           )
 
           s.db.query(
             query="UPDATE apteka set manager_id=%s where id=%s",
             values=[apt_manager_id,R['apteka_id']],
-            #debug=1,
             errors=errors
           )
         
@@ -108,9 +105,7 @@ def change_apteka_account(R):
             query=update_query+where,
             values=values,
             errors=errors,
-            debug=1
         )
-
 
         if R['password']:
           send_mes(

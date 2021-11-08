@@ -115,7 +115,7 @@ def read_config(**arg):
 
   form.get_values()
   form.run_all_before_code()
-  
+  form.get_fields_values()
   #print('after_get_values:',form.fields[0])
   
 

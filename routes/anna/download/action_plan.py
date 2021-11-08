@@ -33,7 +33,6 @@ def action_plan(format,id):
           JOIN good g ON ag.good_id=g.id
         WHERE ag.action_plan_id = %s''',
         values=[id],
-        debug=1
         
     )
     if format=='xls':
@@ -124,7 +123,6 @@ def dbf_ready(id):
     r=db.getrow(
         table='dbf_daemon',
         id=id,
-        debug=1
     )
     
     if r:

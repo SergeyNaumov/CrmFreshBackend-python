@@ -67,7 +67,6 @@ async def x(bonus_id: int, R:dict): # attach: UploadFile = File(...)
                 s.db.query(
                     query='UPDATE bonus_order SET attach=%s where id=%s',
                     values=[filename,insert_id],
-                    debug=1
                 )
                 
                 send_mes(

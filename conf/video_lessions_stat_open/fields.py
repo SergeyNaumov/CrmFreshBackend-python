@@ -22,7 +22,7 @@ def get_fields():
       'filter_on':1
     },
     {
-      'description':'Наименование видео',
+      'description':'Наименование',
       'name':'text',
       'type':'filter_extend_text',
       'db_name':'header',
@@ -30,7 +30,7 @@ def get_fields():
       'filter_on':1
     },
     {
-      'description':'Длительность просмотра видео, сек',
+      'description':'Длительность, сек',
       'name':'sec_opened',
       'type':'text',
       'filter_type':'range',
@@ -45,12 +45,13 @@ def login_filter_code(form,field,row):
     manager_type='Менеджер АннА'
   
   if t==2:
-    manager_type='Представитель юридического лица'
+    #form.pre(row)
+    manager_type=f"Представитель юридического лица<br>{row['ul__header']}"
   
   if t==3:
-    manager_type='Представитель аптеки'
+    manager_type=f"Представитель аптеки<br>{row['apt__ur_address']}<br>{row['ul_apt__header']}"
   
   if t==4:
-    manager_type='Фармацевт'
+    manager_type=f"Фармацевт<br>{row['pharm_apt__ur_address']}<br>{row['pharm_ul__header']}"
 
-  return f"{row['m__login']}<br>\n<small>{row['m__name']}</small>\n<small>{manager_type}</small>"
+  return f"{row['m__login']}<br>\n<small>{row['m__name']}</small>,<br><small>{manager_type}</small>"

@@ -22,10 +22,11 @@ def events_permission1(form):
 
 
 def events_before_code(form):
-    print('is_before_code')
+    #print('is_before_code')
+    pass
 
 def before_delete(form):
-    print('before_detele STARTED!')
+    #print('before_detele STARTED!')
     form.errors.append('Вам запрещено удалять!')
 
 events={

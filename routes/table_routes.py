@@ -10,11 +10,15 @@ router = APIRouter()
 #, 
 # Загрузка файла в wysiwyg
 @router.get('/{config}')
-async def wysiwyg_upload(config:str): # 
+async def wysiwyg_upload(config:str,limit: int = 0): # 
+  R={}
+  if limit:
+    R['limit']=limit
 
   form=read_config(
     action='',
     config=config,
+    R=R,
     #id=id,
     #values=values,
     script='table'
@@ -23,7 +27,8 @@ async def wysiwyg_upload(config:str): #
 
   
 
-  #for d in data_list:
+  #print('R:',form.R)
+  
   data=[]
   headers=form.headers
   return {

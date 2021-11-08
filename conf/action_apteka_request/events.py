@@ -9,6 +9,7 @@ def events_permissions(form):
     form.make_delete=1
     form.manager['apt_list_ids']=[]
     form.read_only=0
+    form.not_edit=0
 
   
 
@@ -17,6 +18,7 @@ def events_permissions(form):
     form.make_delete=1
     form.read_only=0
     form.manager['apt_list_ids']=get_apt_list_ids(form)
+    form.not_edit=0
     form.remove_field('status')
 
   #form.pre(form.manager['apt_list_ids'])

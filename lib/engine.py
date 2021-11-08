@@ -50,22 +50,20 @@ class Engine():
         where='0'
         values=[]
         if 'manager_id' in config['debug']:
-          where="id=%s",
-          values=[config['debug']['manager_id']]
+          where=f"id={config['debug']['manager_id']}"
 
         if 'login' in config['debug']:
-          where="login=%s"
-          values=[config['debug']['login']]
+          where=f"login='{config['debug']['login']}'"
+        
 
         self.manager=db.getrow(
           table=config['auth']['manager_table'],
-          select_fields="*",
           where=where,
-          #debug=1,
           values=values
         )
 
-       # print('manager:',self.manager)
+
+
         if self.manager:
           self.login=self.manager['login']
         else:
