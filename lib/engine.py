@@ -27,7 +27,8 @@ class Engine():
     self.project=None
     
     self.env={}
-    #print('request_url:',self.request.url.path)
+    s.url=self.request.url.path
+    #print('request_url:',dict(self.request))
     # x-real-ip
 
     for k in self.request['headers']:

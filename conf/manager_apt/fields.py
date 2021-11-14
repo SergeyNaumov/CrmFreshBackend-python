@@ -99,6 +99,7 @@ def get_fields():
       'header_field':'header',
       'value_field':'id',
       'tablename':'u',
+      'before_code':ur_lico_id_before_code,
       'filter_code':ur_lico_id_filter_code
     },
     # Юридические лица
@@ -121,19 +122,19 @@ def get_fields():
         }
       ]
     },
-    {
-      'name':'type',
-      'description':'Тип учётной записи',
-      'type':'select_values',
-      'tab':'permissions',
-      'before_code':type_before_code,
-      'values':[
-        {'v':1,'d':'Сотрудник компании Анна'},
-        {'v':2,'d':'Представитель юридического лица'},
-        {'v':3,'d':'Представитель аптеки'},
-        {'v':4,'d':'Фармацевт'},
-      ]
-    },
+    # {
+    #   'name':'type',
+    #   'description':'Тип учётной записи',
+    #   'type':'select_values',
+    #   'tab':'permissions',
+    #   'before_code':type_before_code,
+    #   'values':[
+    #     {'v':1,'d':'Сотрудник компании Анна'},
+    #     {'v':2,'d':'Представитель юридического лица'},
+    #     {'v':3,'d':'Представитель аптеки'},
+    #     {'v':4,'d':'Фармацевт'},
+    #   ]
+    # },
     {
       'description':'Аптека',
       'name':'apteka_id',
@@ -161,7 +162,15 @@ def get_fields():
       'before_code':access_to_video_bc
     },
 ]
+def ur_lico_id_before_code(form,field):
+ # form.pre(field)
+  if form.manager['type']==2:
+    field['where']=f"id in ({','.join(form.manager['ur_lico_list_ids'])})"
+
+  #form.pre(form.manager['ur_lico_list_ids'])
+
 def ur_lico_id_filter_code(form,field,row):
+  
   return row["ur_lico_list"]
   
 def anna_manager_id_filter_code(form,field,row):
@@ -226,7 +235,7 @@ def apteka_id_before_code(form,field):
       if form.action=='new':
         field['value']=apt_list_ids[0]
     else:
-      field[where]=" 0 "
+      field['where']=" 0 "
   #print('v:',form.ov['apteka_id'], ' field:',field)
 
   if form.manager['type']==1:

@@ -1,5 +1,6 @@
 #def pre(d):
 #    form.pre(d)
+from lib.anna.get_ul_list import get_ul_list_ids
 from lib.anna.get_apt_list import get_apt_list_ids
 from lib.send_mes import send_mes 
 def get_ov(form):
@@ -29,13 +30,19 @@ def events_permissions(form):
       form.make_delete=1
       form.not_create=0
       form.read_only=0
+    
+    if form.manager['type']==2:
+      form.manager['ur_lico_list_ids']=get_ul_list_ids(form)
+    
+    if form.manager['type'] in (3,4):
+      form.remove_field('ur_lico_id')
 
     if form.manager['type'] in (2,3):
       apt_list_ids=get_apt_list_ids(form)
       form.manager['apt_list_ids']=apt_list_ids
-
+      
       if not len(apt_list_ids):
-        form.errors('Вы не можете администрировать фармацевтов, поскольку не привязаны ни к одной аптеке')
+        form.errors.append('Вы не можете администрировать фармацевтов, поскольку не привязаны ни к одной аптеке')
     
     if form.manager['type']=='4':
       form.errors.append('Доступ запрещён')

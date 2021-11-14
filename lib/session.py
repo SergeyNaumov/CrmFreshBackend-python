@@ -165,7 +165,10 @@ def session_start(s,**arg):
   if manager['login']:
     s.login=manager['login']
   else:
-    s._content['redirect']='/login'
+
+    #s._content['redirect']='/login?'
+    
+    #s._content['referer']=s.request
     s._content['success']=0
     s.end()
 

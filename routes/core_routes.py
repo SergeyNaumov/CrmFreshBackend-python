@@ -126,8 +126,10 @@ async def leftmenu():
 @router.get('/startpage')
 async def startpage():
   errors=[]
+  #print('referer:',referer)
   manager=None
   manager_menu_table=None
+  
   left_menu=[]
 
   if(config['use_project']):
