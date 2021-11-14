@@ -23,7 +23,6 @@ def get_filters():
       'value':1,
       'name':'out_action',
       'filter_on':1,
-
       'before_code':out_action_before_code,
       'not_process':1
     },
@@ -105,7 +104,9 @@ def ur_lico_id_filter_code(form,field,row):
   links=[f'''<a href="/edit-form/{form.work_table}/{row['wt__id']}" target="_blank">посмотреть прогнозный бонус</a>''']
   
   if (1 in form.query_search['on_filters_hash']['out_action']):
-    url=f"/edit-form/action_plan/{row['ap__id']}?open_summary=1&prev={row['prev']}"
+    #form.pre(f"period_id: {row['wt__period_id']}")
+    #url=f"/edit-form/action_plan/{row['ap__id']}?open_summary=1&prev={row['prev']}"
+    url=f"/edit-form/action_plan/{row['ap__id']}?open_summary=1&period={row['wt__period_id']}"
     if form.manager['type']==1:
       url+=f"&ur_lico_id={row['u__id']}"
       

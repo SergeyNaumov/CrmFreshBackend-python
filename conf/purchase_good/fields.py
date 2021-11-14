@@ -150,11 +150,14 @@ def apteka_filter_code(form,field,row):
 def ur_lico_id_before_code(form,field):
   if form.manager['type']==2:
     field['autocomplete']=0
-    if len(form.manager["apt_list_ids"]):
+
+    if len(form.manager["ur_lico_ids"]):
       #form.pre(form.manager)
       field['where']=f' id in ({ ",".join(form.manager["ur_lico_ids"]) }) '
+      del(field['autocomplete'])
 
-    del(field['autocomplete'])
+
+    
 
 def dates_filter_code(form,field,row):
   return f"{row['act__date_start']} ... {row['act__date_stop']}"

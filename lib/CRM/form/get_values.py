@@ -121,6 +121,10 @@ def func_get_fields_values(form):
 
     elif f['type']=='get_in_ext_url':
       get_in_ext_url(form,f)
-    elif exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table'] and (not exists_arg('values',f) or not len(f['values'])):
-      print('get_values')
+    elif exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
+
       f['values']=get_values_for_select_from_table(form,f)
+      
+      if f['name']=='ur_lico_id':
+        print(f'get_values {f["name"]} {f["where"]}')
+        print(f['values'])

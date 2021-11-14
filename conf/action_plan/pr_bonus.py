@@ -222,8 +222,23 @@ def pr_bonus(form,field):
             total['earned_bonus']+=b['earned_bonus']
             # Процент выполнения = сумма закупки в сип-ценах / план
             if total['plan']:
-                total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
                 
+                #total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
+                if form.ov['plan']==2:
+                    #form.pre(f"100 * ({b['buy_cnt']} / {b['plan']})")
+                    total['percent_complete'] = round(100 * (total['buy_cnt'] / total['plan']),2)
+                    #pass
+                    # b['buy_cnt'] b['plan']
+                    # Количественный
+                   # total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
+                else:
+                    # Суммовой
+                    total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
+
+
+                
+                #form.pre(f" 100 * {total['price']}/ {total['plan']} = {total['percent_complete']}")
+
                 #form.pre(f'''100 * ({total['price']} / {total['plan']} )''')
                 '''     
                 form.ov['period']['querter_begin_days'] -- кол-во дней, прошедших с начала квартала, включая сегодняшний
@@ -333,7 +348,7 @@ def pr_bonus(form,field):
             
             header_total='* Сводные данные по всем юридическим лицам'
             if form.manager['type']==3:
-                header_total='* Сводные данные по всем аптекам!!'
+                header_total='* Сводные данные по всем аптекам'
             
             if form.manager['type']!=3: # для аптек просили убрать прогнозный бонус по всем аптекам
                 open_summary=0
@@ -352,7 +367,7 @@ def pr_bonus(form,field):
                             'type':'html',
                             'body':f'''
                                 <div style="margin-top: 20px; margin-bottom: 20px; border: 1px solid gray; padding: 20px; border-radius: 4px;">
-                                    <h2>Сводные данные по всем юрлицам</h2>
+                                    <h2>{header_total}</h2>
                                     <br>
                                     {body_text}
                                 </div>

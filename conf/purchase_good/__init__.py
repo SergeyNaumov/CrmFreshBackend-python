@@ -10,7 +10,7 @@ class Config(Form):
         
         form.title='Отчёты онлайн'
         form.not_edit=1
-        form.explain=True
+        form.explain=0
         form.read_only=1
         form.make_delete=0
         form.not_create=1

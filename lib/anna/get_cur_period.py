@@ -70,9 +70,9 @@ def get_period(form,id):
   querter=0
 
   period=form.db.query(
-    query='SELECT *, if(stopdate<now(),1,0) prev from prognoz_bonus_period where id=%s',
+    query='SELECT *, if(date_end<now(),1,0) prev from prognoz_bonus_period where id=%s',
     values=[id],
-    onerow=1
+    onerow=1,
   )
   querter_begin_days=cnt_days_period(querter_begin_day,cur_date())+1
   querter_total_days=cnt_days_period(querter_begin_day,querter_end_day)
