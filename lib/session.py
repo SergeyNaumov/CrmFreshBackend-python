@@ -159,14 +159,14 @@ def session_start(s,**arg):
     'success':1,
     'login':manager['login'],
     'errors':errors,
-    'env':s.env
+    #'env':s.env
   }
 
   if manager['login']:
     s.login=manager['login']
   else:
-
-    #s._content['redirect']='/login?'
+    #s._content['redirect']=''
+    s._content['redirectX']='/login?'
     
     #s._content['referer']=s.request
     s._content['success']=0

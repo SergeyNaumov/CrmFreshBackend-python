@@ -7,7 +7,7 @@ def get_anna_manager():
   return s.db.query(
     query="""
       SELECT
-        am.id, concat(am.name_f,' ',am.name_i,' ',am.name_o) fio, if(am.email,am.email,am.login) email
+        am.id, concat(am.name_f,' ',am.name_i,' ',am.name_o) fio, if(am.email<>'',am.email,am.login) email
       FROM
         manager wt
         join manager am ON am.id=wt.anna_manager_id
@@ -27,7 +27,7 @@ def get_ur_lico(ur_lico_id):
     query='''
       SELECT
         ul.*,
-        ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, ma.login ma_email, ma.phone ma_phone
+        ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, ma.email ma_email, ma.phone ma_phone
       from
         ur_lico ul
         LEFT JOIN manager ma ON ma.id=ul.anna_manager_id
@@ -76,8 +76,8 @@ def get_manager_data(manager_id=0,errors=[]):
     manager=s.db.query(
         query="""
             SELECT
-                wt.id,wt.login,wt.name_f,wt.name_i,wt.name_o,wt.name,wt.phone,wt.type,
-                ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, if(ma.email,ma.email,ma.login) ma_email, ma.phone ma_phone,
+                wt.id,wt.login,wt.name_f,wt.name_i,wt.name_o,wt.name,wt.phone,wt.type,wt.email,
+                ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, if(ma.email<>'',ma.email,ma.login) ma_email, ma.phone ma_phone,
                 wt.access_to_video, wt.access_to_conf
             FROM 
                 manager wt

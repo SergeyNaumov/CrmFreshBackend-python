@@ -51,6 +51,7 @@ def get_fields():
         'type':'checkbox',
         'filter_type':'checkbox',
         'not_process':True,
+        'not_order':True,
         'tablename':'act',
         'default_off':1,
         'filter_code':suppliers_filter_code,

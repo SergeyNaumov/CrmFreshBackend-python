@@ -2,13 +2,18 @@ import random, re, time, datetime, os
 
 def cnt_days_period(d1,d2):
   # Ввычисляет кол-во дней между датами
+  
+  if not(isinstance(d1,str)): d1=str(d1)
+  if not(isinstance(d2,str)): d2=str(d2)
+  #print('type_d1:',type(d1))
+  #print('type_d2:',type(d2))
   d1=d1.split('-')
   d2=d2.split('-')
   res=str(datetime.date(int(d2[0]),int(d2[1]),int(d2[2]))-datetime.date(int(d1[0]),int(d1[1]),int(d1[2])))
   #print('rez:',str(res))
   if str(res) == '0:00:00':
     return 0
-  return int(res.split()[0])
+  return int(res.split()[0])+1
 
 def tree_to_list(tree_list,lst,level):
   for t in tree_list:

@@ -1,3 +1,4 @@
+
 {%if manager.type==3%} 
     <!--- Для аптек -->
     
@@ -42,7 +43,7 @@
         
 
         {%if ov.plan !=3 %}
-            {%if b.left_to_complete_percent>=100%}
+            {%if b.percent_complete>=100%}
                 осталось выполнить в %: 0.00<br>
             {%else%}
                 осталось выполнить в %: {{b.left_to_complete_percent}}<br>
@@ -65,12 +66,11 @@
 {%if manager.type != 3%}
     <!-- Для всех остальных -->
         кол-во аптек: {{b.cnt_apt}}<br>
-
-        {%if set1%}
-            {%if ov.plan !=3 %}
-                {{label_plan}}: {{b.plan}}<br>
-            {%endif%}
+       
+        {%if ov.plan !=3 %}
+            {{label_plan}}: {{b.plan}}<br>
         {%endif%}
+        
 
         {%if ov.plan==1 or ov.plan==3%}
             {%if ov.total_good_price>0%}

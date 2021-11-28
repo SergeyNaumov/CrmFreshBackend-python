@@ -1,6 +1,5 @@
 <div>
-    Начало: {{d.start}}<br>
-    {%if d['link']%}Ссылка на конференцию: <a href="{{d['link']}}" target="_blank">{{d['link']}}</a><br>{%endif%}
+    {%if d['link']%}Ссылка на конференцию: <a href="{{d['link']}}" data-id="{{d['id']}}" onclick="return window.conference_go_link(this)" target="_blank">{{d['link']}}</a><br>{%endif%}
     {%if d.conf_id%}Идентификатор конференции: {{d.conf_id}}<br>{%endif%}
     {%if d.access_code%}Код доступа: {{d.access_code}}<br>{%endif%}
     {{d.comment}}

@@ -44,6 +44,7 @@ class Config(Form):
             #     #'value':["2020-01-01","2020-01-02"]
             # },
         ]
+        self.GROUP_BY='wt.id'
         self.search_on_load=1
         self.fields=get_fields()
 

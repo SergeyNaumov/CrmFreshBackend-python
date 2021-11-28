@@ -108,14 +108,12 @@ def func_get_values(form):
 
     #form.pre(f"v2: {form.fields[5]['value']}")
     form.values=values
-    #print('GET_VALUES2:',values)
 
 
 # Получаем значения для select_from_table, 1_to_m
 def func_get_fields_values(form):
   form.set_orig_types()
   for f in form.fields:
-    #print('name:',f['name'],f['type'])
     if f['type'] == '1_to_m':
       get_1_to_m_data(form,f)
 
@@ -125,6 +123,3 @@ def func_get_fields_values(form):
 
       f['values']=get_values_for_select_from_table(form,f)
       
-      if f['name']=='ur_lico_id':
-        print(f'get_values {f["name"]} {f["where"]}')
-        print(f['values'])

@@ -5,7 +5,7 @@ def permissions(form):
         form.not_create=0
         form.read_only=0
         form.make_delete=True
-
+        
     if form.script=='page' and form.id:
 
         d=form.db.query(
@@ -15,7 +15,10 @@ def permissions(form):
         )
         d['start']=date_to_rus(d['start'])
         form.title=d['header']
-        form.blocks=[{'type':'html','body':form.template('./conf/conference/templates/dialog.html',d=d)}]
+        form.blocks=[
+            {'type':'html','body':form.template('./conf/conference/templates/dialog.html',d=d)},
+            {'type':'link','onclick':''}
+        ]
         
 
     

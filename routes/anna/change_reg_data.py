@@ -7,7 +7,7 @@ from lib.core import exists_arg
 def change_reg_data(R:dict):
     success=1
     manager=get_manager_data()
-   # print('manager:',manager)
+    
     rules=[
        [ (R['phone']),'Телефон не указан'],
        [ is_phone(R['phone']),'Телефон указан не корректно' ],
@@ -91,7 +91,7 @@ def change_reg_data(R:dict):
     
 
     if apteka: # если это представитель аптеки -- отправляем в юрлицо
-        #print('apteka:',apteka)
+        
         # Письмо представителю юридического лица
         ur_lico=manager['ur_lico']
         
@@ -113,6 +113,7 @@ def change_reg_data(R:dict):
     
     if manager['type'] in [2,3] and is_email(manager['ma_email']):
         # если рег. данные меняет юр.лицо
+        
         if manager['type']==2: # гер
             send_mes(
                 to=manager['ma_email'],
@@ -133,9 +134,9 @@ def change_reg_data(R:dict):
 
         #print('send_to (anna manager):',manager['ma_email'])
 
-    if is_email(manager['login']):
+    if is_email(manager['email']):
         send_mes(
-            to=manager['login'],
+            to=manager['email'],
             subject=subject,
             message=message
         )

@@ -29,7 +29,9 @@ async def process_page(config:str,id:int): #
       'blocks':form.blocks,
       'log':form.log,
       'errors':form.errors,
+
     },
+    'javascript':form.javascript['page'],
     'success':1,
 
   }

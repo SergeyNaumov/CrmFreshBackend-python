@@ -92,6 +92,11 @@ def before_delete(form):
     else:
       form.errors.append('Удаление запрещено')
     
+def after_insert(form):
+  form.db.query(
+    query='UPDATE manager set type=4 where id=%s',
+    values=[form.id]
+  )
 
 def after_save(form):
     nv=form.new_values
@@ -99,13 +104,14 @@ def after_save(form):
       'id':form.id,
       'apteka_id':nv['apteka_id']
     }
-  
+
     form.db.save(
       table='manager_pharmacist',
       errors=form.errors,
       replace=1,
       data=data
     )
+
     #form.pre({'nv':nv})
     get_ov(form)
     form.ov['apteka_id']=nv['apteka_id']
@@ -145,6 +151,7 @@ events={
     
   ],
   'before_insert':before_insert,
+  'after_insert':after_insert,
   'after_save':after_save,
   'before_search':before_search,
   'before_delete':before_delete,

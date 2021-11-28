@@ -64,18 +64,23 @@ def get_period(form,id):
   mon = int(datetime.now().month)-3
 
   
-  querter_begin_day=str(year)+'-01-01'
-  querter_end_day=str(year)+'-03-31'
+
 
   querter=0
 
   period=form.db.query(
-    query='SELECT *, if(date_end<now(),1,0) prev from prognoz_bonus_period where id=%s',
+    query='SELECT *, if(date_end<curdate(),1,0) prev from prognoz_bonus_period where id=%s',
     values=[id],
     onerow=1,
+    debug=1
   )
-  querter_begin_days=cnt_days_period(querter_begin_day,cur_date())+1
-  querter_total_days=cnt_days_period(querter_begin_day,querter_end_day)
+  querter_begin_day=period['date_begin']
+  querter_end_day=period['date_end']
+
+  querter_begin_days=cnt_days_period(querter_begin_day,cur_date())
+  querter_total_days=cnt_days_period(period['date_begin'],period['date_end'])
+  #querter_total_days=cnt_days_period(querter_begin_day,querter_end_day)
+  #form.pre({'period':period,'querter_total_days':querter_total_days,'d1':period['date_begin'],'d2':str(period['date_end']), 'bd':querter_begin_day, 'ed':querter_end_day })
   if not period:
     period={'id':None,'querter':querter}
   

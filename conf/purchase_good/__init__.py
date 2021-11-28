@@ -38,7 +38,7 @@ class Config(Form):
 
         # ]
         #form.search_on_load=1
-
+        form.out_before_search=['<span style="color: red;">Данные обновляются с задержкой 1-2 дня</span><br><br>']
         form.fields=get_fields()
 
 """

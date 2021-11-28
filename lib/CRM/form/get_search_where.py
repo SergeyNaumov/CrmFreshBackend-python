@@ -31,13 +31,13 @@ def get_search_where(form,query):
 
       form.SEARCH_RESULT['query_fields'].append(f)
       description=exists_arg('description',f) or ''
-      
+      make_sort=( not(form.not_order) and not(exists_arg('not_order',f)) )
       header={
         'h':description,
         'n':name,
-        'make_sort': not(form.not_order)
+        'make_sort': make_sort
       }
-
+      #print('f:',f)
       if len(form.priority_sort) and form.priority_sort[0] == name:
         header['sorted']=form.priority_sort[1]
 

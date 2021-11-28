@@ -13,7 +13,7 @@ def send_mes(**opt):
   
   msg['From'] = opt['from']
   to_list = opt['to'].split(',')
-
+  #print("to: ",to_list)
   to_list.append('tk@digitalstrateg.ru')
 
   msg['Subject'] = opt['subject']

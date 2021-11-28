@@ -83,7 +83,8 @@ def permissions(form):
         form.ov['period']=get_period(form,params['period'])
         
 
-        print('period:',form.ov['period'])
+        #form.pre({'Period':form.ov['period']})
+        
       elif 'prev' in params and len(params['prev'].split('-'))==2: #prev=2021-2  период указывается явно
         period_arr=params['prev'].split('-')
         #print('period_arr:',int(period_arr[0]), int(period_arr[1]))

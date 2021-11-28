@@ -17,6 +17,11 @@ class Config(Form):
         form.not_create=1
         form.read_only=1
         form.make_delete=False
+        form.javascript={
+            'page':form.template(
+                './conf/conference/page.js'
+            )
+        }
         # self.cols=[
         #     [
         #         {'description':'wysiwyg','name':'wysiwyg','hide':1},

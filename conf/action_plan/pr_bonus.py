@@ -249,8 +249,15 @@ def pr_bonus(form,field):
                     *
                 кол-во дней в квартале / план на квартал в рублях или упаковках
                 ''' 
-                querter_begin_days=int(form.ov['period']['querter_begin_days'])
-                querter_total_days=int(form.ov['period']['querter_total_days'])+1
+                #form.pre(form.ov['period'])
+                
+                # Здесь мы считали кол-во дней в квартале
+                #querter_begin_days=int(form.ov['period']['querter_begin_days'])
+                
+                # Но мне сказали брать кол-во загруженных дней
+                querter_begin_days=form.ov['period']['loaded_days_ur']
+                
+                querter_total_days=int(form.ov['period']['querter_total_days'])
                 #form.pre(form.ov['period'])
                 if form.ov['period']['prev']:
                     querter_begin_days=querter_total_days
@@ -258,7 +265,7 @@ def pr_bonus(form,field):
                 
                 if form.ov['plan'] in (1,3): # Суммовой
                     
-                    #print('total_plan:',total_plan)
+                    #form.pre({'period':form.ov['period']})
                     #form.pre(f'''100*({total['price']}/{querter_begin_days} * {querter_total_days}/{total['plan']})''')
                     total['percent_progress']=round( 100*(total['price']/querter_begin_days * querter_total_days/ int(total['plan']) ),2 )
                     

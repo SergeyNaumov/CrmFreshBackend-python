@@ -33,6 +33,34 @@ router.include_router(bonus,prefix='/bonus')
 def controller_left_menu():
     return left_menu()
 
+@router.get('/conference_stat/{id}')
+def controller_conference_stat(id: int):
+    manager_data=get_manager_data()
+    record_id=None
+    db=s.db
+    with db.connect.cursor() as cursor:
+        sql="select id from conference_stat where manager_id=%s and conference_id=%s and ts>= (current_timestamp() - interval 10 second) order by id desc limit 1"
+        cursor.execute(sql,[manager_data['id'],id])
+
+        e=cursor.fetchone()
+        if e and len(e): e=e[0]
+
+        #print('e:',e)
+        
+        if not(e):
+            sql="INSERT INTO conference_stat(conference_id,manager_id) values(%s,%s)"
+            cursor.execute(sql,[id,manager_data['id']])
+            db.connect.commit()
+            record_id=cursor.lastrowid
+
+            record=db.query(
+                query='select * from conference_stat where id=%s',
+                id=record_id,
+                onerow=1
+            )
+
+
+    return {'id':record_id,'success':True,'e':e}
 
 @router.post('/check-account-login')
 def check_account_login(R:dict):

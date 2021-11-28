@@ -122,6 +122,7 @@ def get_fields():
         }
       ]
     },
+
     # {
     #   'name':'type',
     #   'description':'Тип учётной записи',
