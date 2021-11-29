@@ -35,7 +35,6 @@ def pr_bonus(form,field):
                         period_id=%s and pb.action_plan_id=%s and pb.ur_lico_id in ({','.join(form.manager['ur_lico_ids'])})
                 """,
                 values=[form.ov['period']['id'],form.id],
-            
             )
 
     elif form.id and form.manager['type']==3:

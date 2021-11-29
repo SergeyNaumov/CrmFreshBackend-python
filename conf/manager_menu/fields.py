@@ -77,6 +77,12 @@ def get_fields():
           'tab':'advanced',
         },
         {
+          'description':'Выводить представителям нескольких юрлиц',
+          'name':'out_ur_lico_multi',
+          'type':'checkbox',
+          'tab':'advanced',
+        },
+        {
           'description':'Выводить для аптеки',
           'name':'out_apteka',
           'type':'checkbox',

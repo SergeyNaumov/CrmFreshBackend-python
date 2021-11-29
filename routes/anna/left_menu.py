@@ -1,5 +1,7 @@
 from lib.engine import s
 from config import config
+
+
 def left_menu():
   errors=[]
   manager=None
@@ -15,7 +17,18 @@ def left_menu():
   if manager['type']==1: # Менеджер АннА
     where='out_manager_anna=1'
   elif manager['type']==2: # Юридическое лицо
+    ur_lico_ids=s.db.query(
+        query="select ur_lico_id from ur_lico_manager where manager_id=%s",
+        values=[manager['id']],
+        massive=1
+    )
+    
     where='out_ur_lico=1'
+
+    if len(ur_lico_ids)>1:
+      where+=' OR out_ur_lico_multi=1'
+
+    
   elif manager['type']==3: # Аптека
     where='out_apteka=1'
   elif manager['type']==4: # Аптека
