@@ -42,7 +42,9 @@ def get_filters():
       'type':'select_from_table',
       'table':'action',
       'tablename':'a',
-      'header_field':'concat(header," (",date_start,"..",date_stop,")")',
+
+      'before_code':action_id_before_code,
+      'header_field':'header',
       'value_field':'id',
       #'where':'date_stop>=curdate()',
       #'autocomplete':1,
@@ -92,6 +94,10 @@ def percent_complete_filter_code(form,field,row):
   if row['ap__plan']==3:
     return '% за любые закупки'
   return row['wt__percent_complete']
+
+def action_id_before_code(form,field):
+  if form.script=='admin_table':
+    field['header_field']='concat(header," (",date_start,"..",date_stop,")")'
 
 def ur_lico_id_before_code(form,field):
   if form.manager['type']==2:

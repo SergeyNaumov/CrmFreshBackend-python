@@ -33,11 +33,12 @@ def get_filters():
       'type':'select_from_table',
       'table':'action',
       'tablename':'a',
-      'header_field':'concat(header," (",date_start,"..",date_stop,")")',
+      'header_field':'header',
       'value_field':'id',
       #'where':'date_stop>=curdate()',
       #'autocomplete':1,
       #'autocomplete_start_loaded':1,
+      'before_code':action_id_before_code,
       'filter_code':action_id_filter_code,
       'filter_on':1
     },
@@ -61,12 +62,19 @@ def apteka_id_filter_code(form,field,row):
 
   return out
 
+def action_id_before_code(form,field):
+  if form.script=='admin_table':
+    field['header_field']='concat(header," (",date_start,"..",date_stop,")")'
+
 def action_id_filter_code(form,field,row):
   return f'{row["a__header"]} ({row["a__date_start"]}..{row["a__date_stop"]})'
 
 def period_id_filter_code(form,field,row):
   #form.pre(row)
   return f'{row["pbp__year"]}, {row["pbp__querter"]} квартал'
+
+
+
 def period_id_before_code(form,field):
     field['values']=form.db.query(
       query="select id v,concat(year,' ',querter,' квартал') d from prognoz_bonus_period  where date_begin>=from_days(to_days(curdate())-180) order by date_begin"

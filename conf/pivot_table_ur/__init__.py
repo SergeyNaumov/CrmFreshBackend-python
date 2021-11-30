@@ -9,7 +9,7 @@ class Config(Form):
 
         super().__init__(arg) 
         
-        form.title='Сводные данные по юр лицам'
+        form.title='Сводные данные юр. лица'
         form.not_edit=1
         form.explain=0
         #form.read_only=1
