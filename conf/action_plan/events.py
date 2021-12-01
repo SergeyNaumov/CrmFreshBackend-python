@@ -14,7 +14,12 @@ def permissions(form):
     if 'ur_lico_id' in params and form.manager['type']==1:
       
       form.manager['ur_lico_ids']=get_ul_list_from_ur_lico_id(form,params['ur_lico_id'])
-
+      form.manager['apt_list_ids']=form.db.query(
+        query="select id from apteka where ur_lico_id=%s",
+        values=[params['ur_lico_id']],
+        massive=1,
+        str=1
+      )
 
 
   if form.script=='edit_form' and form.id and 'cgi_params' in form.R and 'manager_id' in form.R['cgi_params']:

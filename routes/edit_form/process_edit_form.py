@@ -112,5 +112,5 @@ def process_edit_form(**arg):
       'cols':form.cols,
       'tabs':form.tabs,
       'config':form.config,
-      'javascript':form.javascript['edit_form'] if form.javascript['edit_form'] else '' 
+      'javascript':exists_arg('edit_form',form.javascript)
     }

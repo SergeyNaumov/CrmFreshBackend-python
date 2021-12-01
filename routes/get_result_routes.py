@@ -147,7 +147,7 @@ async def get_result(R: dict):
               'results':form.SEARCH_RESULT,
               'errors':form.errors,
               'out_before_search':form.out_before_search,
-              'javascript':form.javascript['find_objects'],
+              'javascript':exists_arg('find_objects',form.javascript),
               'out_after_search':form.out_after_search,
               'explain_query':form.explain_query
       }

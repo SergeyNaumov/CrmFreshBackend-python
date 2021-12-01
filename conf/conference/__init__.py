@@ -20,7 +20,8 @@ class Config(Form):
         form.javascript={
             'page':form.template(
                 './conf/conference/page.js'
-            )
+            ),
+            
         }
         # self.cols=[
         #     [

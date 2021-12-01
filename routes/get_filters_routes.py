@@ -76,13 +76,15 @@ async def get_filters_controller(config: str):
 
   make_create=1
   if form.not_create: make_create=0
+  
   return {
     'success':1,
     'title':form.title,
     'filters':filters,
     'search_links':form.search_links,
     'before_filters_html':form.before_filters_html,
-    'javascript':form.javascript['admin_table'],
+    'javascript':exists_arg('admin_table',form.javascript),
+    #form.javascript['admin_table'],
     'filters_groups':form.filters_groups,
     'log':form.log,
     'search_plugin':form.search_plugin,

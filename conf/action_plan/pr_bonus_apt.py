@@ -32,7 +32,8 @@ def pr_bonus_apt(form,field):
             #form.pre(bonus_list)
             #form.pre([form.ov['period']['id'],form.id])
     else:
-        return
+        form.manager['apt_list_ids']
+        pass
     if len(bonus_list):
 
         # field['after_html']=form.template(
