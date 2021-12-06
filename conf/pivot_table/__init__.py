@@ -1,5 +1,5 @@
 from lib.CRM.form import Form
-#from .fields import get_fields
+from .fields import get_fields
 from .events import events
 
 
@@ -12,30 +12,29 @@ class Config(Form):
         form.title='Сводные данные'
         form.not_edit=1
         form.explain=0
-        #form.read_only=1
-        #form.make_delete=0
-        #form.not_create=1
-        form.events=events
-        form.headers=[
-            {'h':'юр лицо', 'n':'ur_lico'},
-            {'h':'период','n':'querter'},
-            {'h':'маркетинговое мероприятие','n':'action'},
-            {'h':'%выполнения','n':'percent_complete'},
-            {'h':'осталось выполнить в %','n':'left_to_complete_percent'},
-            {'h':'осталось выполнить в рублях / штуках','n':'left_to_complete_rub'},
+        form.read_only=1
+        form.make_delete=0
+        form.not_create=1
+        form.QUERY_SEARCH_TABLES=[
+            {'t':'prognoz_bonus','alias':'wt'},
+            {'t':'action_plan','a':'ap','l':'ap.id=wt.action_plan_id','lj':0},
+            {'t':'prognoz_bonus_period','a':'per','l':'per.id = wt.period_id','lj':0},
+            {'t':'action','a':'a','l':'a.id=wt.action_id','lj':0},
+            {'t':'ur_lico','a':'ul','l':'wt.ur_lico_id=ul.id','lj':0},
 
         ]
+        
+        #form.GROUP_BY='wt.id'
+        
+        form.filters_groups=[]
+        form.fields=get_fields()
+
+    
+
+        form.events=events
         form.sort='ur_lico' # поле, по которому сортируем изначально
         form.sort_desc=False
-        # form.data_query="""
-        #      SELECT 
-        #      from
-        #         prognoz_bonus wt
-        #         JOIN ur_lico ul ON wt.ur_lico_id=ul.id
-        #     WHERE
 
-        # """
-        # form.data_values=[]
 
         
 

@@ -85,6 +85,12 @@ def get_fields():
       ],
       'filter_on':1
     },
+    {
+      'name':'comment',
+      'description':'Комментарий',
+      'type':'textarea',
+      'tab':'main',
+    },
     # {
     #   'name':'name_f',
     #   'description':'Фамилия',

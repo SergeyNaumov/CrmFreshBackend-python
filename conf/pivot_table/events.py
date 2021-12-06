@@ -1,10 +1,26 @@
 from lib.anna.get_ul_list import get_ul_list_ids
+def permissions_admin_table(form):
+    #form.pre(form.fields)
+    pass
+#     ids=get_ul_list_ids(form)
 def permissions(form):
+    if form.script=='table':
+        permissions_table(form)
 
-    ids=get_ul_list_ids(form)
-
-# ap.plan=3   -- только % за любые закупки
+def permissions_table(form):
+    # ap.plan=3   -- только % за любые закупки
     # Получаем id текущего периода
+    ids=get_ul_list_ids(form)
+    form.headers=[
+        {'h':'юр лицо', 'n':'ur_lico'},
+        {'h':'период','n':'querter'},
+        {'h':'маркетинговое мероприятие','n':'action'},
+        {'h':'%выполнения','n':'percent_complete'},
+        {'h':'осталось выполнить в %','n':'left_to_complete_percent'},
+        {'h':'осталось выполнить в рублях / штуках','n':'left_to_complete_rub'},
+
+    ]
+
     period_id=form.db.query(
         query='SELECT id from prognoz_bonus_period where date_begin<=curdate() order by date_begin desc limit 1',
         onevalue=1
@@ -59,7 +75,7 @@ def permissions(form):
     for d in form.data:
         if d['percent_complete']=='percent':
             d['percent_complete']='% за любые закупки'
-        d['action']+=f" <small><a href='/edit-form/action_plan/{d['action_plan_id']}?open_summary=1' target='_blank'>сводные данные</a></small>"
+        d['action']+=f"<br><small><a href='/edit-form/action_plan/{d['action_plan_id']}?open_summary=1' target='_blank'>сводные данные</a></small>"
         del d['action_plan_id']
         del d['period_id']
     form.sort=''
@@ -67,6 +83,34 @@ def permissions(form):
     
 
 
+def before_search(form):
+    qs=form.query_search
+    qs['SELECT_FIELDS']=[
+        'wt.id wt__id, ap.plan ap__plan',
+        'ul.id ul__id','ul.header ul__header',
+        'wt.action_plan_id wt__action_plan_id',
+        'if(ap.plan=3,"percent",wt.percent_complete) percent_complete',
+        'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",wt.left_to_complete_percent) left_to_complete_percent',
+        'if(ap.plan=3 or wt.percent_complete>=100,"выполнен", concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) ) left_to_complete_rub',
+        #'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) left_to_complete_rub',
+        'per.year per__year, per.querter per__querter',
+        'a.id a__id, a.header a__header'
+    ]
+    # Для того, чтобы сортировка по "осталось выполнить...." работала верно
+    if len(qs['ORDER'])==1:
+
+        if qs['ORDER'][0]=='wt.left_to_complete_percent ':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,101,wt.left_to_complete_percent)']
+        elif qs['ORDER'][0]=='wt.left_to_complete_percent desc':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,101,wt.left_to_complete_percent) desc']
+
+        elif qs['ORDER'][0]=='wt.left_to_complete_rub ':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub)']
+        elif qs['ORDER'][0]=='wt.left_to_complete_rub desc':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub) desc']
+    #form.pre(qs)
+
 events={
-    'permissions':[permissions]
+    'permissions':[permissions],
+    'before_search':before_search
 }

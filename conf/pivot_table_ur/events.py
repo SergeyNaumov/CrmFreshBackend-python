@@ -1,5 +1,19 @@
 from lib.anna.get_ul_list import get_ul_list_ids
 def permissions(form):
+    if form.script=='table':
+        permissions_table(form)
+
+def permissions_table(form):
+
+    form.headers=[
+        {'h':'период','n':'querter'},
+        {'h':'маркетинговое мероприятие','n':'action'},
+        {'h':'%выполнения','n':'percent_complete'},
+        {'h':'осталось выполнить в %','n':'left_to_complete_percent'},
+        {'h':'осталось выполнить в рублях / штуках','n':'left_to_complete_rub'},
+    ]
+    form.sort='action' # поле, по которому сортируем изначально
+    form.sort_desc=False
 
     ids=get_ul_list_ids(form)
 
@@ -66,7 +80,34 @@ def permissions(form):
     #form.pre(form.data)
     
 
+def before_search(form):
+    qs=form.query_search
+    qs['SELECT_FIELDS']=[
+        'wt.id wt__id, ap.plan ap__plan',
+        'wt.action_plan_id wt__action_plan_id',
+        'm.login m__login','m.comment m__comment',
+        'if(ap.plan=3,"percent",wt.percent_complete) percent_complete',
+        'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",wt.left_to_complete_percent) left_to_complete_percent',
+        'if(ap.plan=3 or wt.percent_complete>=100,"выполнен", concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) ) left_to_complete_rub',
+        #'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) left_to_complete_rub',
+        'per.year per__year, per.querter per__querter',
+        'a.id a__id, a.header a__header'
+    ]
+
+    # Для того, чтобы сортировка по "осталось выполнить...." работала верно
+    if len(qs['ORDER'])==1:
+
+        if qs['ORDER'][0]=='wt.left_to_complete_percent ':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,101,wt.left_to_complete_percent)']
+        elif qs['ORDER'][0]=='wt.left_to_complete_percent desc':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,101,wt.left_to_complete_percent) desc']
+
+        elif qs['ORDER'][0]=='wt.left_to_complete_rub ':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub)']
+        elif qs['ORDER'][0]=='wt.left_to_complete_rub desc':
+            qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub) desc']
 
 events={
-    'permissions':[permissions]
+    'permissions':[permissions],
+    'before_search':before_search
 }
