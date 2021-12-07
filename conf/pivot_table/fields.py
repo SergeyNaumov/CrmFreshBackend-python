@@ -26,7 +26,7 @@ def get_fields():
     {
       'description':'Название маркетингового мероприятия',
       'name':'action_id',
-      'db_name':'id',
+      
       'type':'select_from_table',
       'table':'action',
       'tablename':'a',
