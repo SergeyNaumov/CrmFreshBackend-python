@@ -119,7 +119,7 @@ def percent_complete_filter_code(form,field,row):
   else:
     r=str(row['percent_complete'])
 
-  return r+f"<br><small><a href='/edit-form/action_plan/{row['wt__action_plan_id']}?open_summary=1&ur_lico_id={row['ul__id']}' target='_blank'>сводные данные</a></small>"
+  return r+f"<br><small><a href='/edit-form/action_plan/{row['wt__action_plan_id']}?open_summary=1&ur_lico_id={row['ul__id']}&period={row['wt__period_id']}' target='_blank'>сводные данные</a></small>"
 
 def left_to_complete_percent_filter_code(form,field,row):
   return row['left_to_complete_percent']

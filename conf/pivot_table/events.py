@@ -1,11 +1,12 @@
 from lib.anna.get_ul_list import get_ul_list_ids
-def permissions_admin_table(form):
-    #form.pre(form.fields)
-    pass
-#     ids=get_ul_list_ids(form)
+
+
+        #form.pre(periods)
+
 def permissions(form):
     if form.script=='table':
         permissions_table(form)
+
 
 def permissions_table(form):
     # ap.plan=3   -- только % за любые закупки
@@ -89,6 +90,7 @@ def before_search(form):
         'wt.id wt__id, ap.plan ap__plan',
         'ul.id ul__id','ul.header ul__header',
         'wt.action_plan_id wt__action_plan_id',
+        'wt.period_id wt__period_id',
         'if(ap.plan=3,"percent",wt.percent_complete) percent_complete',
         'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",wt.left_to_complete_percent) left_to_complete_percent',
         'if(ap.plan=3 or wt.percent_complete>=100,"выполнен", concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) ) left_to_complete_rub',
@@ -96,6 +98,19 @@ def before_search(form):
         'per.year per__year, per.querter per__querter',
         'a.id a__id, a.header a__header'
     ]
+
+    periods=form.db.query(
+      query="select id from prognoz_bonus_period  where date_begin>=from_days(to_days(curdate())-180) order by date_begin",
+      massive=1,
+      str=1
+    )
+
+    # Ограничиваем поиск текущим и предыдущим периодом:
+    if len(periods):
+        qs['WHERE'].append(f"wt.period_id IN ({','.join(periods)})")
+        #form.pre(qs)
+        #form.pre(periods)
+
     # Для того, чтобы сортировка по "осталось выполнить...." работала верно
     if len(qs['ORDER'])==1:
 

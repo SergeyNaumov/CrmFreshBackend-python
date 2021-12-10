@@ -90,10 +90,11 @@ def before_search(form):
         'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",wt.left_to_complete_percent) left_to_complete_percent',
         'if(ap.plan=3 or wt.percent_complete>=100,"выполнен", concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) ) left_to_complete_rub',
         #'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) left_to_complete_rub',
-        'per.year per__year, per.querter per__querter',
+        'per.year per__year, per.querter per__querter, per.date_begin per__date_begin',
         'a.id a__id, a.header a__header'
     ]
-
+    
+    
     # Для того, чтобы сортировка по "осталось выполнить...." работала верно
     if len(qs['ORDER'])==1:
 
@@ -106,6 +107,10 @@ def before_search(form):
             qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub)']
         elif qs['ORDER'][0]=='wt.left_to_complete_rub desc':
             qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub) desc']
+        elif qs['ORDER'][0]=="per.period_id desc":
+            qs['ORDER']=['per.date_begin desc']
+        elif qs['ORDER'][0]=="per.period_id ":
+            qs['ORDER']=['per.date_begin']
 
 events={
     'permissions':[permissions],
