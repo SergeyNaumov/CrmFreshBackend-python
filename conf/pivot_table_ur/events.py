@@ -82,10 +82,27 @@ def permissions_table(form):
 
 def before_search(form):
     qs=form.query_search
+    
+    # Собираем соответствие manager_id и ur_lico_id
+    ids=form.db.query(query="SELECT distinct(manager_id) FROM prognoz_bonus_pivot_ul",massive=1,str=1)
+    manager_ur_lico=[]
+    form.manager_ur_lico={}
+    if len(ids):
+        manager_ur_lico=form.db.query(
+            query=f'select manager_id,ur_lico_id from ur_lico_manager where manager_id in ({",".join(ids)}) group by manager_id',
+           
+        )
+    
+    for mu in manager_ur_lico:
+        form.manager_ur_lico[mu['manager_id']]=mu['ur_lico_id']
+
+    #form.pre(form.manager_ur_lico)
+
     qs['SELECT_FIELDS']=[
-        'wt.id wt__id, ap.plan ap__plan',
+        'wt.id wt__id, ap.plan ap__plan, wt.manager_id wt__manager_id',
         'wt.action_plan_id wt__action_plan_id',
         'm.login m__login','m.comment m__comment',
+        'ap.header ap__header',
         'if(ap.plan=3,"percent",wt.percent_complete) percent_complete',
         'if(ap.plan=3 or wt.percent_complete>=100,"выполнен",wt.left_to_complete_percent) left_to_complete_percent',
         'if(ap.plan=3 or wt.percent_complete>=100,"выполнен", concat(wt.left_to_complete_rub," ",if(ap.plan=2,"шт","руб")) ) left_to_complete_rub',

@@ -42,6 +42,9 @@ def good_categories(form,field):
     plan_ids=[]
     plan_dict={}
     good_list=[]
+    
+    show_percent=0
+
     for p in plan_list:
       plan_ids.append( str(p['id']) )
       p['child']=[]
@@ -57,14 +60,21 @@ def good_categories(form,field):
       elif p['plan'] == 3:
         p['plan_label']='% за любые закупки'
         p['value_name']='Выплачиваемый процент'
-    
+      elif p['plan'] == 4:
+        p['plan_label']='начисление по бонусу (индивидуальный бонус по товарам)'
+        p['value_name']='Выплачиваемый процент'
+        show_percent=1
+      elif p['plan'] == 5:
+        p['plan_label']='начисление по бонусу (в рублях)'
+        p['value_name']='Выплачиваемый процент'
+        show_percent=1
 
     if len(plan_ids):
       good_list=form.db.query(query='''
         SELECT
           ag.action_plan_id plan_id, g.header,
           if(g.showcase='0','нет','да') showcase,
-          g.price, g.code, g.percent
+          g.price, g.code, g.percent, g.summa
         from 
           action_plan_good ag
           JOIN good g ON ag.good_id=g.id
@@ -74,7 +84,8 @@ def good_categories(form,field):
       #form.pre(good_list)
       #for g in good_list:
       #    plan_dict[g['plan_id']]['child'].append(g)
-    show_percent=0
+    
+
     for p in plan_list:
       for g in good_list:
         if g['percent']>0: show_percent=1
@@ -105,15 +116,25 @@ def good_categories(form,field):
         })
     
       table_headers.append({'h':'Сип-цена'})
-      #form.pre(form.ov)
-      if p['plan'] !=3 and show_percent and (form.ov['subscribed_on_action'] or form.manager['type']==1):
-        table_headers.append({
-          'h':'Начисления<br> по бонусу',
-          'tooltip':{
-            'header':'Бонус',
-            'body':'% бонуса зависит от закупленного товара. Каждый товар имеет свой % бонуса'
-        }
-      })
+      if show_percent and (form.ov['subscribed_on_action'] or form.manager['type']==1):
+        if p['plan'] in (1,2,4):
+          table_headers.append({
+            'h':'Начисления<br> по бонусу',
+            'tooltip':{
+              'header':'Бонус',
+              'body':'% бонуса зависит от закупленного товара. Каждый товар имеет свой % бонуса'
+            }
+          })
+        elif p['plan']==5:
+          table_headers.append({
+            'h':'Начисления<br> по бонусу',
+            'tooltip':{
+              'header':'Бонус',
+              'body':'сумма бонуса зависит от закупленного товара. Каждый товар имеет свой бонус в рублях'
+            }
+          })
+
+
       table_data=[]
       #form.pre({'p':})
       for g in p['child']:
@@ -128,8 +149,11 @@ def good_categories(form,field):
         else:
           table_tr.append(g['price'])
 
-        if p['plan'] !=3 and show_percent and (form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action'])):
-          table_tr.append(g['percent'])
+        if show_percent and (form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action'])):
+          if p['plan'] in (1,2,4):
+            table_tr.append(g['percent'])
+          elif p['plan']==5:
+            table_tr.append(g['summa'])
 
         table_data.append(table_tr)
       

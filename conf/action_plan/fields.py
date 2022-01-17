@@ -48,7 +48,7 @@ def plan_info(form,field):
   '''
   if len(form.errors):
     return 
-
+  #form.pre(ov['plan'])
   if ov['plan']==1:
     plan_data+=f'План: Cуммовой<br>Сумма от: {ov["value"]} <small>в квартал на одну аптеку</small><br>'
     if ov["reward_percent"]:
@@ -61,9 +61,14 @@ def plan_info(form,field):
   elif ov['plan']==3:
     #form.pre(ov)
     plan_data+=f'План: % за любые закупки<br>Бонус: {ov["reward_percent"]}%<br>'
+  elif ov['plan']==4:
+    plan_data+=f'План: начисление по бонусу (индивидуальный бонус по товарам)<br>Бонус: зависит от закупленного товара<br>'
+  elif ov['plan']==5:
+    plan_data+=f'План: начисление по бонусу (в рублях)<br>Бонус: {ov["reward_percent"]}%<br>'
 
   
   period=form.ov['period']
+
   different_percentage=''
   
   if ov['goods_cnt_percent']>1: # в случае, когда 

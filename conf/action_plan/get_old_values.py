@@ -31,7 +31,7 @@ def get_old_values(form):
         onerow=1,
         values=[form.id]
     )
-
+    
     if ov['subscribed_ur_lico_id']:
       ov['subscribed_ur_lico_id']=ov['subscribed_ur_lico_id'].split(',')
     else:

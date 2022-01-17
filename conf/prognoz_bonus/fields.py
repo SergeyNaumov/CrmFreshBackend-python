@@ -38,6 +38,7 @@ def prognoz_bonus(form,field):
     action=ov['action'],
     managers=ov['managers'],
     period=ov['period'],
+    only_percent=(ov['action_plan']['plan'] in (3,4,5)), # только процент за любые закупки
     total_left_to_complete_label=total_left_to_complete_label
 
   )

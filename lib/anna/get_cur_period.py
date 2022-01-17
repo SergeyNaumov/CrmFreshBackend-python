@@ -87,7 +87,7 @@ def get_period(form,id):
   period['querter_begin_days']=querter_begin_days
   period['querter_begin_day']=querter_begin_day
   period['querter_total_days']=querter_total_days
-  period['year']=str(year)
+  #period['year']=str(year)
   period['prev']=False
   return period
 

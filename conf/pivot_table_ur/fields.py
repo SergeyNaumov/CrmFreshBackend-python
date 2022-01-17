@@ -24,7 +24,7 @@ def get_fields():
 
     },
     {
-      'description':'Название маркетингового мероприятия',
+      'description':'Маркетинговое мероприятие',
       'name':'action_id',
       'type':'select_from_table',
       'table':'action',
@@ -81,7 +81,12 @@ def action_filter_code(form,field,row):
     return row['act__header']
   
   if row['a__id']:
-    return f'''<a href="/edit-form/action/{row['a__id']}" target="_blank">{row['a__header']}</a><br>'''
+    ur_lico_id=''
+    if row['wt__manager_id'] and (row['wt__manager_id'] in form.manager_ur_lico):
+      ur_lico_id=form.manager_ur_lico[row['wt__manager_id']]
+
+    url=f'''/edit-form/action_plan/{row['wt__action_plan_id']}?open_summary=1&ur_lico_id={ur_lico_id}'''
+    return f'''<a href="{url}" target="_blank">{row['a__header']} / {row['ap__header']}</a><br>'''
       # wt.id: {row['wt__id']}<br>
       # action_plan_id: {row['ap__id']}<br>
       # ur_lico_id: {row['ul__id']}<br>

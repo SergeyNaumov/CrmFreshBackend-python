@@ -85,8 +85,8 @@ def permissions(form):
         form.ov['open_summary']=1
         #form.pre(form.ov)
       if 'period' in params and params['period']:
+
         form.ov['period']=get_period(form,params['period'])
-        
 
         #form.pre({'Period':form.ov['period']})
         

@@ -2,7 +2,7 @@
 from .get_old_values import get_old_values
 
 def events_permissions(form):
-  form.pre(form.R)
+  #form.pre(form.R)
   #filter_ur_lico(form)
   #print('action:',form.action)
   #print('script:',form.script)

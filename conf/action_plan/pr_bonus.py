@@ -1,8 +1,9 @@
 def pr_bonus(form,field):
 
-    # form.id -- action.id
-    #form.pre(form.manager['ur_lico_ids'])
-    
+    only_percent=0  # С планом
+    if not(form.ov['plan'] in (3,4,5)):
+        only_percent=1 # Без плана
+
     bonus_list=[]
 
     #form.pre({'total_good_price':total_good_price})
@@ -108,6 +109,7 @@ def pr_bonus(form,field):
                     body_text=form.template(
                         './conf/action_plan/templates/pr_bonus.html',
                         ov=form.ov,
+                        only_percent=only_percent,
                         manager=form.manager,
                         label_plan=label_plan,
                         total_left_to_complete_label=total_left_to_complete_label,
@@ -176,7 +178,7 @@ def pr_bonus(form,field):
 
                     # диаграммы добавляем только к планам, отличным от "% за любые закупки"
 
-                    if form.ov['plan']!=3:
+                    if not (form.ov['plan'] in (3,4,5)):
 
                         accordion_item['content'].append(
                             {
@@ -300,12 +302,14 @@ def pr_bonus(form,field):
                 #form.pre(str(total['plan'])+'-'+str(total['price']) )
                 #total['current_bonus']=total['plan']-total['price']
             else:
+                #form.pre([total['plan'],total['buy_cnt']])
                 total['current_bonus']=total['plan']-total['buy_cnt']
 
             
             body_text=form.template(
                 './conf/action_plan/templates/pr_bonus.html',
                 ov=form.ov,
+                only_percent=only_percent,
                 manager=form.manager,
                 label_plan=label_plan,
                 total_left_to_complete_label=total_left_to_complete_label,
@@ -385,7 +389,7 @@ def pr_bonus(form,field):
 
                 })
 
-                if form.ov['plan']!=3:
+                if not form.ov['plan'] in (3,4,5):
                     accordion_data[0]['content'].append(
                         {
                             'type':'chart',

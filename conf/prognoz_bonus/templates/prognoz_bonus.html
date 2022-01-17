@@ -26,40 +26,54 @@
             Выплачиваемый процент: {{action_plan.value}}
         {%endif%}
     </div>
+    {%elif action_plan.plan==4%}
+    <div>
+        План: начисление по бонусу (индивидуальный бонус по товарам)<br>
+        {%if action_plan.value>0%}
+            Выплачиваемый процент: {{action_plan.value}}
+        {%endif%}
+    </div>
+    {%elif action_plan.plan==5%}
+    <div>
+        План: начисление по бонусу (в рублях)<br>
+        {%if action_plan.value>0%}
+            Выплачиваемый процент: {{action_plan.value}}
+        {%endif%}
+    </div>
     {%endif%}
     Кол-во аптек: {{ov.cnt_apt}}<br>
-    {%if action_plan.plan!=3%}
+    {%if not(only_percent) %}
         План для юридического лица: {{ov.plan}}<br>
     {%endif%}
     Кол-во закупки: {{ov.buy_cnt}}<br>
-    {%if ov.plan==1 or ov.plan==3%}
+    {%if ov.plan in (3,4,5)%}
         Сумма закупки в sip-ценах:
     {%else%}
         Сумма закупки:
     {%endif%}
      {{ov.price}}<br>
-    {%if action_plan.plan!=3%}
+    {%if not(only_percent)%}
         Процент выполнения: {{ov.percent_complete}}<br>
     {%endif%}
-    {%if ov.percent_complete<100 and action_plan.plan!=3%}
+    {%if ov.percent_complete<100 and not(only_percent)%}
         Текущий бонус: {{ov.current_bonus}} <small>(бонус выплачивается при выполнении плана)</small><br>
     {%endif%}
-    {%if action_plan.plan!=3%}
+    {%if not(only_percent)%}
     Процент выполнения при сохранении темпа закупки: {{ov.percent_progress}}<br>
     {%endif%}
     Бонус при сохранении темпа закупки: {{ov.bonus_progress}}<br>
     Остальные дистрибьютеры (сумма закупленного товара у всех неразрешённых поставщиков): {{ov.other_distrib_sum}}<br>
     Упущенная выгода (общая сумма, сколько недополучили): {{ov.lost_profit}}<br>
-    {%if action_plan.plan!=3 and ov.left_to_complete_percent>0%}
+    {%if not(only_percent) and ov.left_to_complete_percent>0%}
         
             Осталось выполнить в %: {{ov.left_to_complete_percent}}<br>
         
     {%endif%}
-    {%if ov.percent_complete>=100 or action_plan.plan==3%}
+    {%if ov.percent_complete>=100 or only_percent%}
         Заработанный бонус: {{ov.earned_bonus}}<br>
     {%endif%}
     
-    {%if action_plan.plan!=3 and ov.left_to_complete_percent%}
+    {%if not(only_percent) and ov.left_to_complete_percent%}
             {{total_left_to_complete_label}}: {{ov.left_to_complete_rub}}<br>
     {%endif%}
     
