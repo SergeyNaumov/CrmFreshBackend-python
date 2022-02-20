@@ -21,7 +21,9 @@ def func_get_values(form):
         values=[form.id],
         log=form.log
       )
-      
+      if not values:
+        form.errors.append(f'Запись {form.id} не найдена')
+        return
       for v in values:
         # Декодирую bites (такое счастье было в трейде)
         if(type(values[v]) is bytes):

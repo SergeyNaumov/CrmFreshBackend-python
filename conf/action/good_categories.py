@@ -44,8 +44,9 @@ def good_categories(form,field):
     good_list=[]
     
     show_percent=0
-
+    
     for p in plan_list:
+      #form.pre({'plan':p['plan']})
       plan_ids.append( str(p['id']) )
       p['child']=[]
       p['begin_date']=date_to_rus(p['begin_date'])
@@ -61,11 +62,13 @@ def good_categories(form,field):
         p['plan_label']='% за любые закупки'
         p['value_name']='Выплачиваемый процент'
       elif p['plan'] == 4:
-        p['plan_label']='начисление по бонусу (индивидуальный бонус по товарам)'
+        p['plan_label']='% за любые закупки'
+        #p['plan_label']='начисление по бонусу (индивидуальный бонус по товарам)'
         p['value_name']='Выплачиваемый процент'
         show_percent=1
       elif p['plan'] == 5:
-        p['plan_label']='начисление по бонусу (в рублях)'
+        #p['plan_label']='начисление по бонусу (в рублях)'
+        p['plan_label']='% за любые закупки'
         p['value_name']='Выплачиваемый процент'
         show_percent=1
 
@@ -73,8 +76,8 @@ def good_categories(form,field):
       good_list=form.db.query(query='''
         SELECT
           ag.action_plan_id plan_id, g.header,
-          if(g.showcase='0','нет','да') showcase,
-          g.price, g.code, g.percent, g.summa
+          if(ag.showcase='0','нет','да') showcase,
+          ag.price, g.code, ag.percent, ag.summa
         from 
           action_plan_good ag
           JOIN good g ON ag.good_id=g.id
@@ -116,8 +119,12 @@ def good_categories(form,field):
         })
     
       table_headers.append({'h':'Сип-цена'})
-      if show_percent and (form.ov['subscribed_on_action'] or form.manager['type']==1):
+      #form.pre({'show_percent':show_percent,'subscribed_on_action':form.ov['subscribed_on_action']})
+      if show_percent:
+        # and (form.ov['subscribed_on_action'] or form.manager['type']==1):
+        
         if p['plan'] in (1,2,4):
+          
           table_headers.append({
             'h':'Начисления<br> по бонусу',
             'tooltip':{
@@ -135,6 +142,7 @@ def good_categories(form,field):
           })
 
 
+
       table_data=[]
       #form.pre({'p':})
       for g in p['child']:
@@ -144,12 +152,14 @@ def good_categories(form,field):
         if form.ov['subscribed_on_action'] or form.manager['type']==1: # витрина
           table_tr.append(g['showcase'])
 
-        if g['price']==0 or g['price']=='0':
+        if g['price']==0 or g['price']=='0': # сип-цена
           table_tr.append('закупочная цена')
         else:
           table_tr.append(g['price'])
 
-        if show_percent and (form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action'])):
+        # начисления по бонусу
+        if show_percent:
+        #and (form.manager['type']==1 or (not p['reward_percent'] and form.ov['subscribed_on_action'])):
           if p['plan'] in (1,2,4):
             table_tr.append(g['percent'])
           elif p['plan']==5:
@@ -165,7 +175,10 @@ def good_categories(form,field):
       header_data_item=p['header']+' ('+p['begin_date']+'..'+p['end_date']+') '
       pb_links=[]
       header_links=[]
-
+      #form.pre({
+      #  'set1':set1,
+      #  'exists_pb':exists_prognoz_bonus(form,p['id'],cur_period)
+      #})
       if set1 and exists_prognoz_bonus(form,p['id'],cur_period):
         # !!!!!
         header_links.append({
@@ -197,13 +210,15 @@ def good_categories(form,field):
             'type':'html',
             'body':f'''<p>{' | '.join(pb_links)}</p>'''
         })
-      
-      if form.manager['type']==1 or form.ov['subscribed_on_action']:
+      # https://trello.com/c/0eHk0Yq1/13-%D0%BD%D0%B5-%D1%83%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD-%D1%82%D0%B8%D0%BF-%D0%B0%D0%BA%D1%86%D0%B8%D0%B8-%D0%B8-%D0%BD%D0%B5-%D0%B2%D0%B8%D0%B4%D0%B5%D0%BD-%D0%B1%D0%BE%D0%BD%D1%83%D1%81-%D1%80%D0%B8%D0%BD%D0%B0%D0%BB
+      # -- попросили выводить всегда
+      if True or (form.manager['type']==1 or form.ov['subscribed_on_action']):
         body=f'''План: {p['plan_label']}<br>'''
         
         if p['plan'] in (1,2):
           body+=f'''{p['value_name']}: {p['value']} <small>в квартал на одну аптеку</small><br>'''
-
+        elif p['plan']==4:
+          body+=f'''{p['value_name']}: индивидуальный бонус на каждую позицию<br>'''
         elif p['plan'] != 3:
           body+=f'''{p['value_name']}: {p['value']}<br>'''
 

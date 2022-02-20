@@ -135,6 +135,7 @@ def left_to_complete_rub_filter_code(form,field,row):
 def manager_id_before_code(form,field):
   # узнаём, какие логины вообще у нас есть
   ids=form.db.query(query="SELECT distinct(manager_id) FROM prognoz_bonus_pivot_ul",massive=1,str=1)
+  form.pre(ids)
   if len(ids):
     field['values']=form.db.query(
       query=f"""
@@ -147,6 +148,7 @@ def manager_id_before_code(form,field):
         ORDER BY login
       """
     )
+    form.pre(field['values'])
 
 def manager_id_filter_code(form,field,row):
   if row['m__comment']:

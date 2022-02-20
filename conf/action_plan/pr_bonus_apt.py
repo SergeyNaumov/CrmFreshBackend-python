@@ -3,8 +3,9 @@ def pr_bonus_apt(form,field):
     #form.pre(form.manager['ur_lico_ids'])
     #form.pre(form.manager['apt_list_ids'])
     if len(form.errors):
-      form.pre('errors:',form.errors)
+      #form.pre({'errors':form.errors})
       return 
+      
     if form.manager['type'] not in [1,2]:
         return
     field['before_html']='<h2 style="margin-top: 20px; margin-bottom: 10px;">Прогнозный бонус по аптекам</h2>'

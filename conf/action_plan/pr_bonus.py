@@ -1,5 +1,8 @@
 def pr_bonus(form,field):
+    if not form.ov:
+        return
 
+    
     only_percent=0  # С планом
     if not(form.ov['plan'] in (3,4,5)):
         only_percent=1 # Без плана
@@ -301,9 +304,9 @@ def pr_bonus(form,field):
                 pass
                 #form.pre(str(total['plan'])+'-'+str(total['price']) )
                 #total['current_bonus']=total['plan']-total['price']
-            else:
+            #else:
                 #form.pre([total['plan'],total['buy_cnt']])
-                total['current_bonus']=total['plan']-total['buy_cnt']
+                #total['current_bonus']=total['plan']-total['buy_cnt']
 
             
             body_text=form.template(

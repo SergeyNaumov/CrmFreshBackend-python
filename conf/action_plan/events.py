@@ -76,7 +76,7 @@ def permissions(form):
     if form.ov:
       form.ov['period']={'id':''}
       form.ov['total_good_price']=form.db.query(
-        query='select sum(price) from action_plan_good apg join good g on g.id=apg.good_id where apg.action_plan_id=%s',
+        query='select sum(apg.price) from action_plan_good apg join good g on g.id=apg.good_id where apg.action_plan_id=%s',
         values=[form.id],
         onevalue=1
       )
@@ -113,13 +113,13 @@ def permissions(form):
             count(*)
           from (
             SELECT
-              *
+              apg.good_id
             FROM 
               action_plan_good apg
               join good g on apg.good_id=g.id
             WHERE
               apg.action_plan_id=%s
-            GROUP BY g.percent
+            GROUP BY apg.percent
           ) x
           
         ''',

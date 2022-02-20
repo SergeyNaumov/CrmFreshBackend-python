@@ -121,7 +121,7 @@ async def remember_get_code(R: dict):
       )
 
       # отправка на manager.email
-      print('Send Mes: ', manager['email'],remember_code)
+      #print('Send Mes: ', manager['email'],remember_code)
       send_mes(
         to=manager['email'],
         subject='Восстановление пароля в система AннА',

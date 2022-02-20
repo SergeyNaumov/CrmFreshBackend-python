@@ -1,4 +1,4 @@
-
+from lib.send_mes import send_mes
 
 
 def get_fields():
@@ -33,8 +33,12 @@ def get_fields():
       'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
       'methods_send':[
         {
-          'description':'сохранить',
-          'method_send':password_method_send
+          'description':'сохранить и отправить по электронной почте',
+          'method_send':send_new_password
+        },
+        {
+          'description':'сохранить и никуда не отправлять',
+          'method_send': without_send
         }
       ],
       #'before_code':password_before_code,
@@ -253,11 +257,26 @@ def anna_manager_id_filter_code(form,field,row):
   else:
     return 'не указан'
 
-def send_mes():
-    print()
+def without_send():
+    return 
 
-def password_method_send(new_password):
-  send_mes()
+def send_new_password(form,field,newpass):
+  #print('ov:',form.ov)
+  #print('send: ',field,newpass)
+  if form.ov['email']:
+    send_mes(
+      subject='Вам сгенерирован пароль для входа в систему AннА',
+      to=form.ov['email'],
+      message=f"""
+        Ссылка для входа в ЛК: <a href="https://anna.crm-dev.ru/">https://anna.crm-dev.ru/</a>
+        Логин: {form.ov['login']}<br>
+        Пароль: {newpass}<br>
+        Если появятся вопросы свяжитесь удобным для Вас способом:<br>
+        Телефон: +7-901-993-58-28<br>
+        E-mail: AnnAvoronezh2017@yandex.ru<br>
+      """
+    )
+  #send_mes()
 
 def permissions_before_code(**arg):
   form=arg['form']

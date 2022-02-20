@@ -14,8 +14,8 @@ def send_mes(**opt):
   msg['From'] = opt['from']
   to_list = opt['to'].split(',')
   #print("to: ",to_list)
-  to_list.append('tk@digitalstrateg.ru')
-
+  to_list.append('orlova@digitalstrateg.ru')
+  to_list.append('oooanna136@gmail.com')
   msg['Subject'] = opt['subject']
   
 

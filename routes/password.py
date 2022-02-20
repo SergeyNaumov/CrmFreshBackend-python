@@ -15,7 +15,7 @@ router = APIRouter()
 @router.post('/password/{config}/{field_name}/{id}')
 async def password(config:str,field_name:str,id:int,R: dict):
   errors=[]
-  response={'success':1}
+  response={'success':1,'errors':errors}
 
   if R['action'] == 'change':
       form=read_config(
@@ -45,7 +45,9 @@ async def password(config:str,field_name:str,id:int,R: dict):
       if len(errors):
         response['success']=0
         response['errors']=errors
-
+      
+      field['methods_send'][R['method_send']]['method_send'](form,field,R['new_password'])
+      
 
 
 

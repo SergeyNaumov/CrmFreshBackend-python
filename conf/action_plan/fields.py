@@ -70,7 +70,7 @@ def plan_info(form,field):
   period=form.ov['period']
 
   different_percentage=''
-  
+  #print('goods_cnt_percent:',ov['goods_cnt_percent'])
   if ov['goods_cnt_percent']>1: # в случае, когда 
     different_percentage='<div style="color: red;">% бонуса зависит от закупленного товара. Каждый товар имеет свой % бонуса</div>'
 

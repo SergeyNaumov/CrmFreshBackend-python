@@ -61,6 +61,7 @@ config={
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','asus-tarusa'],
     
     'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+    #'manager_id': 328, # представитель ООО "Ринал"
     #'manager_id': 193, # Юрлицо "Амрита"
     #'manager_id':243, # Менеджер Анна с множеством юрлиц
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)

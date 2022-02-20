@@ -96,6 +96,11 @@ def get_old_values(form):
         debug=form.log,
         onerow=1
       )
+    
+    if not ov:
+      return 
+
+
     ov['apteka_id']=form.manager['apteka_settings']['id']
 
 
@@ -122,6 +127,8 @@ def get_old_values(form):
       values=[form.id],
       onerow=1
     )
+    if not ov:
+      return 
     ov['subscribed_on_action']=0
     ov['subscribed_ur_lico_id']=[]
     ov['requested_ur_lico_id']=[]
