@@ -109,6 +109,7 @@ def pr_bonus(form,field):
                         ]
                     })
             else:
+                    #print('ov:',form.ov)
                     body_text=form.template(
                         './conf/action_plan/templates/pr_bonus.html',
                         ov=form.ov,

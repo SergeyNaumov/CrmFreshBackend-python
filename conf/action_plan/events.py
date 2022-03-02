@@ -80,6 +80,10 @@ def permissions(form):
         values=[form.id],
         onevalue=1
       )
+      
+      if not form.ov['total_good_price']:
+        form.ov['total_good_price']=0
+
       form.ov['open_summary']=0
       if ('open_summary' in params) and params['open_summary']=='1': # если этот параметр включен, тогда блок "Сводные данные по всем юридическим лицам" выводим открытым
         form.ov['open_summary']=1
