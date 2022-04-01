@@ -127,7 +127,7 @@ async def remember_get_code(R: dict):
         subject='Восстановление пароля в система AннА',
         message=f"""
           <p>
-            Вы запросили изменение пароля в Системе АннА!<br>
+            Вы ({manager['login']}) запросили изменение пароля в Системе АннА!<br>
             Ваш код доступа: {remember_code}
           </p>
           <div style="color: red;">

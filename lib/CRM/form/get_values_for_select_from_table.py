@@ -21,34 +21,36 @@ def get_values_for_select_from_table(form,f):
   
   if exists_arg('query',f):
     query=f['query']
+  else:
+    if not exists_arg('order',f):
+      if exists_arg('tree_use',f):
+        f['order']='parent_id'
+      else:
+        f['order']=f['header_field']
   
-  #form.pre(query)
-  if not exists_arg('where',f):
-    f['where']=''
+      #form.pre(query)
+      if not exists_arg('where',f):
+        f['where']=''
 
-  if not exists_arg('order',f):
-    if exists_arg('tree_use',f):
-      f['order']='parent_id'
-    else:
-      f['order']=f['header_field']
 
-  if exists_arg('autocomplete',f):
-    if exists_arg('value',f):
-      if f['where']: f['where']+=' AND '
-      f['where']+=f"""{f['value_field']}="{f['value']}" """
-    
-    else:
-      return []
 
-  if f['where']:
-    if not re.match('^\s*where',f['where'],re.IGNORECASE):
-      query+=' WHERE '
-    
-    query+=f['where']
+      if exists_arg('autocomplete',f):
+        if exists_arg('value',f):
+          if f['where']: f['where']+=' AND '
+          f['where']+=f"""{f['value_field']}="{f['value']}" """
+        
+        else:
+          return []
 
-  if not re.match('^\s*order by',f['order'],re.IGNORECASE):
-    query+=' ORDER BY '
-  query+=f['order']
+      if f['where']:
+        if not re.match('^\s*where',f['where'],re.IGNORECASE):
+          query+=' WHERE '
+        
+        query+=f['where']
+
+      if not re.match('^\s*order by',f['order'],re.IGNORECASE):
+        query+=' ORDER BY '
+      query+=f['order']
 
   lst=[]
   if exists_arg('list',f) and len(f['list']):

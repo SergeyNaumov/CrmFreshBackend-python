@@ -1,12 +1,39 @@
 from lib.engine import s
 from config import config
 
+def get_banners():
+  banners={
+    'desktop':[
+      {'show':True,'list':[]},
+      {'show':True,'list':[]},
+      {'show':True,'list':[]},
+      {'show':True,'list':[]}
+    ],
+    'mobile':[
+      {'show':True,'list':[]},{'show':True,'list':[]}
+    ]
+  }
+  all_banners=s.db.query(
+    query='select url,attach file, type, type_mobile from banner where enabled=1'
+  )
+  for b in all_banners:
+    if b['file']:
+      b['file']=f"/files/bfiles/{b['file']}"
+      if b['type']:
+        idx=b['type']-1
+        banners['desktop'][idx]['list'].append(b)
 
+      if b['type_mobile']:
+        idx=b['type_mobile']-1
+        banners['mobile'][idx]['list'].append(b)
+  return banners
 def left_menu():
   errors=[]
   manager=None
   manager_menu_table=None
   left_menu=[]
+
+
 
   manager=s.db.query(
     query='select id,name,type from manager where login=%s',
@@ -50,6 +77,7 @@ def left_menu():
 
   return {
     'left_menu':left_menu,
+    'banners':get_banners(),
     'manager':manager,
     'errors':errors,
     'success': not len(errors),

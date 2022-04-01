@@ -1,11 +1,14 @@
 #def pre(d):
 #    form.pre(d)
+from lib.CRM.plugins.search.xlsx import go as init_search_plugin
 
 def events_permissions(form):
     
     if ('superadmin' in form.manager['permissions']) or (form.manager['login']=='admin'):
       form.is_admin=1
       form.read_only=0
+      init_search_plugin(form)
+      
     else:
       form.is_admin=0
       form.make_delete=0
@@ -41,7 +44,7 @@ def events_permissions(form):
 def before_search(form):
   qs=form.query_search
   #form.pre(qs['SELECT_FIELDS'])
-  qs['SELECT_FIELDS'].append('group_concat(u.header SEPARATOR "; ") ur_lico_list')
+  qs['SELECT_FIELDS'].append('if(wt.type=4, uf.header ,group_concat(u.header SEPARATOR "; ")) ur_lico_list')
   #form.explain=1
 
 def events_before_code(form):

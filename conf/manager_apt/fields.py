@@ -146,6 +146,14 @@ def get_fields():
       'type':'select_from_table',
       'header_field':'ur_address',
       'value_field':'id',
+      'query':'''
+          SELECT
+            wt.id v, concat(ul.header,' / ',wt.ur_address) d
+          FROM
+            apteka wt
+            LEFT JOIN ur_lico ul ON ul.id=wt.ur_lico_id
+          
+      ''',
       'before_code':apteka_id_before_code
     },
     {
@@ -224,7 +232,7 @@ def apteka_id_before_code(form,field):
   if form.action=='edit':
     field['value']=form.ov['apteka_id']
 
-
+  where=''
   if form.manager['type'] in (2,3): # Аптеке или юрлицу показываем только их аптеки
     apt_list_ids=form.manager['apt_list_ids']
 
@@ -232,15 +240,21 @@ def apteka_id_before_code(form,field):
   
 
     if len(apt_list_ids)>0:
-      field['where']=f"id in ({ ','.join(apt_list_ids) })"
+      where=f"WHERE wt.id in ({ ','.join(apt_list_ids) })"
       if form.action=='new':
         field['value']=apt_list_ids[0]
     else:
-      field['where']=" 0 "
-  #print('v:',form.ov['apteka_id'], ' field:',field)
+      where="where 0 "
 
-  if form.manager['type']==1:
-    field['autocomplete']=1
+  field['sql']=f'''
+    SELECT
+      wt.id v, concat(wt.header,' / ',ul.header) d
+    FROM
+      apteka wt
+      LEFT JOIN ur_lico ul ON ul.id=wt.ur_lico_id
+    {where}
+    ORDER BY ul.header,wt.header
+  '''
 
 
 
