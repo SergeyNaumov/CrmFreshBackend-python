@@ -29,7 +29,7 @@ def check_defaults(form,field):
 def get(form,field):
   where=exists_arg('relation_table_where',field)
   if not where: where=''
-
+  select_fields=''
   if exists_arg('tree_use',field):
     if where: where+=' AND '
     where+='parent_id is null'
