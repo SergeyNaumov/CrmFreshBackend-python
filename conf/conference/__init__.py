@@ -21,7 +21,6 @@ class Config(Form):
             'page':form.template(
                 './conf/conference/page.js'
             ),
-            
         }
         # self.cols=[
         #     [

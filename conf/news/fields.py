@@ -53,7 +53,7 @@ def get_fields():
       #         my $e=shift;                    
               
       # },
-      'description':'Список юридических лиц для полечения',
+      'description':'Список юридических лиц для получения рассылки',
       'type':'multiconnect',
       'tree_table':'ur_lico',
       'name':'includes',
@@ -65,7 +65,7 @@ def get_fields():
       'relation_save_table_id_relation':'ur_lico_id',
       #'make_add':1,
       'fast_search':1,
-      'cols':3,
+      'cols':4,
       'view_only_selected':0,
       #'tab':'tags'
     },

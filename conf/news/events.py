@@ -1,6 +1,7 @@
 #def pre(d):
 #    form.pre(d)
 #from lib.CRM.plugins.search.xlsx import go as init_search_plugin
+from lib.core import exists_arg, date_to_rus
 
 def events_permissions(form):
     
@@ -15,10 +16,22 @@ def events_permissions(form):
       form.make_delete=0
       form.not_create=True
 
-    if not ( str(form.manager['type']) == "1" ):
+    if not(form.script in ['video_list','page']) and not ( str(form.manager['type']) == "1" ):
       form.errors.append('доступ запрещён!')
       #return 
-
+    
+    if form.script=='page' and form.id:
+        d=form.db.query(
+            query='select header,body,DATE_FORMAT(registered, %s) registered from news where id=%s',
+            values=['%d.%m.%Y',form.id],
+            onerow=1
+        )
+        #d['start']=date_to_rus(d['start'])
+        form.title=d['header']
+        form.blocks=[
+            {'type':'html','body':form.template('./conf/news/templates/dialog.html',d=d)},
+            
+        ]
 
 
 

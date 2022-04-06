@@ -15,6 +15,7 @@ from .autocomplete import router as router_autocomplete
 from .documentation_routes import router as router_documentation
 from .page_routes import router as router_page
 from .video_routes import router as router_video
+from .news_routes import router as router_news
 from .table_routes import router as router_table
 
 # Роутеры, не входящие в систему
@@ -49,6 +50,7 @@ router.include_router(router_page,prefix='/page')
 router.include_router(router_table,prefix='/table')
 
 router.include_router(router_video,prefix='/VideoList')
+router.include_router(router_news,prefix='/NewsList')
 
 
 router.include_router(router_autocomplete,prefix='/autocomplete')
