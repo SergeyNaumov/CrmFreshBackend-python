@@ -58,7 +58,7 @@ config={
   },
 
   'debug':{ # для отладки
-    'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','asus-tarusa'],
+    'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     
     'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
     #'manager_id':194, # natalja.tolubaeva@yandex.ru # ИП "Косолапова"

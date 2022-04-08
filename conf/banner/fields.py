@@ -20,6 +20,11 @@ def get_fields():
       'before_code':enabled_before_code
     },
     {
+      'description':'Показывать до',
+      'name':'show_to',
+      'type':'date'
+    },
+    {
       'description':'Url',
       'type':'text',
       'filter_on':1,

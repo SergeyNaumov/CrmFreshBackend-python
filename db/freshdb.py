@@ -143,11 +143,13 @@ class FreshDB():
       
       if not exists_arg('values',arg):
         arg['values']=[]
-
+      
+      
       try:
         cur.execute(arg['query'],arg['values'])
         self.connect.commit()
       except pymysql.err.ProgrammingError as err:
+        print('ERR:',err, str(err))
         if 'errors' in arg: arg['errors'].append(str(err))
 
       except pymysql.err.DataError as err:
