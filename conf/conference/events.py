@@ -22,6 +22,10 @@ def permissions(form):
         
 
     
+def before_search(form):
+    qs=form.query_search
+    #print('QS:',qs['SELECT_FIELDS'])
+    #form.pre(qs['SELECT'])
 
 def events_before_code(form):
     pass
@@ -32,5 +36,6 @@ def before_delete(form):
 events={
   'permissions': permissions,
   'before_delete':before_delete,
-  'before_code':events_before_code
+  'before_code':events_before_code,
+  #'before_search':before_search
 }
