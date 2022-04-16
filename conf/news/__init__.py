@@ -16,6 +16,19 @@ class Config(Form):
 
             # 
         ]
+        form.headers=[
+            {'h':'Название ', 'n':'header'},
+            {'h':'Дата новости','n':'registered'},
+            {'h':'Краткое описание','n':'anons'},
+            #{'h':'Ссылка на конференци','n':'link'},
+            #{'h':'Идентификатор конференции','n':'conf_id'},
+            #{'h':'Код доступа','n':'access_code'},
+            #{'h':'Комментарий','n':'comment'},
+
+        ]
+        form.data=[]
+        form.sort='registered' # поле, по которому сортируем изначально
+        form.sort_desc=True
         form.GROUP_BY='wt.id'
         form.read_only=1
         form.events=events

@@ -21,11 +21,12 @@ def permissions_table(form):
         {'h':'осталось выполнить в рублях / штуках','n':'left_to_complete_rub'},
 
     ]
-
+    # Залача: https://trello.com/c/2VGHgqn1/56-%D1%81%D0%B2%D0%BE%D0%B4%D0%BD%D1%8B%D0%B5-%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B2-%D0%BB%D0%BA-%D1%8E%D1%80%D0%BB%D0%B8%D1%86%D0%B0
     period_id=form.db.query(
-        query='SELECT id from prognoz_bonus_period where date_begin<=curdate() order by date_begin desc limit 1',
+        query='SELECT id from prognoz_bonus_period where date_begin<=curdate() and (to_days(curdate())-to_days(date_begin) > 29) order by date_begin desc limit 1',
         onevalue=1
     )
+    #period_id=4
     #form.pre({'period_id':period_id})
     if not period_id:
         period_id=0

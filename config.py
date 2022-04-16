@@ -56,11 +56,12 @@ config={
         '/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password'
     ]
   },
-
+  # 8Xiddqdidkfa#762x
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     
-    'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+    #'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+    'manager_id': 245, # oksana_voronezh@mail.ru
     #'manager_id':194, # natalja.tolubaeva@yandex.ru # ИП "Косолапова"
     #'manager_id': 328, # представитель ООО "Ринал"
     #'manager_id': 193, # Юрлицо "Амрита"

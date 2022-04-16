@@ -26,6 +26,25 @@ def get_fields():
           'filter_on':1,
       },
       {
+          'description':'Название компании, проводящей конференцию',
+          'type':'text',
+          'name':'comp_name',
+          'filter_on':1,
+      },
+      {
+          'description':'Тема конференции',
+          'type':'textarea',
+          'name':'subject_conf',
+          'filter_on':1,
+      },
+      {
+          'description':'Название документа',
+          'add_description':'"Сертификат", "Диплом" или иное',
+          'type':'text',
+          'name':'document_name',
+          'filter_on':1,
+      },
+      {
           'description':'Дата и время начала',
           'type':'datetime',
           'name':'start',

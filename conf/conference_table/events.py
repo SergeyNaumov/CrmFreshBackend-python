@@ -9,12 +9,15 @@ def permissions(form):
     
     query=f"""
          SELECT 
-            id, header, start,
-            link,conf_id,access_code,comment
+            wt.id, wt.header, wt.start,
+            wt.link,wt.conf_id,wt.access_code,wt.comment,
+            if(cf.id is null, null, wt.id) cert_exists
          from
-            conference
+            conference wt
+            LEFT JOIN conference_stat cf ON wt.id=cf.conference_id and cf.manager_id=%s
         WHERE
-            enabled=1 order by start desc
+            wt.enabled=1 GROUP by wt.id order by wt.start desc
+
     """ #  , link, conf_id, access_code, comment
     
     if 'limit' in form.R and form.R['limit']:
@@ -34,10 +37,12 @@ def permissions(form):
 
     form.data=form.db.query(
         query=query,
+        values=[form.manager['id']],
         log=form.log,
         errors=form.errors,
         arrays=1
     )
+
 
 
     #print('data:',form.data)
@@ -51,6 +56,12 @@ def permissions(form):
                 'url':f"/page/conference/{d['id']}",
                 
             }
+
+            if d['cert_exists']:
+                #d['cert_exists']=f'<a href="http://dev-crm.test/backend/anna/download/certpdf/{d["cert_exists"]}">получить</a>'
+                d['cert_exists']=f'<a href="/backend/anna/download/certpdf/{d["cert_exists"]}">получить</a>'
+            else:
+                d['cert_exists']='-'
             # d['header']={
             #     'header':d['header'],
             #     'type':'dialog',
