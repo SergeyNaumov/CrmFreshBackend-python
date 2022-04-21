@@ -10,13 +10,14 @@ def permissions(form):
     query=f"""
          SELECT 
             wt.id, wt.header, wt.start,
-            wt.link,wt.conf_id,wt.access_code,wt.comment,
-            if(wt.not_cert=0 and cf.id is null, null, wt.id) cert_exists
+            wt.link,wt.conf_id,wt.access_code,wt.comment
          from
             conference wt
-            LEFT JOIN conference_stat cf ON wt.id=cf.conference_id and cf.manager_id=%s
+            LEFT JOIN conference_stat cf ON wt.id=cf.conference_id and cf.manager_id={form.manager['id']}
+            LEFT JOIN video_lessions vl ON vl.conference_id=wt.id
+            LEFT JOIN video_lessions_stat_open vlso ON vlso.video_id=vl.id and vlso.manager_id={form.manager['id']}
         WHERE
-            wt.enabled=1 GROUP by wt.id order by wt.start desc
+            wt.enabled=1 and wt.not_cert=0 and (cf.id is not null or vlso.sec_opened >=600  ) GROUP by wt.id order by wt.start desc
 
     """ #  , link, conf_id, access_code, comment
     
@@ -25,26 +26,18 @@ def permissions(form):
 
     #print(form.R)
 
-    if form.manager['type']==1:
-        form.links=[
-            {
-                'type':'url',
-                'link':'/admin_table/conference',
-                'description':'Редактирование конференций'
-            },
-        ]
-    
 
+    
     form.data=form.db.query(
         query=query,
-        values=[form.manager['id']],
+        values=[],
         log=form.log,
         errors=form.errors,
         arrays=1
     )
 
 
-
+    #form.data=[]
     #print('data:',form.data)
     for d in form.data:
         d['start']=date_to_rus(d['start'])
@@ -57,17 +50,8 @@ def permissions(form):
                 
             }
 
-            if d['cert_exists']:
-                #d['cert_exists']=f'<a href="http://dev-crm.test/backend/anna/download/certpdf/{d["cert_exists"]}">получить</a>'
-                d['cert_exists']=f'<a href="/backend/anna/download/certpdf/{d["cert_exists"]}">получить</a>'
-            else:
-                d['cert_exists']='-'
-            # d['header']={
-            #     'header':d['header'],
-            #     'type':'dialog',
-            #     'dialog_html':form.template('./conf/conference_table/templates/dialog.html',d=d),
-            #     #'url':f"/table/{form.config}/ajax-dialog/{d['id']}"
-            # }
+            d['cert_exists']=f'<a href="/backend/anna/download/certpdf/{d["id"]}">получить</a>'
+            
             for for_del in ('id','link','conf_id','access_code','comment'):
                 del d[for_del]
             #f"""<a href="" target="_blank">{d['header']}</a>"""

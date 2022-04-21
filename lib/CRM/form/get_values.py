@@ -99,16 +99,7 @@ def func_get_values(form):
             values[name]=str(values[name])
           if set_from_nv and not(form.script == 'admin_table' and ('value' in f)):
             f['value']=values[name]
-            
-    #form.pre(values) 
-      #print(form.script)
-      # if 'before_code' in f:
-      #   f['before_code'](form=form,field=f)  
 
-
-          
-
-    #form.pre(f"v2: {form.fields[5]['value']}")
     form.values=values
 
 

@@ -191,3 +191,35 @@ async def request(action_id:int, apteka_id:int):
 @router.post('/change-apteka-order')
 async def route_change_apteka_order(R:dict):
     change_apteka_order(R)
+
+# Просмотр баннера
+@router.get('/banner/{action}/{id}')
+async def banner_show(action:str,id:int):
+    if action in ('show','click'):
+        seconds=s.db.query(
+            query=f'''
+                select
+                    to_seconds(now()) - to_seconds(ts)
+                from
+                    banner_stat
+                where
+                    manager_id={s.manager["id"]} and action=%s and banner_id={id} order by id desc limit 1
+            ''',
+            values=[action],
+            #debug=1,
+            onevalue=1
+        )
+        if not(seconds) or seconds>10:
+            s.db.save(
+                table='banner_stat',
+                data={
+                    'action':action,
+                    'manager_id':s.manager['id'],
+                    'banner_id':id
+                }
+            )
+            return True
+
+    return False
+
+# клик по баннеру

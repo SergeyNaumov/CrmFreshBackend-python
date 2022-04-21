@@ -14,10 +14,15 @@ def link_filter_code(form,field,row):
 def get_fields():
   return [ 
       {
-        'description':'Вкл',
-        'type':'checkbox',
-        'name':'enabled',
-        'before_code':enabled_before_code
+          'description':'Вкл',
+          'type':'checkbox',
+          'name':'enabled',
+          'before_code':enabled_before_code
+      },
+      {
+          'description':'Не выдавать сертификат',
+          'type':'checkbox',
+          'name':'not_cert',
       },
       {
           'description':'Название конференции',

@@ -25,12 +25,15 @@ async def wysiwyg_upload(config:str,limit: int = 0): #
   )
   errors=[]
 
-  
+  if not( hasattr(form,'empty_message') ):
+    form.empty_message='Записи для показа отсутствуют'
+
 
   #print('R:',form.R)
   
   data=[]
   headers=form.headers
+  
   return {
     'form':{
       'config':form.config,
@@ -39,6 +42,7 @@ async def wysiwyg_upload(config:str,limit: int = 0): #
       'errors':form.errors,
       'headers':headers,
       'data':form.data,
+      'empty_message':form.empty_message,
       'sort':form.sort,
       'links':form.links,
       'sort_desc':form.sort_desc

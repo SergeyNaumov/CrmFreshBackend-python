@@ -14,7 +14,7 @@ def get_banners():
     ]
   }
   all_banners=s.db.query(
-    query='select url,attach file, type, type_mobile from banner where enabled=1 and show_to>=curdate()'
+    query='select id, url,attach file, type, type_mobile from banner where enabled=1 and show_to>=curdate()'
   )
   for b in all_banners:
     if b['file']:

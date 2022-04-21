@@ -16,7 +16,8 @@ config={
   },
   'system_email':'svcomplex@gmail.com',
   'system_url':'https://anna.crm-dev.ru/',
-
+  
+  'stat_log':1, # Записываем статистику посещений
   'connects':{
     'crm_read':{
       'user':'crm',

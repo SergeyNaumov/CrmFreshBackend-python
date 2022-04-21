@@ -27,7 +27,7 @@ def download_cert(id):
     conference=s.db.query(
         query="""
             SELECT
-                c.*, date(min(cs.ts)) date
+                c.*, date(c.start) date
             FROM
                 conference c
                 join conference_stat cs ON cs.conference_id=c.id and cs.manager_id=%s
