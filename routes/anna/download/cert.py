@@ -30,7 +30,7 @@ def download_cert(id):
                 c.*, date(c.start) date
             FROM
                 conference c
-                join conference_stat cs ON cs.conference_id=c.id and cs.manager_id=%s
+                LEFT join conference_stat cs ON cs.conference_id=c.id and cs.manager_id=%s
             WHERE c.id=%s
         """,
         debug=1,
@@ -48,7 +48,7 @@ def download_cert(id):
         id=id,
         fio=fio,
         compname=conference['comp_name'],
-        subject=conference['header'],
+        subject=conference['subject_conf'],
         date=date,
         images={
             #'bg_left':img_to_b64('./files/cert_template/bg_left.jpg'),
@@ -77,10 +77,10 @@ def html_cert(id):
     conference=s.db.query(
         query="""
             SELECT
-                c.*, date(min(cs.ts)) date
+                c.*, date(c.start) date
             FROM
                 conference c
-                join conference_stat cs ON cs.conference_id=c.id and cs.manager_id=%s
+                LEFT join conference_stat cs ON cs.conference_id=c.id and cs.manager_id=%s
             WHERE c.id=%s
         """,
         debug=1,
@@ -89,12 +89,13 @@ def html_cert(id):
     )
     if not(conference) or not(conference['id']):
         return HTMLResponse(content='Сертификат не найден', status_code=404)
+    print('conference:',conference)
     date=date_to_rus(conference['date'])
     html_content=t.render(
         id=id,
         fio=fio,
         compname=conference['comp_name'],
-        subject=conference['header'],
+        subject=conference['subject_conf'],
         date=date,
         images={
             'bg':img_to_b64('./files/cert_template/bg.jpg'),
