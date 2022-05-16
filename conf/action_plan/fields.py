@@ -48,7 +48,7 @@ def plan_info(form,field):
   '''
   if len(form.errors):
     return 
-  #form.pre(ov['plan'])
+  form.pre(ov['plan'])
   if ov['plan']==1:
     plan_data+=f'План: Cуммовой<br>Сумма от: {ov["value"]} <small>в квартал на одну аптеку</small><br>'
     if ov["reward_percent"]:

@@ -16,7 +16,7 @@ def permissions(form):
             conference wt
             LEFT JOIN conference_stat cf ON wt.id=cf.conference_id and cf.manager_id=%s
         WHERE
-            wt.enabled=1 GROUP by wt.id order by wt.start desc
+            wt.enabled=1 and wt.not_cert=0 GROUP by wt.id order by wt.start desc
 
     """ #  , link, conf_id, access_code, comment
     

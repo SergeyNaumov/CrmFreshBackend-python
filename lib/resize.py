@@ -1,7 +1,7 @@
 from PIL import Image, ImageOps
 import re
 from lib.core import exists_arg, get_name_and_ext
-from lib.save_base64_file import save_base64_file
+#from lib.save_base64_file import save_base64_file
 
 def resize_all(**arg):
   field=arg['field']
@@ -99,7 +99,7 @@ def resize_one(**arg):
   #print(f'width: {width}, height: {height}')
   size=(width,height)
   print('size:',size)
-  img = Image.open(fr)
+  img = Image.open(fr).convert('RGB')
   ox, oy = img.size
   k=1
   if not height:

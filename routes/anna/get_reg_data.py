@@ -34,7 +34,7 @@ def get_reg_data():
                 query="""
                     SELECT
                         wt.*, 0 more, concat(m.name_f,' ',m.name_i,' ',m.name_o)  ma_fio, m.email ma_email,
-                        m.phone ma_phone, subscribe
+                        m.phone ma_phone, subscribe, m.photo ma_photo
                     FROM
                         ur_lico_manager ulm
                         join ur_lico wt ON wt.id=ulm.ur_lico_id
@@ -52,7 +52,9 @@ def get_reg_data():
 
             apteka_ids=[]
             for c in response['comp_list']:
-
+               
+                if c['ma_photo']:
+                    c['ma_photo']=f"/files/manager/{c['ma_photo']}"
                 c['apteka_list']=s.db.query(
                     query="""
                         SELECT

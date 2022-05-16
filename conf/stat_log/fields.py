@@ -19,7 +19,7 @@ def get_fields():
       'filter_on':1,
     },
     {
-      'description':'Аккант',
+      'description':'Аккаунт',
       'type':'select_from_table',
       'name':'manager_id',
       'table':'manager',

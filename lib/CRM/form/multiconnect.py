@@ -26,7 +26,7 @@ def get_values(form,field):
 def save(form,field,new_values):
   old_values=get_values(form,field)
   old_values_hash={}
-  print('NEW_VALUES:',new_values)
+  
   for ov in old_values:
     old_values_hash[ov]=1
   

@@ -45,13 +45,13 @@ def get(form,field):
   _list=[]
   
   if 'query' in field and field['query']:
-    print('USE QUERY')
+    #print('USE QUERY')
     _list=form.db.query(
       query=field['query']
     )
   else:
-    print('NOT QUERY')
-    print(field)
+    #print('NOT QUERY')
+    #print(field)
     _list=form.db.get(
       select_fields=select_fields,
       table=field["relation_table"],

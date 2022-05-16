@@ -78,7 +78,7 @@ def get_manager_data(manager_id=0,errors=[]):
             SELECT
                 wt.id,wt.login,wt.name_f,wt.name_i,wt.name_o,wt.name,wt.phone,wt.type,wt.email,
                 ma.id ma_id, ma.name_f ma_name_f,  ma.name_i ma_name_i, ma.name_o ma_name_o, if(ma.email<>'',ma.email,ma.login) ma_email, ma.phone ma_phone,
-                wt.access_to_video, wt.access_to_conf
+                wt.access_to_video, wt.access_to_conf, ma.photo ma_photo
             FROM 
                 manager wt
                 LEFT JOIN manager ma ON wt.anna_manager_id=ma.id
@@ -88,6 +88,8 @@ def get_manager_data(manager_id=0,errors=[]):
         values=[manager_id],
         onerow=1,
     )
+    if manager['ma_photo']:
+        manager['ma_photo']=f"/files/manager/{manager['ma_photo']}"
     
     
 

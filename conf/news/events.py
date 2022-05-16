@@ -34,7 +34,7 @@ def events_permissions(form):
             errors=form.errors,
             arrays=1
         )
-        print('data:',form.data)
+        #print('data:',form.data)
         for d in form.data:
             d['registered']=date_to_rus(d['registered'])
             if d['header']:
@@ -90,7 +90,7 @@ def before_search(form):
 def events_before_code(form):
     pass
 
-def before_delete(form,opt):
+def before_delete(form):
     pass
 
 events={

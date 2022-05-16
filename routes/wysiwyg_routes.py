@@ -6,8 +6,7 @@ from .edit_form.wysiwyg_process import wysiwyg_process
 router = APIRouter()
 
 
-# , file: bytes = File(...), fileb: UploadFile = File(...)
-#, 
+
 # Загрузка файла в wysiwyg
 @router.post('/wysiwyg/{config}/{field_name}/{id}/upload')
 async def wysiwyg_upload(
@@ -28,15 +27,26 @@ async def wysiwyg_upload(
     script='wysiwyg',
     R={}
   )
-  #with open(file.filename, "wb") as buffer:
-  #        shutil.copyfileobj(file.file, buffer)
 
-  # return {
-  #   'manager':form.manager,
-  #   'path':path,
-  #   'filename':file.filename
-  # }
-  #return {"file_size": len(file)}
+# Загрузка файла в wysiwyg: пришлось сделать дубль при заливке в визивиг фото, когда запись ещё не создана (нет id)
+@router.post('/wysiwyg/{config}/{field_name}/upload')
+async def wysiwyg_upload(
+  config:str,
+  field_name:str,
+  path: str=Form(...),
+  file: UploadFile = File(...)
+): # 
+
+  #print('path:',path)
+  return wysiwyg_process(
+    action='upload',
+    path=path,
+    file=file,
+    config=config,
+    field_name=field_name,
+    script='wysiwyg',
+    R={}
+  )
 
 @router.post('/wysiwyg/{config}/{field_name}')
 async def wysiwyg1(config:str,field_name:str,R:dict):

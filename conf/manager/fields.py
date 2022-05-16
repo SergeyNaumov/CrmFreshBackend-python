@@ -63,19 +63,27 @@ def get_fields():
           '/-(\d{2})(\d{2}\d*)$/',"-$1-$2"
 
       ]
-      #regexp':'^(\+\d{6}\d*)?$',
-      # replace=>[
-      #   ['(^\(|,\s*\()','+7'],
-      #   ['[^\+\s\d,]',''],
-      #   ['(^\s+|[^,\d]\s+$)',''],
-      #   ['(^|,\s*)(9|4)','$1+7$2'],
-      #   ['(^|,\s*)[8]','+7'],
-      #   ['^(\d)',' +$1'],
-      #   ['(,\s*)(\d)',', +$2'],
-      #   ['(\d)\s(\d)','$1$2'],
-      #   ['(,\s*),','$1'],
-      #   ['(\d)\+7','$1, +7']
-      # ],
+    },
+    {
+        'description':'фото',
+        'type':'file',
+        
+        'name':'photo',
+        #'keep_orig_filename':1,
+        'filedir':'./files/manager',
+        'preview':'200x200',
+        'crops':1,
+        'tab':'main',
+        'resize':[
+            {
+              'description':'Квадратное фото',
+              #'file':'<%filename_without_ext%>_mini1.<%ext%>',
+              'file':'<%filename_without_ext%>.<%ext%>',
+              'size':'200x200',
+              'quality':'95'
+            },
+
+        ]
     },
 
     {
