@@ -34,7 +34,7 @@ def stat_log_record(s,request):
         script=arr[1]
     
     
-    if script:
+    if script and s.manager['id']:
         if notRecord(r,script,config):
             return        
         s.db.save(

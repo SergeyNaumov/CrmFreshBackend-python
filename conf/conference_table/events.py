@@ -11,12 +11,12 @@ def permissions(form):
          SELECT 
             wt.id, wt.header, wt.start,
             wt.link,wt.conf_id,wt.access_code,wt.comment,
-            if(wt.not_cert=0 and cf.id is null, null, wt.id) cert_exists
+            if(wt.not_cert=1 or cf.id is null, null, wt.id) cert_exists
          from
             conference wt
             LEFT JOIN conference_stat cf ON wt.id=cf.conference_id and cf.manager_id=%s
         WHERE
-            wt.enabled=1 and wt.not_cert=0 GROUP by wt.id order by wt.start desc
+            wt.enabled=1  GROUP by wt.id order by wt.start desc
 
     """ #  , link, conf_id, access_code, comment
     

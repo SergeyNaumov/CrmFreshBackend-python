@@ -61,8 +61,16 @@ async def news_videos(config:str, limit: int = 0): #
   if not len(errors):
     if limit:
       data_list=form.db.query(
-        query=f'select id,anons,body,header,DATE_FORMAT(registered, %s) registered from {form.work_table} where enabled=1 order by registered desc limit {limit}',
-        values=['%d.%m.%Y']
+        query=f'''
+          select
+            id,anons,body,header,registered reg, DATE_FORMAT(registered, %s) registered
+          from
+            {form.work_table}
+          where
+            enabled=1 and registered<=curdate() order by reg desc limit {limit}
+        ''',
+        values=['%d.%m.%Y'],
+        debug=1
       )
     else:
       data_list=form.db.query(

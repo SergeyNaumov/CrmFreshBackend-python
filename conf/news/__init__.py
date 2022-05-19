@@ -17,9 +17,9 @@ class Config(Form):
             # 
         ]
         form.headers=[
-            {'h':'Название ', 'n':'header'},
-            {'h':'Дата новости','n':'registered'},
-            {'h':'Краткое описание','n':'anons'},
+            {'h':'Название ', 'n':'header','sort':'header'},
+            {'h':'Дата новости','n':'registered','sort':'reg'},
+            {'h':'Краткое описание','n':'anons','sort':'anons'},
             #{'h':'Ссылка на конференци','n':'link'},
             #{'h':'Идентификатор конференции','n':'conf_id'},
             #{'h':'Код доступа','n':'access_code'},
@@ -27,7 +27,7 @@ class Config(Form):
 
         ]
         form.data=[]
-        form.sort='registered' # поле, по которому сортируем изначально
+        form.sort='reg' # поле, по которому сортируем изначально
         form.sort_desc=True
         form.GROUP_BY='wt.id'
         form.read_only=1
@@ -37,13 +37,7 @@ class Config(Form):
 
         form.filters_groups=[]
         form.on_filters=[
-            # {
-            #     'name':'address'
-            # },
-            # {
-            #     'name':'f_date',
-            #     #'value':["2020-01-01","2020-01-02"]
-            # },
+
         ]
         form.search_on_load=1
 

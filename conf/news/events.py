@@ -25,10 +25,10 @@ def events_permissions(form):
         form.data=form.db.query(
             query='''
               select
-                id,header,registered,anons
+                id,header,registered reg,anons
               from
                 news
-              where enabled=1
+              where enabled=1 and registered<=curdate() order by registered desc
             ''',
             log=form.log,
             errors=form.errors,
@@ -36,7 +36,8 @@ def events_permissions(form):
         )
         #print('data:',form.data)
         for d in form.data:
-            d['registered']=date_to_rus(d['registered'])
+            #d['reg']=d['registered']
+            d['registered']=date_to_rus(d['reg'])
             if d['header']:
                 #Формируем объект-dialog
                 d['header']={
