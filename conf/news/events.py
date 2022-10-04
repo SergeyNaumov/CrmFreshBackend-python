@@ -76,6 +76,7 @@ def events_permissions(form):
         )
         #d['start']=date_to_rus(d['start'])
         form.title=d['header']
+        if not(form.referer): d['out_main_link']=1
         form.blocks=[
             {'type':'html','body':form.template('./conf/news/templates/dialog.html',d=d)},
             

@@ -222,7 +222,11 @@ def filter_ur_lico(form):
       apt_list_ids=[]
 
       for u in form.manager['ur_lico_list']:
-        u['apt_ids']=u['apt_ids'].split('|')
+        if u['apt_ids']:
+          u['apt_ids']=u['apt_ids'].split('|')
+        else:
+          u['apt_ids']=[]
+          
         apt_list_ids=list(apt_list_ids)+list(u['apt_ids'])
       
       if not len(apt_list_ids): apt_list_ids=[]

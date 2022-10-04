@@ -10,12 +10,12 @@ router = APIRouter()
 #, 
 # Загрузка файла в wysiwyg
 @router.get('/{config}/{id}')
-async def process_page(config:str,id:int): # 
-
+async def process_page(config:str,id:int,referer:str): # 
   form=read_config(
     action='',
     config=config,
     id=id,
+    referer=referer,
     #values=values,
     script='page'
   )
@@ -25,6 +25,7 @@ async def process_page(config:str,id:int): #
 
   return {
     'form':{
+      
       'title':form.title,
       'blocks':form.blocks,
       'log':form.log,

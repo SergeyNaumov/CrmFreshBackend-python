@@ -24,6 +24,8 @@ class Form():
     self.title=''
     
     script=arg['script']
+    if 'referer' in arg:
+      self.referer=arg['referer']
     #self.db=s.db
     self.run_js=''
     self.work_table=arg['config']

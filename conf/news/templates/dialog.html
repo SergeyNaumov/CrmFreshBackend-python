@@ -2,4 +2,9 @@
 <div>
     {{d.body}}
 </div>
-<p><a href="/table/news">к списку новостей</a></p>
+<p>
+    {% if 1 or out_main_link %}
+        <a href="/">на главную страницу</a> |
+    {% endif %}
+    <a href="/table/news">к списку новостей</a>
+</p>

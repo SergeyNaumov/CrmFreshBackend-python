@@ -1,7 +1,7 @@
 from lib.anna.get_ul_list import get_ul_list_ids
 
 def events_permissions(form):
-  
+  #form.explain=1
   for f in form.fields:
     f['read_only']=1
 
@@ -137,13 +137,21 @@ def before_search(form):
       
   #form.explain=1
   qs['SELECT_FIELDS'].append('if(pbp.date_end < curdate(),1,0) prev ')
+  period_ids=[]
   
-  # берём периоды не старше чем 90*2 дней (2 квартала назад)
-  period_ids=form.db.query(
-    query='select id from prognoz_bonus_period where date_begin>=curdate()- interval 90*2 day',
-    massive=1,
-    str=1
-  )
+  if form.manager['type']==2 and not(form.manager['show_old_plans']): # Если это юрлицо -- и не включена возможность просмотра периода прошлых периодов
+    period_ids=form.db.query(
+      query='select id from prognoz_bonus_period where date_begin>=curdate() or date_end >= curdate()- interval 14 day',
+      massive=1,
+      str=1
+    )
+  else: # берём периоды не старше чем 90*2 дней (2 квартала назад)
+    period_ids=form.db.query(
+      query='select id from prognoz_bonus_period where date_begin>=curdate()- interval 90*2 day',
+      massive=1,
+      str=1
+    )
+  
   if len(period_ids):
     qs['WHERE'].append(f"wt.period_id IN ({ ','.join(period_ids) })")
   
