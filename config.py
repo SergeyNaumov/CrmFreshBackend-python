@@ -61,7 +61,7 @@ config={
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     
-    'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+    #'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
     #'manager_id': 245, # oksana_voronezh@mail.ru
     #'manager_id':194, # natalja.tolubaeva@yandex.ru # ИП "Косолапова"
     
@@ -82,7 +82,7 @@ config={
     #'manager_id':240, # aksilife@mail.ru
     #'manager_id':305 # | oooanna136@gmail.com
 
-    #'manager_id':342 ,# farmmac@yandex.ru
+    'manager_id':342 ,# farmmac@yandex.ru
     #'manager_id':275, # provizor-259-1
     
   },
