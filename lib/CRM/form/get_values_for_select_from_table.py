@@ -1,6 +1,6 @@
 import re
 from lib.core import exists_arg, tree_to_list
-def get_values_for_select_from_table(form,f):
+def get_values_for_select_from_table(form,f,debug=False):
 
 
   if not exists_arg('value_field',f):
@@ -28,31 +28,32 @@ def get_values_for_select_from_table(form,f):
       else:
         f['order']=f['header_field']
   
-      #form.pre(query)
-      if not exists_arg('where',f):
-        f['where']=''
+    #form.pre(query)
+    if not exists_arg('where',f):
+      f['where']=''
 
 
 
-      if exists_arg('autocomplete',f):
-        if exists_arg('value',f):
-          if f['where']: f['where']+=' AND '
-          f['where']+=f"""{f['value_field']}="{f['value']}" """
-        
-        else:
-          return []
+    if exists_arg('autocomplete',f):
+      if exists_arg('value',f):
+        if f['where']: f['where']+=' AND '
+        f['where']+=f"""{f['value_field']}="{f['value']}" """
+      
+      else:
+        return []
 
-      if f['where']:
-        if not re.match('^\s*where',f['where'],re.IGNORECASE):
-          query+=' WHERE '
-        
-        query+=f['where']
+    if f['where']:
+      if not re.match('^\s*where',f['where'],re.IGNORECASE):
+        query+=' WHERE '
+      
+      query+=f['where']
 
-      if not re.match('^\s*order by',f['order'],re.IGNORECASE):
-        query+=' ORDER BY '
-      query+=f['order']
+    if not re.match('^\s*order by',f['order'],re.IGNORECASE):
+      query+=' ORDER BY '
+    query+=f['order']
 
   lst=[]
+
   if exists_arg('list',f) and len(f['list']):
     _lst = f['list']
   else:

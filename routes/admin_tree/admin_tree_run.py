@@ -116,7 +116,7 @@ def get_branch(**arg):
 
 def add_where_foreign_key(form,where):
   if form.work_table_foreign_key and form.work_table_foreign_key_value:
-    where.append(f'(form.work_table_foreign_key=form.work_table_foreign_key_value)')
+    where.append(f'({form.work_table_foreign_key}={form.work_table_foreign_key_value})')
   return where
 
 def add_where_to_query(query,where):

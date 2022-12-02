@@ -29,7 +29,7 @@ async def wysiwyg_upload(config:str,limit: int = 0): #
     form.empty_message='Записи для показа отсутствуют'
 
 
-  #print('R:',form.R)
+  #print('R:',form.data)
   
   data=[]
   headers=form.headers
