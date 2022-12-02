@@ -145,12 +145,13 @@ def before_search(form):
       massive=1,
       str=1
     )
-  else: # берём периоды не старше чем 90*2 дней (2 квартала назад)
-    period_ids=form.db.query(
-      query='select id from prognoz_bonus_period where date_begin>=curdate()- interval 90*2 day',
-      massive=1,
-      str=1
-    )
+ # else: # берём периоды не старше чем 90*2 дней (2 квартала назад)
+    # https://trello.com/c/jIJUAtC5/81-%D0%BF%D1%80%D0%BE%D0%B3%D0%BD%D0%BE%D0%B7%D0%BD%D1%8B%D0%B9-%D0%B1%D0%BE%D0%BD%D1%83%D1%81
+    #period_ids=form.db.query(
+    #  query='select id from prognoz_bonus_period where date_begin>=curdate()- interval 90*2 day',
+    #  massive=1,
+    #  str=1
+    #)
   
   if len(period_ids):
     qs['WHERE'].append(f"wt.period_id IN ({ ','.join(period_ids) })")

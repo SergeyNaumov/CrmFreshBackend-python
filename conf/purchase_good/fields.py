@@ -149,13 +149,19 @@ def apteka_filter_code(form,field,row):
 
     
 def ur_lico_id_before_code(form,field):
+  #print("BC1")
   if form.manager['type']==2:
-    field['autocomplete']=0
+    #field['autocomplete']=0
 
     if len(form.manager["ur_lico_ids"]):
       #form.pre(form.manager)
       field['where']=f' id in ({ ",".join(form.manager["ur_lico_ids"]) }) '
-      del(field['autocomplete'])
+      #print('BC: ',field['where'])
+      del field['values']
+      #=[]
+      #form.pre(field)
+      
+      #del(field['autocomplete'])
 
 
     

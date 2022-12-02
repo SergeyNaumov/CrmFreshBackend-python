@@ -8,9 +8,9 @@ def get_fields():
       'description':'Наименование',      
       'type':'text',
       'filter_on':1,
-      'regexp_rules':[
-        '/.{1}/','название обязательно',
-      ],
+      #'regexp_rules':[
+      #  '/.{1}/','название обязательно',
+      #],
     },
     {
       'description':'Вкл',
@@ -35,9 +35,9 @@ def get_fields():
       'type':'textarea',
       'filter_on':1,
       'name':'anons',
-      'regexp_rules':[
-        '/.{1}/','Обязательно заполните краткое описание',
-      ],
+      #'regexp_rules':[
+      #  '/.{1}/','Обязательно заполните краткое описание',
+      #],
     },
     {
       'description':'Текст новости',
@@ -122,11 +122,11 @@ def get_fields():
       'tree_table':'manager',
       'name':'to_pharm',
       'relation_table':'manager',
-      'relation_save_table':'news_include_manager',
+      'relation_save_table':'news_include_pharm',
       'relation_table_header':'login',
       'relation_tree_order':'login',
       'relation_table_id':'id',
-      'relation_save_table_id_worktable':'id',
+      'relation_save_table_id_worktable':'news_id',
       'relation_save_table_id_relation':'manager_id',
       #'make_add':1,
       'fast_search':1,

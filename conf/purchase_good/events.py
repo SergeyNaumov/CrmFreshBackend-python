@@ -4,6 +4,7 @@ from lib.anna.get_ul_list import get_ul_list_ids
 def events_permissions(form):
   
   init_search_plugin(form)
+  form.pre(form.manager['type'])
   if form.manager['type']==2:
     
     apt_list_ids=get_apt_list_ids(form, form.manager['id'])

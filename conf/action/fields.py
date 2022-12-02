@@ -115,7 +115,6 @@ def get_fields():
 
 def distrib_code(form,field):
   if form.script == 'edit_form' and form.action=='edit':
-    #form.pre(form.manager)
     suppliers_lst=form.db.query(
       query='''
         select
@@ -151,4 +150,4 @@ def distrib_code(form,field):
 
 def date_stop_before_code(form,field):
   print()
-  #form.pre({'script':form.script})
+ 

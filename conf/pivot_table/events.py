@@ -23,7 +23,8 @@ def permissions_table(form):
     ]
     # Залача: https://trello.com/c/2VGHgqn1/56-%D1%81%D0%B2%D0%BE%D0%B4%D0%BD%D1%8B%D0%B5-%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B2-%D0%BB%D0%BA-%D1%8E%D1%80%D0%BB%D0%B8%D1%86%D0%B0
     period_id=form.db.query(
-        query='SELECT id from prognoz_bonus_period where date_begin<=curdate() and (to_days(curdate())-to_days(date_begin) > 29) order by date_begin desc limit 1',
+        #query='SELECT id from prognoz_bonus_period where date_begin<=curdate() and (to_days(curdate())-to_days(date_begin) > 29) order by date_begin desc limit 1',
+        query='SELECT id from prognoz_bonus_period where date_begin<=curdate()  order by date_begin desc limit 1',
         onevalue=1
     )
     #period_id=4
@@ -64,9 +65,12 @@ def permissions_table(form):
             join action a ON a.id=wt.action_id
             JOIN ur_lico ul ON wt.ur_lico_id=ul.id
         WHERE
-            wt.period_id={period_id} and wt.ur_lico_id in ({','.join(ids)})
+            
+            wt.ur_lico_id in ({','.join(ids)})
+        ORDER BY wt.period_id desc
+    """ #  wt.period_id={period_id} and 
 
-    """ # 
+    print('query:',query)
     form.data=form.db.query(
         query=query,
         log=form.log,
@@ -110,7 +114,7 @@ def before_search(form):
     if len(periods):
         qs['WHERE'].append(f"wt.period_id IN ({','.join(periods)})")
         #form.pre(qs)
-        #form.pre(periods)
+        print('periods:',periods)
 
     # Для того, чтобы сортировка по "осталось выполнить...." работала верно
     if len(qs['ORDER'])==1:
@@ -124,7 +128,7 @@ def before_search(form):
             qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub)']
         elif qs['ORDER'][0]=='wt.left_to_complete_rub desc':
             qs['ORDER']=['if(ap.plan=3 or wt.percent_complete>=100,9999999999, wt.left_to_complete_rub) desc']
-    #form.pre(qs)
+    print(qs)
 
 events={
     'permissions':[permissions],

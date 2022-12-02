@@ -4,10 +4,15 @@ def get_old_values(form):
   ov={}
   form.apteka_subscribe=[]
   form.ur_lico_subscribe=[]
-
+ 
   #print('apt_list_ids:',form.manager['apt_list_ids'])
   if form.manager['type']==2:
     apt_list_ids=','.join(form.manager['apt_list_ids'])
+    
+    if not apt_list_ids:
+      apt_list_ids='0'
+    
+
     ur_lico_ids=','.join(form.manager['ur_lico_ids'])
     query=f'''
             SELECT
@@ -24,7 +29,8 @@ def get_old_values(form):
             GROUP BY wt.id
         
         '''
-
+    #form.pre(query)
+    #form.pre(form.id)
     ov=form.db.query(
         query=query,
         #errors=form.errors,
@@ -52,7 +58,7 @@ def get_old_values(form):
 
 
 
-
+    
     #print('ov:',ov)
     for u in form.manager['ur_lico_list']:
       v=0

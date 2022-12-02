@@ -37,8 +37,10 @@ def good_categories(form,field):
           LEFT JOIN manufacturer man ON man.id = ap.manufacturer_id
         WHERE  action_id=%s and ap.begin_date>=%s ORDER BY ap.end_date desc
       ''',
+      
       values=[form.id, prev_period['date_begin']]
     )
+    
     plan_ids=[]
     plan_dict={}
     good_list=[]
@@ -71,7 +73,7 @@ def good_categories(form,field):
         p['plan_label']='% за любые закупки'
         p['value_name']='Выплачиваемый процент'
         show_percent=1
-
+    #form.pre({'ids':plan_ids})
     if len(plan_ids):
       good_list=form.db.query(query='''
         SELECT
@@ -253,7 +255,7 @@ def good_categories(form,field):
     else:
       field['before_html']+='<p style="margin-top: 20px; color: red;">Группы товаров отсутствуют</p>'
 
-
+    #field['before_html']+='XXXX'
     #form.javascript['edit_form']+=form.template('./conf/action/templates/good_categories.js')
 def exists_prognoz_bonus(form,action_plan_id,period):
   need=False
