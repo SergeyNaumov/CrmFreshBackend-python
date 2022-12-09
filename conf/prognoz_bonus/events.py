@@ -153,8 +153,8 @@ def before_search(form):
     #  str=1
     #)
   
-  if len(period_ids):
-    qs['WHERE'].append(f"wt.period_id IN ({ ','.join(period_ids) })")
+  #if len(period_ids):
+  #  qs['WHERE'].append(f"wt.period_id IN ({ ','.join(period_ids) })")
   
 
   

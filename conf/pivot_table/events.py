@@ -4,9 +4,11 @@ from lib.anna.get_ul_list import get_ul_list_ids
         #form.pre(periods)
 
 def permissions(form):
+    form.manager['ur_lico_ids']=get_ul_list_ids(form,form.manager['id'])
     if form.script=='table':
         permissions_table(form)
-
+    
+    
 
 def permissions_table(form):
     # ap.plan=3   -- только % за любые закупки
@@ -70,7 +72,7 @@ def permissions_table(form):
         ORDER BY wt.period_id desc
     """ #  wt.period_id={period_id} and 
 
-    print('query:',query)
+    #print('query:',query)
     form.data=form.db.query(
         query=query,
         log=form.log,
@@ -81,7 +83,7 @@ def permissions_table(form):
     for d in form.data:
         if d['percent_complete']=='percent':
             d['percent_complete']='% за любые закупки'
-        d['action']+=f"<br><small><a href='/edit-form/action_plan/{d['action_plan_id']}?open_summary=1' target='_blank'>сводные данные</a></small>"
+        d['action']+=f"<br><small><a href='/edit-form/action_plan/{d['action_plan_id']}?open_summary=1&period={d['period_id']}' target='_blank'>сводные данные </a></small>"
         del d['action_plan_id']
         del d['period_id']
     form.sort=''
@@ -104,17 +106,17 @@ def before_search(form):
         'a.id a__id, a.header a__header'
     ]
 
-    periods=form.db.query(
-      query="select id from prognoz_bonus_period  where date_begin>=from_days(to_days(curdate())-180) order by date_begin",
-      massive=1,
-      str=1
-    )
+    # periods=form.db.query(
+    #   query="select id from prognoz_bonus_period  where date_begin>=from_days(to_days(curdate())-180) order by date_begin",
+    #   massive=1,
+    #   str=1
+    # )
 
     # Ограничиваем поиск текущим и предыдущим периодом:
-    if len(periods):
-        qs['WHERE'].append(f"wt.period_id IN ({','.join(periods)})")
-        #form.pre(qs)
-        print('periods:',periods)
+    # if len(periods):
+    #     qs['WHERE'].append(f"wt.period_id IN ({','.join(periods)})")
+    #     #form.pre(qs)
+    #     print('periods:',periods)
 
     # Для того, чтобы сортировка по "осталось выполнить...." работала верно
     if len(qs['ORDER'])==1:

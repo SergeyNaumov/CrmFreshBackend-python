@@ -60,20 +60,19 @@ config={
   # 8Xiddqdidkfa#762x
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
-    
+    'manager_id':217, # nadezda_t97@mail.ru
     #'manager_id': 1, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага
+    
     #'manager_id': 245, # oksana_voronezh@mail.ru
     #'manager_id':194, # natalja.tolubaeva@yandex.ru # ИП "Косолапова"
-    
-    
-    #'manager_id': 328, # представитель ООО "Ринал"
+    #'manager_id': 328, # представитель ООО "Ринал" rinalapteka@mail.ru
     
     #'manager_id': 193, # Юрлицо "Амрита"
     #'manager_id':243, # Менеджер Анна с множеством юрлиц
     #'manager_id':152, # tk@digitalstrateg.ru (юрлицо)
     #'manager_id': 141, # dir1@digitalstrateg.ru Кнейжиц Игорь Владимирович, Представитель юридического лица
     #'manager_id': 211, # pavlik-libra5@mail.ru, Представитель юридического лица
-    #'manager_id':228, # (в подчинении 3 аптеки) realko2-z@mail.ru, Представитель юридического лица
+    
     #'manager_id':144, # Представитель артеки: apt2@digitalstrateg.ru
     #'manager_id':248, # представитель аптеки (с подпиской на акции mandarin149@yandex.ru)
     #'manager_id':246, # tifilatova@bk.ru
@@ -81,10 +80,11 @@ config={
     #'manager_id':259, # представитель аптеки himfarm5@kvmail.ru 
     #'manager_id':240, # aksilife@mail.ru
     #'manager_id':305 # | oooanna136@gmail.com
-
-    'manager_id':342 ,# farmmac@yandex.ru
+    #'manager_id':342 ,# farmmac@yandex.ru
     #'manager_id':275, # provizor-259-1
-    
+    #'manager_id':'460', #  medfarm1@inbox.ru
+    #'manager_id':'331', #  deshina@mail.ru
+    #'manager_id':228, # (в подчинении 3 аптеки) realko2-z@mail.ru, Представитель юридического лица
   },
   # Возможен дебаг по директории, в которой запущен сервер
   # 'debug':{ # для отладки

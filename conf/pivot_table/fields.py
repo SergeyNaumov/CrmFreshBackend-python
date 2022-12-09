@@ -11,7 +11,7 @@ def get_fields():
       'header_field':'header',
       'value_field':'id',
       'tablename':'ul',
-      #'before_code':ur_lico_id_before_code,
+      'before_code':ur_lico_id_before_code,
       'filter_on':1,
     },
     {
@@ -67,6 +67,9 @@ def get_fields():
     },
 ]
 
+def ur_lico_id_before_code(form,field):
+  if len(form.manager['ur_lico_ids']):
+    field['where']=f"""id in ({','.join(form.manager['ur_lico_ids'])})"""
 
 def period_id_filter_code(form,field,row):
   #form.pre(row)
