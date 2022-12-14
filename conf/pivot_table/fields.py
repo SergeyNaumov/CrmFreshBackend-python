@@ -21,7 +21,6 @@ def get_fields():
       'type':'select_values',
       'filter_code':period_id_filter_code,
       'before_code':period_id_before_code,
-
     },
     {
       'description':'Название маркетингового мероприятия',
@@ -68,8 +67,9 @@ def get_fields():
 ]
 
 def ur_lico_id_before_code(form,field):
-  if len(form.manager['ur_lico_ids']):
+  if form.manager['type']==2 and len(form.manager['ur_lico_ids']):
     field['where']=f"""id in ({','.join(form.manager['ur_lico_ids'])})"""
+  
 
 def period_id_filter_code(form,field,row):
   #form.pre(row)
@@ -86,7 +86,7 @@ def action_filter_code(form,field,row):
   
   if row['a__id']:
     return f'''<a href="/edit-form/action/{row['a__id']}" target="_blank">{row['a__header']}</a><br>'''
-      # wt.id: {row['wt__id']}<br>
+      # wt.id: {row['wt__id']}<br>3
       # action_plan_id: {row['ap__id']}<br>
       # ur_lico_id: {row['ul__id']}<br>
       # apteka_id: {row['wt__apteka_id']} {row['a__header']}

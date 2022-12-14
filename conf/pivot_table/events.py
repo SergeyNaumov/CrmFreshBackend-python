@@ -117,8 +117,11 @@ def before_search(form):
     #     qs['WHERE'].append(f"wt.period_id IN ({','.join(periods)})")
     #     #form.pre(qs)
     #     print('periods:',periods)
-
+    if form.manager['type']==2 and len(form.manager['ur_lico_ids']):
+        qs['WHERE'].append(f"wt.ur_lico_id IN ({','.join(form.manager['ur_lico_ids'])})")
     # Для того, чтобы сортировка по "осталось выполнить...." работала верно
+    #form.pre(form.manager['ur_lico_ids'])
+
     if len(qs['ORDER'])==1:
 
         if qs['ORDER'][0]=='wt.left_to_complete_percent ':

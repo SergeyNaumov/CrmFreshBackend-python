@@ -230,6 +230,7 @@ def pr_bonus(form,field):
                 
                 #total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
                 if form.ov['plan']==2:
+                    
                     #form.pre(f"100 * ({b['buy_cnt']} / {b['plan']})")
                     total['percent_complete'] = round(100 * (total['buy_cnt'] / total['plan']),2)
                     #pass
@@ -238,8 +239,8 @@ def pr_bonus(form,field):
                    # total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
                 else:
                     # Суммовой
-                    total['percent_complete'] = round(100 * (total['price'] / total['plan']),2)
-
+                    total["percent_complete"] = round(100 * (total['price'] / total['plan']),2)
+                    
 
                 
                 #form.pre(f" 100 * {total['price']}/ {total['plan']} = {total['percent_complete']}")
@@ -279,8 +280,11 @@ def pr_bonus(form,field):
                     total['percent_progress']=round( 100*(total['buy_cnt']/querter_begin_days * querter_total_days/int(total['plan'])),2 )
                     
 
-                if total['percent_complete']<100:
-                    total['left_to_complete_percent']=100-total['percent_complete']
+            if total['percent_complete']<100:
+                #form.pre(f'total[percent_complete]: {total["percent_complete"]}')
+                total['left_to_complete_percent']=100-total['percent_complete']
+            else:
+                total['left_to_complete_percent']=0
 
 
             
