@@ -4,6 +4,8 @@ import shlex
 def get_search_where(form,query):
   WHERE,headers=[],[]
   VALUES=[]
+  if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value'):
+    WHERE.append(f"wt.{form.foreign_key}={form.foreign_key_value}")
 
   form.SEARCH_RESULT['query_fields']=[]
   #print('get_search_where - доделать')
@@ -16,6 +18,7 @@ def get_search_where(form,query):
           f=form.fields_hash[name]
           form.SEARCH_RESULT['query_fields'].append(f)
           query.append([name,''])
+
   for f in form.fields:
     form.fields_hash[f['name']]=f
     
@@ -99,11 +102,11 @@ def get_search_where(form,query):
 
         min,max=values
         if min:
-          WHERE.append('('+db_name+' >= %s)')
+          WHERE.append(f'({table}.{db_name} >= %s)')
           VALUES.append(min)
 
         if max:
-          WHERE.append('('+db_name+' <= %s)')
+          WHERE.append(f'({table}.{db_name} <= %s)')
           VALUES.append(max)
 
       elif f['type'] in ('text','textarea','email','filter_extend_text'):

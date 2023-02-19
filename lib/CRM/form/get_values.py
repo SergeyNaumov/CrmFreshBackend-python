@@ -14,7 +14,6 @@ def func_get_values(form):
     
 
     if form.id:
-
       values=form.db.getrow(
         table=form.work_table,
         where=f'{form.work_table_id}=%s',
@@ -41,34 +40,26 @@ def func_get_values(form):
         if f['type']=='password':
           del values[f['name']]
 
-    #print('values:',values)
 
-    #form.pre(f"v1: {form.fields[5]['value']}")
-    #form.pre("action: "+form.action)
     for f in form.fields:
-      #print('f:',f)
-      #if f['type'] in ['date','datetime','text','textarea']:
-
-
-
-      name=f['name']
+      if form.action=='new':
+        f['value']=''
+      if 'name' in f: name=f['name']
+      
       
       if is_wt_field(f):
         #if name=='checkbox':
           #print('not name checkbox:', (not name in values) )
           #print('not value checkbox:', (not values[name]) )
         # if name in values:
-        #   print('before:',name,':',values[name])
+        
         if not name in values or (not (values[name]) and values[name]!=0 and values[name]!='0'):
             values[name]=''
         else:
           values[name]=str(values[name])
           if f['type']=='datetime' and values[name]=='0000-00-00 00:00:00':
-            values[name]=''
-
-
-          
-          
+            values[name]=''    
+      
       set_from_nv=True
       if form.script=='edit_form' and (form.action in ('new')) and ('value' in f ):
         #print('f:',f)
@@ -98,8 +89,9 @@ def func_get_values(form):
           if values[name].isnumeric():
             values[name]=str(values[name])
           if set_from_nv and not(form.script == 'admin_table' and ('value' in f)):
-            f['value']=values[name]
-
+            f['value']=values[name]         
+      
+    #form.pre(f"v2: {form.fields[5]['value']}")
     form.values=values
 
 

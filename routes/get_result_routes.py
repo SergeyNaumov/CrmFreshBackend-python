@@ -59,7 +59,8 @@ async def get_result(R: dict):
   # 
 
 
-  
+
+
   # если требуется подменить фильтры
   form.run_event('before_search_tables')
 
@@ -67,6 +68,9 @@ async def get_result(R: dict):
   
   form.get_search_where(R['query'])
   
+
+  
+
   form.run_event('before_search')
 
   form.run_event('before_search_mysql',
@@ -141,9 +145,9 @@ async def get_result(R: dict):
     return form.plugin_output
 
   else : # not s['end'])
-
-      return {
-              'success':(1,0)[len(form.errors)],
+      
+      return {  
+              'success':form.success(), #(1,0)[len(form.errors)],
               'results':form.SEARCH_RESULT,
               'errors':form.errors,
               'out_before_search':form.out_before_search,

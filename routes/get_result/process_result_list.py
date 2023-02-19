@@ -73,6 +73,12 @@ def process_result_list(form,R,result_list):
         if field['type']=='memo':
           type='memo'
         
+        elif field['type']=='file':
+          if value:
+            value=(field['filedir']+'/'+value).replace('./','/')
+          
+          type='file'
+
         elif field['type']=='multiconnect':
           type='multiconnect'
           if exists_arg(r['wt__'+form.work_table_id],multiconnect_values):
@@ -130,13 +136,15 @@ def process_result_list(form,R,result_list):
         elif field['type_orig']=='date':
           
           if value:
-            value=date_to_rus(value)
+            if not ('make_change_in_search' in field):
+              value=date_to_rus(value)
           else:
             value=''
           if exists_arg('make_change_in_search',field):
             type='date'
-          
-      if not type in('memo') and not exists_arg('make_change_in_search',field):
+
+
+      if not type in('memo','file') and not exists_arg('make_change_in_search',field):
         type='html'
 
 

@@ -32,9 +32,9 @@ def get(form,field):
   if not where: where=''
   select_fields=''
   if exists_arg('tree_use',field):
-    if where: where+=' AND '
-    where+='parent_id is null'
-    select_fields=f'{field["relation_table_id"]} id, {field["relation_save_table_header"]} header'
+    #if where: where+=' AND '
+    #where+='parent_id is null'
+    select_fields=f'{field["relation_table_id"]} id, {field["relation_save_table_header"]} header, parent_id'
 
     # В элементе v-treeview нет возможности задизейблить весь элемент, поэтому для каждой галочки добавляем read_only:
     if form.read_only or exists_arg('read_only',field):
@@ -50,8 +50,7 @@ def get(form,field):
       query=field['query']
     )
   else:
-    #print('NOT QUERY')
-    #print(field)
+    
     _list=form.db.get(
       select_fields=select_fields,
       table=field["relation_table"],
@@ -59,10 +58,10 @@ def get(form,field):
       #debug=1,
       order=exists_arg('relation_tree_order',field),
       tree_use=exists_arg('tree_use',field),
-      
       errors=form.errors
     )
   value=get_values(form,field)
+  #print(_list)
   return _list,value
 
 def multiconnect_process(**arg):

@@ -3,10 +3,12 @@ from lib.all_configs import read_config
 from .move import move
 
 def get_branch(**arg):
+  
   form=arg['form']
   parent_id=str(exists_arg('parent_id',arg) or '')
+  parents=exists_arg('parents',arg)
   where=[]
-  cur_level=0
+  #cur_level=0
   branch={'path':[],'list':[]}
   
   if parent_id: # Если находимся не в корне, то собираем $branch->{path} (путь ветки)
@@ -28,8 +30,9 @@ def get_branch(**arg):
       return
 
     # определяем уровень вложенности
-    cur_level=len( list(pathstr.split('/')) ) -1 
+    #cur_level=len( list(pathstr.split('/')) ) -1 
     path_elements=pathstr.split('/')
+    
     for id in path_elements:
       if not id:
         continue
@@ -46,18 +49,19 @@ def get_branch(**arg):
         
         if len(where):
           query+=' WHERE '+' AND '.join(where)
-
+      
+      query+=' LIMIT 1000'
       item=form.db.query(
         query=query,
         onerow=1,
-        errors=form.errors
+        debug=1,
+        errors=form.errors,
       )
+      
 
       header=form.default_find_filter or 'header'
-
-      for k in item.keys():
-
-        header=header.replace('<%'+k+'%>',str(item[k]))
+      if item:
+        for k in item.keys(): header=header.replace('<%'+k+'%>',str(item[k]))
 
       branch['path'].append({'header':header,'id':id})
   
@@ -78,7 +82,7 @@ def get_branch(**arg):
         if parent_id and parent_id.isnumeric():
           where.append('w.parent_id='+parent_id)
         else:
-          where.append('w.parent_id is null or w.parent_id=0')
+          where.append('(w.parent_id is null or w.parent_id=0)')
       
       add_where_foreign_key(form,where);
       
@@ -89,20 +93,24 @@ def get_branch(**arg):
     sql_query+=' ORDER BY w.'+form.sort_field
   else:
     sql_query+=' ORDER BY w.'+form.header_field
+  
+  sql_query+' LIMIT 1000' # защита от дурака
 
   result_lst=form.db.query(
-    query=sql_query
+    query=sql_query,
+    errors=form.errors
   )
   for item in result_lst:
+    if not(form.header_field) in item:
+      form.errors.append(f"в таблице {form.work_table} отсутствует поле {form.header_field}")
+      return []
     id=item[form.work_table_id]
     el={
       'header':item[form.header_field],
-      'id':id
+      'id':id,
     }
+    el['sort']=exists_arg('sort',item) or ''
     if form.tree_use:
-
-      el['sort']=exists_arg('sort',item) or ''
-      
       if exists_arg('get_childs',arg):
         el['childs']=get_branch(
           form=form,
@@ -110,13 +118,22 @@ def get_branch(**arg):
           parent_id=id
         )
     branch['list'].append(el)
+  ids=[]
 
+  if 0 and form.tree_use and exists_arg('get_childs',arg): 
+    for item in branch['list']:
+      ids.append(item['id'])
+    child_list=get_branch(
+      form=form,
+      get_childs=0,
+      parents=ids
+    )
   return branch['list']
 
 
 def add_where_foreign_key(form,where):
-  if form.work_table_foreign_key and form.work_table_foreign_key_value:
-    where.append(f'({form.work_table_foreign_key}={form.work_table_foreign_key_value})')
+  if hasattr(form,'foreign_key') and form.foreign_key_value:
+    where.append(f'({form.foreign_key}={form.foreign_key_value})')
   return where
 
 def add_where_to_query(query,where):
@@ -125,19 +142,22 @@ def add_where_to_query(query,where):
   return query
 
 def admin_tree_run(**arg):
+  
   R=arg['R']
   action=exists_arg('action',R) or ''
   parent_id=str(exists_arg('parent_id',R) or '')
   if parent_id =='0':
     parent_id=''
   id=exists_arg('id',R) or ''
-
+  
   form=read_config(
     config=arg['config'],
     script='admin_tree',
     action=action,
     id=id
   )
+  
+  
   if len(form.errors):
     return {
        'success':0,
@@ -148,75 +168,85 @@ def admin_tree_run(**arg):
 
 
   if form.action == 'add_branch_plain':
-      h=exists_arg('header',R)
-      if h:
-        cur_path=''
-        cur_sort=0
-        if parent_id and parent_id.isnumeric():
-          cur_path=form.db.query(
-            query=f'SELECT path from {form.work_table} where {form.work_table_id}=%s',
-            values=[parent_id],
-            onevalue=1
-          )
-          cur_path+='/'+parent_id
-        if form.sort:
-          qw=f'SELECT max({form.sort_field}) from {form.work_table}'
-          if form.tree_use:
-            
-            if parent_id and parent_id.isnumeric():
-              qw+=' WHERE parent_id='+parent_id
-            else:
-              qw+=' WHERE parent_id is null'
-          
-          cur_sort=form.db.query(query=qw,onevalue=1)
-          
-          if not cur_sort:
-            cur_sort='1'
-          else:
-            cur_sort=str(int(cur_sort)+1)
-          
-
-        sql_query=''
-        value=[]
-        fields=[]
-        data={form.header_field:h}
-        if form.sort:
-          data[form.sort_field]=cur_sort
+      headers=exists_arg('header',R).split("\n")
+      data_for_multi=[]
+      for h in headers:
         
-        if form.tree_use:
-
+        if h:
+          cur_path=''
+          cur_sort=0
           if parent_id and parent_id.isnumeric():
-            data['parent_id']=parent_id
-            data['path']=cur_path
+            cur_path=form.db.query(
+              query=f'SELECT path from {form.work_table} where {form.work_table_id}=%s',
+              values=[parent_id],
+              onevalue=1
+            )
+            cur_path+='/'+parent_id
+          if form.sort:
+            qw=f'SELECT max({form.sort_field}) from {form.work_table}'
+            if form.tree_use:
+              
+              if parent_id and parent_id.isnumeric():
+                qw+=' WHERE parent_id='+parent_id
+              else:
+                qw+=' WHERE parent_id is null'
+            
+            cur_sort=form.db.query(query=qw,onevalue=1)
+            
+            if not cur_sort:
+              cur_sort='1'
+            else:
+              cur_sort=str(int(cur_sort)+1)
+            
 
-        if form.work_table_foreign_key and form.work_table_foreign_key_value:
-            data[form.work_table_foreign_key]=form.work_table_foreign_key_value
+          sql_query=''
+          value=[]
+          fields=[]
+          data={form.header_field:h}
+          if form.sort:
+            data[form.sort_field]=cur_sort
+          
+          if form.tree_use:
 
-        # EVENTS!
-        form.new_values=data
-        form.run_event('before_insert')
-        form.run_event('before_save')
+            if parent_id and parent_id.isnumeric():
+              data['parent_id']=parent_id
+              data['path']=cur_path
 
-        form.id=form.db.save(
-          table=form.work_table,
-          data=data
-        )
-        
-        if not form.id:
-          form.errors.append('произошла ошибка при добавлении раздела. Возможно, превышен максимальный уровень вложенности')
+          if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value'):
+              data[form.foreign_key]=form.foreign_key_value
 
-        form.run_event('after_insert')
-        form.run_event('after_save')
-        return {
-          'success':form.success(),
-          'errors':form.errors,
-          'data':{
+          # EVENTS!
+          form.new_values=data
+          form.run_event('before_insert')
+          form.run_event('before_save')
+          
+          form.id=form.db.save(
+            table=form.work_table,
+            data=data
+          )
+          data_for_multi.append({
             'id':form.id,
             'sort':cur_sort,
             'header':h,
             'childs':[]
-          }
-        }
+          })
+          if not form.id:
+            form.errors.append('произошла ошибка при добавлении раздела. Возможно, превышен максимальный уровень вложенности')
+
+          form.run_event('after_insert')
+          form.run_event('after_save')
+          
+      return {
+        'success':form.success(),
+        'errors':form.errors,
+        'data':{ # Оставляем для старых версий, в которых нельзя добавлять много записей
+          'id':form.id,
+          'sort':cur_sort,
+          'header':h,
+          'childs':[]
+        },
+        'data_for_multi': data_for_multi
+      }
 
   elif form.action == 'sort':
     if form.sort:
@@ -232,7 +262,7 @@ def admin_tree_run(**arg):
           values=[R['obj_sort'][id],id],
           errors=form.errors
         )
-
+      form.run_event('after_sort')
       return {'success':form.success(),'errors':form.errors}
     else:
       return {'success':'0','errors':['сортировка запрещена']}
@@ -252,6 +282,7 @@ def admin_tree_run(**arg):
         )
 
         query=add_where_to_query(f'DELETE FROM {form.work_table}',where)
+        form.run_event('after_delete')
         form.db.query(query=query,errors=form.errors)
 
         cur_count='0'
@@ -326,6 +357,7 @@ def admin_tree_run(**arg):
             'make_delete':form.make_delete,
             'read_only':form.read_only,
             'max_level':form.max_level,
+            'changed_in_tree':hasattr(form,'changed_in_tree')
         },
         'log':form.log,
         'errors':form.errors,

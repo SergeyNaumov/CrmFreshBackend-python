@@ -42,7 +42,7 @@ def upload_file(form):
     #print('filename_without_ext:',filename_without_ext)
     filename_for_out=filename_without_ext+'.'+ext
     crops=[]
-    
+    #print('FORM:',form.fields)
     if value:
       orig_name=value['orig_name']
       
@@ -65,11 +65,7 @@ def upload_file(form):
           orig_name=orig_name,
           filename=filename_without_ext+'.'+ext
         )
-        full_filename=field['filedir']+'/'+filename_without_ext+'.'+ext
-        # чтобы не было ошибки "KeyError: 'RGBA'"
-        #Image.open(full_filename).convert('RGB').save(full_filename)
 
-        #print('filename:',full_filename)
     if form.success() and exists_arg('resize',field):
       if  exists_arg('crops',field) and len(crops):
         for r in field['resize']:

@@ -19,16 +19,21 @@ def get_values_for_select_from_table(form,f,debug=False):
     return []
   query=f'SELECT {select_fields} from {f["table"]}'
   
+  if f['name']=='service_id':
+    print('f1:',f)
   if exists_arg('query',f):
     query=f['query']
   else:
+
+
     if not exists_arg('order',f):
       if exists_arg('tree_use',f):
         f['order']='parent_id'
       else:
         f['order']=f['header_field']
   
-    #form.pre(query)
+    print('f2:',f['order'])
+
     if not exists_arg('where',f):
       f['where']=''
 
@@ -48,9 +53,12 @@ def get_values_for_select_from_table(form,f,debug=False):
       
       query+=f['where']
 
-    if not re.match('^\s*order by',f['order'],re.IGNORECASE):
-      query+=' ORDER BY '
-    query+=f['order']
+    #if not re.match('^\s*order by',f['order'],re.IGNORECASE):
+
+    query+=f" ORDER BY {f['order']}"
+    if f['name']=='service_id':
+      print('f3:',f['order'],"\n\n")
+      print('query:',query,f['order'])    
 
   lst=[]
 

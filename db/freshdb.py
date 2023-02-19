@@ -24,6 +24,7 @@ def get_func(value):
       rez=re.match('func:(.+)',value)
     
     if rez:
+      #print('value:',value,'rez:',rez[1])
       return rez[1]
   return ''
 
@@ -143,13 +144,11 @@ class FreshDB():
       
       if not exists_arg('values',arg):
         arg['values']=[]
-      
-      
+
       try:
         cur.execute(arg['query'],arg['values'])
         self.connect.commit()
       except pymysql.err.ProgrammingError as err:
-        print('ERR:',err, str(err))
         if 'errors' in arg: arg['errors'].append(str(err))
 
       except pymysql.err.DataError as err:
@@ -265,6 +264,7 @@ class FreshDB():
 
       return rez
     def get(self, **arg):
+      print('GET')
       self.connect.ping()  # reconnecting mysql
       self.error_str=''
 
@@ -285,6 +285,9 @@ class FreshDB():
       else:
         try:
           rez=cur.fetchall()
+          if exists_arg('tree_use',arg):
+            #print('TRANSFORM')
+            rez=tree_use_transform(rez)
         except pymysql.err.ProgrammingError as err:
           return []
 

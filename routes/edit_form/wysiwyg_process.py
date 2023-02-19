@@ -88,6 +88,7 @@ def wysiwyg_process(**arg):
         file_list,error=get_file_list(path=path,errors=errors,form=form)
         if error:
           errors.append(error)
+        
         return {
             'success':form.success(),
             'errors':errors,

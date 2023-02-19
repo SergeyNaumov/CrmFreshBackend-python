@@ -27,7 +27,6 @@ async def new_or_insert_form(config: str,R: dict):
 # update изменений в карте
 @router.put('/edit-form/{config}/{id}')
 async def update_form(config: str,id: int,R: dict):
-
   return process_edit_form(
     action='update',
     config=config,
@@ -38,13 +37,11 @@ async def update_form(config: str,id: int,R: dict):
 @router.post('/edit-form/{config}/{id}')
 async def work_form(config:str,id:int,R:dict):
   action=''
-  values=None
+  #values=None
 
-  if 'action' in R:
-    action=R['action']
+  if 'action' in R: action=R['action']
   else:
     action='edit'
-  #if 'values' in R: values=R['values']
   return process_edit_form(
     action=action,
     config=config,

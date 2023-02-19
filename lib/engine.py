@@ -12,7 +12,8 @@ hostname=socket.gethostname()
 class Engine():
   def __init__(self,**arg):
     self.manager={}
-  
+    self.errors=[]
+    
   def reset(self,**arg):
     self.db=db
     self.db_read=db_read
@@ -25,10 +26,10 @@ class Engine():
     self._content_type='application/json'
     self._content=''
     self.project=None
-    
+    self.errors=[]
     self.env={}
-    s.url=self.request.url.path
-    #print('request_url:',dict(self.request))
+
+    #print('request_url:',self.request.url.path)
     # x-real-ip
 
     for k in self.request['headers']:
@@ -41,9 +42,11 @@ class Engine():
     #print('host:',hostname)
     # Если мы не логинимся -- проверяем сессию
     s.config=config
+    auth=config['auth']
     s.use_project=config['use_project']
     if not(self.request.url.path in config['login']['not_login_access']):
       host_ok=not('hosts' in config['debug']) or (('hosts' in config['debug']) and  ( hostname in config['debug']['hosts'] ))
+      
       pwd_ok=not('pwd' in config['debug']) or (('pwd' in config['debug']) and  ( pwd in config['debug']['pwd'] ))
       #print('pwd:',pwd)
       #print('host_ok:',host_ok,' pwd_ok:',pwd_ok)
@@ -51,34 +54,35 @@ class Engine():
         where='0'
         values=[]
         if 'manager_id' in config['debug']:
-          where=f"id={config['debug']['manager_id']}"
+          where=f"{auth['manager_table_id']}={config['debug']['manager_id']}"
 
         if 'login' in config['debug']:
           where=f"login='{config['debug']['login']}'"
         
 
         self.manager=db.getrow(
-          table=config['auth']['manager_table'],
+          table=auth['manager_table'],
           where=where,
           values=values
         )
-
-
+        
 
         if self.manager:
+          self.manager['id']=self.manager[auth['manager_table_id']]
           self.login=self.manager['login']
         else:
           self.login='nonelogin'
           self.manager={'id':0,'login':'nonelogin','name':'менеджер не найден'}
       else:
-        #print('session start')
-        session_start(self,encrypt_method=config['encrypt_method']);
+        
+        session_start(self);
 
             
             
       
           
-
+      if self.manager['id'] and ('after_create_engine' in config):
+        config['after_create_engine'](self)
 
     
 

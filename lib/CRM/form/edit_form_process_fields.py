@@ -3,7 +3,10 @@ import re
 def edit_form_process_fields(form):
 
   for f in form.fields:
-
+    # для новой формы очищаем поля
+    #if form.action=='new' and exists_arg('value',f):
+    #  f['value']=''
+      
     if f['type']=='password':
       if 'enctypt_method' in f: del( f['enctypt_method'])
       if 'method_send' in f:

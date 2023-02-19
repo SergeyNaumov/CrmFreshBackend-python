@@ -3,6 +3,7 @@ from lib.core import exists_arg, random_filename
 
 import re 
 def form_update_or_insert(form):
+
     if form.read_only:
       form.errors.append('Вам запрещено сохранять изменения')
     else:
@@ -50,6 +51,8 @@ def process_edit_form(**arg):
     values=values,
     script='edit_form'
   )
+  
+  if len(form.errors): return {'success':False,'errors':form.errors}
 
   need_fields=[]
   
@@ -60,9 +63,7 @@ def process_edit_form(**arg):
   form.fields=need_fields
   
 
-  field=None
-  if 'name' in R and R['name']:
-    field=form.fields_hash[R['name']]
+
   
   #print("\nField:\n",field)
   #if len(form.errors): return form
@@ -108,7 +109,7 @@ def process_edit_form(**arg):
       'id':form.id,
       'log':form.log,
       'read_only':form.read_only,
-      'width':form.width,
+      'wide_form':(hasattr(form, 'wide_form') and form.wide_form),
       'cols':form.cols,
       'tabs':form.tabs,
       'config':form.config,

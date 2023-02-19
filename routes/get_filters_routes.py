@@ -18,6 +18,7 @@ async def get_filters_controller(config: str):
     script='admin_table'
   )
   
+
   if is_errors(form):
     return {
       'success':0,
@@ -64,12 +65,12 @@ async def get_filters_controller(config: str):
     if exists_arg('filter_type',f) and f['filter_type'] == 'range':
       f['range']=1
     
-    for k in ('tablename','db_name','regexp','tab','table','where','table_id','header_field','value_field','empty_value'): # 'filter_type' -- убрал, потому что появился filter_type: checkbox
+    for k in ('tablename','db_name','regexp_rules','regexp','tab','where','table_id','header_field','value_field','empty_value'): # 'filter_type' -- убрал, потому что появился filter_type: checkbox
       if exists_arg(k,f): del f[k]
     
-
+    # order исправил на _order (конфиликтовал с беком в запросах)
     if exists_arg('filter_on',f):
-      f['order']=order
+      f['filter_order']=order
       order+=1
 
     filters.append(f)

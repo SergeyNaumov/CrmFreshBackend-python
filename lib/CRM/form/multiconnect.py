@@ -26,7 +26,7 @@ def get_values(form,field):
 def save(form,field,new_values):
   old_values=get_values(form,field)
   old_values_hash={}
-  
+  new_values=[str(x) for x in new_values]
   for ov in old_values:
     old_values_hash[ov]=1
   
@@ -59,3 +59,5 @@ def save(form,field,new_values):
           field['relation_save_table_id_relation']:v
         }
       )
+
+  form.run_event('after_save_multiconnect')

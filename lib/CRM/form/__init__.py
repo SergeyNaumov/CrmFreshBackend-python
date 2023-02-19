@@ -12,6 +12,7 @@ from .run_event import run_event as func_run_event
 from .upload_file import upload_file as func_upload_file
 from .delete_file import delete_file as func_delete_file
 from .template import template as func_template
+from config import config
 import copy
 
 
@@ -45,6 +46,7 @@ class Form():
     self.search_links=[]
     self.log=[]
     self.errors=[]
+    self.fields=[]
     self.R={}
     self.before_filters_html=[]
     self.on_filters=[]
@@ -129,7 +131,8 @@ class Form():
       'after_insert':[],
       'before_insert':[],
       'after_delete':[],
-      'before_delete':[]
+      'before_delete':[],
+      'after_sort':[] # после сортировки в дереве
     }
     
     self.GROUP_BY=''
@@ -145,21 +148,33 @@ class Form():
   def edit_form_process_fields(form): # в perl-версии process_edit_form_fields
     
     return func_edit_form_process_fields(form)
-    #print('edit_form_process_fields не реализована')
-    #return {'success':'1'}
+    
+    
 
   def delete_file(form):
-    print('form.delete_file не реализована')
+    
     return {'success':'1'}
 
   def save(form,**arg): save_form(form,arg)
 
   def run_event(form,event_name,field=None):
+    
     func_run_event(form,event_name,field)
-
+    
+    # Если были изменения -- запускаем из конфига общую функцию обработки
+    # (нужно для сроса кэша у сайтов)
+    if event_name in ['after_sort','after_delete','after_save','after_save_const','after_save_multiconnect','after_delete_code','after_save_code','after_slide_sort']:
+      if 'after_all_change_action' in config and config['after_all_change_action']:
+        config['after_all_change_action'](form)
 
   def success(form): # если нет ошибок -- 1
     return (1,0)[len(form.errors)>0]
+
+  def load_data(form,data):
+    
+    for k in data:
+      setattr(form,k,data[k])
+      
 
   def set_default_attributes(form):
     func_set_default_attributes(form)

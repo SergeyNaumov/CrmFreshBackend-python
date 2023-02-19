@@ -2,26 +2,25 @@ from fastapi import Depends, FastAPI, Request, Response
 from starlette.responses import JSONResponse, Response
 from routes import router
 from lib.engine import s
-from lib.stat_log import stat_log_record
+
 # uvicorn main:app --reload --port=5000
 app = FastAPI(Debug=True)
 @app.middleware("http")
 async def for_all_requests(request: Request,call_next, response=Response):
 
   response_obj=response()
-
   s.reset(
     request=request,
     status_code=200
     #response=response_obj
   )
+  #print('RESET END',s.manager)
   # Пишем информацию о посещениях пользователей
-  stat_log_record(s,request)
+  #stat_log_record(s,request)
 
   if( s._end):
     return Response(s.to_json(s._content))
   else:
-
     response = await call_next(request)
     # set cookies
     for k in s.cookies.keys():
