@@ -5,6 +5,15 @@ from .edit_form.one_to_m import process_one_to_m
 router = APIRouter()
 
 
+@router.get('/1_to_m/{config}/{field_name}/{id}')
+def get_value_for_slide(config: str, field_name: str, id: int):
+
+  return process_one_to_m(
+      config=config,
+      action='get_slide_data',
+      field_name=field_name,
+      id=id
+    )
 
 @router.post('/1_to_m/insert/{config}/{field_name}/{id}')
 async def insert(config:str,field_name:str,id:int,R:dict):
@@ -57,7 +66,7 @@ async def sort_slide(config:str,field_name:str,id:int,R:dict):
 # delete record
 @router.get('/1_to_m/delete/{config}/{field_name}/{id}/{one_to_m_id}')
 async def delete_record(config:str,field_name:str,id:int,one_to_m_id:int):
-  print('DELETE!')
+  #print('DELETE!')
   return process_one_to_m(
     config=config,
     field_name=field_name,

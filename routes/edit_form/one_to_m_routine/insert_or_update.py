@@ -61,5 +61,6 @@ def insert_or_update(form,field,arg):
         'success':form.success(),
         'errors':form.errors,
         'id':exists_arg(field['table_id'],data),
+        'field':field,
         'values':field['values']
       }

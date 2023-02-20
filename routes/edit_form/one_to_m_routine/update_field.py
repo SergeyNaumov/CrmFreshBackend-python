@@ -6,7 +6,7 @@ def update_field(form,field,arg):
 
   if child_field_name:
     child_field=get_child_field(field,exists_arg('child_field_name',arg))
-    print('child_field:',child_field)
+    #print('child_field:',child_field)
 
     if not child_field:
       form.errors.append(f'Не найден элемент {arg["child_field_name"]} в элементе {arg["field_name"]}')

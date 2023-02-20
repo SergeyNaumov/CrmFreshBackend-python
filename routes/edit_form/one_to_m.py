@@ -8,6 +8,7 @@ from .one_to_m_routine.update_field import update_field
 from .one_to_m_routine.slide_sort import slide_sort
 from .one_to_m_routine.delete_record import delete_record
 from .one_to_m_routine.upload_file import upload_file
+from .one_to_m_routine.get_slide_data import get_slide_data
 def process_one_to_m(**arg):
   R={}
   if exists_arg('R',arg): R=arg['R']
@@ -40,5 +41,9 @@ def process_one_to_m(**arg):
   elif form.action == 'upload_file':
     
     return upload_file(form,field,arg)
+  
+  
+  elif form.action == 'get_slide_data': # Получение данных слайда
+    return get_slide_data(form,field)
 
 

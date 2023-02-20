@@ -1,7 +1,7 @@
 #uvicorn main:app --port=5021 --workers 5 &>/dev/null &
 uvicorn \
     --reload \
-    --port=3010 --workers 5 \
+    --port=5000 --workers 5 \
  main:app
 
     # --reload-dir=./templates \

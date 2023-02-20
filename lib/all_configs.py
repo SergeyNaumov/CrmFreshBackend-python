@@ -74,6 +74,7 @@ class error():
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
   errors=[]
+  print('confdir:',confdir,' ; config:',arg['config'])
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
       module=importlib.import_module(conflib_dir+'.'+arg['config'])

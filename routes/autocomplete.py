@@ -93,6 +93,9 @@ def get_list(**arg):
   if exists_arg('before_search',element):
     element['before_search'](form,element)
 
+  #print("\n\nElement:",element)
+  if not('orig_type' in element):
+    element['orig_type']=element['type']
 
   T=element['orig_type'] 
 
