@@ -165,6 +165,10 @@ async def startpage():
     'success': not len(errors),
     'manager':manager
   }
+  
+  if not(manager):
+    response['redirect']='/login'
+
   if 'startpage' in config:
     response['startpage']=config['startpage']
     

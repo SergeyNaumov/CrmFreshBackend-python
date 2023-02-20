@@ -8,7 +8,22 @@ config={
   'encrypt_method':'mysql_sha2',
   'use_project':False,
   'auth':{
-    'manager_table':'manager'
+    # Таблица авторизации:
+    'manager_table':'manager',
+    'manager_table_id':'id',
+    'auth_log_field':'login',
+    'auth_pas_field':'password',
+    #'encrypt_method':'mysql_encrypt',
+    'encrypt_method':'mysql_sha2',
+    # b2bb2bconnect / 123
+    # UPDATE manager password=sha2('123',256) where login='b2bb2bconnect';
+    # Сессия:
+    'session_table':'session',
+    'session_fails_table':'session_fails',
+    'max_fails_login':50,
+    'max_fails_login_interval':3600,
+    'max_fails_ip':20,
+    'max_fails_ip_interval':3600
   },
   'startpage':{ # указываем, какой компонент будет загружаться на главной странице
     'type':'src',
@@ -60,8 +75,8 @@ config={
   # 8Xiddqdidkfa#762x
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
-
-    'manager_id':217, # nadezda_t97@mail.ru
+      'manager_id':217, # nadezda_t97@mail.ru
+    #'manager_id':217, # nadezda_t97@mail.ru
     #'manager_id':305 # | oooanna136@gmail.com
     #'manager_id':326 #  barahta-z@yandex.ru
     #'manager_id': 243 # juliy170583@mail.ru
@@ -85,6 +100,7 @@ config={
     #'manager_id':240, # aksilife@mail.ru
     
     #'manager_id':342 ,# farmmac@yandex.ru
+    
     #'manager_id':275, # provizor-259-1
     #'manager_id':'460', #  medfarm1@inbox.ru
     #'manager_id':'331', #  deshina@mail.ru

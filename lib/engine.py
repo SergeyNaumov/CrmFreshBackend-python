@@ -27,8 +27,7 @@ class Engine():
     self.project=None
     
     self.env={}
-    s.url=self.request.url.path
-    #print('request_url:',dict(self.request))
+    #print('request_url:',self.request.url.path)
     # x-real-ip
 
     for k in self.request['headers']:
@@ -41,6 +40,7 @@ class Engine():
     #print('host:',hostname)
     # Если мы не логинимся -- проверяем сессию
     s.config=config
+    auth=config['auth']
     s.use_project=config['use_project']
     if not(self.request.url.path in config['login']['not_login_access']):
       host_ok=not('hosts' in config['debug']) or (('hosts' in config['debug']) and  ( hostname in config['debug']['hosts'] ))
@@ -51,17 +51,19 @@ class Engine():
         where='0'
         values=[]
         if 'manager_id' in config['debug']:
-          where=f"id={config['debug']['manager_id']}"
+          where=f"{auth['manager_table_id']}={config['debug']['manager_id']}"
 
         if 'login' in config['debug']:
           where=f"login='{config['debug']['login']}'"
         
 
         self.manager=db.getrow(
-          table=config['auth']['manager_table'],
+          table=auth['manager_table'],
           where=where,
           values=values
         )
+
+        self.manager['id']=self.manager[auth['manager_table_id']]
 
 
 

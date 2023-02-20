@@ -1,7 +1,7 @@
 from lib.core import exists_arg, gen_pas
 from db import db,db_read,db_write
 from config import config
-import base64
+from base64 import b64decode
 
 def session_project_create(s): # создание сессии для проекта
     pass
@@ -21,51 +21,72 @@ def session_create(s,**arg):
     if not(exists_arg('password',arg)):
       return 'При создании сессии (не указан password)'
 
-  if not(exists_arg('auth_id_field',arg)): arg['auth_id_field']='id'
-  if not(exists_arg('auth_log_field',arg)): arg['auth_log_field']='login'
-  if not(exists_arg('auth_pas_field',arg)): arg['auth_pas_field']='password'
-  if not(exists_arg('session_table',arg)): arg['session_table']='session'
-  if not(exists_arg('auth_table',arg)): arg['auth_table']='manager'
+  session_table='session'
+  session_fails_table='session_fails'
+
+
+  #if 'session_table' in config['auth']:
+  #  session_table=config['auth']['session_table']
+  
+  #if 'session_fails_table' in config['auth']:
+  #  session_fails_table=config['auth']['session_fails_table']
+
+  #session_table=config['auth']['session_table']
+  
+  auth=config['auth']
+
+  if not(exists_arg('auth_id_field',auth)): auth['auth_id_field']='id'
+  if not(exists_arg('auth_log_field',auth)): auth['auth_log_field']='login'
+  if not(exists_arg('auth_pas_field',auth)): auth['auth_pas_field']='password'
+  if not(exists_arg('session_table',auth)): auth['session_table']='session'
+  if not(exists_arg('session_fails_table',auth)): auth['session_fails_table']='session_fails_table'
+  if not(exists_arg('auth_table',auth)): auth['auth_table']='manager'
 
   add_where=''
   if exists_arg('where',arg):
       add_where += ' AND '+arg['where']
 
-  if exists_arg('max_fails_login',arg) and exists_arg('max_fails_login_interval',arg):
+  if exists_arg('max_fails_login',auth) and exists_arg('max_fails_login_interval',auth):
       fails=db.query(
-        query='select count(*) from session_fails where login=%s and registered>=now() - interval %s second',
-        values=[arg['login'],arg['max_fails_login_interval']],
+        query=f'select count(*) from {auth["session_fails_table"]} where login=%s and registered>=now() - interval %s second',
+        values=[arg['login'],auth['max_fails_login_interval']],
         onevalue=True,
         errors=errors
       )
-      if fails and fails > arg['max_fails_login'] :
+      if fails and fails > auth['max_fails_login'] :
         return 'Ошибка безопасности: превышено максимальное количество входа по логину'
   
   # проверяем, сколько было попыток зайти с данного ip под данным паролем
-  if exists_arg('max_fails_ip',arg) and exists_arg('max_fails_login_interval',arg):
+  if exists_arg('max_fails_ip',auth) and exists_arg('max_fails_login_interval',config['auth']):
       fails=s.db.query(
-        query='select count(*) from session_fails where ip=%s and registered>=now() - interval %s second',
-        values=[arg['ip'],arg['max_fails_ip_interval']],
+        query=f'select count(*) from {auth["session_fails_table"]} where ip=%s and registered>=now() - interval %s second',
+        values=[arg['ip'],auth['max_fails_ip_interval']],
         onevalue=True,
         errors=errors
       )
 
-      if fails and fails > arg['max_fails_ip'] :
+      if fails and fails > auth['max_fails_ip'] :
           return 'Ошибка безопасности: превышено максимальное количество входа по IP'
   
 
   auth_id=None
 
-  if arg['encrypt_method']=='mysql_sha2':
+  if auth['encrypt_method']=='mysql_sha2':
       auth_id=s.db.query(
-        query='SELECT '+arg['auth_id_field']+' FROM '+arg['auth_table']+' WHERE '+arg['auth_log_field']+'=%s AND '+arg['auth_pas_field']+'=sha2(%s,256)'+add_where,
+        query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=sha2(%s,256)'+add_where,
         values=[arg['login'],arg['password']],
         onevalue=True,
       )
-
+  elif auth['encrypt_method']=='mysql_encrypt':
+      auth_id=s.db.query(
+        query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=encrypt(%s,password)'+add_where,
+        values=[arg['login'],arg['password']],
+        onevalue=True,
+        debug=1
+      )
   else:
       auth_id=s.db.query(
-          query="SELECT "+arg['auth_id_field']+' FROM '+arg['auth_table']+' WHERE '+arg['auth_log_field']+'=%s AND '+arg['auth_pas_field']+'=%s '+add_where,
+          query="SELECT "+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=%s '+add_where,
           values=[arg['login'], arg['password']],
           onevalue=True
       );
@@ -79,7 +100,7 @@ def session_create(s,**arg):
     key=gen_pas(200)
 
     db.save(
-      table=arg['session_table'],
+      table=session_table,
       data={
         'auth_id':auth_id,
         'session_key':key
@@ -100,7 +121,14 @@ def session_start(s,**arg):
   user_id=s.get_cookie('auth_user_id')
   key=s.get_cookie('auth_key')
   session_table='session'
+  if 'session_table' in config['auth']:
+    session_table=config['auth']['session_table']
+  
   manager_table='manager'
+  
+  if 'manager_table' in config['auth']:
+    session_table=config['auth']['manager_table']
+
   errors=[]
   s.use_project=config['use_project']
   manager={'login':'','id':False, 'password':''}
@@ -110,17 +138,18 @@ def session_start(s,**arg):
   if  exists_arg('type',config['auth']) and config['auth']['type']=='env':
     if 'authorization' in s.env:
       auth=s.env['authorization']
-      login=base64.b64decode(auth.split(' ')[1]).decode('utf-8')
+      login=b64decode(auth.split(' ')[1]).decode('utf-8')
       log_pas=login.split(':')
       log=log_pas[0]
-      log2='naumov'
+      
       #print('spl:',type(log),type(log2),'log',)
       #login=login.split(':')[0]
       #login=login
       #login=login.decode('utf-8')
+      print('remote_user:',s.env)
       if 'remote_user' in s.env:
         m=s.db.query(
-          query=f"select * from {config['auth']['manager_table']} WHERE {config['auth']['login_field']} = %s ",
+          query=f"select *,{config['auth']['manager_table']} id from {manager_table} WHERE {config['auth']['login_field']} = %s ",
           values=[log],
           onerow=1,
         )

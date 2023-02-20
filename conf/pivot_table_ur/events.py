@@ -1,7 +1,56 @@
 from lib.anna.get_ul_list import get_ul_list_ids
+def manager_id_filter_code(form,field,row):
+  if row['m__comment']:
+    return f"{row['m__login']} - {row['m__comment']}"
+  return row['m__login']
+
+def manager_id_before_code(form,field):
+  # узнаём, какие логины вообще у нас есть
+  ids1=form.db.query(query="SELECT distinct(manager_id) FROM prognoz_bonus_pivot_ul",massive=1,str=1)
+  #if form.manager['type']==2:
+  #  form.pre(form.manager)
+
+  if len(ids1):
+    where=f"""id in ({','.join(ids1)})"""
+    if form.manager['type']==2:
+      if len(form.manager["ids"]):
+        where=f'{where} and  id in ({",".join(form.manager["ids"])})'
+      else:
+        where=' 0 '
+
+    field['values']=form.db.query(
+      query=f"""
+        SELECT
+          id v,
+          concat( login,if(comment='','',concat(' - ',comment))) d
+        FROM
+          manager
+        WHERE {where}
+        ORDER BY login
+      """
+    )
+    
 def permissions(form):
+    #form.pre(form.script)
+    if form.manager['type']==1:
+        form.fields.append(
+            {
+            'description':'Логин',
+            'type':'select_values',
+            'name':'manager_id',
+            'values':[],
+            'filter_on':1,
+            'before_code':manager_id_before_code,
+            'filter_code':manager_id_filter_code
+            }
+        )
+    if form.manager['type']==2:
+        form.manager['ids']=get_ul_list_ids(form)
+
     if form.script=='table':
         permissions_table(form)
+    
+
 
 def permissions_table(form):
 
@@ -14,9 +63,9 @@ def permissions_table(form):
     ]
     form.sort='action' # поле, по которому сортируем изначально
     form.sort_desc=False
-
-    ids=get_ul_list_ids(form)
-
+    
+    
+    
 # ap.plan=3   -- только % за любые закупки
     # Получаем id текущего периода
     period_id=form.db.query(
@@ -110,7 +159,8 @@ def before_search(form):
         'per.year per__year, per.querter per__querter, per.date_begin per__date_begin',
         'a.id a__id, a.header a__header'
     ]
-    
+    if form.manager['type']==2:
+        qs['WHERE'].append(f"wt.manager_id={form.manager['id']}")
     
     # Для того, чтобы сортировка по "осталось выполнить...." работала верно
     if len(qs['ORDER'])==1:

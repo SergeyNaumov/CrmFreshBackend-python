@@ -1,5 +1,6 @@
 import re, os
-from base64 import decodestring
+#from base64 import decodestring
+import base64
 from lib.core import exists_arg, del_file_and_resizes,get_name_and_ext, random_filename
 #from lib.resize import resize_all
 
@@ -26,7 +27,8 @@ def save_base64_file(**arg):
             mime=rez[1]
             base64=str.encode(rez[2])
             fh = open(fullname, "wb")
-            fh.write(decodestring(base64))
+            #fh.write(decodestring(base64))
+            
             fh.close()
             return filename
 
@@ -58,7 +60,7 @@ def save_base64_file(**arg):
             mime=rez[1]
             base64=str.encode(rez[2])
             fh = open(fullname, "wb")
-            fh.write(decodestring(base64))
+            #fh.write(decodestring(base64))
             fh.close()
 
 

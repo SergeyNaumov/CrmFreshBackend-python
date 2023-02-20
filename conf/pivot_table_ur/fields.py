@@ -3,15 +3,7 @@
 
 def get_fields():
     return [ 
-    {
-      'description':'Логин',
-      'type':'select_values',
-      'name':'manager_id',
-      'values':[],
-      'filter_on':1,
-      'before_code':manager_id_before_code,
-      'filter_code':manager_id_filter_code
-    },
+
     {
       'description':'Период',
       'name':'period_id',
@@ -132,25 +124,6 @@ def left_to_complete_percent_filter_code(form,field,row):
 def left_to_complete_rub_filter_code(form,field,row):
   return row['left_to_complete_rub']
 
-def manager_id_before_code(form,field):
-  # узнаём, какие логины вообще у нас есть
-  ids=form.db.query(query="SELECT distinct(manager_id) FROM prognoz_bonus_pivot_ul",massive=1,str=1)
-  
-  if len(ids):
-    field['values']=form.db.query(
-      query=f"""
-        SELECT
-          id v,
-          concat( login,if(comment='','',concat(' - ',comment))) d
-        FROM
-          manager
-        WHERE id in ({','.join(ids)})
-        ORDER BY login
-      """
-    )
+
     
 
-def manager_id_filter_code(form,field,row):
-  if row['m__comment']:
-    return f"{row['m__login']} - {row['m__comment']}"
-  return row['m__login']
