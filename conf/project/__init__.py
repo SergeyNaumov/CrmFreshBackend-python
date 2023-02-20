@@ -74,7 +74,7 @@ form={
                     'name':'template_id',
                     'type':'select_from_table',
                     'table':'template',
-                    #'autocomplete':1,
+                    'autocomplete':1,
                     'header_field':'header',
                     'value_field':'template_id'
                 },
@@ -96,6 +96,8 @@ form={
             'description':'Стандартные сервисы',
             'name':'struct_public',
             'tablename':'psp',
+            'fast_search':1,
+            'cols':2,
             'relation_save_table':'project_struct_public',
             'relation_table':'struct_public',
             'relation_table_header':'header',
