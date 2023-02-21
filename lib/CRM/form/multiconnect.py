@@ -16,9 +16,10 @@ def get_values(form,field):
       """,
       massive=1,
       values=[form.id],
-      errors=form.id
+      errors=form.errors
     )
-    
+    print('ERRORS:',form.errors)
+
     return res
   else:
     return []
@@ -46,7 +47,7 @@ def save(form,field,new_values):
     errors=form.errors,
     values=[form.id]
   )
-
+  
   # сохраняем то, чего ещё нет
   for v in new_values:
     if not v in old_values_hash:

@@ -147,7 +147,7 @@ config={
   },
 
   'debug':{ # для отладки
-    'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','asus-tarusa'],
+    'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     'manager_id': 4624, # b2bb2bconnect  
   }
 }

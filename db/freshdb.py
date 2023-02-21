@@ -32,18 +32,25 @@ def get_func(value):
 
 def out_error(self,error,arg):
   self.err_str=error
-  if 'error' in arg:
-    if(type(arg['error']) == type([])): # type is list
-        arg['error'].append(error)
-    else: # type is str
-        arg['error']=error
-  else:
-    print(error)
-    print("\nQUERY:\n"+arg['query'])
-    if ('values' in arg) and len(arg['values']):
-      print(arg['values'])
-    #quit()
+  if ('errors' in arg):
+    if isinstance(arg['errors'],list): # type is list
+        
+        arg['errors'].append(error)
+    else: 
+        arg['errors']=error
 
+  if ('error' in arg):
+    if isinstance(arg['error'],list): # type is list
+        
+        arg['error'].append(error)
+    else: 
+        arg['error']=error
+  
+  print("\nQUERY:\n"+arg['query'])
+  if ('values' in arg) and len(arg['values']):
+    print(arg['values'])
+    #quit()
+  self.error_str=error
 
 def get_query(self,arg): # для get и getrow
   self.error_str=''
@@ -137,7 +144,7 @@ class FreshDB():
 
     def execute(self,cur,arg):
       self.connect.ping()  # reconnecting mysql
-
+      
       if ('debug' in arg) and (arg['debug']):
         print(arg['query'])
         if exists_arg('values',arg): print(arg['values'])
@@ -148,21 +155,26 @@ class FreshDB():
       try:
         cur.execute(arg['query'],arg['values'])
         self.connect.commit()
-      except pymysql.err.ProgrammingError as err:
-        if 'errors' in arg: arg['errors'].append(str(err))
+      except Exception as err:
+        
+        out_error(self,f'{err}',arg)
+        
+        #if 'errors' in arg: print('exec2:',arg['errors'])
+        #if 'errors' in arg: 
+        #  arg['errors'].append(f' {err} ')
 
-      except pymysql.err.DataError as err:
-        if 'errors' in arg: arg['errors'].append(str(err))
-        #self.error_str = str(err)
+      # except pymysql.err.DataError as err:
+      #   if 'errors' in arg: arg['errors'].append(str(err))
+      #   #self.error_str = str(err)
 
-      # except pymysql.err.IntegrityError as e2:
-      #     out_error(self,str(e2),arg)
-      #     self.error_str=e2
+      # # except pymysql.err.IntegrityError as e2:
+      # #     out_error(self,str(e2),arg)
+      # #     self.error_str=e2
 
-      except pymysql.err.InternalError as err:
-          if 'errors' in arg: arg['errors'].append(str(err))
-          #out_error(self,str(err),arg)
-          self.error_str = str(err)
+      # except pymysql.err.InternalError as err:
+      #     if 'errors' in arg: arg['errors'].append(str(err))
+      #     #out_error(self,str(err),arg)
+      #     self.error_str = str(err)
           
 
 
@@ -201,17 +213,16 @@ class FreshDB():
     def getvalue(self, **arg):
       self.connect.ping()  # reconnecting mysql
       cur = self.connect.cursor()
-      #print('arg:',arg)
       arg['method']='getvalue'
       arg['query']=get_query(self,arg)
-      #print(arg)
+
       
       if self.error_str:
         return None
       self.execute(cur,arg)
       
       rez=cur.fetchone()
-      #print('rez',rez)
+      
       if not rez: rez=''
       else: rez=rez[0]
       
@@ -228,6 +239,8 @@ class FreshDB():
         return {}
 
       self.execute(cur,arg)
+      #print('error_str:',self.error_str)
+      
       if self.error_str: return {}
       try:
         rez=cur.fetchone()
@@ -264,7 +277,7 @@ class FreshDB():
 
       return rez
     def get(self, **arg):
-      print('GET')
+      
       self.connect.ping()  # reconnecting mysql
       self.error_str=''
 
@@ -273,15 +286,23 @@ class FreshDB():
 
       cur = pymysql.cursors.DictCursor(self.connect)
       arg['method']='get'
+      #print('GET_QUERY:', arg['errors'])
       arg['query']=get_query(self,arg)
 
+      #print('GET_QUERY END: ', arg['errors'])
       if self.error_str:
         return []
-
+      
+      
       self.execute(cur,arg)
+      
+
 
       if self.error_str:
-        rez=[]
+        if ('onerow' in arg) or ('onevalue' in arg):
+          return None
+        else:
+          return []
       else:
         try:
           rez=cur.fetchall()
@@ -309,15 +330,12 @@ class FreshDB():
         out_error(self,'FreshDB::query: not exists attribute query',arg)
       #print('arg:',arg)
       if self.error_str : return []
-      try:
-        self.execute(cur,arg)
-      except pymysql.err.OperationalError as err:
+      self.execute(cur,arg)
+
+      #except Exception as err:
         
-        if 'errors' in arg:
-          arg['errors'].append(f"error query: {arg['query']} {str(err)}")
-        else:
-          print_console_error("err1 query:\n"+arg['query']+"\n"+str(err))
-        return []
+      #out_error(self,err,arg)
+      #return []
 
       rez=''
       if exists_arg('onevalue',arg):
@@ -336,9 +354,9 @@ class FreshDB():
             try:
               rez=cur.fetchone()
             except pymysql.err.ProgrammingError as err:
-              print('err3: ',err )
+              #print('err3: ',err )
               print_console_error(err)
-              print(arg['query'],)
+              #print(arg['query'],)
               return []
 
           else:
@@ -355,10 +373,10 @@ class FreshDB():
 
 
             except pymysql.err.ProgrammingError as err:
-              print_console_error('freshdb query error:')
-              print('ERR:',err,arg['query'])
-              
-              if exists_arg('errors',arg): arg['errors'].append(err)
+              #print_console_error('freshdb query error:')
+              #print('ERR:',err,arg['query'])
+              out_error(self,err,arg)
+              #if exists_arg('errors',arg): arg['errors'].append(err)
               return []
 
       

@@ -50,7 +50,8 @@ def get(form,field):
       query=field['query']
     )
   else:
-    
+    #print('errors:',form.errors)
+    #print('get begin')
     _list=form.db.get(
       select_fields=select_fields,
       table=field["relation_table"],
@@ -60,8 +61,10 @@ def get(form,field):
       tree_use=exists_arg('tree_use',field),
       errors=form.errors
     )
+  
+  
   value=get_values(form,field)
-  #print(_list)
+  
   return _list,value
 
 def multiconnect_process(**arg):

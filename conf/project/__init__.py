@@ -29,7 +29,7 @@ form={
         {'t':'domain','a':'d','l':'d.project_id = wt.project_id','lj':1},
     ],
     'GROUP_BY':'wt.project_id',
-    'explain':1,
+    #'explain':1,
     'fields':[
  
         {
