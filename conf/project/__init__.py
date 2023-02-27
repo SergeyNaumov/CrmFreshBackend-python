@@ -39,6 +39,12 @@ form={
             'tab':'info'
         },
         {
+            'description':'Дата создания',
+            'type':'datetime',
+            'name':'registered',
+            'tab':'info'
+        },
+        {
             'description':'Номер проекта',
             'name':'project_id',
             'type':'filter_extend_text',

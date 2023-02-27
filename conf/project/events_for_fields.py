@@ -1,6 +1,6 @@
 def header_code(form,field):
     if form.id:
-        field['after_html']=f'Проект №{form.id}'
+        field['before_html']=f'Проект №{form.id}'
 
 events={
     'header':{
