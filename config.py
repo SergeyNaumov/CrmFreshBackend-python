@@ -38,7 +38,7 @@ def after_create_engine(s,errors=[]):
   )
   #print('Project:',project)
   if not(project):
-    s.errors.append(f'Не найден проект, привязанный к {host}')
+    s.errors.append(f'Не найден проект, привязанный к хосту: {host}')
     return 
   elif not(project['access_for_cur_domain']) and not(s.manager['full_access']):
     s.errors.append(f'У Вас нет доступа для администрирования сайта {host}')
@@ -46,7 +46,7 @@ def after_create_engine(s,errors=[]):
   s.project_id=project['project_id']
   s.template_id=project['template_id']
 
-  #print("project_id:",s.project_id)
+  print("project_id:",s.project_id)
   #print('MANAGER:',s.manager)
   #s.errors=[f'Домен {host} не найден в базе данных! Доступ запрещён']
   
@@ -58,7 +58,7 @@ def after_read_form_config(form):
   if len(form.s.errors):
     form.errors=form.s.errors
   
-  print('s:',form.s)
+  #print('s:',form.s)
   form.manager=form.s.manager
   form.manager['files_dir']=f'./files/project_{form.s.project_id}'
   form.manager['files_dir_web']=f'/files/project_{form.s.project_id}'
