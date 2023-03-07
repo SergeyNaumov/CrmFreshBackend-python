@@ -4,6 +4,7 @@ left_menu=[
          "value":"https://help.design-b2b.com/",
          "icon":"fa fa-sitemap",
          "type":"src",
+         "show":True,
          "child":[
             {
                "header":"Promo",
@@ -67,6 +68,7 @@ left_menu=[
          "value":"admin-tree",
          "type":"vue",
          "icon":"fa fa-duotone fa-suitcase",
+         "show":True,
          "child":[
                {
                   "header":"Виды кейсов",
