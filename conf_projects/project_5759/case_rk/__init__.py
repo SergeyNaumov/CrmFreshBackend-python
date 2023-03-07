@@ -85,7 +85,15 @@ form={
                 {
                     'description':'цвет',
                     'name':'color',
-                    'type':'text'
+                    'subtype':'color',
+                    'type':'text',
+                    # Список цветов из которых можно выбрать
+                    'values':[
+                        {'v':'#C13D9A','d':'было'},
+                        {'v':'#9cac12','d':'стало'},
+                        {'v':'#36a3e9','d':'итог'},
+                        
+                    ]
                 },
                 {
                     'description':'значение',
