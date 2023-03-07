@@ -29,7 +29,8 @@ def get_file_list(**arg):
         error=f'Ошибка wysiwyg: {dirname} -- это файл (а должна быть директория), обратитесь к разработчику'
         return res,error
       else:
-        os.mkdir(form.manager['files_dir']+path)
+        os.makedirs(form.manager['files_dir']+path, exist_ok=True)
+        #os.mkdirs(form.manager['files_dir']+path)
 
 
 

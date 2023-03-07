@@ -62,7 +62,7 @@ def get_values_for_select_from_table(form,f,parent_field=None, debug=False):
               #print(f'action: {form.action}  | script: {form.script} | FLD: {f}')
       
       else:    
-        print(f"\n\nscript:{form.script} action: {form.action}, parent_field: {parent_field}")
+      #  print(f"\n\nscript:{form.script} action: {form.action}, parent_field: {parent_field}")
         return []
     if f['name']=='template_id':
       print("\n\nquery:", query)
@@ -72,9 +72,9 @@ def get_values_for_select_from_table(form,f,parent_field=None, debug=False):
       #if not(re.match('^\s*where',query,re.IGNORECASE)):
       #  query+=' WHERE '
       if not(re.match('^\s*where',f_where,re.IGNORECASE)):
-        print('!!!QUERY:', query)
-        print("\n\nwhere:",f_where)
-        print("ADD STR WHERE before\n")
+        #print('!!!QUERY:', query)
+        #print("\n\nwhere:",f_where)
+        #print("ADD STR WHERE before\n")
         query+=' WHERE '
       
       query+=f_where

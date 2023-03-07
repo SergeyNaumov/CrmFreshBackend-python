@@ -15,6 +15,7 @@ class Engine():
     self.errors=[]
     
   def reset(self,**arg):
+    print('RESET')
     self.db=db
     self.db_read=db_read
     self.db_write=db_write
@@ -44,6 +45,8 @@ class Engine():
     s.config=config
     auth=config['auth']
     s.use_project=config['use_project']
+
+      
     if not(self.request.url.path in config['login']['not_login_access']):
       host_ok=not('hosts' in config['debug']) or (('hosts' in config['debug']) and  ( hostname in config['debug']['hosts'] ))
       
@@ -51,6 +54,7 @@ class Engine():
       #print('pwd:',pwd)
       #print('host_ok:',host_ok,' pwd_ok:',pwd_ok)
       if host_ok and pwd_ok:
+        
         where='0'
         values=[]
         if 'manager_id' in config['debug']:
@@ -62,10 +66,10 @@ class Engine():
 
         self.manager=db.getrow(
           table=auth['manager_table'],
+          #debug=1,
           where=where,
           values=values
         )
-        
 
         if self.manager:
           self.manager['id']=self.manager[auth['manager_table_id']]
@@ -73,16 +77,22 @@ class Engine():
         else:
           self.login='nonelogin'
           self.manager={'id':0,'login':'nonelogin','name':'менеджер не найден'}
+          if 'manager_id' in config['debug']:
+            self.errors.append(f"менеджер с ID: {config['debug']['manager_id']} не найден")
+          if 'login' in config['debug']:
+            self.errors.append(f"менеджер с логином: {config['debug']['login']} не найден")
+
       else:
-        
         session_start(self);
+
+    if ('id' in self.manager) and self.manager['id'] and ('after_create_engine' in config):
+      config['after_create_engine'](self)
 
             
             
       
           
-      if self.manager['id'] and ('after_create_engine' in config):
-        config['after_create_engine'](self)
+
 
     
 

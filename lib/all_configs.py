@@ -74,25 +74,24 @@ class error():
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
   errors=[]
-  print('confdir:',confdir,' ; config:',arg['config'])
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
       module=importlib.import_module(conflib_dir+'.'+arg['config'])
       
       form_data=copy.deepcopy(module.form)
     except SyntaxError as e:
-      errors.append(f"Ошибка при загрузке конфига {arg['config']}: {e}")
+      errors.append(f"1Ошибка при загрузке конфига {arg['config']}: {e}")
     except ModuleNotFoundError as e:
-      errors.append(f"Ошибка при загрузке конфига {arg['config']}: {e}")
+      errors.append(f"2Ошибка при загрузке конфига {arg['config']}: {e}\n{conflib_dir+'.'+arg['config']}")
     
     if not len(errors) and os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
       try:
         module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events')
         form_data['events']=module.events
       except SyntaxError as e:
-        errors.append(f"Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+        errors.append(f"1Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
       except ModuleNotFoundError as e:
-        errors.append(f"Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+        errors.append(f"2Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
     
     if not len(errors):
       form=Form(arg)  
@@ -113,9 +112,9 @@ def load_form_from_dir(confdir,conflib_dir, arg):
                 f[postfix]=events[f['name']][postfix]
 
       except SyntaxError as e:
-          errors.append(f"Ошибка при загрузке конфига {arg['config']}/events_for_fields.py: {e}")
+          errors.append(f"1Ошибка при загрузке конфига {arg['config']}/events_for_fields.py: {e}")
       except ModuleNotFoundError as e:
-          errors.append(f"Ошибка при загрузке конфига {arg['config']}/events_for_fields: {e}")
+          errors.append(f"2Ошибка при загрузке конфига {arg['config']}/events_for_fields: {e}")
           
       #print('FIELDS:',form.fields)
         
@@ -127,42 +126,18 @@ def read_config(**arg):
   
   # попытка загрузки локального конфига
   #print('STEP1')
+  if len(s.errors): return error(s.errors)
   [form,errors]=load_form_from_dir(f'./conf', f'conf',arg)
   if len(errors): return error(errors)
   
   # Если локальной папки нет -- загружаем глобальный конфиг
-  if not(form):
-    [form,errors]=load_form_from_dir(f'./conf', f'conf',arg)
+  if not(form) and hasattr(s,'project_id'):
+    [form,errors]=load_form_from_dir(f'./conf_projects/project_{s.project_id}', f'conf_projects.project_{s.project_id}',arg)
     if len(errors): return error(errors)
 
-  if not(form):
-    
+  if not(form):    
     return error([f'конфиг {arg["config"]} не найден'])
-  #else:
-  #  print('NOT RETURN ERROR')
-  
-  # confdir='./conf'
-  # conflib_dir='conf'
-  # if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
-  #   try:
-  #     module=dynamic_import(conflib_dir+'.'+arg['config'])
-  #     form_data=module.form
-  #   except SyntaxError as e:
-  #     return error(f"Ошибка при загрузке конфига {arg['config']}: {e}")
-  #   except ModuleNotFoundError as e:
-  #     return error(f"Ошибка при загрузке конфига {arg['config']}: {e}")
 
-  #     #print("Except!",
-
-  #   if os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
-  #     module=dynamic_import(conflib_dir+'.'+arg['config']+'.events')
-  #     form_data['events']=module.events
-    
-    
-  #   form.load_data(form_data)
-  # else:
-  #   return error(arg['config'])
-  #form=config_class(arg)
   
   form.s=s
   s.form=form
