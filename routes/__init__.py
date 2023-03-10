@@ -30,7 +30,7 @@ router = APIRouter()
 # /register /remember
 router.include_router(router_register)
 router.include_router(router_password)
-router.include_router(router_ajax)
+
 # /login, /logout, /mainpage, /startpage 
 router.include_router(router_core)
 
@@ -54,8 +54,10 @@ router.include_router(router_table,prefix='/table')
 router.include_router(router_video,prefix='/VideoList')
 router.include_router(router_news,prefix='/NewsList')
 
-
 router.include_router(router_autocomplete,prefix='/autocomplete')
+
+router.include_router(router_ajax) # /ajax
+
 router.include_router(router_svcms,prefix='/svcms')
 
 

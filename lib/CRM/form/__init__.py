@@ -33,6 +33,7 @@ class Form():
     self.work_table_id='id'
     self.id=''
     self.sort=0
+    
     self.tree_use=0
     self.sort_field=''
     self.header_field='header'
@@ -57,7 +58,9 @@ class Form():
       'page':''
     }
     
-
+    # В том случае, если есть end_responsе, то в качестве ответа будет выводиться оно
+    #self.end_response=False
+    
     self.explain=0
     self.card_format='vue'
     # для проектов

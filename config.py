@@ -1,6 +1,7 @@
 # UPDATE manager set password=sha2('123',256);
 
-import re
+#import re
+from config_wysiwyg import config_wysiwyg
 def after_create_engine(s,errors=[]):
   #print('AFTER CREATE ENGINE: ',s.manager)
   if not(s.manager) or not s.manager['login']:
@@ -70,6 +71,8 @@ def alter_all_change_action(form):
   print('Alter_all_change_action: ',host)
   
 
+
+
 config={
   'BaseUrl':'/manager',
   'title':'CMS Digitalstrateg',
@@ -122,7 +125,6 @@ config={
   },
   'stat_log':0, # Записываем статистику посещений
   'controllers':{
-    
     'left_menu':'/svcms/left-menu'
   },
   #'docpack':{
@@ -145,7 +147,7 @@ config={
         '/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password'
     ]
   },
-
+  'wysiwyg':config_wysiwyg,
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     'manager_id': 4624, # b2bb2bconnect  

@@ -50,7 +50,16 @@ left_menu=[
                "params":{
                   "config":"template_const"
                }
-            }
+            },
+            {
+               "header":"Шаблоны для wysiwyg",
+               "value":"admin-tree",
+               "type":"vue",
+               "child":[],
+               "params":{
+                  "config":"wysiwyg_template"
+               }
+            },
          ]
       },
 

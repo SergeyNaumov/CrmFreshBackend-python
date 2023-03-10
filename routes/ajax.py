@@ -16,13 +16,14 @@ router = APIRouter()
 async def ajax(config:str,ajax_name:str,R: dict):
   success=1
   errors=[]
-
+  print('AJAX!')
   form=read_config(
     script='ajax', config=config,
     R=R,
     id=R['id']
   )
   result=[];
+  
   if exists_arg(ajax_name,form.ajax):
     result = form.ajax[ajax_name](form,R['values'])
   else:
