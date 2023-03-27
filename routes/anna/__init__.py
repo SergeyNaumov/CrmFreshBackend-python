@@ -9,6 +9,8 @@ from .reg_apteka_account import reg_apteka_account, change_apteka_account
 from .change_comp_order import change_comp_order, change_on_notify
 from .change_apteka_order import change_apteka_order
 from .get_reg_data import get_reg_data, access_ur_lico_ok
+from .feedback import feedback
+
 from .left_menu import left_menu
 from .action_subscribe import *
 from .change_reg_data import change_reg_data
@@ -144,6 +146,11 @@ async def check_password(R: dict):
 @router.post('/change-password')
 async def change_password_controller(R:dict):
     return change_password(R)
+
+# Обратная связь
+@router.post('/feedback')
+def fb(R:dict):
+    return feedback(R)
 
 # Изменени рег. данных менеджера
 @router.post('/change-reg-data')
