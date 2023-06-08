@@ -182,6 +182,7 @@ def admin_tree_run(**arg):
               onevalue=1
             )
             cur_path+='/'+parent_id
+          print('sort: ',form.sort)
           if form.sort:
             qw=f'SELECT max({form.sort_field}) from {form.work_table}'
             if form.tree_use:
@@ -190,7 +191,12 @@ def admin_tree_run(**arg):
                 qw+=' WHERE parent_id='+parent_id
               else:
                 qw+=' WHERE parent_id is null'
+
+              if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value'):
+                qw+=f' AND {form.foreign_key}={form.foreign_key_value}'
             
+            print('qw: ',qw)
+
             cur_sort=form.db.query(query=qw,onevalue=1)
             
             if not cur_sort:
