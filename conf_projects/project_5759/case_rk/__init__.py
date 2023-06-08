@@ -108,21 +108,15 @@ form={
             'add_description':'регион, старт работы  и т.д.',
             'type':'wysiwyg',
             'name':'tbl',
-            # 'frontend':{
-            #     'wysiwyg_templates':[
+            'frontend':{
+                'buttons':[
+                    {
+                        'description':'Шаблон таблицы "регионы, старт, работы"',
+                        'ajax':'tbl1_load_template',
+                    },
 
-            #         {"title": "Шаблон1", "description": "Описание шаблона1", "content": "[шаблон1]"},
-            #         {"title": "Шаблон2", "description": "Описание шаблона2", "url": "/manager/edit_form/case_rk?action=load_template"}
-            
-            #     ],
-            #     'buttons':[
-            #         {
-            #             'description':'Шаблон таблицы "регионы, старт, работы"',
-            #             'ajax':'tbl1_load_template',
-            #         },
-
-            #     ]
-            # }
+                ]
+            }
         },
         {
             'description':'Фото графика',
@@ -136,14 +130,14 @@ form={
             'add_description':'поисковые запросы',
             'type':'wysiwyg',
             'name':'tbl2',
-            # 'frontend':{
-            #     'buttons':[
-            #         {
-            #             'description':'шаблон таблицы "кейсы"',
-            #             'ajax':'tbl2_load_template',
-            #         },
-            #     ]
-            # }
+            'frontend':{
+                'buttons':[
+                    {
+                        'description':'шаблон таблицы "кейсы"',
+                        'ajax':'tbl2_load_template',
+                    },
+                ]
+            }
         },
         {
             'description':'Дата (для сортировки)',

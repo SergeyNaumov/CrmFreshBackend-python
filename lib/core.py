@@ -112,7 +112,7 @@ def b64_split(data):
 
 
 def random_filename(): # генерирует имя файла без расширения
-    return str(time.time()).split('.')[0]+'_'+str(random.random()*10**12).split('.')[1]
+    return str(time.time()).split('.')[0]+'_'+gen_pas(2)
 
 # is_wt_field
 check_list=[

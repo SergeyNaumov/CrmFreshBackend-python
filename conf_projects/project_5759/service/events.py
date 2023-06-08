@@ -8,12 +8,16 @@ def permissions(form):
         form.cols=[
             [ # Колонка1
               {'description':'Общая информация','name':'main','hide':0},
-              {'description':'Тарифы','name':'tarifs','hide':0},
+              {'description':'Блок "Тарифы"','name':'tarifs','hide':0},
+              {'description':'Блок "Тарифы2"','name':'tarifs2','hide':0},
             ],
             [
               #{'description':'Юридические лица','name':'comp','hide':1},
               #{'description':'Аптеки','name':'apteka','hide':1},
-              {'description':'Промо','name':'promo','hide':0}
+              {'description':'Промо','name':'promo','hide':0},
+              {'description':'Этапы выполнения работ','name':'stages','hide':0},
+              {'description':'Вопросы и ответы','name':'faq','hide':0},
+              {'description':'Вас заинтересует','name':'interest','hide':0},
               
             ]
         ]
