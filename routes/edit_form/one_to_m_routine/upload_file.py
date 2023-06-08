@@ -50,7 +50,7 @@ def upload_file(form,field,arg):
           to=child_field['filedir']+'/'+resize_filename,
           width=width,
           height=height,
-          grayscale=exfts_arg('grayscale',r),
+          grayscale=exists_arg('grayscale',r),
           composite_file=exists_arg('composite_file',r),
           composite_gravity=exists_arg('composite_gravity',r),
           composite_resize=exists_arg('composite_resize',r),
