@@ -31,5 +31,6 @@ def slide_sort(form,field):
         query=query,
         errors=form.errors
       )
+      form.run_event('after_slide_sort')
 
     return {'success':form.success(),'errors':form.errors}

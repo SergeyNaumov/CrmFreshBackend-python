@@ -2,7 +2,7 @@ from .delete_file import delete_file
 
 def delete_record(form,field,arg):
   form.run_event('before_delete')
-  print('success:',form.success())
+  #print('success:',form.success())
   if form.success():
     for cf in field['fields']:
 

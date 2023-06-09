@@ -21,10 +21,9 @@ def run_event(form,event_name,arg={}):
       if event_name in form.events:
         #print('events:',form.events)
         event=form.events[event_name]
-        #print('run_event for form:',event_name)
-        #print('TYPE:',type(event))
-        #event(form)
+
         if isinstance(event,list):
+
           for e in event:
             if arg:
               #print('arg:',arg)
@@ -32,6 +31,7 @@ def run_event(form,event_name,arg={}):
             else:
               e(form)
         else:
+
           try:
             if arg:
               event(form,arg)

@@ -33,6 +33,7 @@ def update_field(form,field,arg):
         SET
           {child_field["name"]}=%s
         WHERE {field["table_id"]}=%s""",
+      debug=1,
       values=[value,id]
 
     )

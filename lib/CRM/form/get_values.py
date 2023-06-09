@@ -1,10 +1,59 @@
 from lib.core import is_wt_field, exists_arg, tree_to_list
 from lib.get_1_to_m_data import get_1_to_m_data
 from .get_values_for_select_from_table import get_values_for_select_from_table
+# sub get_in_ext_url{
+#     my %arg=@_;
+#     my $s=$arg{'s'}; my $form=$arg{form}; my $f=$arg{field};
+#     return '' unless($form->{id});
+#     my $in_url=get_in_url($f,$form->{id});
+#     return '' unless($in_url);
+#     my @where=('in_url=?'); my @values=($in_url);
+
+#     if($f->{foreign_key} && $f->{foreign_key_value}){
+#         push @where,"$f->{foreign_key}=?";
+#         push @values,$f->{foreign_key_value};
+#     }
+
+#     my $where_str=join(' AND ',@where);
+#     my $exists=$s->{db}->get(
+#         table=>'in_ext_url',
+#         where=>$where_str,
+#         values=>\@values,
+#         onerow=>1
+#     );
+#     if($exists){
+#         $f->{value}=$exists->{ext_url};
+#     }
+#     #print Dumper($f);
+# }
+
 
 
 def get_in_ext_url(form,f):
-  print('get_in_ext_url не готова')
+  if not(form.id) or not(exists_arg('in_url',f)):
+    return
+    
+  in_url=f['in_url'].replace('<%id%>',str(form.id))
+  where=[f'in_url="{in_url}"']
+  values=[]
+
+  if exists_arg('foreign_key',f) and exists_arg('foreign_key_value',f):
+    where.append(f'{f["foreign_key"]}={f["foreign_key_value"]}')
+
+  where_str=' AND '.join(where)
+  #print('WHERE:',where_str)
+  exists=form.db.get(
+    table='in_ext_url',
+    where=where_str,
+    #values=values,
+    onerow=1
+  )  
+
+  if exists:
+    f['value']=exists['ext_url']
+      
+
+  #print('get_in_ext_url не готова')
 
 def func_get_values(form):
 
@@ -14,7 +63,6 @@ def func_get_values(form):
     
 
     if form.id:
-
       values=form.db.getrow(
         table=form.work_table,
         where=f'{form.work_table_id}=%s',
@@ -41,34 +89,26 @@ def func_get_values(form):
         if f['type']=='password':
           del values[f['name']]
 
-    #print('values:',values)
 
-    #form.pre(f"v1: {form.fields[5]['value']}")
-    #form.pre("action: "+form.action)
     for f in form.fields:
-      #print('f:',f)
-      #if f['type'] in ['date','datetime','text','textarea']:
-
-
-
-      name=f['name']
+      if form.action=='new':
+        f['value']=''
+      if 'name' in f: name=f['name']
+      
       
       if is_wt_field(f):
         #if name=='checkbox':
           #print('not name checkbox:', (not name in values) )
           #print('not value checkbox:', (not values[name]) )
         # if name in values:
-        #   print('before:',name,':',values[name])
+        
         if not name in values or (not (values[name]) and values[name]!=0 and values[name]!='0'):
             values[name]=''
         else:
           values[name]=str(values[name])
           if f['type']=='datetime' and values[name]=='0000-00-00 00:00:00':
-            values[name]=''
-
-
-          
-          
+            values[name]=''    
+      
       set_from_nv=True
       if form.script=='edit_form' and (form.action in ('new')) and ('value' in f ):
         #print('f:',f)
@@ -89,7 +129,7 @@ def func_get_values(form):
 
         get_1_to_m_data(form,f)
 
-      if f['type']=='get_in_ext_url':
+      if f['type']=='in_ext_url':
         get_in_ext_url(form,f)
         #values[name]=f['value']
 
@@ -98,8 +138,9 @@ def func_get_values(form):
           if values[name].isnumeric():
             values[name]=str(values[name])
           if set_from_nv and not(form.script == 'admin_table' and ('value' in f)):
-            f['value']=values[name]
-
+            f['value']=values[name]         
+      
+    #form.pre(f"v2: {form.fields[5]['value']}")
     form.values=values
 
 
@@ -110,7 +151,8 @@ def func_get_fields_values(form):
     if f['type'] == '1_to_m':
       get_1_to_m_data(form,f)
 
-    elif f['type']=='get_in_ext_url':
+    elif f['type']=='in_ext_url':
+      
       get_in_ext_url(form,f)
     elif exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
 

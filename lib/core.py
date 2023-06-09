@@ -61,8 +61,8 @@ def get_func(f):
 def date_to_rus(d):
   d=str(d)
   rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
-  
-  if rez[5]:
+  print(f'res: {rez}')
+  if rez and rez[5]:
     return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
   elif rez:
     return f"{rez[4]}.{rez[3]}.{rez[2]}"
@@ -112,7 +112,7 @@ def b64_split(data):
 
 
 def random_filename(): # генерирует имя файла без расширения
-    return str(time.time()).split('.')[0]+'_'+str(random.random()*10**12).split('.')[1]
+    return str(time.time()).split('.')[0]+'_'+gen_pas(2)
 
 # is_wt_field
 check_list=[

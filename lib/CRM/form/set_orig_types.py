@@ -1,5 +1,8 @@
 def func_set_orig_types(form):
   for f in form.fields:
+    if not('name' in f):
+      form.errors.append(f'Отсутствует name в описании поля {f}')
+      continue
     if 'type' in f:
       T=f['type']
     else:

@@ -1,15 +1,18 @@
-#from conf.test import Config as config_test
-#from conf.manager_menu import Config as config_manager_menu
+import importlib,os
+
 from lib.session import project_get_permissions_for, get_permissions_for
 
 from lib.engine import s
-from lib.core import create_fields_hash, exists_arg
-import importlib,os
+from lib.core import exists_arg
+
+from config import config as sysconfig
+from lib.CRM.form import Form
+import copy
 
 def need_only_read(form):
   w1=True #(form.script=='admin_table' and form.action=='edit')
-  w2=(form.script=='memo' and form.action=='get_data')
-  w3=(form.script=='find_results')
+  #w2=(form.script=='memo' and form.action=='get_data')
+  #w3=(form.script=='find_results')
   if w1: #  or w2 or w3
     return True
 
@@ -48,36 +51,101 @@ def get_cur_role(**arg):
 def dynamic_import(module):
     return importlib.import_module(module)
 
-configs={}
-  #'test':config_test,
-  #'manager_menu':config_manager_menu
+# configs={}
+#   #'test':config_test,
+#   #'manager_menu':config_manager_menu
 
-folders = os.listdir('./conf')
-for f in folders:
-  if f !='__pycache__' and os.path.isdir('./conf/'+f) and os.path.isfile('./conf/'+f+'/__init__.py'):
 
-    cur_module=dynamic_import('conf.'+f)
-    configs[f]=cur_module.Config
+# folders = os.listdir('./conf')
+# for f in folders:
+#   if f !='__pycache__' and os.path.isdir('./conf/'+f) and os.path.isfile('./conf/'+f+'/__init__.py'):
+
+#     cur_module=dynamic_import('conf.'+f)
+#     configs[f]=cur_module.Config
 
 
 class error():
-  def __init__(self,config):
-      self.errors=['Конфиг '+config+' не найден']
+  def __init__(self,errors):
+      self.errors=errors
       self.success=0
 
-def read_config(**arg):
-  response={}
-  
-  if not (arg['config'] in configs):
-    return error(arg['config'])
-  
-  config_class=configs[arg['config']]
-  
-  form=config_class(arg)
+      
 
+def load_form_from_dir(confdir,conflib_dir, arg):
+  form=False
+  errors=[]
+  if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
+    try:
+      module=importlib.import_module(conflib_dir+'.'+arg['config'])
+      
+      form_data=copy.deepcopy(module.form)
+    except SyntaxError as e:
+      errors.append(f"1Ошибка при загрузке конфига {arg['config']}: {e}")
+    except ModuleNotFoundError as e:
+      errors.append(f"2Ошибка при загрузке конфига {arg['config']}: {e}\n{conflib_dir+'.'+arg['config']}")
+    
+    if not len(errors) and os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
+      try:
+        module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events')
+        form_data['events']=module.events
+      except SyntaxError as e:
+        errors.append(f"1Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+      except ModuleNotFoundError as e:
+        errors.append(f"2Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+    
+    if not len(errors):
+      form=Form(arg)  
+      form.load_data(form_data)
+    
+    if not len(errors) and  os.path.isfile(f"{confdir}/{arg['config']}/events_for_fields.py"):
+      try:
+        module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events_for_fields')
+        events=module.events
+        for f in form.fields:
+          if 'name' not in f:
+            form.errors.append(f'{f["description"]}: не указано имя!')
+            break
+          
+          if f['name'] in events:
+            for postfix in ['before_code','permissions','filter_code','code']:
+              if postfix in events[f['name']]:
+                f[postfix]=events[f['name']][postfix]
+
+      except SyntaxError as e:
+          errors.append(f"1Ошибка при загрузке конфига {arg['config']}/events_for_fields.py: {e}")
+      except ModuleNotFoundError as e:
+          errors.append(f"2Ошибка при загрузке конфига {arg['config']}/events_for_fields: {e}")
+          
+      #print('FIELDS:',form.fields)
+        
+
+  return [form,errors]
+
+def read_config(**arg):
+  #response={}
+  
+  # попытка загрузки локального конфига
+  #print('STEP1')
+  if len(s.errors): return error(s.errors)
+  [form,errors]=load_form_from_dir(f'./conf', f'conf',arg)
+  if len(errors): return error(errors)
+  #print('STEP2')
+  # Если локальной папки нет -- загружаем глобальный конфиг
+  if not(form) and hasattr(s,'shop_id'):
+    [form,errors]=load_form_from_dir(f'./conf_projects/project_{s.shop_id}', f'conf_projects.project_{s.shop_id}',arg)
+    if len(errors): return error(errors)
+  #print('STEP3')
+  if not(form):    
+    print(f'конфиг {arg["config"]} не найден')
+    return error([f'конфиг {arg["config"]} не найден'])
+  
+  
   form.s=s
   s.form=form
   
+  if 'after_read_form_config' in sysconfig:
+      sysconfig['after_read_form_config'](form)
+
   form.config=arg['config']
   form.script=arg['script']
 
@@ -89,20 +157,20 @@ def read_config(**arg):
   if 'R' in arg: form.R=arg['R']
 
   # Получаем manager-а 
-  login=get_cur_role(
-    login=s.login,
-    form=form
-  )
-  if s.use_project:
-    form.manager=project_get_permissions_for(form,login)
-  else:
-    form.manager=get_permissions_for(form,login)
-    # Атрибуты по умолчанию
+  auth=sysconfig['auth']
+
   
+  if auth['use_permissions']:
+    if s.use_project:
+      form.manager=project_get_permissions_for(form,login)
+    else:
+      form.manager=get_permissions_for(form,login)
+  
+  # Атрибуты по умолчанию
   if exists_arg('id',arg): form.id=arg['id']
   if exists_arg('action',arg): form.action=arg['action']
   if not form.work_table: form.work_table=arg['config']
-
+  
   form.run_event('permissions')
 
   form.default_config_attr(arg)
@@ -111,19 +179,9 @@ def read_config(**arg):
   # Перенёс из routes.edit_form.process_edit_form.py
   #form.get_values()
   
-  
-
   form.get_values()
   form.run_all_before_code()
   form.get_fields_values()
-  #print('after_get_values:',form.fields[0])
-  
-
-  #default_config_attr(form,arg)
-
-
-
-
 
   return form
 

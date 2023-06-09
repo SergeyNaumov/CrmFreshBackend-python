@@ -21,8 +21,8 @@ def session_create(s,**arg):
     if not(exists_arg('password',arg)):
       return 'При создании сессии (не указан password)'
 
-  session_table='session'
-  session_fails_table='session_fails'
+  #session_table='session'
+  #session_fails_table='session_fails'
 
 
   #if 'session_table' in config['auth']:
@@ -30,8 +30,9 @@ def session_create(s,**arg):
   
   #if 'session_fails_table' in config['auth']:
   #  session_fails_table=config['auth']['session_fails_table']
-
-  #session_table=config['auth']['session_table']
+  
+  session_table=config['auth']['session_table']
+  session_fails_table=config['auth']['session_fails_table']
   
   auth=config['auth']
 
@@ -48,7 +49,7 @@ def session_create(s,**arg):
 
   if exists_arg('max_fails_login',auth) and exists_arg('max_fails_login_interval',auth):
       fails=db.query(
-        query=f'select count(*) from {auth["session_fails_table"]} where login=%s and registered>=now() - interval %s second',
+        query=f'select count(*) from {session_fails_table} where login=%s and registered>=now() - interval %s second',
         values=[arg['login'],auth['max_fails_login_interval']],
         onevalue=True,
         errors=errors
@@ -59,7 +60,7 @@ def session_create(s,**arg):
   # проверяем, сколько было попыток зайти с данного ip под данным паролем
   if exists_arg('max_fails_ip',auth) and exists_arg('max_fails_login_interval',config['auth']):
       fails=s.db.query(
-        query=f'select count(*) from {auth["session_fails_table"]} where ip=%s and registered>=now() - interval %s second',
+        query=f'select count(*) from {session_fails_table} where ip=%s and registered>=now() - interval %s second',
         values=[arg['ip'],auth['max_fails_ip_interval']],
         onevalue=True,
         errors=errors
@@ -75,6 +76,7 @@ def session_create(s,**arg):
       auth_id=s.db.query(
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=sha2(%s,256)'+add_where,
         values=[arg['login'],arg['password']],
+        
         onevalue=True,
       )
   elif auth['encrypt_method']=='mysql_encrypt':
@@ -82,7 +84,6 @@ def session_create(s,**arg):
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=encrypt(%s,password)'+add_where,
         values=[arg['login'],arg['password']],
         onevalue=True,
-        debug=1
       )
   else:
       auth_id=s.db.query(
@@ -96,7 +97,7 @@ def session_create(s,**arg):
       'id':auth_id,
       'login':arg['login']
     }
-
+    #print('manager:',s.manager)
     key=gen_pas(200)
 
     db.save(
@@ -124,11 +125,12 @@ def session_start(s,**arg):
   if 'session_table' in config['auth']:
     session_table=config['auth']['session_table']
   
-  manager_table='manager'
+  manager_table=config['auth']['manager_table']
   
   if 'manager_table' in config['auth']:
     session_table=config['auth']['manager_table']
-
+  
+  
   errors=[]
   s.use_project=config['use_project']
   manager={'login':'','id':False, 'password':''}
@@ -152,6 +154,7 @@ def session_start(s,**arg):
           query=f"select *,{config['auth']['manager_table']} id from {manager_table} WHERE {config['auth']['login_field']} = %s ",
           values=[log],
           onerow=1,
+          
         )
         if m:
           manager=m
@@ -162,22 +165,24 @@ def session_start(s,**arg):
         session_table='project_session'
         manager_table='project_manager'
 
-      
+      #print('OK:')    
       ok=s.db.query(
-        query='SELECT count(*) FROM '+session_table+' WHERE auth_id=%s and session_key=%s',
+        query='SELECT count(*) FROM '+config['auth']['session_table']+' WHERE auth_id=%s and session_key=%s',
         values=[user_id, key],
         onevalue=1,
+        #debug=1,
         errors=errors
       )
       
+      #print(f'ok: {ok}')
       if ok:
           manager=s.db.query(
             query='select * from '+manager_table+' where id=%s',
             values=[user_id],
-            onerow=1,errors=errors
+            onerow=1,errors=errors,
+            debug=1
           );
 
-  
   if manager:
     manager['id']=str(manager['id'])
     

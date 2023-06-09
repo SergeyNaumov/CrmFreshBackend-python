@@ -17,10 +17,11 @@ from .page_routes import router as router_page
 from .video_routes import router as router_video
 from .news_routes import router as router_news
 from .table_routes import router as router_table
+from .const_routes import router as router_const
 
 # Роутеры, не входящие в систему
-from .testing import router as router_testing
-from .anna import router as router_anna
+#from .testing import router as router_testing
+from .assistant import router as router_assistant
 
 # Расширения
 from .extend_routes import router as router_extend
@@ -36,13 +37,14 @@ router.include_router(router_core)
 
 
 
-router.include_router(router_testing)
+#router.include_router(router_testing)
 router.include_router(router_get_filters)
 router.include_router(router_get_result)
 router.include_router(router_admin_tree)
 router.include_router(router_edit_form)
 router.include_router(router_one_to_m)
 router.include_router(router_memo,prefix='/memo')
+router.include_router(router_const,prefix='/const')
 
 router.include_router(router_extend)
 router.include_router(router_documentation,prefix='/documentation')
@@ -54,7 +56,7 @@ router.include_router(router_news,prefix='/NewsList')
 
 
 router.include_router(router_autocomplete,prefix='/autocomplete')
-router.include_router(router_anna,prefix='/anna')
+router.include_router(router_assistant,prefix='/assist-ant')
 
 
 

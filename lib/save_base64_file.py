@@ -1,6 +1,5 @@
 import re, os
-#from base64 import decodestring
-import base64
+from base64 import b64encode, b64decode
 from lib.core import exists_arg, del_file_and_resizes,get_name_and_ext, random_filename
 #from lib.resize import resize_all
 
@@ -25,10 +24,13 @@ def save_base64_file(**arg):
 
             fullname=arg['filedir']+'/'+filename
             mime=rez[1]
-            base64=str.encode(rez[2])
+            #print('res2:',rez[2])
+            #base64=str.encode(rez[2])
+            #rez[2]=b64decode(arg['src'])
+            bytes = b64decode(rez[2], validate=True)
+
             fh = open(fullname, "wb")
-            #fh.write(decodestring(base64))
-            
+            fh.write(bytes)
             fh.close()
             return filename
 
@@ -47,7 +49,8 @@ def save_base64_file(**arg):
           
           if not os.path.isdir(field['filedir']):
             try:
-              os.mkdir(field['filedir'])
+              print('mkdir: ',field['filedir'])
+              os.makedirs(field['filedir'], exist_ok=True)
             except FileExistsError:
               errors.append(f'не удалось создать директорию {field["filedir"]}')
 
@@ -58,9 +61,11 @@ def save_base64_file(**arg):
           if rez:
             # Сохраняем файл
             mime=rez[1]
-            base64=str.encode(rez[2])
+            #base64=str.encode(rez[2])
+            bytes = b64decode(rez[2], validate=True)
+            print('save to:',fullname)
             fh = open(fullname, "wb")
-            #fh.write(decodestring(base64))
+            fh.write(bytes)
             fh.close()
 
 
@@ -107,8 +112,6 @@ def save_base64_file(**arg):
             values=[filename,arg['id']],
           )
 
-  
-    
 
 
 def b64_split(src):
