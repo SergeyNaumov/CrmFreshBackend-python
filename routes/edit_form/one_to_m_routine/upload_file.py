@@ -2,6 +2,7 @@ from lib.core import get_child_field, exists_arg, get_ext, random_filename
 from lib.get_1_to_m_data import get_1_to_m_data
 from lib.resize import resize_one
 import shutil,os
+import re
 
 def upload_file(form,field,arg):
   child_field_name=arg['child_field_name']
@@ -13,7 +14,7 @@ def upload_file(form,field,arg):
   #if form.success():
 
   
-
+  
 
   # сохраняем файл
   if form.success():
@@ -56,7 +57,8 @@ def upload_file(form,field,arg):
           composite_resize=exists_arg('composite_resize',r),
           quality=exists_arg('quality',r),
         )
-
+    
+    
     
     if arg['one_to_m_id']:
 
@@ -113,13 +115,32 @@ def upload_file(form,field,arg):
             child_field_name:db_value
           }
         )
-
+        
+           
+           
+           
         value={
           field['foreign_key']:form.id,
           field['table_id']:id,
           child_field['name']:filename,
           child_field['name']+'_filename':filename,
         }
+
+        
+        if filename and exists_arg('filedir',child_field) and exists_arg('preview',child_field) and exists_arg('resize',child_field) and len(child_field['resize']):
+            resize_for_preview=None
+            for r in child_field['resize']:
+              if r['size'] == child_field['preview']:
+                resize_for_preview=r['file']
+            if not resize_for_preview:
+               resize_for_preview=child_field['resize'][0]['file']
+            
+            fdir=re.sub(r'^\.\/','/',child_field['filedir'])
+
+            name,ext=filename.split('.')
+
+            value['preview_img']=fdir +'/'+resize_for_preview.replace('<%filename_without_ext%>',name).replace('<%ext%>',ext)
+            
 
 
 

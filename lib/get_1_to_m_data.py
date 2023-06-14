@@ -22,23 +22,27 @@ def normalize_value_row(form,field,d):
           else:
             filename=d_cname
           
-
+          #print('filedir:',filedir,"\nfilename:",filename)
+          #print(f'preview: {cf["preview"]}\n\n')
+          #print(f'resize: {cf["resize"]}\n\n')
           if filedir and filename:  # для превью на фронте
-            print('filedir: ',filedir)
+            #print('filedir: ',filedir)
             resize_for_preview=None
             if exists_arg('preview',cf) and exists_arg('resize',cf) and len(cf['resize'])>0:
               for r in cf['resize']:
-                 if r['size']==cf['preview']:
-                    resize_for_preview=r
+                #print('r:',r['size'])
+                if r['size']==cf['preview']:
+                  #print('eq!')
+                  resize_for_preview=r
               
               if resize_for_preview:
+                #print('resize_for_preview:',resize_for_preview)
                 name,ext=filename.split('.')
-                tmp_file=r['file'].replace('<%filename_without_ext%>',name).replace('<%ext%>',ext)
+                tmp_file=resize_for_preview['file'].replace('<%filename_without_ext%>',name).replace('<%ext%>',ext)
                 d['preview_img']=fdir+'/'+tmp_file  
 
             else:
               d['preview_img']=fdir+'/'+filename             
-               
           d[c_name+'_filename']=filename
       if exists_arg('slide_code',cf):
         d[c_name]=form.run_event('slide_code',{'field':cf,'data':d})
@@ -56,7 +60,7 @@ def get_1_to_m_data(form,f):
   for cf in f['fields']:
       if cf['type'] == 'select_from_table':
           cf['values']=get_values_for_select_from_table(form,cf)
-
+      
   headers=[]
   for c in f['fields']:
       
@@ -99,9 +103,9 @@ def get_1_to_m_data(form,f):
       
       #element_fields={}
       for d in data:
-        #print('D:',d)
-        
+        #print('f:',f,"\nD:",d)
         normalize_value_row(form,f,d)
+        
         f['values'].append(d)
   else:
     f['values']=[]
