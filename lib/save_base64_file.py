@@ -5,6 +5,32 @@ from lib.core import exists_arg, del_file_and_resizes,get_name_and_ext, random_f
 
 def save_base64_file(**arg):
 
+    # убиваем существующий файл, если он есть:
+    if exists_arg('field',arg) and exists_arg('form',arg) and exists_arg('id',arg):
+      form=arg['form']
+      field=arg['field']
+      #print('field:',field)
+      exists=form.db.query(
+        query=f'SELECT {field["name"]} from {form.work_table} where {form.work_table_id}={arg["id"]}',
+        onevalue=1
+
+      )
+      if exists:
+
+        filename=''
+        exists_values=exists.split(';')
+        if len(exists_values)>1:
+          filename=exists_values[0]
+        else:
+          print('NOT KEEP ORIG!')
+          filename=exists
+
+        print('delete file:', f'{field["filedir"]}/{filename}')
+        del_file_and_resizes(
+          field=field,
+          value=filename,
+          name=field['name']
+        )
 
     if exists_arg('filedir',arg) and exists_arg('src',arg) and exists_arg('orig_filename',arg):
           
@@ -38,7 +64,6 @@ def save_base64_file(**arg):
           form=arg['form']
           field=arg['field']
           ext=arg['ext']
-          
           to_save_field=''
           filename=arg['filename']
           
@@ -50,8 +75,7 @@ def save_base64_file(**arg):
           
           if not os.path.isdir(field['filedir']):
             try:
-              #print('mkdir: ',field['filedir'])
-              os.makedirs(field['filedir'], exist_ok=True)
+              os.mkdir(field['filedir'])
             except FileExistsError:
               errors.append(f'не удалось создать директорию {field["filedir"]}')
 
@@ -76,25 +100,25 @@ def save_base64_file(**arg):
             return 
 
           # удаляем старый
-          if not exists_arg('table',arg) or not exists_arg('id',arg):
-            return
+          #if not exists_arg('table',arg) or not exists_arg('id',arg):
+          #  return
 
 
 
-          old_photo=form.db.query(
-            query=f'SELECT {field["name"]} from {arg["table"]} WHERE id=%s',
-            values=[arg['id']],
-            onevalue=1,
-            errors=form.errors
-          )
+          # old_photo=form.db.query(
+          #   query=f'SELECT {field["name"]} from {arg["table"]} WHERE {form.work_table_id}=%s',
+          #   values=[arg['id']],
+          #   onevalue=1,
+          #   errors=form.errors
+          # )
           #print()
           #print('OLD_PHOTO: ',old_photo)
           # удаляем старое фото и все его ресайзы
 
-          del_file_and_resizes(
-            field=field,
-            value=old_photo
-          )
+          #del_file_and_resizes(
+          #  field=field,
+          #  value=old_photo
+          #)
 
 
           # сохраняем полное имя в базе или нет?
@@ -103,12 +127,12 @@ def save_base64_file(**arg):
 
           elif exists_arg('keep_orig_filename_in_field',field):
             form.db.query(
-              query=f'UPDATE {arg["table"]} SET {field["name"]}=%s, {field["keep_orig_filename_in_field"]}=%s where id=%s',
+              query=f'UPDATE {arg["table"]} SET {field["name"]}=%s, {field["keep_orig_filename_in_field"]}=%s where {form.work_table_id}=%s',
               values=[filename,arg['orig_name'],arg['id']]
             )
 
           form.db.query(
-            query=f'UPDATE {arg["table"]} SET {field["name"]}=%s where id=%s',
+            query=f'UPDATE {arg["table"]} SET {field["name"]}=%s where {form.work_table_id}=%s',
             errors=form.errors,
             values=[filename,arg['id']],
           )

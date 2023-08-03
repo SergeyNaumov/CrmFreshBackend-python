@@ -1,7 +1,6 @@
 from lib.resize import resize_one
 from lib.core import exists_arg, get_ext, random_filename
-from lib.save_base64_file import save_base64_file
-from lib.save_url_file import save_url_file
+from lib.save_base64_file import save_base64_file, b64_split
 
 def upload_file(form):
     R=form.R
@@ -20,27 +19,20 @@ def upload_file(form):
     if not value:
       return {'success':0,'errors':['не указано value']}
 
-    extern_link=exists_arg('external_link',value)
-    orig_name=''
 
-    if extern_link:
-      orig_name=extern_link.split('/')[-1]
-      ext = get_ext(orig_name)
-
+    orig_name=exists_arg('orig_name',value)
+    if not orig_name:
+      #form.errors.append('не указано orig_name')
+      return {'success':0,'errors':['не указано orig_name']}
     else:
-      orig_name=exists_arg('orig_name',value)
-
-      if not orig_name:
-        return {'success':0,'errors':['не указано orig_name']}
-      else:
-        ext = get_ext(orig_name)
-        if not ext: 
-          form.errors.append(f'не удалось определить расщирение. orig_name: {orig_name}')
+      ext = get_ext(orig_name)
+      if not ext: 
+        form.errors.append(f'не удалось определить расщирение. orig_name: {orig_name}')
 
 
-        src=exists_arg('src',value)
-        if not src:
-          return {'success':0,'errors':['нет value.src']}
+    src=exists_arg('src',value)
+    if not src:
+      return {'success':0,'errors':['нет value.src']}
 
     
     if not form.success():
@@ -51,33 +43,18 @@ def upload_file(form):
     filename_for_out=filename_without_ext+'.'+ext
     crops=[]
     #print('FORM:',form.fields)
-
+    if value:
+      orig_name=value['orig_name']
       
       
-    if 'crops' in value:
-      crops=value['crops']
+      if 'crops' in value:
+        crops=value['crops']
       
       #b64=b64_split(src)
 
 
-    if extern_link:
-        if not ext: return {'success':False,'errors':['не удалось определить расширение файла']}
 
-        save_url_file(
-           form=form,
-           url=extern_link,
-           field=field,
-           table=form.work_table,
-           id=form.id,
-           ext=ext,
-           orig_name=orig_name,
-           filename=filename_without_ext+'.'+ext
-        )
-        return {'full_name':fullname}
-
-
-    
-    elif src and not len(form.errors):
+      if src and not len(form.errors):
         save_base64_file(
           form=form,
           src=src,

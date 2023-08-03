@@ -157,11 +157,13 @@ async def startpage():
   if manager and ('password' in manager): del manager['password']
 
 
-
+  left_menu_controller='/left-menu'
+  if exists_arg('left-menu',s.config['controllers']):
+    left_menu_controller=s.config['controllers']['left_menu']
   response={
     'title':config['title'],
     'copyright':config['copyright'].replace('{{cur_year}}',CY),
-    'left_menu_controller':s.config['controllers']['left_menu'],
+    'left_menu_controller':left_menu_controller,
     'errors':errors,
     'success': not len(errors),
     'manager':manager

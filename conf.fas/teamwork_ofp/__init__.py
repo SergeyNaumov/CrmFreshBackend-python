@@ -218,6 +218,7 @@ form={
           'description':'Файл',
           'name':'attach',
           'type':'file',
+          #'keep_orig_filename':True,
           'filedir':'./files/teamwork_ofp',
           
           # after_save=>sub{

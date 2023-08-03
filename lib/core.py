@@ -61,8 +61,8 @@ def get_func(f):
 def date_to_rus(d):
   d=str(d)
   rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
-  
-  if rez[5]:
+  print(f'res: {rez}')
+  if rez and rez[5]:
     return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
   elif rez:
     return f"{rez[4]}.{rez[3]}.{rez[2]}"
@@ -87,7 +87,7 @@ def create_fields_hash(form):
     if 'name' in f:
       form.fields_hash[f['name']]=f
     else:
-      form.errors.append(f'Отсутствует name в поле: {f}')
+      form.errors.append('Отсутствует name в поле: ',f)
 
 
 # Возвращает расширение файла
@@ -142,11 +142,12 @@ def del_file_and_resizes(**arg):
   field=arg['field']
   value=arg['value']
   name=field['name']  
-  
+  print('VALUE:',value)
   if not value:
     return
   
   filename_without_ext,ext=get_name_and_ext(value)
+  print('filename_without_ext:',filename_without_ext, 'ext:',ext)
   if ext:
       # удаляем ресайзы
       if exists_arg('resize',field) and len(field['resize']):
@@ -159,12 +160,15 @@ def del_file_and_resizes(**arg):
           file_for_del=field['filedir']+'/'+f
           #print('rm: ',file_for_del)
           if os.path.isfile(file_for_del):
+            print('remove:',file_for_del)
             os.remove(file_for_del)
 
       # удаляем основной файл
+
       file_for_del=field['filedir']+'/'+value
+      print('del main file:',file_for_del)
       if os.path.isfile(file_for_del):
         os.remove(file_for_del)
-        #print('del main file:',file_for_del)
+        
 
 
