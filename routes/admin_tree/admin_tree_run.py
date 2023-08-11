@@ -54,14 +54,13 @@ def get_branch(**arg):
       item=form.db.query(
         query=query,
         onerow=1,
-        debug=1,
         errors=form.errors,
       )
       
 
       header=form.default_find_filter or 'header'
       if item:
-        for k in item.keys(): header=header.replace('<%'+k+'%>',str(item[k]))
+          for k in item.keys(): header=header.replace('<%'+k+'%>',str(item[k]))
 
       branch['path'].append({'header':header,'id':id})
   
