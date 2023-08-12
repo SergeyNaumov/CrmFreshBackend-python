@@ -1,7 +1,7 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 import datetime as dt
-
+from lib.core import date_to_rus
 
 router = APIRouter()
 
@@ -42,6 +42,8 @@ async def get_memo(config:str, field_name:str,id:int): #
       values=[form.id],
       errors=form.errors
     )
+    for d in data:
+      d['date']=date_to_rus(d['date'])
 
     response={
       'success':True,
