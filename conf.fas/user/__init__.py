@@ -199,8 +199,8 @@ form={
             'reverse':1,
             'memo_table_alias':'memo',
             'auth_table_alias':'m_memo',
-            'make_delete':'1',
-            'make_edit':'1',
+            #'make_delete':False,
+            'make_edit':False,
             'tab':'sale'
         },
         {
