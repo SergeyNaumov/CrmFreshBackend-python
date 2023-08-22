@@ -31,17 +31,19 @@ async def autocomplete(config:str,R: dict):
   
   elif term:
     #print('NAME',name)
+    #print('TERM:',term)
     # используем get_name_and_ext для получения name и subname 
     name,sub_name=get_name_and_ext(name)
-    #print('name:',name,'subname',subname)
+    field=form.get_field(name)
+
     if sub_name:
-      field=form.get_field(name)
+      
       for f in field['fields']:
         if f['name'] == sub_name:
           field=f
-    else:
+    #else:
 
-      field=form.get_field(name)
+    #  field=form.get_field(name)
       
 
   else: # нет поиска по строке, вывозим по depend_where (зависимый фильтр)
@@ -98,7 +100,7 @@ def get_list(**arg):
     element['orig_type']=element['type']
 
   T=element['orig_type'] 
-
+  #print('T:',T)
   if T=='multiconnect':
     return form.db.query(
       query=f'''
@@ -124,6 +126,7 @@ def get_list(**arg):
 
   if T in ['select_from_table','filter_extend_select_from_table']:
     
+
     if not exists_arg('out_header',element): 
       element['out_header'] = element['header_field']
 
@@ -154,6 +157,8 @@ def get_list(**arg):
           if where: where+=' OR '
           where+=element['value_field']+' IN ('+','.join(values_array)+')'
 
+    
+
     if T=='filter_extend_select_from_table' and exists_arg('filter_table',element):
       element['table']=element['filter_table']
 
@@ -165,10 +170,11 @@ def get_list(**arg):
 
     if exists_arg('search_query',element):
       
-      element['search_query']=element['search_query'].replace('<%like%>',like_val).replace('<%v%>',like_val)
+      element['search_query']=element['search_query'].replace('<%like%>',like_val).replace('<%v%>','%s')
     
 
     return form.db.query(
+
       query=element['search_query'],
       values=like_values
     );

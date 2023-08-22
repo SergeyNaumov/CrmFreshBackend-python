@@ -109,9 +109,13 @@ def load_form_from_dir(confdir,conflib_dir, arg):
             break
 
           if f['name'] in events:
-            for postfix in ['before_code','permissions','filter_code','code']:
-              if postfix in events[f['name']]:
-                f[postfix]=events[f['name']][postfix]
+            # все возможные события
+            for event_name in (
+              'before_code','permissions','filter_code','code','slide_code','after_save_code','after_insert_code','after_update_code',
+              'before_save_code','before_update_code','before_delete_code','after_delete_code'
+            ):
+              if event_name in events[f['name']]:
+                f[event_name]=events[f['name']][event_name]
 
       except SyntaxError as e:
           errors.append(f"Ошибка при загрузке конфига {arg['config']}/events_for_fields.py: {e}")
