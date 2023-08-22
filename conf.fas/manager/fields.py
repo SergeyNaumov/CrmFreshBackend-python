@@ -19,7 +19,7 @@ def get_fields():
       'read_only':1,
       'unique':1,
       'regexp_rules':[
-        '/.{5}/','длина логина должна быть не менее 5 символов',
+        '/.{3}/','длина логина должна быть не менее 3 символов',
         #'/^[a-zA-Z0-9\.\-_@\/]+$/','только символы: a..z,A..Z, 0-9, _, -, @, .'
       ],
       'frontend':{'ajax':{'name':'login','timeout':600}},
@@ -49,7 +49,7 @@ def get_fields():
       'type':'text',
       'name':'phone',
       'tab':'main',
-      'read_only':1,
+      #'read_only':1,
       # 'regexp_rules':[
       #     '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
       # ],
@@ -133,12 +133,12 @@ def get_fields():
       'relation_save_table_id_relation':'permissions_id',
       'tab':'permissions',
       #'not_order':1,
-      'read_only':1
+      #'read_only':1
     },
     {
        'name':'email',
        'description':'Email',
-       'read_only':1,
+       #'read_only':1,
        'type':'text',
         'replace':[
             ['\s+','']

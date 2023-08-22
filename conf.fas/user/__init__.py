@@ -14,6 +14,25 @@ def otk_before_code(form,field):
 def dt2_before_code(form,field):
     if exists_arg('admin_dt2', form.manager['permissions']):
         field['read_only']=False
+def kladr_after_search(data):
+    i=0
+    list=[]
+    if not data:
+        return list
+    
+    for d in data:
+        res=[]
+        for d2 in d['parents']:
+
+            if d2['name']=='Москва' and d2['contentType']!='city':
+                continue
+            res.append,f'{d2["typeShort"]} {d2["name"]}'
+
+
+        res.append(f'{d["typeShort"]} {d["name"]}')
+        h=', '.join(res)
+        list.append({'header':h})
+    return list
 
 form={
     'wide_form':True,
@@ -70,6 +89,10 @@ form={
         {
             'description':'Адрес',
             'name':'address',
+            'subtype':'kladr',
+            'kladr':{
+                #'after_search':kladr_after_search
+            },
             'type':'text',
             'tab':'main'
         },
@@ -96,7 +119,8 @@ form={
             ],
             'replace_rules':[
                 '/[^0-9]/', ''
-            ]
+            ],
+            #'subtype':'qr_call',
         },
         {
             'description':'Зарегистрирована',
@@ -126,15 +150,31 @@ form={
                 },
                 {
                     'description':'Телефон',
-                    'add_description':'В формате +7XXXXXXXXXX, например: +74951234567',
+                    #'add_description':'В формате +7XXXXXXXXXX, например: +74951234567',
                     'name':'phone',
                     'type':'text',
+                    'subtype':'qr_call',
                     'replace_rules':[
                         '/^8/','+7',
+                        '/^92/', '+792',
+                        '/;/g',',',
+                        
+                        '/,$/',', ',
+                        '/\s+,/', ', ',
+                        '/\s+,/g', ',',
+                        '/[^\s,\d\+]/g','',
+                        '/, 8/',', +7',
+                        #'\s\s+',' ',
+                        #'/^\s+/','',
+                        #'/\s+,/',', ',
+                        
+                        
+
                     ],
                     'regexp_rules':[
-                        '/^(\+7[0-9]{10}(,\+7[0-9]{10})+)*)?$/','Номер телефона в формате: +7XXXXXXXXXX, например: +74951234567',
-                    ]
+                        '/^(\+\d{6,12})(,\s\+\d{6,12})*$/','Номер должен быть в формате: +[код]XXXXXXXXXX, например: +74951234567',
+                       
+                    ],
                 },
                 {
                     'description':'Должность',
@@ -183,7 +223,7 @@ form={
         },
         { # Memo
             # Комментарий 
-            'description':'Комментарий',
+            'description':'Состояние',
             'name':'memo',
             'type':'memo',
             'memo_table':'user_memo',
@@ -199,8 +239,14 @@ form={
             'reverse':1,
             'memo_table_alias':'memo',
             'auth_table_alias':'m_memo',
-            #'make_delete':False,
+            'make_delete':False,
             'make_edit':False,
+            'tab':'sale'
+        },
+        {
+            'description':'Состояние2',
+            'name':'state2',
+            'type':'textarea',
             'tab':'sale'
         },
         {

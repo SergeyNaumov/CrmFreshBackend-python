@@ -52,7 +52,9 @@ def permissions(form):
 	form.is_manager_from=False
 
 	get_old_values(form)
-	#form.pre({'ov':form.ov})
+	#form.pre({'ov':form.ov['firm']})
+	if form.ov:
+		form.title=f"СР: {form.ov['firm']}"
 	form.user_id=None
 
 

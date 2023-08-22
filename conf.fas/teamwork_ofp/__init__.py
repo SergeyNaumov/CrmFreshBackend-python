@@ -1,6 +1,7 @@
 from lib.core import exists_arg
 from lib.CRM.form import Form
 #from .fields import get_fields
+from .ajax import ajax
 
 from .code import *
 form={
@@ -9,7 +10,7 @@ form={
     'work_table':'teamwork_ofp',
     'work_table_id':'teamwork_ofp_id',
     'make_delete':0,
-    #'ajax':ajax,
+    'ajax':ajax,
     'is_admin':False,
     'QUERY_SEARCH_TABLES':[
       {'t':'teamwork_ofp','a':'wt'},
@@ -65,12 +66,7 @@ form={
             'name':'firm',
             #regexp=>'.+',
         },
-        {
-            'description':'Карточка продаж',
-            'name':'link_to_card',
-            'type':'code',
-            'code':link_to_card_code
-        },
+
         { # формируем ссылку на реестровый номер (доделать!!!)
           'description':'Реестровый номер',
           'type':'text',
@@ -78,7 +74,9 @@ form={
           'replace_rules':[
                 '/^\s+/', '',
                 '/\s+$/', '',
-           ]
+           ],
+           'frontend':{'ajax':{'name':'regnumber','timeout':600}},
+
         },
         {
           'description':'Статус победы',
@@ -171,6 +169,7 @@ form={
 
             ],
             'type':'select_values', 
+            'frontend':{'ajax':{'name':'product','timeout':600}},
         },
         {
           'description':'Дата и время заседания',
@@ -199,7 +198,14 @@ form={
           'table':'city',
           'tablename':'city',
           'header_field':'name',
-          'search_query':"SELECT c.city_id v, concat(r.header,' -> ', c.name ) d FROM city c join region r ON (r.region_id=c.region_id) where c.name like <%v%>",
+          'search_query':"""
+              SELECT
+                c.city_id v, concat(r.header,' -> ', c.name ) d
+              FROM
+                city c
+                join region r ON (r.region_id=c.region_id)
+                where c.name like <%v%>
+          """,
           'value_field':'city_id',     
         },
        {
@@ -262,17 +268,111 @@ form={
             'order':'name',
             'value_field':'id',
             'tablename':'mf',
-            'regexp_rules':[
-                '/^\d+$/','выберите менеджера'
-            ],
-            'before_code':manager_from_before_code,            
+            #'regexp_rules':[
+            #    '/^\d+$/','выберите менеджера'
+            #],
+            #'before_code':manager_from_before_code,            
             'read_only':True
         },
         {
-            'description':'Руководитель группы',
-            'type':'code',
-            'name':'group_owner',
+            'description':'Менеджер ОФП',
+            'type':'select_from_table',
+            'table':'manager',
+            'name':'manager_to',
+            'header_field':'name',
+            'order':'name',
+            'tablename':'mt',
+            'value_field':'id',
+            # before_code=>sub{
+            #   my $e=shift;
+            #   #pre($form->{manager});
+            #   if($form->{manager}->{login}=~m/^(naumova|sheglova)$/){
+            #     $e->{readonly}=0;
+            #     return 
+            #   }
+            #   if($form->{service_access}->{9} && $form->{old_values}->{product}=~m/^(9|14|15)$/){
+            #     $e->{readonly}=0;
+            #   }
+            #   # task: 218597
+            #   #pre($form->{access_kostunin});
+              
+            #   if($form->{managers_to_list} && ref($form->{managers_to_list}) eq 'ARRAY' && ($e->{value} eq $form->{manager}->{id} || $e->{value} ~~ $form->{managers_to_list}) ){
+            #     $e->{readonly}=0;
+            #     $e->{where}='id in ('.join(',',@{$form->{managers_to_list}}).')'
+
+
+            #   }
+            #   if($form->{access_kostunin}){
+            #     $e->{readonly}=0;
+            #   }
+            # },
+            'where':'id IN (select manager_id from manager_permissions mp where permissions_id=71) and id != 172',
         },
+        {
+            'description':'Менеджер ОФП2',
+            'type':'select_from_table',
+            'table':'manager',
+            'name':'manager_to2',
+            'header_field':'name',
+            'order':'name',
+            'tablename':'mt2',
+            'value_field':'id',
+            # before_code=>sub{
+            #   my $e=shift;
+            #   if($form->{manager}->{login}=~m/^(naumova|sheglova)$/){
+            #     $e->{readonly}=0;
+            #     return 
+            #   }
+            #   if(  $form->{manager}->{login}=~m{^(sed|akulov|zia|strogov|pan)$}){
+            #       $e->{readonly}=0;
+            #   }
+            #   my $v2=$form->{old_values}->{manager_to};
+            #   if($form->{managers_to_list} && ref($form->{managers_to_list}) eq 'ARRAY' && ($v2 eq $form->{manager}->{id} || $v2 ~~ $form->{managers_to_list} ) ){
+            #     $e->{readonly}=0;
+            #     $e->{where}='id in ('.join(',',@{$form->{managers_to_list}}).')'
+            #   }
+            #   # task: 218597
+            #   if($form->{access_kostunin}){
+            #     $e->{readonly}=0;
+            #   }
+              
+            # },
+            'where':'id in (select manager_id from manager_permissions mp where permissions_id=71) and id != 172',
+            #regexp=>'^(\d+|)$',
+            'readonly':1,
+            # code=>sub{
+            #   my $e=shift;
+            #   return qq{
+            #     $e->{field}<br>
+            #     <small>
+            #       <a href="mailto:$form->{old_values}->{manager_to2_email}">$form->{old_values}->{manager_to2_email}</a> ;
+            #       $form->{old_values}->{manager_to2_phone}
+            #     </small>
+            #   }
+            # },
+            
+        },
+        # {
+        #   'description':'Комментарий',
+        #   'name':'comment1',
+        #   'type':'memo',
+        #   'memo_table':'teamwork_ofp_memo',
+        #   'memo_table_id':'id',
+        #   'memo_table_comment':'comment',
+        #   'memo_table_auth_id':'manager_id',
+        #   'memo_table_registered':'registered',
+        #   'memo_table_foreign_key':'teamwork_ofp_id',
+        #   'auth_table':'manager',
+        #   'auth_login_field':'login',
+        #   'auth_id_field':'id',
+        #   'auth_name_field':'name',
+        #   'reverse':1,
+        #   'memo_table_alias':'memo',
+        #   'auth_table_alias':'m_memo',
+        #   'make_delete':False,
+        #   'make_edit':False,
+        #   'tab':'sale'
+        # }
     ]
 }
 

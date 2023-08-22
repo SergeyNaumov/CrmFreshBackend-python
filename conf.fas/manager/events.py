@@ -14,7 +14,11 @@ def events_permissions(form):
       form.is_admin=0
       form.make_delete=0
 
-    if form.manager['login'] != 'admin':
+    if form.manager['login'] in ('akulov','admin'):
+      form.read_only=0
+      form.make_delete=True
+
+    if not form.manager['login'] in ('akulov','admin'):
       form.errors.append('доступ запрещён!')
       #return 
 
@@ -30,15 +34,7 @@ def events_permissions(form):
       form.ov=ov
       form.title='Учётная запись: '+form.ov['name']
       
-      #  {'v':1,'d':'Сотрудник компании Анна'},
-      #  {'v':2,'d':'Представитель юридического лица'},
-      #  {'v':3,'d':'Представитель аптеки'},
-      
-      # Сотрудник компании "Анна", может изменять только суперадмин
-      #form.pre(form.manager)
-      # Сотрудник компании Анна(1) может вносить изменения в аккаунт (2,3)
-      if (ov['type']==2 or ov['type']==3) and form.manager['type']==1: 
-        form.read_only=0 # -- запретили редактировать всем
+
 
       
 
