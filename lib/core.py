@@ -61,7 +61,6 @@ def get_func(f):
 def date_to_rus(d):
   d=str(d)
   rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
-  print(f'res: {rez}')
   if rez and rez[5]:
     return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
   elif rez:
