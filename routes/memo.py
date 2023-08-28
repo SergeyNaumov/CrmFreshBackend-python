@@ -30,7 +30,7 @@ async def get_memo(config:str, field_name:str,id:int): #
       query=f"""
         SELECT
           memo.{field['memo_table_id']} id, user.{field['auth_id_field']} user_id,
-          user.{field['auth_name_field']} user_name, memo.body message, memo.{field['memo_table_registered']} date
+          user.{field['auth_name_field']} user_name, memo.{field['memo_table_comment']} message, memo.{field['memo_table_registered']} date
         FROM
           {field['memo_table']} memo
           LEFT JOIN {field['auth_table']} user ON (memo.{field['memo_table_auth_id']} = user.{field['auth_id_field']} )

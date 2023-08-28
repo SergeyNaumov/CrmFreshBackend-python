@@ -75,13 +75,13 @@ form={
         },
         {
           'name': 'permissions',
-          'description ': 'Права доступа',
+          'description': 'Права доступа',
           'type': '1_to_m',
           'table': 'manager_menu_permissions',
           'table_id': 'id',
           'foreign_key': 'menu_id',
           'tab':'advanced',
-          'fields ':
+          'fields':
           [
             {
               'description':'Право доступа',

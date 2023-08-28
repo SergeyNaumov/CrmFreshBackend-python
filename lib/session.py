@@ -281,7 +281,15 @@ def get_permissions_for(form,login):
   if manager['password']: del manager['password']
   
   permissions_list=form.db.query(
-    query='SELECT p.id, p.pname from permissions p, manager_permissions mp where p.id = mp.permissions_id and mp.manager_id = %s',
+    query='''
+      SELECT 
+        p.pname, mp.permissions_id id
+      FROM 
+        permissions p
+        LEFT JOIN manager_permissions mp ON p.id = mp.permissions_id and mp.manager_id = %s
+      order by p.pname
+    ''',
+    #debug=1,
     values=[manager['id']]
   );
   manager['permissions']={};

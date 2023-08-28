@@ -18,7 +18,8 @@ def get_values(form,field):
       values=[form.id],
       errors=form.errors
     )
-    print('ERRORS:',form.errors)
+    #print('res:',res)
+    #print('ERRORS:',form.errors)
 
     return res
   else:

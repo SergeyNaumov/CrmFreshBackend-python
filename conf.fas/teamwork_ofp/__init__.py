@@ -22,7 +22,7 @@ form={
       {'t':'manager','a':'m_oso','l':'wt.manager_oso=m_oso.id','lj':1,'for_fields':['manager_oso']},
       {'t':'manager_group','a':'mfg','l':'mf.group_id=mfg.id','lj':1,'for_fields':['manager_from','managers_groups_name']},
       {'t':'city','a':'city','l':'city.city_id=wt.city_id','lj':1,'for_fields':['city_id']},
-      {'t':'teamwork_ofp_memo','a':'memo','l':'memo.teamwork_ofp_id_id=wt.teamwork_ofp_id','for_fields':['comment1']},
+      {'t':'teamwork_ofp_memo','a':'memo','l':'memo.teamwork_ofp_id=wt.teamwork_ofp_id','for_fields':['comment1']},
       {'t':'manager','a':'m_memo','l':'m_memo.id=memo.manager_id','for_fields':['comment1']},
       #{'t':'users_fs_memo_fp','a':'memo4','l':'memo4.users_fs_id=wt.user_id','for_fields':['comment4']},
       #{'t':'manager','a':'m_memo4','l':'m_memo4.id=memo4.manager_id','for_fields':['comment4']},
@@ -352,27 +352,27 @@ form={
             # },
             
         },
-        # {
-        #   'description':'Комментарий',
-        #   'name':'comment1',
-        #   'type':'memo',
-        #   'memo_table':'teamwork_ofp_memo',
-        #   'memo_table_id':'id',
-        #   'memo_table_comment':'comment',
-        #   'memo_table_auth_id':'manager_id',
-        #   'memo_table_registered':'registered',
-        #   'memo_table_foreign_key':'teamwork_ofp_id',
-        #   'auth_table':'manager',
-        #   'auth_login_field':'login',
-        #   'auth_id_field':'id',
-        #   'auth_name_field':'name',
-        #   'reverse':1,
-        #   'memo_table_alias':'memo',
-        #   'auth_table_alias':'m_memo',
-        #   'make_delete':False,
-        #   'make_edit':False,
-        #   'tab':'sale'
-        # }
+        {
+          'description':'Комментарии',
+          'name':'comment1',
+          'type':'memo',
+          'memo_table':'teamwork_ofp_memo',
+          'memo_table_id':'id',
+          'memo_table_comment':'comment',
+          'memo_table_auth_id':'manager_id',
+          'memo_table_registered':'registered',
+          'memo_table_foreign_key':'teamwork_ofp_id',
+          'auth_table':'manager',
+          'auth_login_field':'login',
+          'auth_id_field':'id',
+          'auth_name_field':'name',
+          'reverse':1,
+          'memo_table_alias':'memo',
+          'auth_table_alias':'m_memo',
+          'make_delete':False,
+          'make_edit':False,
+          
+        }
     ]
 }
 

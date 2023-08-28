@@ -101,7 +101,7 @@ def save_form(form,arg):
 
     value=form.new_values[name]
     if f['type']=='multiconnect':
-      print('!!NEW_VALUES:',value)
+      #print('!!NEW_VALUES:',value)
       if isinstance(value,list):
         multiconnect_save(form,f,value)
     elif f['type']=='in_ext_url':
