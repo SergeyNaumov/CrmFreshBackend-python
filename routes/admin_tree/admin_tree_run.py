@@ -54,13 +54,14 @@ def get_branch(**arg):
       item=form.db.query(
         query=query,
         onerow=1,
+        debug=1,
         errors=form.errors,
       )
       
 
       header=form.default_find_filter or 'header'
       if item:
-          for k in item.keys(): header=header.replace('<%'+k+'%>',str(item[k]))
+        for k in item.keys(): header=header.replace('<%'+k+'%>',str(item[k]))
 
       branch['path'].append({'header':header,'id':id})
   
@@ -181,7 +182,6 @@ def admin_tree_run(**arg):
               onevalue=1
             )
             cur_path+='/'+parent_id
-          
           if form.sort:
             qw=f'SELECT max({form.sort_field}) from {form.work_table}'
             if form.tree_use:
@@ -190,12 +190,7 @@ def admin_tree_run(**arg):
                 qw+=' WHERE parent_id='+parent_id
               else:
                 qw+=' WHERE parent_id is null'
-
-              if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value'):
-                qw+=f' AND {form.foreign_key}={form.foreign_key_value}'
             
-            
-
             cur_sort=form.db.query(query=qw,onevalue=1)
             
             if not cur_sort:
@@ -340,7 +335,19 @@ def admin_tree_run(**arg):
 
     if len(obj_list):
       for id in obj_list:
-        data_result[id]=get_branch(form=form,get_childs=0,parent_id=id)
+        sort=''
+        order=''
+
+        if form.sort:
+          sort=f'{form.sort_field} sort'
+          order=f'ORDER BY {form.sort_field}'
+
+        #query=f'select {form.work_table_id} id,{form.header_field} header {sort} from {form.work_table} where parent_id={id} {order}'
+
+        data_result[id]=form.db.query(
+          #query=f'SELECT id,header,sort from {form.work_table} where parent_id={id} order by sort'
+          query=query
+        )#get_branch(form=form,get_childs=0,parent_id=id)
     return {'success':1,'data':data_result}
 
 
