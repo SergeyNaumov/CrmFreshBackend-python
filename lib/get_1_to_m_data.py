@@ -53,7 +53,7 @@ def normalize_value_row(form,field,d):
 
 
 
-def get_1_to_m_data(form,f):
+def get_1_to_m_data(form,f,id=None):
   #print('f:',f)
   if not exists_arg('fields',f): f['fields']=[]
 
@@ -87,7 +87,8 @@ def get_1_to_m_data(form,f):
       
       
       if exists_arg('sort',f): order=exists_arg('sort_field',f) or 'sort'
-      
+      if id:
+        where+=f' AND {f["table_id"]}={id}'
     
       #query=f'SELECT * from {f["table"]} {where} {order'
       data=form.db.get(
@@ -95,7 +96,6 @@ def get_1_to_m_data(form,f):
         where=where,
         order=order,
         errors=form.errors,
-        
         log=form.log,
       )
 

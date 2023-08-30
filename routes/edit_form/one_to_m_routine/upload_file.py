@@ -91,7 +91,9 @@ def upload_file(form,field,arg):
           }
         )
         # Сделать ресайз!
-
+        if form.success():
+          form.run_event('after_update_code',{'field':field})
+          form.run_event('after_save_code',{'field':field})
         get_1_to_m_data(form,field)
         return {
           'success':form.success(),
@@ -114,14 +116,19 @@ def upload_file(form,field,arg):
           }
         )
 
-        value={
-          field['foreign_key']:form.id,
-          field['table_id']:id,
-          child_field['name']:filename,
-          child_field['name']+'_filename':filename,
-        }
+        # value={
+        #   field['foreign_key']:form.id,
+        #   field['table_id']:id,
+        #   child_field['name']:filename,
+        #   child_field['name']+'_filename':filename,
+        # }
 
+        if form.success():
+          form.run_event('after_update_code',{'field':field})
+          form.run_event('after_save_code',{'field':field})
 
+        get_1_to_m_data(form,field,id)
+        values=field['values']
 
         return {
           'success':form.success(),
