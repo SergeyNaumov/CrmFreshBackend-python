@@ -82,8 +82,21 @@ def get_1_to_m_data(form,f,id=None):
       where=exists_arg('where',f) or ''
       order = exists_arg('order',f) or ''
       
-      if where: where+=' AND '
-      where+=f['foreign_key']+'='+str(form.id)
+      if where:
+          where+=' AND '
+      
+      # Если предусмотрена подстановка значения для fK:
+      if 'foreign_key_value' in f:
+        if f['foreign_key_value']:
+          where+=f"{f['foreign_key']}={f['foreign_key_value']}"
+        else:
+          # значение предусмотрено, но его нет
+          f['values']=[]
+          return 
+      
+      else:
+        # Если f['foreign_key_value'] не предусмотрен, то используем form.id
+        where+=f['foreign_key']+'='+str(form.id)
       
       
       if exists_arg('sort',f): order=exists_arg('sort_field',f) or 'sort'
@@ -91,12 +104,14 @@ def get_1_to_m_data(form,f,id=None):
         where+=f' AND {f["table_id"]}={id}'
     
       #query=f'SELECT * from {f["table"]} {where} {order'
+      print('ONETOM_DATA:',where)
       data=form.db.get(
         table=f["table"],
         where=where,
         order=order,
         errors=form.errors,
         log=form.log,
+        debug=1
       )
 
       #print('ONETOM_DATA:',data)

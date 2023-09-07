@@ -45,6 +45,39 @@ def get_fields():
       'tab':'main'
     },
     {
+      'description':'Email - адреса',
+      'name':'emails',
+      'type':'1_to_m',
+      'table':'manager_email',
+      'table_id':'id',
+      'foreign_key':'manager_id',
+      'fields':[
+        {
+          'description':'Бренд',
+          'type':'select_from_table',
+          'name':'brand_id',
+          'table':'brand',
+          'header_field':'header',
+          'value_field':'id'
+        },
+        {
+          'description':'Email',
+          'type':'text',
+          'name':'email',
+        },
+      ],
+      'tab':'main'
+
+    },
+    {
+      'description':'Email',
+      'name':'email',
+      'type':'filter_extend_text',
+      'tablename':'me',
+      'db_name':'group_concat(me.email) SEPARATOR ", "'
+    },
+
+    {
       'description':'Телефон',
       'type':'text',
       'name':'phone',
@@ -135,18 +168,19 @@ def get_fields():
       #'not_order':1,
       #'read_only':1
     },
-    {
-       'name':'email',
-       'description':'Email',
-       #'read_only':1,
-       'type':'text',
-        'replace':[
-            ['\s+','']
-        ],
-        #'regexp':'^([a-zA-Z0-9_\-\.]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9_\-]+)?$',
+    # {
+    #    'name':'email',
+    #    'description':'Email',
+    #    #'read_only':1,
+    #    'type':'text',
+    #     'replace':[
+    #         ['\s+','']
+    #     ],
+    #     #'regexp':'^([a-zA-Z0-9_\-\.]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9_\-]+)?$',
 
-       'tab':'main'
-    },
+    #    'tab':'main'
+    # },
+
 
 
 

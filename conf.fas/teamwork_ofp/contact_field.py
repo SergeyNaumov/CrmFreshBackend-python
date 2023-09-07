@@ -2,8 +2,8 @@ contact_field={
             'description':'Контакты',
             'name':'contacts',
             'type':'1_to_m',
-            'table':'teamwork_ofp_contact',
-            'foreign_key':'teamwork_ofp_id',
+            'table':'user_contact',
+            'foreign_key':'user_id',
             'table_id':'id',
             'view_type':'list',
             'fields':[

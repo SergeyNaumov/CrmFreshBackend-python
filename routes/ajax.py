@@ -16,7 +16,6 @@ router = APIRouter()
 async def ajax(config:str,ajax_name:str,R: dict):
   success=1
   errors=[]
-  print('AJAX!')
   form=read_config(
     script='ajax', config=config,
     R=R,

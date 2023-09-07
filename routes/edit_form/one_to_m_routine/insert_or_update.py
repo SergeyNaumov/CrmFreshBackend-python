@@ -11,8 +11,15 @@ def insert_or_update(form,field,arg):
       form.errors.append('обратитесь к разработчику: в запросе отсутствуют значения (values)')
     
     data=get_data(form,field)
+    foreign_key_value=form.id
+    if 'foreign_key_value' in field:
+      if field['foreign_key_value']:
+        foreign_key_value=field['foreign_key_value']
+      else:
+        form.errors.append('foreign_key_value предусмотрено, но не заполнено. обратитесь к разработчику')
 
     if form.success():
+
 
       # INSERT
       if form.action=='insert':
@@ -26,8 +33,8 @@ def insert_or_update(form,field,arg):
             errors=form.errors,
           )
 
-        form.run_event('after_insert_code',{'field':field,'data':data})
-        form.run_event('after_save_code',{'field':field,'data':data})    
+          form.run_event('after_insert_code',{'field':field,'data':data})
+          form.run_event('after_save_code',{'field':field,'data':data})    
 
       elif form.action=='update':
         data[field['table_id']]=arg['one_to_m_id']
@@ -35,9 +42,10 @@ def insert_or_update(form,field,arg):
         form.run_event('before_save_code',{'field':field,'data':data})
         
         if form.success():
+
           data=form.db.save(
             table=field['table'],
-            where=f'{field["foreign_key"]}={form.id} and {field["table_id"]}={arg["one_to_m_id"]}',
+            where=f'{field["foreign_key"]}={foreign_key_value} and {field["table_id"]}={arg["one_to_m_id"]}',
             update=1,
             errors=form.errors,
             data=data,

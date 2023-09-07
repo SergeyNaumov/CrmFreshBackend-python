@@ -22,7 +22,7 @@ def permissions(form):
       if exists_arg('cgi_params;action',R) == 'create_ofp_card':
           create_ofp_card(form)
       
-
+      form.read_only=0
 events={
   'permissions':permissions
 }

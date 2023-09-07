@@ -13,7 +13,7 @@ def get_old_values(form):
 		ov=form.db.query(
 			query='''
 				SELECT 
-                  wt.*,
+                  wt.user_id, wt.manager_from, wt.manager_to, wt.manager_to2,  u.firm, u.inn,
                   mf.group_id manager_from_group, mf.email manager_from_email,
                   mf.phone manager_from_phone,
                   mt.group_id manager_to_group, mt2.group_id manager_to2_group,
@@ -88,7 +88,7 @@ def permissions(form):
 			form.read_only=0
 
 
-		form.title=f"СР: {form.ov['firm']}"
+		form.title=f"ОФП: {form.ov['firm']}"
 	form.user_id=None
 
 

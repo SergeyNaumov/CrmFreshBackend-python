@@ -2,7 +2,15 @@ from lib.core import exists_arg
 def get_data(form,field):
     R=form.R
     values=exists_arg('values',R) or {}
-    data={field['foreign_key']:form.id}
+    data={}
+    foreign_key_value=None
+    if 'foreign_key_value' in field:
+      foreign_key_value=field['foreign_key_value']
+
+    else:
+      foreign_key_value=form.id
+
+    data[field['foreign_key']]=foreign_key_value
 
     for f in field['fields']:
         
@@ -13,7 +21,7 @@ def get_data(form,field):
 
 
         if not v==None:
-          print(f'VALUE {f["name"]}', v)
+          #print(f'VALUE {f["name"]}', v)
           regexp_rules=exists_arg('regexp_rules',f) or ''
           
           # проверка регулярок

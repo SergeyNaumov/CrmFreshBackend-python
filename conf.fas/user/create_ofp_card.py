@@ -3,15 +3,13 @@ def create_ofp_card(form):
         ov=form.ov
     # Пример ссылки на создание: /edit_form/user/106998?action=create_ofp_card
         #action=R['cgi_params']['action']
-        contact_list=db.query(
-          query=f'select * from user_contact where user_id={form.id}'
-        )
-        form.pre(ov)
+
+        #form.pre(ov)
         city_id=0
         data={
-            'firm':ov['firm'],
+            #'firm':ov['firm'],
             'city':ov['city'],
-            'inn':ov['inn'],
+            #'inn':ov['inn'],
             'user_id':form.id,
             'manager_to':form.manager['id'],        
         }
@@ -28,19 +26,23 @@ def create_ofp_card(form):
           table='teamwork_ofp',
           data=data
         )
-        for contact in contact_list:
-          db.save(
-            table='teamwork_ofp_contact',
-            data={
-              'teamwork_ofp_id':ofp_card_id,
-              'fio':contact['fio'],
-              'email':contact['email'],
-              'phone':contact['phone'],
-              'position':contact['position'],
-              'otv':contact['otv'],
-              'comment':contact['comment']
-            }
-          )
+        # Убрал копирование контактов, попросили сделать сквозными
+        # contact_list=db.query(
+        #   query=f'select * from user_contact where user_id={form.id}'
+        # )
+        # for contact in contact_list:
+        #   db.save(
+        #     table='teamwork_ofp_contact',
+        #     data={
+        #       'teamwork_ofp_id':ofp_card_id,
+        #       'fio':contact['fio'],
+        #       'email':contact['email'],
+        #       'phone':contact['phone'],
+        #       'position':contact['position'],
+        #       'otv':contact['otv'],
+        #       'comment':contact['comment']
+        #     }
+        #   )
         redirect_link=f"/edit_form/teamwork_ofp/{ofp_card_id}"
         #form.pre(f"<a href='{redirect_link}'>{redirect_link}</a>")
         form.redirect=redirect_link

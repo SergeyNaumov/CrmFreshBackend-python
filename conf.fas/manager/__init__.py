@@ -7,11 +7,13 @@ form={
     'work_table':'manager',
     'ajax':ajax,
     'is_admin':False,
+    'explain_exit':1,
     'QUERY_SEARCH_TABLES':[
             {'table':'manager','alias':'wt'},
-        
+            {'t':'manager_email','a':'me','l':'me.manager_id=wt.id','lj':1},
             {'t':'manager_permissions','a':'mp','l':'mp.manager_id=wt.id','lj':1},
-            {'t':'permissions','a':'p','l':'p.id=mp.permissions_id','lj':1}
+            {'t':'permissions','a':'p','l':'p.id=mp.permissions_id','lj':1},
+
             # 
     ],
     'cols':[

@@ -1,7 +1,7 @@
 #def pre(d):
 #    form.pre(d)
 from lib.CRM.plugins.search.xlsx import go as init_search_plugin
-
+from lib.core import exists_arg
 def events_permissions(form):
     #form.pre(form.manager)
     #return 
@@ -40,6 +40,11 @@ def events_permissions(form):
 
 def before_search(form):
   qs=form.query_search
+  #form.pre('email' in qs['on_filters_hash'])
+  # Фильтр email включен - добавляем в результаты
+  if 'email' in qs['on_filters_hash']:
+    qs['SELECT_FIELDS'].append("group_concat(me.email SEPARATOR ', ') email  ")
+
   #form.pre(qs['SELECT_FIELDS'])
   #qs['SELECT_FIELDS'].append('if(wt.type=4, uf.header ,group_concat(u.header SEPARATOR "; ")) ur_lico_list')
   #form.explain=1
