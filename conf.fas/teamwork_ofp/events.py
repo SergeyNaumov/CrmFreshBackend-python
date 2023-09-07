@@ -48,12 +48,46 @@ def get_old_values(form):
 	form.old_values=ov
 
 def permissions(form):
-	form.is_manager_to=False
+	
+	form.is_admin=False
 	form.is_manager_from=False
+	form.is_manager_to=False
+	form.is_manager_to2=False
+	
+
 
 	get_old_values(form)
 	#form.pre({'ov':form.ov['firm']})
 	if form.ov:
+		#form.pre([form.ov['manager_to'],form.manager['id'],form.ov['manager_to']==form.manager['id']])
+		#form.pre(form.manager)
+		#form.pre([form.ov['manager_to_group'],])
+		#print('CHILD_GROUPS_HASH:',form.manager['CHILD_GROUPS_HASH'])
+		
+
+		# Админ ОФП
+		if form.manager['login'] in ('akulov','sed','pzm'):
+			form.is_admin=True
+
+		# Менеджер
+		if form.ov['manager_from']==form.manager['id'] or (form.ov['manager_from_group'] in form.manager['CHILD_GROUPS_HASH']):
+			form.is_manager_from=True
+			
+		
+		# Менеджер ОФП
+		if form.ov['manager_to']==form.manager['id'] or (form.ov['manager_to_group'] in form.manager['CHILD_GROUPS_HASH']):
+			form.is_manager_to=True
+			
+
+		# менеджер ОФП2
+		if form.ov['manager_to2']==form.manager['id'] or (form.ov['manager_to2_group'] in form.manager['CHILD_GROUPS_HASH']):
+			form.is_manager_to2=True
+			
+
+		if (form.is_admin or form.is_manager_from or form.is_manager_to or form.is_manager_to2):
+			form.read_only=0
+
+
 		form.title=f"СР: {form.ov['firm']}"
 	form.user_id=None
 
@@ -63,11 +97,8 @@ def permissions(form):
 	 	if user_id and user_id.isnumeric(): form.user_id=user_id
 	
 	if form.id:
-		form.user_id=form.db.query(
-			query='select user_id from teamwork_ofp where teamwork_ofp_id=%s',
-			values=[form.id], onevalue=1
-		)
-		
+		form.user_id=form.ov['user_id']
+	#form.pre(form.read_only)		
 
 events={
 	'permissions':permissions

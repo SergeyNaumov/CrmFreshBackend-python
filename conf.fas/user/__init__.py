@@ -2,52 +2,33 @@ from lib.core import exists_arg
 from lib.CRM.form import Form
 #from .fields import get_fields
 
-#from .ajax import ajax
-def firm_filter_code(form,field,row):
-    return f"<a href='/edit_form/user/{row['wt__id']}' target='_blank'>{row['wt__firm']}</a>"
+from .ajax import ajax
 
-def otk_before_code(form,field):
-    if exists_arg('admin_otk', form.manager['permissions']):
-        field['read_only']=False
+
+
     
 
-def dt2_before_code(form,field):
-    if exists_arg('admin_dt2', form.manager['permissions']):
-        field['read_only']=False
-def kladr_after_search(data):
-    i=0
-    list=[]
-    if not data:
-        return list
-    
-    for d in data:
-        res=[]
-        for d2 in d['parents']:
-
-            if d2['name']=='Москва' and d2['contentType']!='city':
-                continue
-            res.append,f'{d2["typeShort"]} {d2["name"]}'
 
 
-        res.append(f'{d["typeShort"]} {d["name"]}')
-        h=', '.join(res)
-        list.append({'header':h})
-    return list
+
+
 
 form={
     'wide_form':True,
     'title':'Карты ОП',
     'work_table':'user',
-    #'ajax':ajax,
+    'ajax':ajax,
     'is_admin':False,
     'QUERY_SEARCH_TABLES':[
             {'table':'user','alias':'wt'},
             {'t':'manager','a':'m','l':'m.id=wt.manager_id','lj':1,'for_fields':['manager_id','f_manager_group']},
             {'t':'manager_group', 'a':'mg', 'l':'m.group_id','for_fields':['f_manager_group']},
             {'t':'user_contact','a':'uc','l':'uc.user_id=wt.id','lj':1, 'for_fields':['f_fio','f_email','f_phone']},
+            {'t':'brand','a':'b','l':'wt.brand_id=b.id','lj':1,'for_fields':['brand_id']}
     ],
     'cols':[
             [ # Колонка1
+              {'description':'Ссылки','name':'links','hide':0, 'not_save_button':1},
               {'description':'Общая информация','name':'main','hide':0},
             ],
             [
@@ -70,15 +51,30 @@ form={
     #'read_only':1,
     'GROUP_BY':'wt.id',
     'fields':[
-
+        {
+            'tab':'links',
+            'name':'links',
+            'type':'code',
+            
+        },
+        {
+            'description':'Бренд',
+            'name':'brand_id',
+            'type':'select_from_table',
+            'table':'brand',
+            'header_field':'header',
+            'value_field':'id',
+            'tab':'main',
+            'read_only':True,
+            'frontend':{'ajax':{'name':'brand_id','timeout':100}},
+            'filter_on':True,
+        },
         {
             'description':'Название компании',
             'name':'firm',
             'type':'text',
             'tab':'main',
             'filter_on':True,
-            'filter_code':firm_filter_code
-
         },
         {
             'description':'Город',
@@ -254,7 +250,7 @@ form={
             'name':'otk',
             'type':'checkbox',
             'read_only':True,
-            'before_code':otk_before_code,
+            #'before_code':otk_before_code,
             'tab':'sale',
         },
         {
@@ -262,7 +258,7 @@ form={
             'name':'dt2',
             'type':'checkbox',
             'read_only':True,
-            'before_code':dt2_before_code,
+            #'before_code':dt2_before_code,
             'tab':'sale',
         },
         {

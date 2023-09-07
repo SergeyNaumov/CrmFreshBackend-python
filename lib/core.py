@@ -1,5 +1,12 @@
 import random, re, time, datetime, os
+def join_ids(ids):
+  result=''
+  idx=0
+  for id in ids:
+    ids[idx]=str(id)
+    idx+=1
 
+  return ','.join(ids)
 def cnt_days_period(d1,d2):
   # Ввычисляет кол-во дней между датами
   
@@ -29,6 +36,20 @@ def cur_year():
 
 def exists_arg(key,dict):
   #print('dict:',key,dict)
+  # Сложная структура
+  if isinstance(key,str):
+    keys=key.split(';')
+  
+    if len(keys)>1:
+      dict2=dict
+      v=False
+      for k in keys:
+        if not(k in dict2) or not(dict2[k]):
+          return False
+        dict2=dict2[k]
+      return dict2
+  # Простая структура
+  
   if (key in dict) and dict[key]:
     return dict[key]
   return False

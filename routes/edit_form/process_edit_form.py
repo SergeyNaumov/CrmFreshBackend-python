@@ -113,5 +113,6 @@ def process_edit_form(**arg):
       'cols':form.cols,
       'tabs':form.tabs,
       'config':form.config,
-      'javascript':exists_arg('edit_form',form.javascript)
+      'javascript':exists_arg('edit_form',form.javascript),
+      'redirect':(hasattr(form, 'redirect') and form.redirect),
     }

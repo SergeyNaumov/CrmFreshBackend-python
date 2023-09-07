@@ -4,16 +4,7 @@ from lib.core import exists_arg
 
 
 
-# для поля "статус клиента"
-def client_status_before_code(form,field):
-	if form.is_manager_to:
-		
-		if not(form.ov['block_card']):
-			field['read_only']=False
 
-		field['regexp_rules']=[
-			'/^[1-9]$/','Выберите значение'
-		]
 
 
 

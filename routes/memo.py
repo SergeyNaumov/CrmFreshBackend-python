@@ -40,7 +40,8 @@ async def get_memo(config:str, field_name:str,id:int): #
       """,
       log=form.log,
       values=[form.id],
-      errors=form.errors
+      errors=form.errors,
+      #debug=1
     )
     for d in data:
       d['date']=date_to_rus(d['date'])

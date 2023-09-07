@@ -24,7 +24,7 @@ def child_groups(**arg):
 		else:
 			for g in arg['group_id']:
 				list_hash[g]=1
-				print('g:',g)
+				#print('g:',g)
 				_list=child_groups(db=arg['db'],group_id=g)
 				if _list:
 					for gl in _list:

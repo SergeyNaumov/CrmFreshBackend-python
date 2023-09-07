@@ -1,4 +1,4 @@
-from lib.core import exists_arg, gen_pas
+from lib.core import exists_arg, gen_pas, join_ids
 from db import db,db_read,db_write
 from config import config
 from base64 import b64decode
@@ -174,7 +174,7 @@ def session_start(s,**arg):
           );
 
   if manager:
-    manager['id']=str(manager['id'])
+  #  manager['id']=str(manager['id'])
     
     del manager['password']
     s.manager=manager
@@ -243,18 +243,20 @@ def child_groups(db,group_id):
     group_table='project_manager_group'
   
   # group_id to str for join
-  j=0
-  for g in group_id:
-    group_id[j]=str(group_id[j])
+  #j=0
+  #for g in group_id:
+  #  group_id[j]=group_id[j]
   g_list=db.query(
-    query="SELECT id from "+group_table+" where parent_id IN (" + ','.join(group_id) + ')'
+    query=f"SELECT id from {group_table} where parent_id IN ({join_ids(group_id)})"
   )
+  #print('g_list:',g_list)
   for g1 in g_list:
+    g1['id']=int(g1['id'])
     for g2 in child_groups(db,[g1['id']]):
-
-      group_id.append(g2)
-
-  return group_id
+      #print('g2:',[int(g2)])
+      group_id.append(int(g2))
+  #print('group_id:',group_id)
+  return [int(x) for x in group_id]
   
 
 
@@ -276,7 +278,7 @@ def get_permissions_for(form,login):
     """,
     values=[login],onerow=1,log=form.log
   )
-  manager['id']=str(manager['id'])
+  #manager['id']=str(manager['id'])
   
   if manager['password']: del manager['password']
   
@@ -297,7 +299,7 @@ def get_permissions_for(form,login):
       manager['permissions'][p['pname']]=p['id']
 
   if manager['group_id']:
-    group_id=manager['group_id']
+    group_id=int(manager['group_id'])
     gr_perm_list=form.db.query(
       query="""
         SELECT
@@ -311,12 +313,13 @@ def get_permissions_for(form,login):
     )
     for p in gr_perm_list:
         manager['permissions'][p['pname']]=p['id']
-
+    
+    
     manager['CHILD_GROUPS']=child_groups(form.db,[group_id])
     manager['CHILD_GROUPS_HASH']={}
     for g_id in manager['CHILD_GROUPS']:
-        manager['CHILD_GROUPS_HASH'][g_id]=1
-    
+        manager['CHILD_GROUPS_HASH'][int(g_id)]=1
+    #print('CHILD_GROUPS_HASH:',manager['CHILD_GROUPS_HASH'])
   manager['files_dir']='./files'
   manager['files_dir_web']='/files'
   return manager

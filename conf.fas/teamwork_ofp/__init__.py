@@ -2,16 +2,29 @@ from lib.core import exists_arg
 from lib.CRM.form import Form
 #from .fields import get_fields
 from .ajax import ajax
-
+from .contact_field import contact_field
 from .code import *
 form={
-    #'wide_form':True,
+    'wide_form':True,
     'title':'Совместная работа',
     'work_table':'teamwork_ofp',
     'work_table_id':'teamwork_ofp_id',
     'make_delete':0,
+    'read_only':1,
+    #'not_create':1,
     'ajax':ajax,
     'is_admin':False,
+    'cols':[
+            [ # Колонка1
+              
+              {'description':'Общая информация','name':'main','hide':0},
+              
+            ],
+            [
+              {'description':'Работа с картой','name':'work','hide':0},
+              {'description':'Контакты','name':'contacts','hide':0},
+            ]
+    ],
     'QUERY_SEARCH_TABLES':[
       {'t':'teamwork_ofp','a':'wt'},
       {'t':'user','a':'u','l':'u.id=wt.user_id','lj':1, 'for_fields':['f_city']},
@@ -27,44 +40,41 @@ form={
       #{'t':'users_fs_memo_fp','a':'memo4','l':'memo4.users_fs_id=wt.user_id','for_fields':['comment4']},
       #{'t':'manager','a':'m_memo4','l':'m_memo4.id=memo4.manager_id','for_fields':['comment4']},
     ],
-
+    #'explain':1,
     'filters_groups':[],
+
     'GROUP_BY':'wt.teamwork_ofp_id',
     'fields':[
 
-        {
-            'description':'№',
-            'type':'text',
-            'name':'teamwork_ofp_id',
-            'tab':'ofp',
-            'read_only':True,
-        },
+        # {
+        #     'description':'№',
+        #     'type':'text',
+        #     'name':'teamwork_ofp_id',
+        #     'tab':'ofp',
+        #     'read_only':True,
+
+        # },
         {
             'description':'Дата создания',
-            'type':'datetime',
+            'type':'date',
             'name':'born',
-            #before_code=>sub{
-            #  my $e=shift;
-            #  if($form->{manager}->{login} eq 'akulov'){
-            #    $e->{read_only}=0;
-            #  }
-            #},
-            #after_insert=>sub{
-            #  $form->{dbh}->do("UPDATE teamwork_ofp set born=now() where teamwork_ofp_id=$form->{id}");
-            #},
-            'read_only':True,
+            'read_only':1,
+            'filter_on':1,
+            'tab':'main',
         },
         {
             'description':'Дата следующего контакта',
             'type':'datetime',
             'name':'contact_date',
             'tab':'ofp',
+            'tab':'main',
         },
         {
             'description':'Наименование компании',
             'type':'text',
             'name':'firm',
-            #regexp=>'.+',
+            'filter_on':True,
+            'tab':'main',
         },
 
         { # формируем ссылку на реестровый номер (доделать!!!)
@@ -76,7 +86,7 @@ form={
                 '/\s+$/', '',
            ],
            'frontend':{'ajax':{'name':'regnumber','timeout':600}},
-
+           'tab':'main',
         },
         {
           'description':'Статус победы',
@@ -88,19 +98,25 @@ form={
             {'v':3,'d':'Поражение','c':'red'},
             {'v':4,'d':'Работа не велась, оплаты не было','c':'blue'},
           ],
+          'tab':'main',
         },
         {
           'description':'Дата изменения статуса победы',
           'type':'date',
           'name':'win_status_change_date',
           'read_only':1,
+          'tab':'main',
         },
         {
           'description':'Председатель комиссии',
           'type':'text',
           'name':'pred_comm',
           'placeholder':'обязательно укажите председателя комиссии',
+          'tab':'main',
         },
+        # Контакты
+        contact_field
+        ,
         {
           'description':'Статус клиента',
           'name':'client_status',
@@ -111,10 +127,11 @@ form={
             {'v':2,'d':'Одобрено, получена платежка'},
             {'v':4,'d':'Одобрено, отказ клиента'},
             {'v':1,'d':'Отказ Банка/МФО'},
-            {'v':9,'d':'Gередан в гр. Тихонова по регламенту'},
+            {'v':9,'d':'Передан в гр. Тихонова по регламенту'},
           ],
-          'read_only':1,
-          'before_code':client_status_before_code
+          'tab':'work',
+          #'read_only':1,
+          #'before_code':client_status_before_code
         },
         {
             'description':'ИНН',
@@ -125,24 +142,8 @@ form={
             ],
             'replace_rules':[
                 '/[^0-9]/', ''
-            ]
-            # code=>sub{
-            #   my $e=shift;
-            #   $e->{value}=~s{[^\d]}{}g;
-            #   #pre();
-            #   if($e->{value}=~m{\d+} &&
-            #     (
-            #       $form->{manager}->{full_path}=~m{\/155($|\/)}
-            #         ||
-            #       $form->{manager}->{login}=~m{admin1|akulov}
-            #     )
-            #   ){
-                
-            #     $e->{field}.=qq{<a href="/moderator/crm_fresh/find_objects.pl?config=sr_ofp_win_card&order_firm=1&order_status=1&inn=$e->{value}&order_inn=2&order_type=3&order_NN=4&order_regnumber=5&order_client_status=6&order_manager_to=7&order_create_date=8&filter_create_date_disabled=1&order_memo=9" target="_blank">поиск дублей</a>}
-            #     #$e->{field}.=qq{<a href="./find_objects.pl?config=sr_ofp_win_card&order_firm=1&order_status=2&inn=$e->{value}&order_inn=2&order_type=3&order_regnumber=4&order_manager_to=5&order_create_date=6&filter_create_date_disabled=1&order_memo=7" target="_blank">поиск дублей</a>}
-            #   }
-            #   return $e->{field}
-            # },
+            ],
+            'tab':'main',
         },
         {
             'description':'Вид продукта',
@@ -170,6 +171,7 @@ form={
             ],
             'type':'select_values', 
             'frontend':{'ajax':{'name':'product','timeout':600}},
+            'tab':'main',
         },
         {
           'description':'Дата и время заседания',
@@ -177,6 +179,7 @@ form={
           'name':'dat_session',
           'before_code':dat_session_before_code,
           'read_only':True,
+          'tab':'main',
           
         },
         {
@@ -188,6 +191,7 @@ form={
           'where':'group_id in (select id from manager_group where parent_id=347 or path regexp "/347/")', # группа 
           'header_field':'name',
           'value_field':'id',
+          'tab':'main',
         },
         # !!!!не отображается список, наладить
         {
@@ -207,44 +211,33 @@ form={
                 where c.name like <%v%>
           """,
           'value_field':'city_id',     
+          'tab':'main',
         },
        {
           'description':'Время вылета на заседание',
           'name':'date_fly_to',
           'type':'datetime',
-          
+          'tab':'main',
         },
         {
           'description':'Время возвращения с заседания',
           'name':'date_fly_from',
           'type':'datetime',
+          'tab':'main',
           
         },
         {
           'description':'Файл',
           'name':'attach',
           'type':'file',
-          #'keep_orig_filename':True,
+          'tab':'main',
           'filedir':'./files/teamwork_ofp',
-          
-          # after_save=>sub{
-          #   if($form->{new_values}->{attach}){
-          #       send_mes({
-          #           from=>'noreply@trade.su',
-          #           message=>qq{
-          #             $form->{manager}->{name} только что добавил документ в карточку ОФП:
-          #             Наименование компании: <a href="http://trade.su/moderator/crm_fresh/edit_form.pl?config=$form->{config}&action=edit&id=$form->{id}">$form->{old_values}->{firm}</a><br>
-          #           },
-          #           subject=>'Новый документ в карточке  ОФП / '.$form->{old_values}->{firm},
-          #           to=>$to
-          #       });
-          #   }
-          # }
         },
         {
             'description':'Контактное лицо',
             'type':'text',
             'name':'contact',
+            'tab':'main',
         },
         {
             'description':'Группа менеджеров',
@@ -257,7 +250,8 @@ form={
             'filter_table': 'manager_group',
             'header_field': 'header',
             'value_field': 'id',
-            'tree_use':True
+            'tree_use':True,
+            'tab':'work',
         },
         {
             'description':'Менеджер',
@@ -268,11 +262,9 @@ form={
             'order':'name',
             'value_field':'id',
             'tablename':'mf',
-            #'regexp_rules':[
-            #    '/^\d+$/','выберите менеджера'
-            #],
-            #'before_code':manager_from_before_code,            
-            'read_only':True
+            'tab':'work',
+            'read_only':True,
+            'filter_on':True
         },
         {
             'description':'Менеджер ОФП',
@@ -283,30 +275,8 @@ form={
             'order':'name',
             'tablename':'mt',
             'value_field':'id',
-            # before_code=>sub{
-            #   my $e=shift;
-            #   #pre($form->{manager});
-            #   if($form->{manager}->{login}=~m/^(naumova|sheglova)$/){
-            #     $e->{readonly}=0;
-            #     return 
-            #   }
-            #   if($form->{service_access}->{9} && $form->{old_values}->{product}=~m/^(9|14|15)$/){
-            #     $e->{readonly}=0;
-            #   }
-            #   # task: 218597
-            #   #pre($form->{access_kostunin});
-              
-            #   if($form->{managers_to_list} && ref($form->{managers_to_list}) eq 'ARRAY' && ($e->{value} eq $form->{manager}->{id} || $e->{value} ~~ $form->{managers_to_list}) ){
-            #     $e->{readonly}=0;
-            #     $e->{where}='id in ('.join(',',@{$form->{managers_to_list}}).')'
-
-
-            #   }
-            #   if($form->{access_kostunin}){
-            #     $e->{readonly}=0;
-            #   }
-            # },
             'where':'id IN (select manager_id from manager_permissions mp where permissions_id=71) and id != 172',
+            'tab':'work',
         },
         {
             'description':'Менеджер ОФП2',
@@ -317,40 +287,9 @@ form={
             'order':'name',
             'tablename':'mt2',
             'value_field':'id',
-            # before_code=>sub{
-            #   my $e=shift;
-            #   if($form->{manager}->{login}=~m/^(naumova|sheglova)$/){
-            #     $e->{readonly}=0;
-            #     return 
-            #   }
-            #   if(  $form->{manager}->{login}=~m{^(sed|akulov|zia|strogov|pan)$}){
-            #       $e->{readonly}=0;
-            #   }
-            #   my $v2=$form->{old_values}->{manager_to};
-            #   if($form->{managers_to_list} && ref($form->{managers_to_list}) eq 'ARRAY' && ($v2 eq $form->{manager}->{id} || $v2 ~~ $form->{managers_to_list} ) ){
-            #     $e->{readonly}=0;
-            #     $e->{where}='id in ('.join(',',@{$form->{managers_to_list}}).')'
-            #   }
-            #   # task: 218597
-            #   if($form->{access_kostunin}){
-            #     $e->{readonly}=0;
-            #   }
-              
-            # },
             'where':'id in (select manager_id from manager_permissions mp where permissions_id=71) and id != 172',
-            #regexp=>'^(\d+|)$',
-            'readonly':1,
-            # code=>sub{
-            #   my $e=shift;
-            #   return qq{
-            #     $e->{field}<br>
-            #     <small>
-            #       <a href="mailto:$form->{old_values}->{manager_to2_email}">$form->{old_values}->{manager_to2_email}</a> ;
-            #       $form->{old_values}->{manager_to2_phone}
-            #     </small>
-            #   }
-            # },
-            
+            'read_only':1,
+            'tab':'work',         
         },
         {
           'description':'Комментарии',
@@ -371,7 +310,7 @@ form={
           'auth_table_alias':'m_memo',
           'make_delete':False,
           'make_edit':False,
-          
+          'tab':'work',
         }
     ]
 }

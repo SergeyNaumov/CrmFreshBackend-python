@@ -47,8 +47,9 @@ def product(form,v):
     #    <div style="display: inline-block; width: 50px; height: 50px; background-color: {bgcolor}; border: 1px solid gray;"></div>
     #    <div style="display: inline-block; vertical-align: top;">{firm}</div>`"""
 
-    #jscode=f"document.querySelector('.v-application--wrap .v-application--wrap').style.background='{bgcolor}'"
-    jscode=f"document.querySelector('form .layout .v-card ').style.background='{bgcolor}'"
+    
+    #jscode=f"document.querySelector('form .layout .v-card').style.background='{bgcolor}'"
+    jscode=f"document.querySelector('#EditForm').style.background='{bgcolor}'"
     
 
   

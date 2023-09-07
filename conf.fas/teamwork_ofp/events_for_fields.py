@@ -1,5 +1,6 @@
 from config import config
 from lib.core_crm import get_manager, get_owner
+from lib.core import cur_date, date_to_rus
 
 
 def firm_code(form,field):
@@ -7,7 +8,7 @@ def firm_code(form,field):
   user_id=form.user_id
   html=''
   if user_id:
-    html=f'Карточка ОП: <a href="{config["BaseUrl"]}edit_form/user/{user_id}" target="_blank">{config["BaseUrl"]}edit_form/user/{user_id}</a>'
+    html=f'Карточка ОП: <a href="/edit_form/user/{user_id}" target="_blank">{config["BaseUrl"]}edit_form/user/{user_id}</a>'
   else:
     html = "<span style='color: red'>id не было введено на этапе создания карточки СР</span>"
 
@@ -62,7 +63,27 @@ def manager_to2_before_code(form,field):
     field['read_only']=False
 
   manager_before_code(form,field)
+
+def born_before_code(form,field):
+  if form.script=='admin_table':
+    d=cur_date()
+    field['value']=[d,d]
+
+  #form.pre(form.script)
+# для поля "статус клиента"
+def client_status_before_code(form,field):
+  #return 
+  if form.is_manager_to:    
+    if not(form.ov['block_card']):
+      field['read_only']=0
+      field['regexp_rules']=[
+        '/^[1-9]$/','Выберите значение'
+      ]
+
 events={
+  'born':{
+    'before_code':born_before_code
+  },
   'firm':{
     'before_code':firm_code
   },
@@ -74,6 +95,9 @@ events={
   },
   'manager_to2':{
     'before_code':manager_to2_before_code
+  },
+  'client_status':{
+    'before_code':client_status_before_code
   }
 
 }

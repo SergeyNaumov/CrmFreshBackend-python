@@ -1,32 +1,8 @@
 # для тестирования
-from lib.core import cnt_days_period;
-import time,random,re
-import datetime
-print(cnt_days_period('2021-04-06','2021-06-25'))
-def from_datetime_get_date(dt):
-  rez=re.search('^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2}:\d{2})?$',dt)
-  if rez: return rez[1]
-  return False
+from lib.core import exists_arg;
+R={32: True, 'cgi_params':{'action':'create_ofp_card'}}
 
-
-def get_func(s):
-  rez=re.search('func:\((.+)\)',s)
-  if rez: rez=rez[1]
-  else: rez=''
-  return rez
-  #return rez
-
-def from_datetime_get_date(dt):
-  if not dt: return False
-  rez=re.search('^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2}(:\d{2})?)?$',dt)
-  if rez:
-    return rez[0]
-  return False
-
-def datetime:
-  print(datetime.datetime.strptime(data[4]+data[5],'%Y%m%d%H%M%S')
-
-print datetime()
+print('exists_arg:',exists_arg(32,R))
 # f={
 #   'name': 'status',
 #   'description': 'Выбор из списка (select_values)',
