@@ -41,6 +41,8 @@ def brand_id_before_code(form,field):
     if form.manager['login'] in ('akulov','sed','pzm'):
         field['read_only']=0
 
+
+
 events={
   'links':{
     'before_code':links_before_code
@@ -56,6 +58,7 @@ events={
   },
   'dt2':{
     'before_code':dt2_before_code
-  }
+  },
+
 
 }

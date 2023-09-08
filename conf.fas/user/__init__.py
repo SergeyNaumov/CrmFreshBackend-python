@@ -4,15 +4,6 @@ from .fields import fields
 
 from .ajax import ajax
 
-
-
-    
-
-
-
-
-
-
 form={
     'wide_form':True,
     'title':'Карты ОП',
@@ -33,6 +24,7 @@ form={
             ],
             [
               {'description':'Продажи','name':'sale','hide':0},
+              {'description':'Документы','name':'docpack','hide':0},
             ]
     ],
     'filters_groups':[],

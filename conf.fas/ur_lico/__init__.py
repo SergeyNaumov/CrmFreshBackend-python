@@ -11,161 +11,329 @@ form={
     'explain':False,
     'header_field':'url',
     'default_find_filter':'header',
+    'cols':[
+        [
+            {'description':'Реквизиты','name':'main'}
+        ],
+        [
+            {'description':'Настройки','name':'addon'},
+            #{'description':'Дополнительные соглашения','name':'dop_sogl'},
+        ],
+    ],
+    
     'fields': [ 
+    {
+      'description':'Доступно всем',
+      'name':'for_all',
+      'type':'checkbox',
+      'tab':'addon'
+    },
+    {
+      'description':'Могут выставлять только',
+      'type':'1_to_m',
+      'name':'ur_lico_access_only',
+      'table':'ur_lico_access_only',
+      'table_id':'id',
+      
+      'foreign_key':'ur_lico_id',
+      'fields':[
         {
-            'description':'Вкл',
-            'type':'checkbox',
-            'name':'enabled',
-            'filter_on':True
-        },
-        {
-            'description':'Название организации',
-            'type':'text',
-            'name':'pnam',
-            'filter_on':True
-        },
-        {
-            'description':'Счета с НДС',
-            'type':'checkbox',
-            'name':'with_nds',
-            #'filter_on':True
-        },
-        {
-            'description':'Юр. Адрес',
-            'type':'text',
-            'name':'paddress'
-        },
-        {
-            'description':'Адрес',
-            'type':'text',
-            'name':'paddress2'
-        },
-        {
-            'description':'Расчетный счет и банк',
-            'type':'text',
-            'name':'prschet'
-        },
-        {
-            'description':'Расчетный счет',
-            'type':'text',
-            'name':'plic'
-        },
-        {
-            'description':'Банк',
-            'type':'text',
-            'name':'pbank'
-        },
-        {
-            'description':'БИК',
-          'type':'text',
-            'name':'pbik'
-        },
-        {
-            'description':'к/с',
-            'type':'text',
-            'name':'pkorschet'
-        },
-        {
-            'description':'ИНН',
-            'type':'text',
-            'name':'pinn'
-        },
-        {
-            'description':'КПП',
-            'type':'text',
-            'name':'pkpp'
-        },
-        {
-            'description':'ОГРН',
-            'type':'text',
-            'name':'pogrn'
-        },
-        {
-            'description':'Подпись ген. директора',
-            'type':'file',
-            'filedir':ur_lico_filedir,
-            'name':'imgpfaxgd'
-        },
-        {
-            'description':'Имя ген. директора',
-            'type':'text',
-            'name':'pgendir'
-        },
-        {
-            'description':'Имя ген. директора в родительном падеже',
-            'type':'text',
-            'name':'pgendir_r'
-        },
-        {
-            'description':'Имя ген. директора в дательном падеже',
-            'type':'text',
-            'name':'pgendir_d'
-        },
-        {
-            'description':'Подпись глав. бух.',
-            'type':'file',
-            'filedir':ur_lico_filedir,
-            'name':'imgpfaxgb'
-        },
-        {
-            'description':'Имя глав. бух',
-            'type':'text',
-            'name':'pglavbuh'
-        },
-        {
-            'description':'Печать',
-            'type':'file',
-            'filedir':ur_lico_filedir,
-            'name':'imgppechat'
-        },      
-        {
-            'description':'Печать с подписью',
-            'type':'file',
-            'filedir':ur_lico_filedir,
-            'name':'imgppechat2'
-        },      
-        {
-            'description':'Печать и подпись с рамкой',
-            'type':'file',
-            'filedir':ur_lico_filedir,
-            'name':'imgppodpech'
-        },
-        {
-            'description':'Для нерезидентов',
-            'type':'checkbox',
-            'name':'for_non_residents'
-        },
-        {
-            'description':'Diadoc Mailbox',
-            'type':'text',
-            'name':'diadoc_mailbox'
-        },
-        {
-            'description':'Diadoc login',
-            'type':'text',
-            'name':'diadoc_login'
-        },
-        {
-            'description':'Diadoc pass',
-            'type':'text',
-            'name':'diadoc_pass'
-        },
-        {
-            'description':'Diadoc key',
-            'type':'text',
-            'name':'diadoc_key'
-        },
-        {
-            'description':'Diadoc департамент',
-            'type':'text',
-            'name':'diadoc_dep'
-        },
-        {
-            'description':'Текст ссылки для счета',
-            'type':'text',
-            'name':'text_link'
-        },
-  ]  
+          'description':'Сотрудник',
+          'type':'select_from_table',
+          'table':'manager',
+          'header_field':'name',
+          'value_field':'id',
+          #'autocomplete':1,
+          'name':'manager_id'
+        }
+      ],
+      'tab':'addon'
+    },
+    # {
+    #   'description':'Нумерация в связке с ',
+    #   'name':'order_num_ur_lico',
+    #   'type':'select_from_table',
+    #   'table':'ur_lico',
+    #   'header_field':'firm',
+    #   'value_field':'id',
+    #   not_filter=>1,
+    #   'tab':'addon'
+    # },
+    # {
+    #   'description':'Прежние реквизиты',
+    #   'type':'1_to_m',
+    #   'name':'ur_lico_old_owner',
+    #   'table':'ur_lico_old_owner',
+    #   'table_id':'id',
+    #   'foreign_key':'ur_lico_id',
+    #   'view_type':'list',
+    #   'fields':[
+    #         {
+    #           'description':'С','name':'from_date','type':'date'
+    #         },
+    #         {
+    #           'description':'По','name':'to_date','type':'date'
+    #         },
+    #         {
+    #           'description':'ФИО ген. дир (в именительном падеже)',
+    #           'name':'gen_dir_fio_im',
+    #           'type':'text'
+    #         },
+    #         {
+    #           'description':'ФИО ген. дир (в родительном падеже)',
+    #           'name':'gen_dir_fio_rod',
+    #           'type':'text'
+    #         },
+    #         {
+    #           'description':'И.О. Фамилия директора',
+    #           'name':'gen_dir_f_in',
+    #           'type':'text'
+    #         },
+    #         {
+    #           'description':'ФИО гл.буха (в именит. падеже)',
+    #           'name':'buh_fio_im',
+    #           'type':'text'
+    #         },
+    #         {
+    #           'description':'ФИО гл.буха (в род. падеже)',
+    #           'name':'buh_fio_rod',
+    #           'type':'text'
+    #         },
+    #         {
+    #           'description':'Печать+подпись',
+    #           'name':'attach',
+    #           'type':'file',
+    #           'filedir':'./files/ur_lico'
+    #         },
+    #         {
+    #           'description':'Печать',
+    #           'name':'attach_pechat',
+    #           'type':'file',
+    #           'filedir':'./files/ur_lico'
+    #         },
+    #         {
+    #           'description':'Подпись ген. директора',
+    #           'name':'gendir_podp',
+    #           'type':'file',
+    #           'filedir':'./files/ur_lico'
+    #         },
+    #         {
+    #           'description':'Подпись гл. бухгалтера',
+    #           'name':'buh_podp',
+    #           'type':'file',
+    #           'filedir':'./files/ur_lico'
+    #         },
+    #   ],
+    #   'tab':'main'
+    # },
+    # {
+    #   name => 'header',
+    #   description => 'Название в списке юрлиц',
+    #   type => 'text',
+    #   'filter_on':1
+    # },
+    {
+        'name':'firm',
+        'description':'Название организации',
+        'type':'text',
+        'filter_on':1,
+        'tab':'main'
+    },
+    {
+      'description':'Комментарий',
+      'name':'comment',
+      'type':'text',
+      'filter_on':1,
+      'tab':'addon'
+    },
+    {
+      'description':'Сообщение в бланке счёта',
+      'name':'warn_for_bill',
+      'type':'text',
+      'filter_on':1,
+      'tab':'addon'
+
+    },
+    {
+      'description':'С НДС',
+      'name':'with_nds',
+      'type':'checkbox',
+      'tab':'addon'
+    },
+    {
+      'description':'Размер НДС в %',
+      'add_description':'для детализации',
+      'name':'nds',
+      'type':'text',
+      #regexp=>'\d+',
+      'tab':'main'
+    },
+    {
+      'description':'Без НДС с',
+      'name':'without_nds_dat',
+      'type':'date',
+      # code=>sub{
+      #   my $e=shift;
+      #   $e->{field}.=q{
+      #     <p><small>
+      #       В случае, если не включена галочка "С НДС" -- всегда считается, что компания без НДС.<br>
+      #       Если включена галочка "С НДС" и выбрана дата "Без НДС с", тогда компания считается как без НДС-ная, начиная с указанной даты<br>
+      #       (счёт-фактура выводится только для актов, которые были выставлены ранее чем дата "Без НДС с")
+      #     </small></p>
+      #   }
+      # },
+      'tab':'addon'
+    },
+    {
+      'description':'Адрес',
+      'name':'address',
+      'type':'textarea',
+      'tab':'main'
+    },
+    {
+      'description':'Юр.Адрес',
+      'name':'ur_address',
+      'type':'textarea',
+      'tab':'main'
+    },
+    {
+      'description':'ФИО ген. дир (в именительном падеже)',
+      'name':'gen_dir_fio_im',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'ФИО ген. дир (в родительном падеже)',
+      'name':'gen_dir_fio_rod',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'И.О. Фамилия директора',
+      'name':'gen_dir_f_in',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'ФИО гл.буха (в именит. падеже)',
+      'name':'buh_fio_im',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'ФИО гл.буха (в род. падеже)',
+      'name':'buh_fio_rod',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'ИНН',
+      'name':'inn',
+      'type':'text',
+      'tab':'main'
+    },
+
+    {
+      'description':'ОГРН',
+      'name':'ogrn',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'КПП',
+      'name':'kpp',
+      'type':'text',
+      'tab':'main'
+      
+    },
+    {
+      'description':'р/с',
+      'name':'rs',
+      'type':'text',
+      'tab':'main'
+      
+    },
+    {
+      'description':'к/с',
+      'name':'ks',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'БИК',
+      'name':'bik',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'Банк',
+      'name':'bank',
+      'type':'text',
+      'tab':'main'
+    },
+    {
+      'description':'Печать+подпись',
+      'name':'attach',
+      'type':'file',
+      'filedir':'./files/ur_lico',
+      'tab':'main'
+    },
+    {
+      'description':'Печать',
+      'name':'attach_pechat',
+      'type':'file',
+      'filedir':'./files/ur_lico',
+      'tab':'main'
+    },
+    {
+      'description':'Подпись ген. директора',
+      'name':'gendir_podp',
+      'type':'file',
+      'filedir':'./files/ur_lico',
+      'tab':'main'
+    },
+    {
+      'description':'Подпись гл. бухгалтера',
+      'name':'buh_podp',
+      'type':'file',
+      'filedir':'./files/ur_lico',
+      'tab':'main'
+    },
+    #{
+    #  'name':'edo_id',
+    #  'description':'ЭДО',
+    #  'type':'checkbox',
+    #  'tab':'addon'
+    #},
+    # { # Доп. соглашения
+    #   'description':'',
+    #   'name':'dop_sogl',
+    #   'table':'ur_lico_dop_sogl',
+    #   'type':'1_to_m',
+    #   'table_id':'id',
+    #   'foreign_key':'ur_lico_id',
+    #   'fields':[
+    #     {
+    #       'description':'Название',
+    #       'type':'text',
+    #       'name':'header'
+    #     },
+    #     {
+    #       'description':'Номер внутри юр. лица',
+    #       'type':'text',
+    #       'name':'num'
+    #     },
+    #     {
+    #       'description':'Шаблон',
+    #       'type':'file',
+    #       'name':'attach',
+    #       'filedir':'./files/ur_lico'
+    #     }
+    #   ],
+    #   'tab':'dop_sogl'
+
+    # }
+    ]  
     
 }
       

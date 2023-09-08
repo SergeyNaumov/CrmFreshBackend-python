@@ -18,7 +18,7 @@ from .video_routes import router as router_video
 from .news_routes import router as router_news
 from .table_routes import router as router_table
 from .const_routes import router as router_const
-
+from .docpack_routes import router as router_docpack
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
 from .svcms import router as router_svcms
@@ -45,6 +45,7 @@ router.include_router(router_edit_form)
 router.include_router(router_one_to_m)
 router.include_router(router_memo,prefix='/memo')
 router.include_router(router_const,prefix='/const')
+router.include_router(router_docpack,prefix='/docpack')
 
 router.include_router(router_extend)
 router.include_router(router_documentation,prefix='/documentation')
