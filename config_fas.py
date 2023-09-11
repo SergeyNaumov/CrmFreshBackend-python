@@ -26,9 +26,8 @@ def alter_all_change_action(form):
   pass
 
 config={
-  'BaseUrl':'',
-  'config_folder':'confBeyeezy', # точки нельзя
-  'title':'CRM Beyeezy',
+  'BaseUrl':'https://fas.crm-dev.ru/',
+  'title':'CRM Fas',
   'copyright':'copyright 2005 - {{cur_year}}',
    'bottom_menu': [
       #{'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}
@@ -71,16 +70,16 @@ config={
   'system_url':'https://fas.crm-dev.ru/',
   'connects':{
     'crm_read':{
-      'user':'beyeezy',
+      'user':'fas',
       'password':'',
       'host':'localhost',
-      'dbname':'beyeezy',
+      'dbname':'fas',
     },
     'crm_write':{
-      'user':'beyeezy',
+      'user':'fas',
       'password':'',
       'host':'localhost',
-      'dbname':'beyeezy',
+      'dbname':'fas',
     },
   },
   'stat_log':0, # Записываем статистику посещений
@@ -115,6 +114,6 @@ config={
 
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
-    'manager_id':1,
+    'manager_id':585,
   }
 }

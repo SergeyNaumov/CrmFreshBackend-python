@@ -32,6 +32,8 @@ class Form():
     self.work_table=arg['config']
     self.work_table_id='id'
     self.id=''
+    self.foreign_key=''
+    self.foreign_key_value=''
     self.sort=0
     self.tree_use=0
     self.sort_field=''

@@ -75,8 +75,10 @@ class error():
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
   errors=[]
+  print(f"confdir: {confdir}\nconflib_dir: {conflib_dir}\n\n")
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
+      
       module=importlib.import_module(conflib_dir+'.'+arg['config'])
 
       form_data=copy.deepcopy(module.form)
@@ -131,13 +133,17 @@ def read_config(**arg):
   response={}
   
   # попытка загрузки локального конфига
-  #print('STEP1')
-  [form,errors]=load_form_from_dir(f'./conf', f'conf',arg)
+  
+  config_folder=exists_arg('config_folder',sysconfig)
+  
+  if not(config_folder): config_folder='./conf'
+
+  [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
   if len(errors): return error(errors)
   
   # Если локальной папки нет -- загружаем глобальный конфиг
   if not(form):
-    [form,errors]=load_form_from_dir(f'./conf', f'conf',arg)
+    [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
     if len(errors): return error(errors)
 
   if not(form):

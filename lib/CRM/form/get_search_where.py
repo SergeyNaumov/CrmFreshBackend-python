@@ -4,7 +4,7 @@ import shlex
 def get_search_where(form,query):
   WHERE,headers=[],[]
   VALUES=[]
-  if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value'):
+  if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value') and form.foreign_key_value:
     WHERE.append(f"wt.{form.foreign_key}={form.foreign_key_value}")
 
   form.SEARCH_RESULT['query_fields']=[]
