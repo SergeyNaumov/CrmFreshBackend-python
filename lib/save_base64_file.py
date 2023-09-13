@@ -9,7 +9,6 @@ def save_base64_file(**arg):
     if exists_arg('field',arg) and exists_arg('form',arg) and exists_arg('id',arg):
       form=arg['form']
       field=arg['field']
-      #print('field:',field)
       exists=form.db.query(
         query=f'SELECT {field["name"]} from {form.work_table} where {form.work_table_id}={arg["id"]}',
         onevalue=1
@@ -22,10 +21,8 @@ def save_base64_file(**arg):
         if len(exists_values)>1:
           filename=exists_values[0]
         else:
-          print('NOT KEEP ORIG!')
           filename=exists
 
-        print('delete file:', f'{field["filedir"]}/{filename}')
         del_file_and_resizes(
           field=field,
           value=filename,
@@ -34,7 +31,6 @@ def save_base64_file(**arg):
 
     if exists_arg('filedir',arg) and exists_arg('src',arg) and exists_arg('orig_filename',arg):
           
-          #print('src:',arg['src'])
           # Сохраняем файл
           rez = re.search(r'^data:(.+?);base64,(.+)',arg['src'])
           
@@ -50,7 +46,6 @@ def save_base64_file(**arg):
 
             fullname=arg['filedir']+'/'+filename
             mime=rez[1]
-            #print('res2:',rez[2])
             #base64=str.encode(rez[2])
             #rez[2]=b64decode(arg['src'])
             bytes = b64decode(rez[2], validate=True)
@@ -88,7 +83,6 @@ def save_base64_file(**arg):
             mime=rez[1]
             #base64=str.encode(rez[2])
             bytes = b64decode(rez[2], validate=True)
-            print('save to:',fullname)
             fh = open(fullname, "wb")
             fh.write(bytes)
             fh.close()
@@ -111,8 +105,6 @@ def save_base64_file(**arg):
           #   onevalue=1,
           #   errors=form.errors
           # )
-          #print()
-          #print('OLD_PHOTO: ',old_photo)
           # удаляем старое фото и все его ресайзы
 
           #del_file_and_resizes(
@@ -140,4 +132,4 @@ def save_base64_file(**arg):
 
 
 def b64_split(src):
-  print('SRC:',src)
+    pass

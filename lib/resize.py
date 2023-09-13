@@ -5,7 +5,6 @@ from lib.core import exists_arg, get_name_and_ext
 #from lib.save_base64_file import save_base64_file
 
 def resize_field(field,value,debug=0):
-  #print("\n\nV:",value)
   if not(exists_arg('resize',field)) or not(value):
     return False
   
@@ -104,7 +103,6 @@ def crop(img,crop_type,width,height):
     max_y=min_y+height
 
     box = (min_x, min_y, max_x, max_y)
-    #print('size:',img.size, 'width:',width,'height:',height, 'crop_box:',box)
   else:
     box = (0, 0, img.size[0], img.size[1])
   return img.crop(box)
@@ -120,7 +118,6 @@ def resize_one(**arg):
   height=int(arg['height'])
   fr=arg['fr']
   to=arg['to']
-  #print('RESIZE_ONE',arg)
   ny=0
   nx=0
 
@@ -133,10 +130,8 @@ def resize_one(**arg):
   if 'optimize' in arg: optimize=arg['optimize']
   
   
-  #print(f'width: {width}, height: {height}')
   #size=(width,height)
   if not(os.path.isfile(fr)):
-    print(f"not open {fr}")
     return 
   
   img = Image.open(fr).convert('RGB')
@@ -246,9 +241,7 @@ def resize_one(**arg):
     img.paste(composite_image, (wm_position_x, wm_position_y) ,composite_image)
 
 
-    #print('водяные знаки не реализованы')
 
-  #print('optimize:',optimize)
   if grayscale:
     img = ImageOps.grayscale(img)
   

@@ -11,9 +11,9 @@ def get_values_for_select_from_table(form,f,debug=False):
   
   select_fields=f'{f["value_field"]} v, {f["header_field"]} d'
   
-  if f['name']=='domain_id':
-      print('F:',f)
-      print(f'SF: ',select_fields)
+  #if f['name']=='domain_id':
+  #    print('F:',f)
+  #    print(f'SF: ',select_fields)
   if exists_arg('tree_use',f):
     select_fields+=', parent_id'
 

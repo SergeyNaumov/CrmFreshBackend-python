@@ -75,7 +75,6 @@ class error():
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
   errors=[]
-  print(f"confdir: {confdir}\nconflib_dir: {conflib_dir}\n\n")
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
       
@@ -136,7 +135,7 @@ def read_config(**arg):
   
   config_folder=exists_arg('config_folder',sysconfig)
   
-  if not(config_folder): config_folder='./conf'
+  if not(config_folder): config_folder='conf'
 
   [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
   if len(errors): return error(errors)

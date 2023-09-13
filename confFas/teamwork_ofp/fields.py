@@ -210,20 +210,21 @@ fields=[
             'tab':'work',
         },
         {
-            'description':'Менеджер',
+            'description':'Менеджер ОП',
             'type':'filter_extend_select_from_table',
             'table':'manager',
             'name':'manager_id', # manager_from
+            'db_name':'id',
             'header_field':'name',
             'order':'name',
             'value_field':'id',
-            'tablename':'mf',
+            'tablename':'m',
             'tab':'work',
             'read_only':True,
             'filter_on':True
         },
         {
-            'description':'Менеджер ОФП',
+            'description':'Юрист',
             'type':'select_from_table',
             'table':'manager',
             'name':'manager_to',
@@ -235,7 +236,7 @@ fields=[
             'tab':'work',
         },
         {
-            'description':'Менеджер ОФП2',
+            'description':'Юрист2',
             'type':'select_from_table',
             'table':'manager',
             'name':'manager_to2',

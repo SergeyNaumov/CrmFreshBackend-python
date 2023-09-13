@@ -19,17 +19,14 @@ def run_event(form,event_name,arg={}):
     else:
 
       if event_name in form.events:
-        #print('events:',form.events)
         event=form.events[event_name]
 
         if isinstance(event,list):
 
           for e in event:
             if arg:
-              #print('arg:',arg)
               e(form,arg)
             else:
-              print('e:',e)
               e(form)
         else:
 

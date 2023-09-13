@@ -1,4 +1,4 @@
-#from lib.core import exists_arg
+from lib.core import exists_arg
 
 def get_old_values(form):
 	ov=None
@@ -14,7 +14,7 @@ def get_old_values(form):
 			query='''
 				SELECT 
                   wt.user_id, wt.manager_from, wt.manager_to, wt.manager_to2,  u.firm, u.inn,
-                  mf.group_id manager_from_group, mf.email manager_from_email,
+                  mf.id mf__id, mf.group_id manager_from_group, mf.email manager_from_email,
                   mf.phone manager_from_phone,
                   mt.group_id manager_to_group, mt2.group_id manager_to2_group,
                   mt.email manager_to_email, mt.phone manager_to_phone,
@@ -27,7 +27,7 @@ def get_old_values(form):
                 FROM
                   teamwork_ofp wt
                   LEFT JOIN user u ON (u.id=wt.user_id)
-                  LEFT JOIN manager mf ON (mf.id=wt.manager_from)
+                  LEFT JOIN manager mf ON (mf.id=u.manager_id)
                   LEFT JOIN manager mt ON (mt.id=wt.manager_to)
                   LEFT JOIN manager mt2 ON (mt2.id=wt.manager_to2)
                   LEFT JOIN manager mu ON (mu.id=u.manager_id)
@@ -53,9 +53,14 @@ def permissions(form):
 	form.is_manager_from=False
 	form.is_manager_to=False
 	form.is_manager_to2=False
+  
+	if form.script=='admin_table':
+		user_id=exists_arg('cgi_params;user_id',form.R)
+		#field['value']=f'user_id:{user_id}'
+		form.title=f'Совместная работа (поиск по карте ОП: {user_id})'
+		form.search_on_load=True
+		#return 
 	
-
-
 	get_old_values(form)
 	#form.pre({'ov':form.ov['firm']})
 	if form.ov:
@@ -100,6 +105,39 @@ def permissions(form):
 		form.user_id=form.ov['user_id']
 	#form.pre(form.read_only)		
 
+def after_save(form):
+	manager_id=exists_arg('values;manager_id', form.R)
+	user_id=exists_arg('user_id', form.ov)
+	if manager_id and form.manager['login'] in ('akulov','sed','pzm'):
+		form.db.query(
+			query='UPDATE user set manager_id=%s where id=%s',
+			values=[manager_id,user_id],
+
+		)
+
+	#old_manager_id=exists_arg('manager_id', form.ov)
+	#print('manager_id:',manager_id)
+	#print('old_manager_id:',manager_id)
+
+
+def before_search(form):
+	
+	user_id=exists_arg('cgi_params;user_id',form.R)
+	if user_id:
+		qs=form.query_search	
+		qs['WHERE'].append(f'wt.user_id={user_id}')
+
+	#form.pre(qs['WHERE'])
+	#firm=exists_arg('on_filters_hash;firm',form.query_search)
+	
+	#if firm.startswith('user_id:'):
+	#	user_id=firm.replace('user_id:','')
+	#	form.pre({'user_id':user_id})
+	#	del qs['on_filters_hash']['firm']
+	#	form.explain=1
+
 events={
-	'permissions':permissions
+	'permissions':permissions,
+	'after_save':after_save,
+	'before_search':before_search
 }

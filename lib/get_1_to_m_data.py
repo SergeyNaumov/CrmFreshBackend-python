@@ -104,14 +104,12 @@ def get_1_to_m_data(form,f,id=None):
         where+=f' AND {f["table_id"]}={id}'
     
       #query=f'SELECT * from {f["table"]} {where} {order'
-      print('ONETOM_DATA:',where)
       data=form.db.get(
         table=f["table"],
         where=where,
         order=order,
         errors=form.errors,
         log=form.log,
-        debug=1
       )
 
       #print('ONETOM_DATA:',data)

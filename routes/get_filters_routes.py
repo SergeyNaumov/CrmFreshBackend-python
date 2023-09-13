@@ -11,10 +11,13 @@ def get_values_for_select_from_table(f,form):
 
 
 @router.get('/get-filters/{config}')
-async def get_filters_controller(config: str):
+@router.post('/get-filters/{config}')
+async def get_filters_controller(config: str, R:dict):
   response={}
+  #print('R0:',R)
   form=read_config(
     config=config,
+    R=R,
     script='admin_table'
   )
   

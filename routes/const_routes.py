@@ -20,8 +20,7 @@ async def get_list(R:dict): #
     if not len(form.errors):
         
         where=''
-        
-        if form.foreign_key:
+        if hasattr(form,'foreign_key') and form.foreign_key:
             where=f'WHERE {form.foreign_key}={form.foreign_key_value}'
         values={}
         for v in form.db.query(

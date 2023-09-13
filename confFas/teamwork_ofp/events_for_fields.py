@@ -1,7 +1,6 @@
 from config import config
 from lib.core_crm import get_manager, get_owner
-from lib.core import cur_date, date_to_rus
-
+from lib.core import cur_date, date_to_rus, exists_arg
 
 
   
@@ -94,6 +93,8 @@ def firm_before_code(form,field):
   #print('FIRM CODE!')
   user_id=form.user_id
   html=''
+
+
   if form.script=='edit_form':
     field['type']='code'
     field['full_str']=1
@@ -133,6 +134,22 @@ def inn_before_code(form,field):
     field['html']=f"{form.ov['inn']}"
     #form.pre(form.ov)
 
+def manager_id_before_code(form,field):
+
+  # Делаем бутофорское поле "менеджер", подтягиваем значение из user.manager_id
+  if form.script=='edit_form':
+    field['type']='select_from_table'
+    field['not_process']=1
+    if form.manager['login'] in ('akulov','sed','fas'):
+      field['read_only']=False
+
+    if form.ov and 'mf__id' in form.ov:
+      field['value']=form.ov['mf__id']
+
+    #form.pre(form.ov)
+
+
+
 events={
   'born':{
     'before_code':born_before_code
@@ -145,9 +162,12 @@ events={
     'before_code':inn_before_code,
     'filter_code':inn_filter_code
   },
-  'manager_from':{
-    'before_code':manager_before_code
+  'manager_id':{
+    'before_code':manager_id_before_code,
   },
+  #'manager_from':{
+  #  'before_code':manager_before_code
+  #},
   'manager_to':{
     'before_code':manager_before_code
   },
