@@ -11,7 +11,7 @@ def create_ofp_card(form):
             'city':ov['city'],
             #'inn':ov['inn'],
             'user_id':form.id,
-            'manager_to':form.manager['id'],        
+            #'manager_to':form.manager['id'], # По умолчанию проставлялся Бородин, но решили убрать
         }
 
         if ov['city']:

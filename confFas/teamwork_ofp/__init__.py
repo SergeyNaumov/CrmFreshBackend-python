@@ -28,7 +28,9 @@ form={
     ],
     'QUERY_SEARCH_TABLES':[
       {'t':'teamwork_ofp','a':'wt'},
-      {'t':'user','a':'u','l':'u.id=wt.user_id','lj':1, 'for_fields':['firm', 'inn', 'f_city']},
+      {'t':'user','a':'u','l':'u.id=wt.user_id','lj':1, 'for_fields':['firm', 'inn', 'f_city','manager_id']},
+      {'t':'manager','a':'m','l':'m.id=u.manager_id','lj':1, 'for_fields':['manager_id']},
+
       {'t':'manager','a':'mf','l':'wt.manager_from=mf.id','lj':1, 'for_fields':['manager_from','managers_groups_name']},
       {'t':'manager','a':'mt','l':'wt.manager_to=mt.id','lj':1},
       {'t':'manager','a':'mt2','l':'wt.manager_to2=mt2.id','lj':1,'for_fields':['manager_to2']},

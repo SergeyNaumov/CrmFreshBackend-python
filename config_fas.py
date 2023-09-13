@@ -27,6 +27,7 @@ def alter_all_change_action(form):
 
 config={
   'BaseUrl':'https://fas.crm-dev.ru/',
+  'config_folder':'confFas'
   'title':'CRM Fas',
   'copyright':'copyright 2005 - {{cur_year}}',
    'bottom_menu': [

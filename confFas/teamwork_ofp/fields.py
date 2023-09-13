@@ -211,9 +211,9 @@ fields=[
         },
         {
             'description':'Менеджер',
-            'type':'select_from_table',
+            'type':'filter_extend_select_from_table',
             'table':'manager',
-            'name':'manager_from',
+            'name':'manager_id', # manager_from
             'header_field':'name',
             'order':'name',
             'value_field':'id',
