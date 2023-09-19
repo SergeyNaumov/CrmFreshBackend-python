@@ -27,6 +27,14 @@ form={
             'value_field':'id'
         },
         {
+            'description':'Бренд',
+            'name':'brand_id',
+            'type':'select_from_table',
+            'table':'brand',
+            'header_field':'header',
+            'value_field':'id'
+        },
+        {
           'before_code': permissions_before_code,
           'description':'Права учётной записи',
           'add_description':'для юрлиц и аптек',

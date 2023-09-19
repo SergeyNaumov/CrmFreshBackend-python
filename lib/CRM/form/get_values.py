@@ -42,6 +42,9 @@ def func_get_values(form):
 
 
     for f in form.fields:
+      if not( 'name' in f ):
+        break
+
       if form.action=='new':
         f['value']=''
       if 'name' in f: name=f['name']

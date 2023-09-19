@@ -50,7 +50,7 @@ def save_form(form,arg):
 
       # Если мы только создаём карточку -- пароль также разрешено сохранить
       if(f['type']=='password' and form.action=='insert'):
-        if form.s.config['encrypt_method'] == 'mysql_sha2':
+        if form.s.config['auth']['encrypt_method'] == 'mysql_sha2':
           save_hash[name]=form.db.query(
             query="select sha2(%s,256)",
             values=[v],

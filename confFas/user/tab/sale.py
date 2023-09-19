@@ -47,7 +47,8 @@ fields=[
             'auth_table_alias':'m_memo',
             'make_delete':False,
             'make_edit':False,
-            'tab':'sale'
+            'tab':'sale',
+            'show_type':'html'
         },
         {
             'description':'Состояние2',
@@ -55,22 +56,22 @@ fields=[
             'type':'textarea',
             'tab':'sale'
         },
-        {
-            'description':'ОТК',
-            'name':'otk',
-            'type':'checkbox',
-            'read_only':True,
-            #'before_code':otk_before_code,
-            'tab':'sale',
-        },
-        {
-            'description':'ДТ2',
-            'name':'dt2',
-            'type':'checkbox',
-            'read_only':True,
-            #'before_code':dt2_before_code,
-            'tab':'sale',
-        },
+        # {
+        #     'description':'ОТК',
+        #     'name':'otk',
+        #     'type':'checkbox',
+        #     'read_only':True,
+        #     #'before_code':otk_before_code,
+        #     'tab':'sale',
+        # },
+        # {
+        #     'description':'ДТ2',
+        #     'name':'dt2',
+        #     'type':'checkbox',
+        #     'read_only':True,
+        #     #'before_code':dt2_before_code,
+        #     'tab':'sale',
+        # },
         {
             'description':'Презентация заявки',
             'name':'prez_order',

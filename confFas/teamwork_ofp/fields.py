@@ -211,14 +211,14 @@ fields=[
         },
         {
             'description':'Менеджер ОП',
-            'type':'filter_extend_select_from_table',
+            'type':'select_from_table',
             'table':'manager',
-            'name':'manager_id', # manager_from
+            'name':'manager_from',
             'db_name':'id',
             'header_field':'name',
             'order':'name',
             'value_field':'id',
-            'tablename':'m',
+            'tablename':'mf',
             'tab':'work',
             'read_only':True,
             'filter_on':True

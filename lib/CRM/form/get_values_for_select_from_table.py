@@ -59,9 +59,7 @@ def get_values_for_select_from_table(form,f,debug=False):
     #if not re.match('^\s*order by',f['order'],re.IGNORECASE):
 
     query+=f" ORDER BY {f['order']}"
-    if f['name']=='service_id':
-      print('f3:',f['order'],"\n\n")
-      print('query:',query,f['order'])    
+  
 
   lst=[]
 

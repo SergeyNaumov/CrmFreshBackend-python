@@ -1,8 +1,5 @@
 #uvicorn main:app --port=5021 --workers 5 &>/dev/null &
-uvicorn \
-    --reload \
-    --port=5000 --workers 5 \
- main:app
+uvicorn  --reload --port=5000 --workers 1 main:app
 
     # --reload-dir=./templates \
     # --reload-dir=./lib \

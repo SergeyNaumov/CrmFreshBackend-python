@@ -27,7 +27,7 @@ def get_old_values(form):
                 FROM
                   teamwork_ofp wt
                   LEFT JOIN user u ON (u.id=wt.user_id)
-                  LEFT JOIN manager mf ON (mf.id=u.manager_id)
+                  LEFT JOIN manager mf ON (mf.id=wt.manager_from)
                   LEFT JOIN manager mt ON (mt.id=wt.manager_to)
                   LEFT JOIN manager mt2 ON (mt2.id=wt.manager_to2)
                   LEFT JOIN manager mu ON (mu.id=u.manager_id)

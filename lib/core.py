@@ -107,7 +107,7 @@ def create_fields_hash(form):
     if 'name' in f:
       form.fields_hash[f['name']]=f
     else:
-      form.errors.append('Отсутствует name в поле: ',f)
+      form.errors.append(f'Отсутствует name в поле: {f["description"]}')
 
 
 # Возвращает расширение файла
