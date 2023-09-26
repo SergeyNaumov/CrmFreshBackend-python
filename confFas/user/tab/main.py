@@ -21,9 +21,21 @@ fields=[
             'filter_on':True,
         },
         {
-            'description':'Город',
+            'description':'Город (старое)',
             'name':'city',
             'type':'text',
+            'read_only':1,
+            'tab':'main'
+        },
+        {
+            'description':'Город',
+            'name':'city_id',
+            'type':'select_from_table',
+            'table':'city',
+            'tablename':'c',
+            'header_field':'name',
+            'value_field':'city_id',
+            'autocomplete':1,
             'tab':'main'
         },
         {

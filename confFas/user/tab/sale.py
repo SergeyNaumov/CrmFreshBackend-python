@@ -9,6 +9,7 @@ fields=[
             'header_field':'name',
             'value_field':'id',
             'tab':'sale',
+            'read_only':True,
             'filter_on':True
         },
         {

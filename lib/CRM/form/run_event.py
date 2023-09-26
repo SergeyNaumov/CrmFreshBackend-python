@@ -4,7 +4,9 @@ def run_event(form,event_name,arg={}):
     
     if not form.success():
       return
-      
+    
+    #print('RUN EVENT:',event_name,arg)  
+
     if arg and 'field' in arg:
       field=arg['field']
       if event_name in field: # Если мы в аргументах передаём поле -- событие ищем внутри этого поля

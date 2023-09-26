@@ -11,6 +11,7 @@ def insert_or_update(form,field,arg):
       form.errors.append('обратитесь к разработчику: в запросе отсутствуют значения (values)')
     
     data=get_data(form,field)
+    print('data:',data)
     foreign_key_value=form.id
     if 'foreign_key_value' in field:
       if field['foreign_key_value']:

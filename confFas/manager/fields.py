@@ -32,10 +32,10 @@ def get_fields():
       'min_length':8,
       'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
       'methods_send':[
-        {
-          'description':'сохранить и отправить по электронной почте',
-          'method_send':send_new_password
-        },
+        # {
+        #   'description':'сохранить и отправить по электронной почте',
+        #   'method_send':send_new_password
+        # },
         {
           'description':'сохранить и никуда не отправлять',
           'method_send': without_send
@@ -50,8 +50,17 @@ def get_fields():
       'type':'1_to_m',
       'table':'manager_email',
       'table_id':'id',
+      'view_type':'list',
       'foreign_key':'manager_id',
+      'order':'main desc',
       'fields':[
+        {
+          'description':'Основной',
+          'type':'checkbox',
+          'name':'main',
+          #'make_change_in_slide':1,
+          #'change_in_slide':1,
+        },
         {
           'description':'Бренд',
           'type':'select_from_table',

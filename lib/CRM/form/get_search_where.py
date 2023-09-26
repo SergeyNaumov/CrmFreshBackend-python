@@ -4,6 +4,15 @@ import shlex
 def get_search_where(form,query):
   WHERE,headers=[],[]
   VALUES=[]
+
+  # add_where
+  if hasattr(form,'add_where') and len(form.add_where):
+    if isinstance(form.add_where, list):
+      for w in form.add_where: WHERE.append(w)  
+    if isinstance(form.add_where, str):
+      WHERE.append(form.add_where)
+
+  
   if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value') and form.foreign_key_value:
     WHERE.append(f"wt.{form.foreign_key}={form.foreign_key_value}")
 
@@ -141,19 +150,22 @@ def get_search_where(form,query):
             VALUES.append(max_date)          
 
       elif f['type']=='memo':
-        v=values[0]
-        date_low=from_datetime_get_date(v['registered_low'])
+        #print('VALUES:',values)
+        v=values
+        if 'registered_low' in v:
+          date_low=from_datetime_get_date(v['registered_low'])
 
-        if date_low:
-            date_low=date_low+' 00:00:00'
-            WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' >= %s')
-            VALUES.append(date_low)
+          if date_low:
+              date_low=date_low+' 00:00:00'
+              WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' >= %s')
+              VALUES.append(date_low)
         
-        date_hi=from_datetime_get_date(v['registered_hi'])
-        if date_hi:
-            date_hi=date_hi+' 23:59:59'
-            WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' <= %s')
-            VALUES.append(date_hi)
+        if 'registered_hi' in v:
+          date_hi=from_datetime_get_date(v['registered_hi'])
+          if date_hi:
+              date_hi=date_hi+' 23:59:59'
+              WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' <= %s')
+              VALUES.append(date_hi)
 
         m=exists_arg('message',v)
         if m:

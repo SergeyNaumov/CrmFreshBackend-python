@@ -54,17 +54,36 @@ def otk_before_code(form,field):
         field['read_only']=False
 
 def brand_id_before_code(form,field):
-    if form.manager['login'] in ('akulov','sed','pzm'):
+
+    if form.manager['permissions']['user_change_brand']:
+        # может менять бренд в картах ОП
         field['read_only']=0
 
+    if form.action in ('new'):
+        field['value']=form.manager_brand
 
+def manager_id_before_code(form,field):
+    if form.manager['permissions']['card_op_make_change_manager']:
+        field['read_only']=0
+
+    # Если это руководитель:
+    if form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
+        field['read_only']=0
+        
+    #form.pre(form.ov)
+    #form.pre(form.manager)
+    if form.action in ('new'):
+        field['value']=form.manager['id']
+    
+        
 
 events={
-  'links':{
-    'before_code':links_before_code
-  },
+
   'brand_id':{
     'before_code':brand_id_before_code
+  },
+  'manager_id':{
+    'before_code':manager_id_before_code
   },
   'firm':{
     'filter_code':firm_filter_code

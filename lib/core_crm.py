@@ -123,18 +123,29 @@ def get_owner(**arg):
 			db=db,
 			include_gone=exists_arg('include_gone',arg)
 		)
-		print('cur_manager:',cur_manager)
+		
 	if cur_manager: 
 		path=f'{cur_manager["group_path"]}/{cur_manager["group_id"]}'
 		for group_id in list(reversed(path.split('/'))):
+
 			if not(group_id): next
 			r=db.query(
-				query='SELECT m.*,mg.id group_owner from manager m JOIN manager_group mg ON (m.id=mg.owner_id) where mg.id=%s and m.id>0',
+				query=f'''
+					SELECT
+						m.id, m.name, m.group_id, m.phone, mg.id group_owner, me.email
+					FROM
+						manager m
+						JOIN manager_group mg ON (m.id=mg.owner_id)
+						LEFT JOIN manager_email me ON (me.manager_id=m.id and me.main=1)
+					WHERE
+						mg.id=%s and m.id>0
+					GROUP BY m.id
+				''',
 				values=[group_id],
 				onerow=1
 			)
 			if r:
-				pass
+				
 				if exists_arg('child_groups',arg) or exists_arg('child_groups_hash',arg):
 					r['CHILD_GROUPS']=child_groups(db=db,group_id=r['group_owner'])
 				

@@ -112,8 +112,18 @@ def load_form_from_dir(confdir,conflib_dir, arg):
           if f['name'] in events:
             # все возможные события
             for event_name in (
-              'before_code','permissions','filter_code','code','slide_code','after_save_code','after_insert_code','after_update_code',
-              'before_save_code','before_update_code','before_delete_code','after_delete_code'
+              'permissions','before_code',
+
+              'before_insert', 'before_update', 'before_save',
+              'before_insert_code', 'before_update_code', 'before_save_code','before_delete_code',
+
+              
+              'after_insert', 'after_update', 'after_save',
+              'after_insert_code''after_update_code','after_save_code','after_delete_code',
+              
+              'code','slide_code',
+              
+              'filter_code',
             ):
               if event_name in events[f['name']]:
                 f[event_name]=events[f['name']][event_name]

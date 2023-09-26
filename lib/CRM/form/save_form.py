@@ -6,7 +6,7 @@ def save_form(form,arg):
   
   if len(form.errors): return
   save_hash={}
-  print('NEW_VALUES:',form.new_values)
+  
   for f in form.fields:
      
       if exists_arg('read_only',f) or exists_arg('not_process',f):
@@ -107,6 +107,24 @@ def save_form(form,arg):
     elif f['type']=='in_ext_url':
         save_in_ext_url(form,f,value)
 
+  # события после сохранения формы
+  if form.success():
+    if form.action=='insert':
+      form.run_event('after_insert')
+    if form.action=='update':
+      form.run_event('after_update')
+    
 
+    for f in form.fields:
 
+      if form.action=='insert':
+        form.run_event('after_insert',{'field':f})
+      if form.action=='update':
+        form.run_event('after_update',{'field':f})
+
+      
+
+      form.run_event('after_save',{'field':f})
+
+    form.run_event('after_save')
   #form.log.append('save_form не сделана')

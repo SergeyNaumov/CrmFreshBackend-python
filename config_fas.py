@@ -27,6 +27,9 @@ def alter_all_change_action(form):
 
 config={
   'BaseUrl':'https://fas.crm-dev.ru/',
+  'system_email':'noname@gmail.com',
+  'system_url':'https://fas.crm-dev.ru/',
+
   'config_folder':'confFas',
   'title':'CRM Fas',
   'copyright':'copyright 2005 - {{cur_year}}',
@@ -67,8 +70,7 @@ config={
   'after_create_engine':after_create_engine,
   'after_read_form_config':after_read_form_config, # Вызывается после чтения конфига от CRM
   #'after_all_change_action':alter_all_change_action,
-  'system_email':'noname@gmail.com',
-  'system_url':'https://fas.crm-dev.ru/',
+
   'connects':{
     'crm_read':{
       'user':'fas',
@@ -115,8 +117,9 @@ config={
 
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
-    #'manager_id':585 ,
+    'manager_id':585 # А ,
     
-    'manager_id':12039  ,
+    #'manager_id':12039 # О ,
+    #'manager_id': 11691 # Г
   }
 }

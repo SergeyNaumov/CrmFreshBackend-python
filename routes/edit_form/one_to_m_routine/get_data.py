@@ -11,15 +11,16 @@ def get_data(form,field):
       foreign_key_value=form.id
 
     data[field['foreign_key']]=foreign_key_value
-
+    
     for f in field['fields']:
         
         if f['type'] in ['code','file','picture']: continue
         if exists_arg('read_only',f): continue
 
-        v=exists_arg(f['name'],values) or None
+        v=exists_arg(f['name'],values)
 
-
+        #if f['type'] in ['checkbox','switch']:
+        #  print('checkbox:', v)
         if not v==None:
           #print(f'VALUE {f["name"]}', v)
           regexp_rules=exists_arg('regexp_rules',f) or ''
@@ -43,6 +44,7 @@ def get_data(form,field):
 
                 i+=2
           if f['type'] in ['checkbox','switch']:
+            #print('checkbox:', v)
             if v=='true': v=1
             elif v=='false': v=0
           data[f['name']]=v

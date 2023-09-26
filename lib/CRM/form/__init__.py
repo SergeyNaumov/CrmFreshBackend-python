@@ -167,12 +167,12 @@ class Form():
   def save(form,**arg): save_form(form,arg)
 
   def run_event(form,event_name,field=None):
-    
+    #print('RUN event:', event_name)
     func_run_event(form,event_name,field)
     
     # Если были изменения -- запускаем из конфига общую функцию обработки
     # (нужно для сроса кэша у сайтов)
-    if event_name in ['after_sort','after_delete','after_save','after_save_const','after_save_multiconnect','after_delete_code','after_save_code','after_slide_sort']:
+    if event_name in ['after_sort','after_delete','aftert_insert', 'after_update', 'after_save','after_save_const','after_save_multiconnect','after_delete_code','after_save_code','after_slide_sort']:
       if 'after_all_change_action' in config and config['after_all_change_action']:
         config['after_all_change_action'](form)
 
