@@ -115,6 +115,8 @@ config={
 
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
-    'manager_id':585,
+    #'manager_id':585 ,
+    
+    'manager_id':12039  ,
   }
 }

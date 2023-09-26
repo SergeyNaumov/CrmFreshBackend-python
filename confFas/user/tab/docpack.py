@@ -45,6 +45,7 @@ fields=[{
   'type':'docpack',
   'name':'docpack',
   'tab':'docpack',
+  'not_filter':1,
   'docpack_foreign_key':'user_id',
   'dogovor_number_rule':dogovor_number_rule,
   'bill_number_rule':bill_number_rule

@@ -137,6 +137,8 @@ async def get_result(R: dict):
 
 
   output=process_result_list(form,R,result_list)
+  #print('output:',output)
+
   form.SEARCH_RESULT['log']=form.log
   form.SEARCH_RESULT['output']=output
   form.run_event('after_search')

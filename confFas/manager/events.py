@@ -7,6 +7,8 @@ def events_permissions(form):
     #return 
     if ('superadmin' in form.manager['permissions']) or (form.manager['login']=='admin'):
       form.is_admin=1
+      form.not_create=0
+      form.make_delete=1
       form.read_only=0
       init_search_plugin(form)
       
@@ -14,11 +16,13 @@ def events_permissions(form):
       form.is_admin=0
       form.make_delete=0
 
-    if form.manager['login'] in ('akulov','admin'):
+    perm=form.manager['permissions']
+    if perm['manager_all_edit']:
       form.read_only=0
       form.make_delete=True
-
-    if not form.manager['login'] in ('akulov','admin'):
+      form.not_create=False
+    
+    if not(perm['manager_access']) and not(perm['manager_all_edit']):
       form.errors.append('доступ запрещён!')
       #return 
 

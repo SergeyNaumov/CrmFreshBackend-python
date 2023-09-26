@@ -1,5 +1,9 @@
 def events_permission(form):
-    pass
+    perm=form.manager['permissions']
+    #form.pre()
+    if perm['manager_group_edit']:
+        form.read_only=0
+    #pass
     #if form.manager['login']!='admin':
     #    form.errors.append('Доступ запрещён')
 
@@ -18,7 +22,7 @@ def before_delete(form):
 
 events={
   'permissions':[
-     
+     events_permission
   ],
   #'before_delete':before_delete,
   #'before_code':events_before_code

@@ -8,7 +8,7 @@ def permissions(form):
   # Смотрим, какой бренд у данного менеджера
   manager_group=db.query(
     query="select * from manager_group where id=%s",
-    values=[381], # form.manager['group_id']
+    values=[form.manager['group_id']], # 
     onerow=1
   )
   manager_brand=None
@@ -18,9 +18,9 @@ def permissions(form):
   
   perm=form.manager['permissions']
 
-  if form.script=='edit_form':
-    form.ov={}
-    if form.id:
+  
+  form.ov={}
+  if form.id:
 
       form.ov=db.query(
         query=f"SELECT * from user where id={form.id}",
@@ -33,10 +33,11 @@ def permissions(form):
       if exists_arg('cgi_params;action',R) == 'create_ofp_card':
           create_ofp_card(form)
       
-      
+      #form.pre({'manager_brand':manager_brand})
       # В карте выбран брэнд
-      if form.ov['brand_id'] and not( perm.get('user_show_all_brand') ) and form.ov['brand_id'] != manager_brand:
-        form.errors.append('Вам запрещено просматривать данную карту (Вы работаете в рамках другого бренда)')
+      if not perm['user_show_all_brand']:
+        if form.ov['brand_id'] and form.ov['brand_id'] != manager_brand:
+          form.errors.append('Вам запрещено просматривать данную карту (Вы работаете в рамках другого бренда)')
 
       form.read_only=0
 events={

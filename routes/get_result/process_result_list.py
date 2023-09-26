@@ -152,7 +152,8 @@ def process_result_list(form,R,result_list):
       data.append({
           'name':name,
           'type':type,
-          'value':value
+          'value':value,
+          'show_type':exists_arg('show_type',field) or ''
       })
 
     # все эти заморочки для структур с составнам work_table_id,

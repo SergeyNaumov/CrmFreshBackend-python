@@ -13,6 +13,7 @@ form={
     'sort':True,
     'tree_use':True,
     'max_level':2,
+    'changed_in_tree':True,
     'explain':False,
     'fields': [ 
         {

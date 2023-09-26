@@ -1,7 +1,7 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 import datetime as dt
-from lib.core import date_to_rus
+from lib.core import date_to_rus, exists_arg
 
 router = APIRouter()
 
@@ -51,7 +51,8 @@ async def get_memo(config:str, field_name:str,id:int): #
       'field':{
         'description':field['description'],
         'type':field['type'],
-        'name':field['name']
+        'name':field['name'],
+        'show_type':exists_arg('show_type',field)
       },
       'errors':form.errors,
       'log':form.log,

@@ -14,6 +14,7 @@ form={
     'tree_use':True,
     'max_level':2,
     'explain':False,
+    'changed_in_tree':True,
     'fields': [ 
         {
             'description':'Наименование',

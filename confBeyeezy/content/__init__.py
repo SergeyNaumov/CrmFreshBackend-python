@@ -1,9 +1,17 @@
+"""
+create table content(
+id int unsigned primary key auto_increment,
+url varchar(255) not null default '',
+body text,
+unique key(url)
+) engine=innodb default charset=utf8;
+"""
 form={
     'work_table':'content',
-    'work_table_id':'content_id',
+    'work_table_id':'id',
     #'work_table_foreign_key':'project_id',
     #'work_table_foreign_key_value':4664,
-    'title':'Статичные страницы',
+    'title':'Текстовые страницы',
     'sort':True,
     'tree_use':True,
     'explain':False,
@@ -26,7 +34,7 @@ form={
             'description':'Содержимое',
             'type':'wysiwyg',
             'name':'body',
-            'filter_on':True
+            'filter_on':False
         },
   ]  
     

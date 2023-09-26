@@ -1,5 +1,14 @@
 def events_permission1(form):
-    print('form: ',form)
+    #print('form: ',form)
+    if form.id:
+        ov=form.db.query(
+            query="select * from category where id=%s",
+            values=[form.id],
+            onerow=1
+        )
+
+        if ov:
+            form.title=ov['header']
     #if form.manager['login']!='admin':
     #    form.errors.append('Доступ запрещён')
 
