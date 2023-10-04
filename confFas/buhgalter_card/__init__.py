@@ -89,6 +89,11 @@ form={
           #'link_edit':'/edit_form.pl?action=edit&config=buhgalter_card_requisits&id=<%id%>',
           'fields':[
                       {
+                        'description':'Реквизиты по умолчанию',
+                        'type':'checkbox',
+                        'name':'main'
+                      },
+                      {
                         'description':'Наименование компании',
                         'add_description':'или ФИО для физ.лиц',
                         'type':'text',

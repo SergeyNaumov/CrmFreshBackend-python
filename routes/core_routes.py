@@ -133,6 +133,7 @@ async def leftmenu():
 # Стартовая страница
 @router.get('/startpage')
 async def startpage():
+
   errors=s.errors
   manager=None
   manager_menu_table=None
@@ -170,16 +171,19 @@ async def startpage():
     'success': not len(errors),
     'manager':manager
   }
-
+  
+  
   if 'app_components' in config:
-    response['app_components']: config['app_components']
-    
+    response['app_components'] = config['app_components']
+  
+  
   if not(manager):
     response['redirect']=config['BaseUrl']+'/login'
   
   if 'bottom_menu' in config:
-    #print('bottom_menu:',config['bottom_menu'])
+    
     response['bottom_menu']=config['bottom_menu']
+  
   
   return response
 

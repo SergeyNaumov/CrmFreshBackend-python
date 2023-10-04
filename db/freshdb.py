@@ -125,7 +125,7 @@ class FreshDB():
       #self.connect = pymysql.connect(arg['host'], arg['user'], arg['password'], arg['dbname'])
       self.connect = pymysql.connect(user=arg['user'], password=arg['password'], host=arg['host'], database=arg['dbname'])
       self.connect.ping(reconnect=True)
-
+      self.query(query='set lc_time_names="ru_RU"')
 
     def __init__(self, **arg):
       self.tmpl_saver = None;
@@ -334,11 +334,6 @@ class FreshDB():
       if self.error_str : return []
       self.execute(cur,arg)
 
-      #except Exception as err:
-        
-      #out_error(self,err,arg)
-      #return []
-
       rez=''
       if exists_arg('onevalue',arg):
         try:
@@ -372,26 +367,15 @@ class FreshDB():
               elif exists_arg('tree_use',arg):
                 rez=tree_use_transform(rez)
 
-
-
             except pymysql.err.ProgrammingError as err:
-              #print_console_error('freshdb query error:')
-              #print('ERR:',err,arg['query'])
+
               out_error(self,err,arg)
-              #if exists_arg('errors',arg): arg['errors'].append(err)
               return []
 
       
       if exists_arg('to_json',arg): rez=to_json(rez)
 
-      #if exists_arg('to_tmpl',arg):
-      #  self.tmpl_vars[arg['to_tmpl']]=rez
-
-      #if exists_arg('perpage',arg) & exists_arg('maxpage',arg):return arg['maxpage']
       return rez
-
-      #print("query:")
-      #print({'arg':arg})
 
 
     def save(self, **arg):

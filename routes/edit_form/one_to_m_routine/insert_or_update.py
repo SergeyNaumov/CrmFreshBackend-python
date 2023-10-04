@@ -11,7 +11,7 @@ def insert_or_update(form,field,arg):
       form.errors.append('обратитесь к разработчику: в запросе отсутствуют значения (values)')
     
     data=get_data(form,field)
-    print('data:',data)
+    #print('data:',data)
     foreign_key_value=form.id
     if 'foreign_key_value' in field:
       if field['foreign_key_value']:
@@ -44,7 +44,7 @@ def insert_or_update(form,field,arg):
         
         if form.success():
 
-          data=form.db.save(
+          form.db.save(
             table=field['table'],
             where=f'{field["foreign_key"]}={foreign_key_value} and {field["table_id"]}={arg["one_to_m_id"]}',
             update=1,
@@ -54,15 +54,18 @@ def insert_or_update(form,field,arg):
 
           data=form.db.query(
             query=f'SELECT * from {field["table"]} WHERE {field["table_id"]}=%s',
+            debug=1,
             values=[arg["one_to_m_id"]]
           )
+          #print('data0:',data)
           if not data:
             form.errors.append('данной записи уже не существует, возможно, кто-то удалил её')
           
           normalize_value_row(form,field,data)
+          #print('data1:',data)
           field['values']=data
-        form.run_event('after_update_code',{'field':field,'data':data})
-        form.run_event('after_save_code',{'field':field,'data':data})
+          form.run_event('after_update_code',{'field':field,'data':data})
+          form.run_event('after_save_code',{'field':field,'data':data})
 
       get_1_to_m_data(form,field)
 

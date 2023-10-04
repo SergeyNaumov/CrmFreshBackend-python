@@ -9,11 +9,24 @@ from .docpack_delete import action_docpack_delete
 from .create_docpack import action_create_docpack
 from .get_bills import action_get_bills
 from .create_bill import action_create_bill
+from .load_dogovor import load_dogovor
+from .load_bill import load_bill
+
 #import os
 
 router = APIRouter()
 
-#
+# Загрузка договора
+@router.get('/load-dogovor/{docpack_id}/{ext}/{need_print}')
+async def load_dog(docpack_id: int, ext: str, need_print: int, debug=0):
+    return load_dogovor(docpack_id, ext, need_print, debug)
+
+
+# Загрузка счёта
+@router.get('/load-bill/{docpack_id}/{bill_id}/{ext}/{need_print}')
+async def load_bl(docpack_id: int, bill_id: int, ext: str, need_print: int, debug=0):
+    return load_bill(docpack_id, bill_id, ext, need_print, debug)
+
 @router.post('/{config}/{field_name}')
 async def get_list(config:str, field_name:str, R:dict): # 
     form=read_config(

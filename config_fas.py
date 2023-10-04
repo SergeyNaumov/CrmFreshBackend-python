@@ -16,6 +16,9 @@ def after_read_form_config(form):
     form.errors=form.s.errors
   
   form.manager=form.s.manager
+  form.manager['files_dir']='./files'
+  form.manager['files_dir_web']='/files'
+  
   #manager_login=form.s.manager['id']
   #form.manager=get_permissions_for(form,manager_login)
   # form.manager['files_dir']=f'./files/project_{form.s.project_id}'
