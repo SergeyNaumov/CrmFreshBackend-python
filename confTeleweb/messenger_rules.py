@@ -3,7 +3,7 @@
 import telebot
 
 
-bot=None
+bot_dict={}
 async def get_new_messages(db,shop_id,manager_id):
 	v=db.query(
 		query="select count(*) from messages where recipient_id=%s and shop_id=%s and readed=0",
@@ -146,11 +146,17 @@ def send(s,R):
 
 
 
-	global bot
-	if not(bot):
-		bot=telebot.TeleBot(s.shop['token']) 
+	global bot_dict
+	token = s.shop['token']
+	print('token:',token)
+	print('bot_dict:',bot_dict)
+	bot = None
+	if token in bot_dict:
+		bot=bot_dict[token]
+	else:
+		bot=telebot.TeleBot(token)
+		bot_dict[token]=bot
 
-	
 	bot.send_message(user['tg_id'],R['message'])
 	# добавляем сообщение в список
 	s.db.save(
