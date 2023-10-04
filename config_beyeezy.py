@@ -11,15 +11,15 @@ def after_create_engine(s,errors=[]):
 # 
 def after_read_form_config(form):
 
-  
+
   if len(form.s.errors):
     form.errors=form.s.errors
   
   form.manager=form.s.manager
-  #manager_login=form.s.manager['id']
-  #form.manager=get_permissions_for(form,manager_login)
-  # form.manager['files_dir']=f'./files/project_{form.s.project_id}'
-  # form.manager['files_dir_web']=f'/files/project_{form.s.project_id}'
+  form.manager['files_dir']='./files'
+  form.manager['files_dir_web']=f'/files/'
+
+  
 
 # Будет выполняться для каждой операции insert / delete / update в crm
 def alter_all_change_action(form):

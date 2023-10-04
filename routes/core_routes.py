@@ -49,6 +49,8 @@ async def mainpage():
   
   if len(response['errors']):
     response['success']=0
+
+
   return response
 # Левое меню по-умолчанию
 @router.get('/left-menu')
@@ -169,6 +171,9 @@ async def startpage():
     'manager':manager
   }
 
+  if 'app_components' in config:
+    response['app_components']: config['app_components']
+    
   if not(manager):
     response['redirect']=config['BaseUrl']+'/login'
   

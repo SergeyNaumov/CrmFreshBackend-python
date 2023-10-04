@@ -32,6 +32,11 @@ config={
 
   'config_folder':'confFas',
   'title':'CRM Fas',
+  'app_components':{ # Компоненты веб-приложения
+    'messenger':{
+
+    }
+  },
   'copyright':'copyright 2005 - {{cur_year}}',
    'bottom_menu': [
       #{'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}
@@ -39,6 +44,8 @@ config={
   #'encrypt_method':'mysql_sha2',
   #'encrypt_method':'encrypt',
   'use_project':False,
+  'messenger_rules':{},
+
   'auth':{
     # Таблица авторизации:
     'manager_table':'manager',
@@ -61,11 +68,11 @@ config={
     
   },
   'mail':{ # Откуда отправляем почту
-    'default_from_addr':'crm@bzinfo.pro',
-    'server':'email.t-pass.pro',
+    'default_from_addr':'',
+    'server':'',
     'port': 587,
-    'user':'crm@bzinfo.pro',
-    'password':'%,52,riantInGstARdeBric'
+    'user':'',
+    'password':''
   },
   'after_create_engine':after_create_engine,
   'after_read_form_config':after_read_form_config, # Вызывается после чтения конфига от CRM
