@@ -12,7 +12,7 @@ def create_ofp_card(form):
             #'inn':ov['inn'],
             'user_id':form.id,
             # По умолчанию проставлялся Бородин, но решили проставлять того, кто создал
-            'manager_id':form.manager['id'], 
+            'manager_from':form.manager['id'], 
         }
 
         if ov['city']:

@@ -1,0 +1,56 @@
+<div style="margin-top: 30px;">
+	<style>
+		h2 {margin-bottom: 10px;}
+		table.zakaz_info {border-collapse: collapse;}
+		table.zakaz_info td {border: 1px solid gray; padding: 2px 5px;}
+
+		h3 {margin-top: 20px;}
+	</style>
+
+	<h2>Заказ №{{zakaz.id}} от {{zakaz.ts}}</h2>
+
+	<div>Информация о заказе:</div>
+	<table class="zakaz_info">
+		<tr>
+			<td>Наименование товар</td>
+			<td>Кол-во</td>
+			<td>Цена</td>
+			<td>Сумма</td>
+		</tr>
+		{%for g in zakaz_info%}
+			<tr>
+				<td>{{g.header}}</td>
+				<td>{{g.cnt}}</td>
+				<td>{{g.price}}</td>
+				<td>{{g.summ}}</td>
+			</tr>
+		{%endfor%}
+		<tr>
+			<td colspan="3">Итого</td>
+			
+			<td>{{zakaz.total_price}}</td>
+		</tr>
+	</table>
+	
+	<h3>Информация о пользователе:</h3>
+	<table class="zakaz_info">
+		<tr>
+			<td>Ник в Telegram:</td>
+			<td>{{user.username}}</td>
+		</tr>
+		<tr>
+			<td>Имя:</td>
+			<td>{{user.first_name}}</td>
+		</tr>
+		{%if user.last_name%}
+		<tr>
+			<td>Фамилия:</td>
+			<td>{{user.last_name}}</td>
+		</tr>
+		{%endif%}
+		<tr>
+			<td>Телефон:</td>
+			<td>{{user.phone}}</td>
+		</tr>
+	</table>
+</div>

@@ -1,13 +1,18 @@
 from fastapi import Depends, FastAPI, Request, Response
+
 from starlette.responses import JSONResponse, Response
 from routes import router
 from lib.engine import s
 
 # uvicorn main:app --reload --port=5000
 app = FastAPI(Debug=True)
-@app.middleware("http")
-async def for_all_requests(request: Request,call_next, response=Response):
 
+
+
+
+@app.middleware("http") # ""
+async def for_all_requests(request: Request,call_next, response=Response):
+  
   response_obj=response()
   s.reset(
     request=request,
@@ -34,6 +39,9 @@ async def for_all_requests(request: Request,call_next, response=Response):
       response.headers[h[0]] = h[1]
 
   return response
+
+
+
 
 
 app.include_router(router)

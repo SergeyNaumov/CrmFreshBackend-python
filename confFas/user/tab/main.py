@@ -14,6 +14,13 @@ fields=[
             'filter_on':True,
         },
         {
+            'description':'Логин',
+            'name':'login',
+            'type':'text',
+            'tab':'main',
+            'filter_on':False,
+        },
+        {
             'description':'Название компании',
             'name':'firm',
             'type':'text',

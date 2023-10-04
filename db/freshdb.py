@@ -45,8 +45,10 @@ def out_error(self,error,arg):
         arg['error'].append(error)
     else: 
         arg['error']=error
-  
-  print("\nQUERY:\n"+arg['query'])
+  else:
+    print("\nERROR QUERY:\n"+arg['query'])
+    print(error)
+    
   if ('values' in arg) and len(arg['values']):
     print(arg['values'])
     #quit()

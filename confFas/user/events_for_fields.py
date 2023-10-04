@@ -67,9 +67,9 @@ def manager_id_before_code(form,field):
         field['read_only']=0
 
     # Если это руководитель:
-    if form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
+    if form.ov and form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
         field['read_only']=0
-        
+
     #form.pre(form.ov)
     #form.pre(form.manager)
     if form.action in ('new'):

@@ -58,7 +58,7 @@ def permissions(form):
       
       # Возможность редактировать все карты ОП
       if perm.get('user_edit_all'):
-        field['read_only']=0
+        form.read_only=0
       
       # Возможность редактировать руководителю
       if form.ov['manager_id']==form.manager['id'] or form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
