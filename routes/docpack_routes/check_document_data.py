@@ -5,7 +5,7 @@ def out_debug(dp):
 		{'description':'Договор','name':'dog'},
 		{'description':'Счёт','name':'bill'},
 		{'description':'Клиент','name':'client'},
-		{'description':'Наше юр. лицо','name':'client'},
+		{'description':'Наше юр. лицо','name':'ur_lico'},
 		{'description':'Изображения','name':'img'},
 
 	]
@@ -18,8 +18,11 @@ def out_debug(dp):
 		},
 		{'description':'дата договора','name':'dogovor_from','tab':'dog'},
 		{'description':'должность ответственного лица в родительном падеже','name':'position_otv_rod','tab':'client'},
-		{'description':'ген. дир в именительном падеже','name':'gen_dir_f_im','tab':'client'},
+		{'description':'ген. дир в именительном падеже (кратко)','name':'gen_dir_f_im','tab':'client'},
+		{'description':'ген. дир в именительном падеже','name':'fio_dir','tab':'client'},
+
 		{'description':'ген. дир в родительном падеже','name':'fio_dir_rod','tab':'client'},
+		
 		{'description':'организация','name':'firm','tab':'client'},
 		{'description':'юридический адрес','name':'ur_address','tab':'client'},
 		{'description':'почтовый адрес','name':'address','tab':'client'},
@@ -30,8 +33,11 @@ def out_debug(dp):
 		{'description':'рассчётный счёт','name':'rs','tab':'client'},
 		{'description':'кор. счёт','name':'ks','tab':'client'},
 
+
+		{'description':'ген. дир в именительном падеже (кратко)','name':'ur_lico_gen_dir_f_in','tab':'ur_lico'},
 		{'description':'ген. дир в именительном падеже','name':'ur_lico_gen_dir_fio_im','tab':'ur_lico'},
 		{'description':'ген. дир в родительном падеже','name':'ur_lico_gen_dir_fio_rod','tab':'ur_lico'},
+
 		
 		{'description':'организация','name':'ur_lico_firm','tab':'ur_lico'},
 		{'description':'рассчётный счёт','name':'ur_lico_rs','tab':'ur_lico'},
@@ -76,7 +82,7 @@ def out_debug(dp):
 						v=f"{v} / <img src='/files/ur_lico/{v}'>"
 				tab_out.append(f"""
 					<tr>
-						<td>{f['description']}</td>
+						<td>{f['description']} {f['tab']}</td>
 						<td>{v}</td>
 						<td>{f['name']}</td>
 					</tr>""")

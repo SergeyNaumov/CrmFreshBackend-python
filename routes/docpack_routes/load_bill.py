@@ -72,6 +72,8 @@ def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
 	if debug:
 		return out_debug(dp)
 
+	dp['bill_summ_prop']=num_to_text(dp['bill_summ'])
+	
 	empty='./routes/docpack_routes/img/empty.png'
 
 	if not(need_print):

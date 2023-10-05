@@ -31,6 +31,21 @@ form={
           'read_only':1,
 
         },
+        {
+          'description':'Изображения в документе, которые являются печатью',
+          'name':'ur_lico_attach_pechat',
+          'type':'text'
+        },
+        {
+          'description':'Изображения в документе, которые являются подписью ген. директора',
+          'name':'ur_lico_gendir_podp',
+          'type':'text'
+        },
+        {
+          'description':'Изображения в документе, которые являются подписью глав. буха',
+          'name':'ur_lico_buh_podp',
+          'type':'text'
+        }
 #        {
 #          'description':'Доступен для выбора в "доп. файлах"',
 #          'name':'to_other_files',

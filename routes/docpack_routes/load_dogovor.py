@@ -20,7 +20,10 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 				t.header tarif_name,
 				t.summ tarif_summ, t.cnt_orders tarif_cnt_orders,
 				t.count_days tarif_count_days, t.percent_pob, t.comment tarif_comment,
-				b_dog.header b_dog_header,
+				b_dog.header b_dog_header, 
+				b_dog.ur_lico_attach_pechat img_replace_ur_lico_attach_pechat,
+				b_dog.ur_lico_buh_podp img_replace_ur_lico_gendir_podp,
+
 				b_dog.attach dogovor_blank, b_dog.id b_dog_id,
 				dp.registered dp_registered, dp.id dp_id, dp.tarif_id,
 				ur_lico.firm ur_lico_firm, ur_lico.gen_dir_fio_im ur_lico_gen_dir_fio_im, ur_lico.gen_dir_fio_rod ur_lico_gen_dir_fio_rod,
@@ -45,7 +48,7 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 		values=['%e %M %Y', docpack_id],onerow=1
 	)
 	#return dp
-	if debug: return out_debug(dp)
+	#if debug: return out_debug(dp)
 	if not(dp):
 		return {'error': f'пакет документов №{docpack_id} не найден'}
 	
@@ -87,11 +90,19 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 		dp['ur_lico_gendir_podp']=empty
 		dp['ur_lico_attach_pechat']=empty
 
-
-	replace_images=[
-		['ur_lico_gendir_podp',dp['ur_lico_gendir_podp'] ],
-		['ur_lico_attach_pechat',dp['ur_lico_attach_pechat'] ]
-	]
+	replace_images=[]
+	if debug:
+		for f in ('ur_lico_attach_pechat','ur_lico_gendir_podp'):
+			if dp[f"img_replace_{f}"]:
+				for pic_name in dp[f"img_replace_{f}"].split(','):
+					pic_name=pic_name.replace(' ','')
+					replace_images.append([pic_name,f])
+		return replace_images
+	else:
+		replace_images=[
+			['ur_lico_gendir_podp',dp['ur_lico_gendir_podp'] ],
+			['ur_lico_attach_pechat',dp['ur_lico_attach_pechat'] ]
+		]
 
 	
 

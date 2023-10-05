@@ -221,7 +221,7 @@ form={
                       },
                       {
                         'description':'И.О. Фамилия директора',
-                        'name':'gen_dir_f_in',
+                        'name':'gen_dir_f_im',
                         'type':'text',
                         'tab':'rekvizits'
                       },
