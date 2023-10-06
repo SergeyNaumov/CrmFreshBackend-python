@@ -4,12 +4,12 @@ def after_create_engine(s,errors=[]):
   # для dev-а переделано!
   if not(s.manager) or not s.manager['login']:
     return
-  host=s.env['host']
+  host='eva-victory.assist-ant.su' #s.env['host']
 
   d=host.split('.')
   if d[0]=='www':
     host='.'.join(d[1:])
-  
+  host = 'assist.assist-ant.su'
   shop=s.db.query(
     query=f'''
       SELECT
@@ -59,6 +59,9 @@ def alter_all_change_action(form):
 
 config={
   'title':'AssistWeb admin panel',
+  'app_components':{
+    'navigator':True
+  },
   'copyright':'copyright 2004 - {{cur_year}}',
    'bottom_menu': [
       #{'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}

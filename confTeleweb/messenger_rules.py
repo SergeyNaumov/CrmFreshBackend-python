@@ -1,7 +1,7 @@
 # Правила поведения messenger-а
 # для AssistWeb-а
 import telebot
-
+from lib.core import date_to_rus
 
 bot_dict={}
 async def get_new_messages(db,shop_id,manager_id):
@@ -111,7 +111,8 @@ def get_chat(s,user_id, last_chat_message_id=0):
 		
 		values=[]
 	)
-
+	for m in messages:
+		m['ts']=date_to_rus(m['ts'])
 	return {
 		'success':True,
 		'messages':messages,
