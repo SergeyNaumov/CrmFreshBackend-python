@@ -13,11 +13,13 @@ form={
     'default_find_filter':'header',
     'QUERY_SEARCH_TABLES':[
         {'t':'contract_termination','a':'wt'},
-        {'t':'manager','a':'m','l':'wt.manager_id=m.id','lj':True},
-        {'t':'user','a':'u','l':'wt.user_id=u.id','lj':True},
+        {'t':'transfere_result','a':'tr', 'l':'tr.parent_id = wt.id','lj':1},
+        {'t':'manager','a':'m','l':'tr.manager_id=m.id','lj':True},
+        {'t':'user','a':'u','l':'tr.user_id=u.id','lj':True},
       ],
+    #'explain':1,
     'search_links':[
-        {'link':'/vue/admin_table/contract_termination_assignment','description':'Список менеджеров для распределения','target':'_blank'},
+        #{'link':'/vue/admin_table/contract_termination_assignment','description':'Список менеджеров для распределения','target':'_blank'},
 
     ],
     'fields': [ 

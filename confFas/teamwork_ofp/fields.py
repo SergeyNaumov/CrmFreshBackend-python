@@ -214,7 +214,6 @@ fields=[
             'type':'select_from_table',
             'table':'manager',
             'name':'manager_from',
-            'db_name':'id',
             'header_field':'name',
             'order':'name',
             'value_field':'id',
@@ -232,7 +231,8 @@ fields=[
             'order':'name',
             'tablename':'mt',
             'value_field':'id',
-            'where':'id IN (select manager_id from manager_permissions mp where permissions_id=71) and id != 172',
+            # 188 -- юрист (lawer)
+            'where':'id IN (select manager_id from manager_permissions mp where permissions_id=188) and id != 172',
             'tab':'work',
         },
         {
@@ -244,7 +244,7 @@ fields=[
             'order':'name',
             'tablename':'mt2',
             'value_field':'id',
-            'where':'id in (select manager_id from manager_permissions mp where permissions_id=71) and id != 172',
+            'where':'id in (select manager_id from manager_permissions mp where permissions_id=188) and id != 172',
             'read_only':1,
             'tab':'work',         
         },

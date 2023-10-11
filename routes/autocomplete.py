@@ -87,7 +87,7 @@ def get_list(**arg):
     return []
 
   work_table=''
-  if not exists_arg('value',arg):
+  if not exists_arg('value',arg) or not(arg['value']):
     arg['value']=''
   
   like_val=arg['value']
@@ -140,7 +140,7 @@ def get_list(**arg):
       where+=element['depend_where']
 
     #print('WHERE:',where)
-    if like_val:
+    if True or like_val:
       if where:
         where=where+' AND '
       where+=f"{element['header_field']} like %s"
@@ -169,10 +169,11 @@ def get_list(**arg):
       '''
 
     if exists_arg('search_query',element):
-      
+      element['search_query']+=' limit 30'
       element['search_query']=element['search_query'].replace('<%like%>',like_val).replace('<%v%>','%s')
     
-
+    #print('query:',element['search_query'])
+    #print('like_values:',like_values)
     return form.db.query(
 
       query=element['search_query'],

@@ -94,8 +94,12 @@ def process_result_list(form,R,result_list):
           else:
             value='да' if value else 'нет'
 
-        elif field['type_orig'] in ['filter_extend_checbox','filter_extend_switch']:
-          value=('нет','да')[value]
+        elif field['type_orig'] in ['filter_extend_checkbox','filter_extend_switch']:
+          if value:
+            value='да'
+          else:
+            value='нет'
+          #value=('нет','да')[value]
 
         elif field['type_orig'] in ['select_from_table','filter_extend_select_from_table']:
           

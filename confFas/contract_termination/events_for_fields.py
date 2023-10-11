@@ -26,6 +26,11 @@ def api_links_filter_code(form,field,row):
   if row["wt__api_links"]:
     return f'<a href="{row["wt__api_links"]}" target="_blank">отправить</a>'
 
+def registered_date_before_code(form,field):
+  # Дата регистрации
+  if form.script=='admin_table':
+    field['value']=['2023-10-10','']
+
 def user_id_filter_code(form,field,row):    
   if row["wt__user_id"]:
     return f'<a href="/edit_form/user/{row["wt__user_id"]}" target="_blank">{row["wt__user_id"]}</a>'
@@ -48,5 +53,8 @@ events={
   },
   'user_id':{
     'filter_code':user_id_filter_code
+  },
+  'registered_date':{
+    'before_code':registered_date_before_code
   }
 }

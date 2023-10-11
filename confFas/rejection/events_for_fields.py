@@ -38,6 +38,9 @@ def user_id_filter_code(form,field,row):
     return f'<a href="/edit_form/user/{v}" target="_blank">{v}</a>'
   return '-'
 
+def is_double_filter_code(form,field,row):
+   form.pre(field)
+
 events={
   'id':{
     'filter_code':id_filter_code
@@ -56,6 +59,9 @@ events={
   },
   'ts':{
     'before_code':ts_before_code
+  },
+  'is_double':{
+    #'filter_code':is_double_filter_code
   },
   'user_id':{
     'filter_code':user_id_filter_code

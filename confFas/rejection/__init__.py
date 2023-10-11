@@ -13,12 +13,15 @@ form={
     'default_find_filter':'header',
     'QUERY_SEARCH_TABLES':[
         {'t':'rejection','a':'wt'},
-        {'t':'manager','a':'m','l':'wt.manager_id=m.id','lj':True},
+        
+        {'t':'transfere_result','a':'tr', 'l':'tr.parent_id = wt.id','lj':1},
+        {'t':'manager','a':'m','l':'tr.manager_id=m.id','lj':True},
+
         
     ],
     'GROUP_BY':'',
     'search_links':[
-        {'link':'/vue/admin_table/rejection_assignment','description':'Список менеджеров для распределения','target':'_blank'},
+        #{'link':'/vue/admin_table/rejection_assignment','description':'Список менеджеров для распределения','target':'_blank'},
 
     ],
     'fields': [ 
@@ -98,10 +101,6 @@ form={
       'type':'checkbox',
       'name':'without_ftp',
       'filter_on':1,
-      # before_code=>sub{
-      #   my $e=shift;
-      #   $e->{filter_value}=1
-      # }
     },
     {
       'description':'Организация',
@@ -186,7 +185,8 @@ form={
     },
     {
       'description':'ID карты ОП',
-      'type':'text',
+      'type':'filter_extend_text',
+      'tablename':'tr',
       'filter_type':'range',
       'name':'user_id',
       #'read_only':1,
@@ -201,7 +201,8 @@ form={
     },
     {
       'description':'Дубль',
-      'type':'checkbox',
+      'type':'filter_extend_checkbox',
+      'tablename':'tr',
       'name':'is_double',
       'filter_on':1,
     }

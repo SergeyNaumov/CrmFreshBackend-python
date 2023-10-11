@@ -9,9 +9,12 @@ from lib.core import cur_date, date_to_rus, exists_arg
 # Менеджер
 def manager_before_code(form,field):
   
-  if form.manager['login'] in ('sed','admin','akulov'):
+  if form.manager['login'] in ('sed','admin','akulov','pzm'):
     
     field['read_only']=False
+
+  #if form.manager['login'] in ('admin','naumova','sheglova','sed','akulov','zia','strogov','pan'):
+  #  field['read_only']=False
 
   name=field['name']
   if form.ov and form.ov[name]:
