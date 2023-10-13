@@ -262,7 +262,7 @@ def child_groups(db,group_id):
 
 
 def get_permissions_for(form,login):
-   
+  print('login:',login)
   manager=form.db.query(
     query="""
         SELECT 
@@ -280,7 +280,8 @@ def get_permissions_for(form,login):
   )
   #manager['id']=str(manager['id'])
   
-  if manager['password']: del manager['password']
+  if manager and manager['password']:
+    del manager['password']
   
   permissions_list=form.db.query(
     query='''

@@ -12,7 +12,7 @@ def run_event(form,event_name,arg={}):
       if event_name in field: # Если мы в аргументах передаём поле -- событие ищем внутри этого поля
         event_func=field[event_name]
         
-        if event_name=='slide_code':
+        if event_name in ('slide_code', 'after_add'):
           data=exists_arg('data',arg) or {}
           return event_func(form,field,data)
         else:

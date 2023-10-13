@@ -1,7 +1,7 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 import datetime as dt
-from lib.core import date_to_rus, exists_arg
+from lib.core import date_to_rus
 
 router = APIRouter()
 
@@ -40,8 +40,7 @@ async def get_memo(config:str, field_name:str,id:int): #
       """,
       log=form.log,
       values=[form.id],
-      errors=form.errors,
-      #debug=1
+      errors=form.errors
     )
     for d in data:
       d['date']=date_to_rus(d['date'])
@@ -51,8 +50,7 @@ async def get_memo(config:str, field_name:str,id:int): #
       'field':{
         'description':field['description'],
         'type':field['type'],
-        'name':field['name'],
-        'show_type':exists_arg('show_type',field)
+        'name':field['name']
       },
       'errors':form.errors,
       'log':form.log,
@@ -81,15 +79,19 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
 
   memo_id=None
   if not len(errors) and 'message' in R and R['message']:
-    memo_id=form.db.save(
-      table=field['memo_table'],
-      data={
+    data={
         field['memo_table_foreign_key']:form.id,
         field['memo_table_registered']:'func:now()',
         field['memo_table_auth_id']:form.manager['id'],
         field['memo_table_comment']:R['message']
-      }
+    }
+    memo_id=form.db.save(
+      table=field['memo_table'],
+      data=data
     )
+    data['id']=memo_id
+    form.run_event('after_add',{'field':field,'data':data})
+
   success=1
   if len(form.errors): success=0
   return {

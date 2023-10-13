@@ -6,6 +6,34 @@ def get_triade(num):
 	else:
 		return num
 
+# получает словарь получателей, 
+def get_email_list_from_manager_id(db, to: dict):
+	ids=[]
+	for manager_id in to:
+		ids.append(str(manager_id))
+	
+	if len(ids):
+		to_emails={}
+		for email in db.query(
+			query=f'''
+				SELECT
+					me.email
+				FROM
+					manager m
+					join manager_email me ON me.manager_id=m.id
+				WHERE m.id in ({','.join(ids)}) and me.email<>''
+			''',
+			massive=1
+		):
+			#print('email:',email)
+			to_emails[email]=True
+		#возвращает словарь email-ов их email-ов
+
+		return to_emails
+	return {}
+
+
+
 def child_groups(**arg):
 	list_hash={}
 	db=arg['db']

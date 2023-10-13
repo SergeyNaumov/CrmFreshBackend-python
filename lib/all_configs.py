@@ -45,6 +45,7 @@ def get_cur_role(**arg):
   )
 
   if r:
+    #del r['password']
     return r
   else:
     return arg['login']
@@ -86,7 +87,9 @@ def load_form_from_dir(confdir,conflib_dir, arg):
       errors.append(f"Ошибка при загрузке конфига {arg['config']}: {e}")
     except ModuleNotFoundError as e:
       errors.append(f"Ошибка при загрузке конфига {arg['config']}: {e}")
-    
+    except Exception as e:
+      errors.append(f"ошибка при обработке конфига {arg['config']}: {e}")
+
     if not len(errors) and os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
       try:
         module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events')
@@ -95,6 +98,8 @@ def load_form_from_dir(confdir,conflib_dir, arg):
         errors.append(f"Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
       except ModuleNotFoundError as e:
         errors.append(f"Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+      except Exception as e:
+        errors.append(f"ошибка при обработке конфига {arg['config']}: {e}")
     
     if not len(errors):
       form=Form(arg)  
@@ -117,7 +122,7 @@ def load_form_from_dir(confdir,conflib_dir, arg):
               'before_insert', 'before_update', 'before_save',
               'before_insert_code', 'before_update_code', 'before_save_code','before_delete_code',
 
-              
+              'after_add', # для memo
               'after_insert', 'after_update', 'after_save',
               'after_insert_code''after_update_code','after_save_code','after_delete_code',
               
@@ -139,10 +144,15 @@ def load_form_from_dir(confdir,conflib_dir, arg):
   return [form,errors]
 
 def read_config(**arg):
+
   response={}
   
-  # попытка загрузки локального конфига
   
+  # это нужно для того, чтобы в конфиг не попали аргументы:
+  arg["config"]=arg["config"].split('?')[0]
+  
+  
+  # попытка загрузки локального конфига
   config_folder=exists_arg('config_folder',sysconfig)
   
   if not(config_folder): config_folder='conf'
@@ -201,17 +211,24 @@ def read_config(**arg):
 
   # Получаем manager-а 
   auth=sysconfig['auth']
+  login=s.login
+  # form.manager содержит login
   if auth['use_roles']:
-    login=get_cur_role(
-      login=s.login,
-      form=form
+    #print('use_roles:',auth)
+    form.manager=get_cur_role(
+     login=s.login,
+     form=form
     )
+    
+    # if m2:
+    #   form.manager=m2
+    #print('use_roles:',form.manager)
   
   if auth['use_permissions']:
     if s.use_project:
       form.manager=project_get_permissions_for(form,login)
     else:
-      form.manager=get_permissions_for(form,form.manager['login'])
+      form.manager=get_permissions_for(form,login)
   
   # Атрибуты по умолчанию
   if exists_arg('id',arg): form.id=arg['id']
