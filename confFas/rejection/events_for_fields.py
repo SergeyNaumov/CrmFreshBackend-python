@@ -33,7 +33,7 @@ def ts_before_code(form,field):
     field['value']=[f'{cd}',f'{cd}']
 
 def user_id_filter_code(form,field,row):
-  v=row['wt__user_id']
+  v=row['tr__user_id']
   if v:
     return f'<a href="/edit_form/user/{v}" target="_blank">{v}</a>'
   return '-'

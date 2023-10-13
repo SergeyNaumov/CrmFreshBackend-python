@@ -1,6 +1,23 @@
 from lib.core import exists_arg
 
+
+
 def get_old_values(form):
+	product_hash={
+	  3:'Банковская Гарантия (Аукцион выигран с нашей помощью)',
+	  4:'Банковская Гарантия (есть победитель)',
+	  5:'Банковская гарантия, консультация для продажи тарифа (50/50 от оплаченного тарифа)',
+	  10:'Банковская гарантия (консультация на будущее)',
+	  7:'Тендерный займ (нужен под конкретный аукцион)',
+	  8:'Подготовка документации',
+	  9:'Юридические услуги (разное)',
+	  14:'Юридические услуги (ФАС)',
+	  15:'Юридические услуги (Арбитраж)',
+	  11:'Оформление сро, Лицензий, Допусков',
+	  12:'Лизинг',
+	  13:'Факторинг'
+	};
+
 	ov=None
 	if form.id:
 
@@ -13,13 +30,13 @@ def get_old_values(form):
 		ov=form.db.query(
 			query='''
 				SELECT 
-                  wt.user_id, wt.manager_from, wt.manager_to, wt.manager_to2,  u.firm, u.inn,
+                  wt.teamwork_ofp_id as id, wt.regnumber, wt.user_id, wt.product, '' as link, '' as product_label, wt.manager_from, wt.manager_to, wt.manager_to2,  u.firm, u.inn,
                   mf.id mf__id, mf.group_id manager_from_group, mf.email manager_from_email,
                   mf.phone manager_from_phone,
                   mt.group_id manager_to_group, mt2.group_id manager_to2_group,
                   mt.email manager_to_email, mt.phone manager_to_phone,
                   mt2.email manager_to2_email, mt2.phone manager_to2_phone,
-                  u.city,
+                  u.city, u.firm,
                   mu.name mu__name,
                   mg.header mg__header, mg.id m__group_id,
                   m_oso.id m_oso__id, m_oso.email m_oso__email, m_oso.group_id m_oso__group_id,
@@ -43,6 +60,13 @@ def get_old_values(form):
 
 	
 	if ov:
+		if ov.get('product'):
+			ov['product_label']=product_hash.get(ov['product'])
+		#print('config: ',)
+		#ov['link']=f'''<a href="{form.s.config['system_url']}"edit_form/teamwork_ofp/{form.ov['id']}">{form.ov['firm']}</a>'''
+		ov['link']=f'''<a href="{form.s.config['system_url']}edit_form/teamwork_ofp/{ov['id']}">{ov["firm"]}</a>'''
+		#form.pre({'link':ov['link']})
+
 		ov['block_card']=0
 	form.ov=ov
 	form.old_values=ov
@@ -71,7 +95,7 @@ def permissions(form):
 		
 
 		# Админ ОФП
-		if form.manager['login'] in ('akulov','sed','pzm'):
+		if form.manager['login'] in ('admin', 'akulov','sed','pzm'):
 			form.is_admin=True
 
 		# Менеджер

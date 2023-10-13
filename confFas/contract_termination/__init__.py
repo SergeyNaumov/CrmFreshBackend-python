@@ -11,12 +11,13 @@ form={
     'explain':False,
     'header_field':'url',
     'default_find_filter':'header',
-    'QUERY_SEARCH_TABLES':[
-        {'t':'contract_termination','a':'wt'},
-        {'t':'transfere_result','a':'tr', 'l':'tr.parent_id = wt.id','lj':1},
-        {'t':'manager','a':'m','l':'tr.manager_id=m.id','lj':True},
-        {'t':'user','a':'u','l':'tr.user_id=u.id','lj':True},
-      ],
+    'read_only':1,
+    # 'QUERY_SEARCH_TABLES':[ # перенёс в permissions
+    #     {'t':'contract_termination','a':'wt'},
+    #     {'t':'transfere_result','a':'tr', 'l':'tr.parent_id = wt.id','lj':1},
+    #     {'t':'manager','a':'m','l':'tr.manager_id=m.id','lj':True},
+    #     {'t':'user','a':'u','l':'tr.user_id=u.id','lj':True},
+    #   ],
     #'explain':1,
     'search_links':[
         #{'link':'/vue/admin_table/contract_termination_assignment','description':'Список менеджеров для распределения','target':'_blank'},
@@ -55,10 +56,11 @@ form={
             'filter_on':True
         },
         {
-            'description':'Дата регистрации',
+            'description':'Дата парсинга',
             'type':'date',
-            'name':'registered_date',
-            'filter_on':False,
+            #'name':'registered_date',
+            'name':'ts',
+            'filter_on':True,
 
         },
         
@@ -104,10 +106,11 @@ form={
         },
         {
           'description':'Распределено на',
-          'type':'select_from_table',
+          'type':'filter_extend_select_from_table',
           'name':'manager_id',
           'table':'manager',
           'tablename':'m',
+          #'db_name':'id',
           'header_field':'name',
           'value_field':'id',
           'filter_on':True

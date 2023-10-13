@@ -1,6 +1,7 @@
 from config import config
-from lib.core_crm import get_manager, get_owner
+from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 from lib.core import cur_date, date_to_rus, exists_arg
+from lib.send_mes import send_mes
 
 
   
@@ -151,6 +152,50 @@ def manager_id_before_code(form,field):
 
     #form.pre(form.ov)
 
+# После добавления комментария:
+def comment_after_add(form,field,data):
+  # сообщение должно уходить: Юристу, менеджеру ср, руководителю менеджера
+  manager_id=form.manager['id']
+
+  to={7576: True} # pzm
+  to[manager_id]=True
+
+  for recipent_id in [form.ov['manager_to'], form.ov['manager_to2'], form.ov['manager_from']]:
+    if recipent_id:
+      
+      #if manager_id!=recipent_id:
+      to[recipent_id]=True
+
+      # для отправки руководителям
+      manager=get_manager(id=recipent_id, db=form.db)
+      if manager: 
+        owner=get_owner(cur_manager=manager,db=form.db)
+        if owner: #and manager_id!=owner['id']:
+          to[owner['id']]=True
+
+
+      
+
+  
+  to_emails=get_email_list_from_manager_id(form.db, to)
+
+  #print(f"to_emails: ", ', '.join(to_emails))
+  #to_emails={}
+  if len(to_emails):
+    regnumber_str=''
+    if form.ov['regnumber']:
+      regnumber_str=f"Реестровый номер: {form.ov['regnumber']}"
+    send_mes(
+      from_addr='info@fascrm.ru',
+      to=','.join(to_emails.keys()),
+      subject=f"Новый комментарий, совместная работа ОФП / {form.ov['firm']} / {form.ov['product_label']}",
+      message=f"Наименование компании: {form.ov['link']}<br>"+\
+          f"Менеджер: {form.manager['name']}<br>"+\
+          f"Комментарий: {data['comment']}<br>"+\
+          regnumber_str
+      
+    )
+    
 
 
 events={
@@ -188,5 +233,11 @@ events={
   },
   'contacts':{
     'before_code':contacts_before_code
+  },
+  
+  'comment1': {
+      'after_add':comment_after_add
   }
+
+  
 }

@@ -28,12 +28,25 @@ fields=[
             'filter_on':True,
         },
         {
-            'description':'Город (старое)',
-            'name':'city',
-            'type':'text',
-            'read_only':1,
-            'tab':'main'
+            'description':'Регион',
+            'name':'region_id',
+            'type':'select_from_table',
+            'table':'region',
+            'tablename':'r',
+            'header_field':'header',
+            'value_field':'region_id',
+            'frontend':{'ajax':{'name':'region_id','timeout':100}},
+            'tab':'main',
+
         },
+        # {
+        #     'description':'Город (старое)',
+        #     'name':'city',
+        #     'type':'text',
+        #     'read_only':1,
+        #     'tab':'main'
+        # },
+
         {
             'description':'Город',
             'name':'city_id',
@@ -43,6 +56,15 @@ fields=[
             'header_field':'name',
             'value_field':'city_id',
             'autocomplete':1,
+            'search_query':"""
+                  SELECT
+                    c.city_id v, concat(r.header,' -> ', c.name ) d
+                  FROM
+                    city c
+                    join region r ON (r.region_id=c.region_id)
+                    where c.name like <%v%>
+            """,
+            'frontend':{'ajax':{'name':'city_id','timeout':100}},
             'tab':'main'
         },
         {

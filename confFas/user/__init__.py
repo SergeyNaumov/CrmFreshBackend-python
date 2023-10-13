@@ -17,6 +17,8 @@ form={
             {'t':'manager_group', 'a':'mg', 'l':'m.group_id','for_fields':['f_manager_group']},
             {'t':'user_contact','a':'uc','l':'uc.user_id=wt.id','lj':1, 'for_fields':['f_fio','f_email','f_phone']},
             {'t':'brand','a':'b','l':'wt.brand_id=b.id','lj':1,'for_fields':['brand_id']},
+            # регион
+            {'t':'region','a':'r','l':'wt.region_id=r.region_id','lj':1,'for_fields':['region_id']},
             # город
             {'t':'city','a':'c','l':'wt.city_id=c.city_id','lj':1,'for_fields':['city_id']},
             # memo

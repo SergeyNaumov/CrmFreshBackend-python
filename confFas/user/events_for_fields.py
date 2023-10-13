@@ -75,7 +75,13 @@ def manager_id_before_code(form,field):
     if form.action in ('new'):
         field['value']=form.manager['id']
     
-        
+def region_id_filter_code(form, field, row):
+    if row['r__header']:
+        ts=row['r__timeshift']
+        if ts>=0:
+            ts=f"+{ts}"
+        return f"{row['r__header']} ({ts})"
+    return '-'
 
 events={
 
@@ -94,6 +100,9 @@ events={
   'dt2':{
     'before_code':dt2_before_code
   },
+  'region_id':{
+    'filter_code':region_id_filter_code
+  }
 
 
 }

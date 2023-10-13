@@ -16,7 +16,7 @@ def get_fields():
       #   $login=~s{([^a-zA-Z\-_0-9\.\@]+)}{<span style="color: red;">$1</span>}gs;
       #   return $login;
       # },
-      'read_only':1,
+      #'read_only':1,
       'unique':1,
       'regexp_rules':[
         '/.{3}/','длина логина должна быть не менее 3 символов',
@@ -32,10 +32,10 @@ def get_fields():
       'min_length':8,
       'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
       'methods_send':[
-        # {
-        #   'description':'сохранить и отправить по электронной почте',
-        #   'method_send':send_new_password
-        # },
+        {
+          'description':'сохранить и отправить по электронной почте',
+          'method_send':send_new_password
+        },
         {
           'description':'сохранить и никуда не отправлять',
           'method_send': without_send
@@ -43,6 +43,16 @@ def get_fields():
       ],
       #'before_code':password_before_code,
       'tab':'main'
+    },
+    {
+        'description':'Группа',
+        'name':'group_id',
+        'type':'select_from_table',
+        'table':'manager_group',
+        'tablename':'mg',
+        'header_field':'header',
+        'value_field':'id',
+        'tab':'main'
     },
     {
       'description':'Email - адреса',
@@ -155,8 +165,40 @@ def get_fields():
     },
 
 
+    {
+       'description':'Доступные роли',
+       'name':'access_roles',
+       'tab':'permissions',
+       'type':'1_to_m',
+       'cols':2,
+       'table':'manager_role',
+       'table_id':'id',
+       'foreign_key':'manager_id',
+       'read_only':1,
+       'fields':[
+          {
+            'description':'Роль',
+            'name':'role',
+            'type':'select_from_table',
+            'table':'manager',
+            'header_field':'name',
+            'value_field':'id'
+          }
+       ],
+       'before_code':access_role_before_code,
+       'tab':'permissions',
 
-
+    },
+    {
+      'description':'Текущая роль',
+      'type':'select_from_table',
+      'name':'current_role',
+      'table':'manager',
+      'header_field':'name',
+      'value_field':'id',
+      'tab':'permissions',
+      'before_code':current_role_before_code
+    },
     {
       'before_code': permissions_before_code,
       'description':'Права учётной записи',
@@ -176,6 +218,36 @@ def get_fields():
       'tab':'permissions',
       #'not_order':1,
       #'read_only':1
+    },
+    {
+      'description':'Юридическое лицо',
+      'name':'ur_lico_id',
+      'type':'select_from_table',
+      'table':'ur_lico',
+      'tablename':'ul',
+      'header_field':'firm',
+      'value_field':'id',
+      'tab':'hr'
+    },
+    {
+      'description':'Должность',
+      'type':'text',
+      'name':'position',
+      'tab':'hr'
+    },
+    {
+      'description':'Год и месяц рождения',
+      'add_description':'в формате MM/YY',
+      'type':'text',
+      'name':'born_date',
+      'regexp_rules':[
+          '/^(\d{2}\/\d{2})?$/i','в формате MM/YY',
+      ],
+      'replace_rules':[
+          '/[^0-9\/]/', '',
+          '/^(\d{2})(\d)/','$1/$2'
+      ],
+      'tab':'hr'
     },
     # {
     #    'name':'email',
@@ -251,3 +323,22 @@ def enabled_before_code(**arg):
 
 def access_to_video_bc(form,field):
   if form.action=='new': field['value']=1
+def access_role_before_code(form,field):
+  if form.manager['permissions'].get('manager_make_change_role'):
+    field['read_only']=0
+#
+def current_role_before_code(form,field):
+  field['read_only']=1
+  
+  if form.manager['permissions'].get('manager_make_change_role'):
+    field['read_only']=0
+  ids=form.db.query(
+    query=f"select role from manager_role where manager_id={form.manager['id']}",
+    massive=1,
+    str=1
+  )
+  if len(ids):
+    field['where']=f"id in ({','.join(ids)})"
+  else:
+    field['read_only']=1
+  

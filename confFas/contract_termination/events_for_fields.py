@@ -32,8 +32,9 @@ def registered_date_before_code(form,field):
     field['value']=['2023-10-10','']
 
 def user_id_filter_code(form,field,row):    
-  if row["wt__user_id"]:
-    return f'<a href="/edit_form/user/{row["wt__user_id"]}" target="_blank">{row["wt__user_id"]}</a>'
+  v=row['tr__user_id']
+  if v:
+    return f'<a href="/edit_form/user/{v}" target="_blank">{v}</a>'
   return '-'
 events={
   'registered':{

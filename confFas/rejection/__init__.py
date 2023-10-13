@@ -9,17 +9,19 @@ form={
     'sort':True,
     'tree_use':True,
     'explain':False,
+    'read_only':1,
     'header_field':'url',
     'default_find_filter':'header',
-    'QUERY_SEARCH_TABLES':[
-        {'t':'rejection','a':'wt'},
+    
+    # 'QUERY_SEARCH_TABLES':[ # перенёс в permissions
+    #     {'t':'rejection','a':'wt'},
         
-        {'t':'transfere_result','a':'tr', 'l':'tr.parent_id = wt.id','lj':1},
-        {'t':'manager','a':'m','l':'tr.manager_id=m.id','lj':True},
+    #     {'t':'transfere_result','a':'tr', 'l':'tr.parent_id = wt.id','lj':1},
+    #     {'t':'manager','a':'m','l':'tr.manager_id=m.id','lj':True},
 
         
-    ],
-    'GROUP_BY':'',
+    # ],
+    'GROUP_BY':'wt.id',
     'search_links':[
         #{'link':'/vue/admin_table/rejection_assignment','description':'Список менеджеров для распределения','target':'_blank'},
 
@@ -175,10 +177,11 @@ form={
     },
     {
       'description':'Распределено на',
-      'type':'select_from_table',
+      'type':'filter_extend_select_from_table',
       'name':'manager_id',
       'table':'manager',
       'tablename':'m',
+      'db_name':'id',
       'header_field':'name',
       'value_field':'id',
       'filter_on':1
