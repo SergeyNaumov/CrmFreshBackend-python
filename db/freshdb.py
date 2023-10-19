@@ -412,7 +412,7 @@ class FreshDB():
               insert_vopr.append(func)
               update_names.append('`'+name+'`='+func)
             else:
-              insert_fields.append(name)
+              insert_fields.append('`'+name+'`')
               insert_vopr.append('%s')
               insert_values.append(data[name])
               update_names.append('`'+name+'`=%s')

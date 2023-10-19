@@ -66,8 +66,9 @@ config={
     'max_fails_login_interval':3600,
     'max_fails_ip':20,
     'max_fails_ip_interval':3600,
-    'use_roles':False,
-    'use_permissions':True
+    'use_roles':True,
+    'use_permissions':True,
+    'out_manager_card_link':True, # выводить ссылку на карточку в шапке
     
   },
   'mail':{ # Откуда отправляем почту

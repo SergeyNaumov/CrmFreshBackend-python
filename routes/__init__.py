@@ -58,7 +58,7 @@ router.include_router(router_messenger,prefix='/messenger')
 
 router.include_router(router_extend)
 router.include_router(router_documentation,prefix='/documentation')
-router.include_router(stat_tool,prefix='/stat-tool')
+
 router.include_router(router_page,prefix='/page')
 router.include_router(router_table,prefix='/table')
 
@@ -66,6 +66,7 @@ router.include_router(router_video,prefix='/VideoList')
 router.include_router(router_news,prefix='/NewsList')
 
 router.include_router(router_autocomplete,prefix='/autocomplete')
+router.include_router(stat_tool,prefix='/stat-tool')
 
 router.include_router(router_ajax) # /ajax
 

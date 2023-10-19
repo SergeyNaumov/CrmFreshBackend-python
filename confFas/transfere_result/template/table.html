@@ -1,0 +1,18 @@
+<table class="tbl1" style="width: 100%;">
+	<tr>
+		<td>Наименование</td>
+		<td>ИНН</td>
+		<td>Город</td>
+		<td>Следующий контакт</td>
+		<td>Комментарий</td>
+	</tr>
+	{%for u in list%}
+	<tr>
+		<td><a href="/edit_form/user/{{u.id}}" target="_blank">{{u.firm}}</a></td>
+		<td>{{u.inn}}</td>
+		<td>{{u.city or ''}}</td>
+		<td>{{u.contact_date}}</td>
+		<td>{{u.comment}}</td>
+	</tr>
+	{%endfor%}
+</table>

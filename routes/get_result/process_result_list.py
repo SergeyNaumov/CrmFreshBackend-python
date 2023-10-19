@@ -123,11 +123,11 @@ def process_result_list(form,R,result_list):
             value=exists_arg(tbl+'__'+db_name,r)
 
             if not exists_arg(name,form.SEARCH_RESULT['selects']):
-              form.SEARCH_RESULT['selects'][name]=field.values
+              form.SEARCH_RESULT['selects'][name]=field['values']
 
         elif field['type_orig'] in ['text','textarea','filter_extend_text']:
           t='text' # или textarea ?
-          type='text'
+          #type='text'
           value=exists_arg(tbl+'__'+db_name,r)
 
         elif field['type_orig'] == 'password':

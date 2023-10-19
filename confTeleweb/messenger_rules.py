@@ -26,6 +26,9 @@ async def  init(s):
 
 # получение списка чатов (пользователей)
 def get_chatlist(s):
+	
+	shop_id=s.shop['id']
+	#return shop_id
 	userlist=s.db.query(
 		query='''
 			SELECT
@@ -33,10 +36,10 @@ def get_chatlist(s):
 			FROM
 				user u
 				LEFT JOIN messages m ON m.sender_id=u.tg_id
-			WHERE u.shop_id=%s
+			WHERE u.shop_id=%s and m.shop_id=%s
 			GROUP BY u.id
 		''',
-		values=[s.shop_id]
+		values=[shop_id, shop_id]
 	)
 	return {
 		'success':True,

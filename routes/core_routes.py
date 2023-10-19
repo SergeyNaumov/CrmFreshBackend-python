@@ -155,12 +155,33 @@ async def startpage():
         )
   else:
     errors.append('Ошибка авторизации')
-      
+  
+  
+
+
+
+
   CY=cur_year()
   if manager and ('password' in manager): del manager['password']
 
 
   left_menu_controller='/left-menu'
+  
+  auth=config['auth']
+  # если используются роли
+  if config['auth']['use_roles'] and manager['current_role']:
+    
+
+    if role_login:=s.db.query(
+      query=f"select {auth['auth_log_field']} from {auth['manager_table']} where {auth['manager_table_id']}=%s",
+      values=[manager['current_role']],
+      onevalue=1
+    ):
+        manager['role_login']=role_login
+  
+  # В конфиге настроен вывод на ссылку карточки        
+  if auth.get('out_manager_card_link'):
+    manager['out_manager_card_link']=True
   if exists_arg('left-menu',s.config['controllers']):
     left_menu_controller=s.config['controllers']['left_menu']
   response={
@@ -172,6 +193,7 @@ async def startpage():
     'manager':manager
   }
   
+
   
   if 'app_components' in config:
     response['app_components'] = config['app_components']

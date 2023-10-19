@@ -30,7 +30,7 @@ def get_comments(form,lst):
         for u in lst:
             #print(f"u: {u}\ncomments: { comments[u['id']] }\n\n")
             u['comment']=form.template(
-                './confFas/transfere_result/template/comments.html',
+                './conf/transfere_result/template/comments.html',
                 list=comments[u['id']]
             )
         
@@ -61,7 +61,7 @@ def get_table_for_manager(form, _type, manager_id, ts):
     #print('lst:',lst)
     
 
-    return form.template('./confFas/transfere_result/template/table.html',list=lst)
+    return form.template('./conf/transfere_result/template/table.html',list=lst)
 def search(form, R):
     #R['cgi_params']['type']='43'
     try:
@@ -92,7 +92,7 @@ def search(form, R):
         for m in lst:
             accordion_data.append({
                 "header":form.template(
-                    filename='./confFas/transfere_result/template/accordion_header.html', **m
+                    filename='./conf/transfere_result/template/accordion_header.html', **m
                 ),
                 #"header_links":[{'url':'sasa','style':'','header':'link1'}],
                 'not_container':True,
@@ -106,12 +106,9 @@ def search(form, R):
             })
             #print('accordion_data:',accordion_data)
 
-        
-        return {
-            'success':True,
-            'errors':[],
-            'list':[
-
+        result_list=[]
+        if len(accordion_data):
+            result_list.append(
                 { # раскрывающийся блок
                     'type':'accordion',
                     'data': accordion_data
@@ -140,18 +137,26 @@ def search(form, R):
 
 
                 },
-                # {
-                #     'type':'html',
-                #     'body':'html-код для вывода'
-                # },
-
-            ]
+            )
+        return {
+            'success':True,
+            'errors':[],
+            'list':result_list
         }
     else:
         return {'success':False, 'errors':['Ошибка при поиске (неверный type)']}
     
 
 def permissions(form):
+    
+    _type=int(exists_arg('cgi_params;type',form.R))
+    print('R:',form.R)
+    if(_type==6):
+        form.title='Статистика по уклонениям (РегРФ)'
+    
+    if(_type==5):
+        form.title='Статистика по расторжениям (РегРФ)'
+
     for f in form.filters:
         if f['name']=='ts':
             f['value']=cur_date()

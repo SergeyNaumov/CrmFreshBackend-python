@@ -3,12 +3,12 @@ from lib.all_configs import read_config
 
 router = APIRouter()
 @router.post('/{config}')
-async def get_list(config: str): # 
+async def get_list(config: str, R:dict): # 
     form=read_config(
         action='init',
         config=config,
         #id=exists_arg('id',arg),
-        
+        R=R,
         script='stat_tool'
     )
     response={}
@@ -41,6 +41,7 @@ async def search(config: str, R: dict):
         script='stat_tool',
         R=R
     )
+
     if len(form.errors):
         return {'success':False, 'errors': form.errors}
     func=form.events['search']
