@@ -26,7 +26,7 @@ form={
             'filter_on':True
         },
         {
-            'description':'Вкл',
+            'description':'Опубликовать',
             'type':'checkbox',
             'name':'enabled',
             'filter_on':False
@@ -71,12 +71,12 @@ form={
             'filter_on':True
         },        
 
-        {
-            'description':'Анонс',
-            'type':'textarea',
-            'name':'anons',
-            'filter_on':True
-        },
+        # {
+        #     'description':'Анонс',
+        #     'type':'textarea',
+        #     'name':'anons',
+        #     'filter_on':True
+        # },
         {
             'description':'Фотографии',
             'name':'photos',

@@ -26,7 +26,7 @@ form={
             'filter_on':True
         },
         {
-            'description':'Вкл',
+            'description':'Опубликовать',
             'type':'checkbox',
             'name':'enabled',
             'filter_on':False
@@ -41,12 +41,12 @@ form={
             'value_field':'id',
             'filter_on':True
         },
-        {
-            'description':'Артикул',
-            'type':'text',
-            'name':'artikul',
-            'filter_on':True
-        },
+        # {
+        #     'description':'Артикул',
+        #     'type':'text',
+        #     'name':'artikul',
+        #     'filter_on':True
+        # },
         # Положение важно, используется в events
 
         {

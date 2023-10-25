@@ -218,31 +218,40 @@ async def script_send_to_manager(s, shop_id:int, user_id:int, message:str, conne
 		}
 	)
 	owner_id=shop['owner_id']
-	print('owner_id:',owner_id)
-	print('connections_hash:',connections_hash)
+	#print('owner_id:',owner_id)
+	#print('connections_hash:',connections_hash)
 
 	# считаем, сколько новых сообщений
 	new_messages = await get_new_messages(db,shop_id,shop['owner_id'])
 
 	# Отправляем сообщение через websocket
-	if owner_id in connections_hash:
-		for websocket in connections_hash[owner_id]:
+	socket_name=get_socket_name(shop_id,owner_id)
+	if socket_name in connections_hash:
+		print(f"send to_socket: {shop_id}.{owner_id}")
+		for websocket in connections_hash[socket_name]:
 			try:
 				await websocket.send_text(f"chat_id:{user_id}:{new_messages}")
 				result['cnt_sockets']+=1
 				print('send ok')
-			except Exception:
-				print('error send: ', Exception)
+			except Exception as e:
+				print(f'error send: {e}')
 
 
 	return result
-	
 
+
+def get_socket_name(shop_id, manager_id):
+	#	изначально именем сокета был manager_id, но потом выяснилось, что
+	#	один и тот же менеджер может находиться в разных хостах, поэтому решено было унифицировать
+
+	return f"{shop_id}.{manager_id}"
 
 messenger_rules={
+	'socket_name':get_socket_name,
 	'init':init,
 	'chat_list':get_chatlist,
 	'get_chat':get_chat,
 	'send':send,
-	'script_send_to_manager':script_send_to_manager
+	'script_send_to_manager':script_send_to_manager,
+	'get_socket_name':get_socket_name
 }

@@ -56,7 +56,7 @@ def child_groups(**arg):
 				_list=child_groups(db=arg['db'],group_id=g)
 				if _list:
 					for gl in _list:
-						lost_hash[gl]=1
+						list_hash[gl]=1
 	return list(list_hash.keys())
 
 def get_manager(**arg):

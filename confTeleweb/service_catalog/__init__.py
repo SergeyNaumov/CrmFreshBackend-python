@@ -43,11 +43,11 @@ form={
             ]
 
         },
-        {
-          'description':'Анонс',
-          'name':'anons',
-          'type':'textarea'
-        },
+        # {
+        #   'description':'Анонс',
+        #   'name':'anons',
+        #   'type':'textarea'
+        # },
         {
           'description':'Подробное описание',
           'name':'body',

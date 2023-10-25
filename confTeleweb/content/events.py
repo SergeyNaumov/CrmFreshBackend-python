@@ -24,7 +24,6 @@ def permissions(form):
             table=form.work_table,
             where=(' and '.join(where)),
             values=[v['url']],
-            debug=1
         )
 
         if exists:

@@ -26,6 +26,11 @@ def permissions(form):
             'type':'text',
             'name':'email_for_zakaz',
         },
+        {
+            'description':'Сообщение, когда бот не оплачен',
+            'type':'textarea',
+            'name':'not_paid_message'
+        },
         # {
         #     'description':'Главный раздел сайта это',
         #     'name':'main_page_type'
@@ -39,7 +44,27 @@ def permissions(form):
         #     'description':'Выводить раздел услуг',
         #     'type':'checkbox',
         #     'name':'need_serv'
-        # }, 
+        # },
+        {
+            'description':'Интеграция',
+            #'type':'select_values',
+            'name':'integration',
+            'type':'text'
+            #'values':[
+            #    {'v':'1','d':'YML-файл'},
+            #    {'v':'2','d':'Retail CRM'},
+            #]
+        },
+        {
+            'description':'Домен для интеграции RetailCRM',
+            'name':'retailcrm_domain',
+            'type':'text',
+        },
+        {
+            'description':'API key для интеграции RetailCRM',
+            'name':'retailcrm_api_key',
+            'type':'text',
+        },
         {
             'description':'Url для yml (товары)',
             'type':'text',

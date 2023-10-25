@@ -1,6 +1,6 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
-
+from lib.CRM.form.get_values_for_select_from_table import get_values_for_select_from_table
 router = APIRouter()
 @router.post('/{config}')
 async def get_list(config: str, R:dict): # 
@@ -14,13 +14,22 @@ async def get_list(config: str, R:dict): #
     response={}
     success=True
     if not len(form.errors):
+        #print('filters:',form.filters)
+
+        for f in form.filters:
+            _type=f.get('type')
+
+            if f.get('type')=='select_from_table':
+                f['values']=get_values_for_select_from_table(form, f)
+                f['type']='select'
 
         response['title']=form.title
         response['filters']=form.filters
-        response['errors']=[]
+
     else:
         success=False
-        response['errors']=form.errors
+
+    response['errors']=form.errors
     
     response['success']=success
 
@@ -41,6 +50,8 @@ async def search(config: str, R: dict):
         script='stat_tool',
         R=R
     )
+
+
 
     if len(form.errors):
         return {'success':False, 'errors': form.errors}
