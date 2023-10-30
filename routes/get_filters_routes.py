@@ -32,6 +32,7 @@ async def get_filters_controller(config: str, R:dict):
   order=1
   
   for f in form.fields:
+    print(f"{f['name']} {f['type']}")
     # if(ref($f->{before_code}) eq 'CODE'){
     #   run_event(event=>$f->{before_code},description=>'before_code for '.$f->{name},form=>$form,arg=>$f);
     # }

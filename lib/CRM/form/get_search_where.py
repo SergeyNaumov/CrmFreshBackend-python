@@ -67,7 +67,7 @@ def get_search_where(form,query):
 
       if f['type'] not in ['1_to_m','memo'] and not exists_arg('not_order',f):
           o,operable_fld='',''
-          #print('F:',f)
+
           if f['type'] in ['date','datetime','filter_extend_date','filter_extend_datetime']:
               operable_fld=table+'.'+db_name
               o=operable_fld+" desc"
@@ -117,6 +117,14 @@ def get_search_where(form,query):
         if max:
           WHERE.append(f'({table}.{db_name} <= %s)')
           VALUES.append(max)
+      elif f['type'] in ('filter_extend_checkbox', 'filter_extend_switch', 'checkbox','switch'):
+        v=values
+        if v in (0,'0'):
+          WHERE.append(f"({table}.{db_name}=0)")
+        elif v:
+          WHERE.append(f"({table}.{db_name}=1)")
+
+
 
       elif f['type'] in ('text','textarea','email','filter_extend_text'):
 
