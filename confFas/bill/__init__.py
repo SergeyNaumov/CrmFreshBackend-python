@@ -5,11 +5,14 @@ form={
     'work_table_id':'id',
     #'work_table_foreign_key':'project_id',
     #'work_table_foreign_key_value':4664,
+    'not_create':True,
     'title':'Счета',
     'sort':True,
     'tree_use':False,
     'max_level':2,
     'explain':False,
+    'make_delete':0,
+    'read_only':1,
     'QUERY_SEARCH_TABLES':
       [
           {'t':'bill','a':'wt',},

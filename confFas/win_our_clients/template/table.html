@@ -1,0 +1,35 @@
+<p>Найдено записей: {{count}}</p>
+<table class="tbl1" style="width: 100%;">
+	<thead>
+		<tr>
+			<td>Компания</td>
+			<td>ИНН</td>
+			<td>Представитель</td>
+			<td>Юрист1</td>
+			<td>Юрист2</td>
+			<td>Юрист3</td>
+			<td>Город</td>
+			<td>Город заседания</td>
+			<td>Дата заседания</td>
+			<td>Вид продукта</td>
+			<td>Реестровый №</td>
+			<td>Председатель комиссии</td>
+		</tr>
+	</thead>
+	{%for u in list%}
+	<tr>
+		<td>{{u.firm}}</td>
+		<td>{{u.inn}}</td>
+		<td>{{u.exhibitor}}</td>
+		<td>{{u.manager}}</td>
+		<td>{{u.manager_to}}</td>
+		<td>{{u.manager_to2}}</td>
+		<td>{{u.city}}</td>
+		<td>{{u.city2}}</td>
+		<td>{{u.born}}</td>
+		<td>{{u.product}}</td>
+		<td>{{u.regnumber}}</td>
+		<td>{{u.pred_comm}}</td>
+	</tr>
+	{%endfor%}
+</table>

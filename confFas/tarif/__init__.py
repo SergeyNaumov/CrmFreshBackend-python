@@ -75,9 +75,9 @@ form={
           'header_field':'header',
           'value_field':'id',
           'name':'blank_act_id',
-          'regexp_rules':[
-            '/^\d+$/','Выберите бланк для акта',
-          ],
+          #'regexp_rules':[
+          #  '/^\d+$/','Выберите бланк для акта',
+          #],
         },
         {
           'description':'Бланк для счёт-фактуры',

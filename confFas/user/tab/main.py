@@ -88,7 +88,8 @@ fields=[
             ],
             'replace_rules':[
                 '/[^0-9]/', ''
-            ]
+            ],
+            'frontend':{'ajax':{'name':'inn','timeout':300}},
         },
         {
             'description':'КПП',

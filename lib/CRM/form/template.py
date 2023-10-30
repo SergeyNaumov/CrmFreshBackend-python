@@ -6,6 +6,8 @@ def template(form,filename,**values):
     t=Template(html)
     return t.render(**values)
   except Exception as e:
+    print(f"exception in template {filename} {e}")
+    form.errors.append(e)
     return ''
   # try:
   #   return t.render(**values)

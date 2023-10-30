@@ -84,11 +84,7 @@ form={
     #           'name':'gen_dir_fio_rod',
     #           'type':'text'
     #         },
-    #         {
-    #           'description':'И.О. Фамилия директора',
-    #           'name':'gen_dir_f_in',
-    #           'type':'text'
-    #         },
+
     #         {
     #           'description':'ФИО гл.буха (в именит. падеже)',
     #           'name':'buh_fio_im',
@@ -209,7 +205,7 @@ form={
       'tab':'main'
     },
     {
-      'description':'И.О. Фамилия директора',
+      'description':'Фамилия И. О. Фамилия директора (кратко)',
       'name':'gen_dir_f_in',
       'type':'text',
       'tab':'main'

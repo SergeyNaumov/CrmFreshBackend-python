@@ -1,0 +1,21 @@
+<table class="tbl1 sm" style="width: 100%;">
+	<tr>
+		<td>Время</td>
+		<td>Компания</td>
+		<td>Комментарий</td>
+	</tr>
+
+
+	{%for c in list_comments%}
+		{%if c.new_hour%}
+			<tr><td align="center"><b>{{c.hour}}</b></td><td></td><td></td></tr>
+		{%endif%}
+
+		<tr>
+			<td>{{c.registered}}</td>
+			<td><a href="/edit_form/user/{{c.user_id}}" target="_blank">{{c.firm}}</a></td>
+			<td>{{c.body}}</td>
+		</tr>
+
+	{%endfor%}
+</table>

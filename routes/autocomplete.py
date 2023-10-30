@@ -41,9 +41,16 @@ async def autocomplete(config:str,R: dict):
       for f in field['fields']:
         if f['name'] == sub_name:
           field=f
-    #else:
-
-    #  field=form.get_field(name)
+    else:
+      #field=form.get_field(name)
+      if ajax_autocomplete:=exists_arg('ajax;autocomplete',field):
+        #print('ajax_autocomplete:',ajax_autocomplete)
+        result_list=ajax_autocomplete(form,field,R)
+        return {
+          'success':True,
+          'list': result_list
+        }
+        print('result_list:',result_list)
       
 
   else: # нет поиска по строке, вывозим по depend_where (зависимый фильтр)

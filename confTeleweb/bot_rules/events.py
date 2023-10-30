@@ -38,17 +38,18 @@ def permissions(form):
     
     
 
-def events_before_code(form):
-    pass
-
-def before_delete(form):
-    pass
+def after_save(form):
+    form.db.query(
+        query='UPDATE const set value=unix_timestamp(now()) where shop_id=%s and name=%s',
+        values=[form.s.shop_id,'_last_update_botcommands'],
+        #debug=1,
+    )
     
 
 events={
   'permissions':[
       permissions
   ],
-  'before_delete':before_delete,
-  'before_code':events_before_code
+  'after_save':after_save
+  
 }

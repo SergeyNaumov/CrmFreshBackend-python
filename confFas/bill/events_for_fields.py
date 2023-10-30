@@ -33,6 +33,7 @@ def d1_number_before_code(form,field):
 
 
 def not_ro_admin(form,field):
+
   if form.is_admin: field['read_only']=0
 
 
@@ -87,15 +88,22 @@ def paid_after_save(form,field):
         #print(message)
     
 def paid_before_code(form,field):
-  if form.is_admin: field['read_only']=0
-  if form.ov and form.ov['avance_fact_number']:
-    field['after_html']=f'''
-      <hr>
-      <b>Авансовая счёт-фактура №{ov['avance_fact_number']}</b><br>
-      с печатями: <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=doc">doc</a> | <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=pdf">pdf</a><br>
-      без печатей: <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=doc&without_print=1">doc</a> | <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=pdf&&without_print=1">pdf</a><br>
-      <hr>
-    '''
+  if form.is_admin or form.manager['permissions']['admin_paids']:
+    field['read_only']=0
+  # if form.ov and form.ov['avance_fact_number']:
+  #   field['after_html']=f'''
+  #     <hr>
+  #     <b>Авансовая счёт-фактура №{ov['avance_fact_number']}</b><br>
+  #     с печатями: <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=doc">doc</a> | <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=pdf">pdf</a><br>
+  #     без печатей: <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=doc&without_print=1">doc</a> | <a href="/tools/load_document.pl?type=av_fact&bill_id={form.id}&format=pdf&&without_print=1">pdf</a><br>
+  #     <hr>
+  #   '''
+
+# Дата оплаты
+def date_before_code(form,field):
+  if form.is_admin or form.manager['permissions']['admin_paids']:
+    field['read_only']=0
+
 def paid_to_before_code(form,field):
   if form.is_admin: field['read_only']=0
   if form.ov:
@@ -148,7 +156,7 @@ events={
     'after_save': paid_after_save
   },
   'paid_date':{
-    'before_code': not_ro_admin,
+    'before_code': date_before_code,
   },
   'paid_to':{
     'before_code': paid_to_before_code,

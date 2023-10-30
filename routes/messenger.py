@@ -19,24 +19,25 @@ class ConnectionManager:
 		self.id_by_socket={}
 	async def connect(self, websocket: WebSocket, socket_name:str):
 		await websocket.accept()
-		print('connect: ',websocket, socket_name)
+		#print('connect: ',websocket, socket_name)
 		self.active_connections.append(websocket)
 
 		if not(socket_name in self.active_connections_hash):
 			self.active_connections_hash[socket_name]=[]
 
 		self.active_connections_hash[socket_name].append(websocket)
-		print('active_connections:',self.active_connections)
-		print('active_connections_hash:',self.active_connections_hash)
+		#print('active_connections:',self.active_connections)
+		#print('active_connections_hash:',self.active_connections_hash)
 	def disconnect(self, websocket: WebSocket,socket_name:str):
-		print('dicconnect:',socket_name)
+		...
+		#print('dicconnect:',socket_name)
 
 
 		if socket_name in self.active_connections_hash:
 			if websocket in self.active_connections_hash[socket_name]:
 				self.active_connections_hash[socket_name].remove(websocket)
-		else:
-			print('not manager')
+		#else:
+			#print('not manager')
 		self.active_connections.remove(websocket)
 
 
@@ -54,7 +55,7 @@ connector_manager = ConnectionManager()
 # websocket для сообщений
 @router.websocket("/ws/{socket_name}")
 async def websocket_endpoint(websocket: WebSocket, socket_name: str):
-	print(f'create websocket: {socket_name}')
+	#print(f'create websocket: {socket_name}')
 	await connector_manager.connect(websocket,socket_name)
 
 	try:
@@ -106,7 +107,7 @@ async def send(R: dict):
 
 @router.get('/connects')
 async def get_chatlist():
-	print('manager.active_connections:',connector_manager.active_connections_hash)
+	#print('manager.active_connections:',connector_manager.active_connections_hash)
 	return {'active_connections':s.manager['id']}
 """
 curl -X POST  -H 'Content-Type: application/json' -d '{"message":"Сообщение от пользователя...","user":{id:37}}'

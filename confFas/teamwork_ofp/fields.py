@@ -54,8 +54,11 @@ fields=[
                 '/^\s+/', '',
                 '/\s+$/', '',
            ],
-           'frontend':{'ajax':{'name':'regnumber','timeout':600}},
-           'tab':'main',
+          'regexp_rules':[
+            '/\S+/i','обязательно для заполнения',
+          ],
+          'frontend':{'ajax':{'name':'regnumber','timeout':600}},
+          'tab':'main',
         },
         {
           'description':'Статус победы',

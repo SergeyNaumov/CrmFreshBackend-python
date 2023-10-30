@@ -1,5 +1,7 @@
 from lib.core import exists_arg
 from .create_ofp_card import *
+from .filters_for_manager_op import prepare_filters_for_manager_op
+from .find_inn_doubles import prepare_filters_for_find_inn_doubles
 def permissions(form):
   
   R=form.R
@@ -11,6 +13,7 @@ def permissions(form):
     values=[form.manager['group_id']], # 
     onerow=1
   )
+
   manager_brand=0
   if manager_group and manager_group['brand_id']:
       manager_brand=manager_group['brand_id']
@@ -18,14 +21,25 @@ def permissions(form):
   form.manager_brand=manager_brand
   
   perm=form.manager['permissions']
+
+
   
+  # Список фильтров
+  if form.script=='admin_table':
+
+    if perm.get('is_manager_op'):
+      # особый список фильтров для менеджеров ОП
+      prepare_filters_for_manager_op(form)
+
+    if inn:=exists_arg('cgi_params;find_inn_doubles',R):
+      prepare_filters_for_find_inn_doubles(form,inn)
+
   if perm['user_delete']:
     form.make_delete=1
   
   
   # Если не разрешено видеть все бренды
   if not perm['user_show_all_brand']:
-    #form.add_where=[f'wt.brand_id={manager_brand}']
     form.add_where=f'wt.brand_id={manager_brand}'
 
   form.ov={}

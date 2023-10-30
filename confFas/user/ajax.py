@@ -25,7 +25,7 @@ def region_id(form,v):
     debug=1,
     onerow=1
   )
-  print('region',region)
+  #print('region',region)
   if region:
     result.append('region_id')
     result.append({'after_html':f"Временная зона: {region['ts']}"})
@@ -65,9 +65,16 @@ def city_id(form,v):
     return ['region_id',{'value':str(region_id) }]  
   else:
     return []
+def inn(form,v):
+  result=[]
+  inn=v['inn']
+  if inn.isnumeric() and (len(inn)==10 or len(inn)==12):
+    result=['inn',{'after_html':f'<a href="/vue/admin_table/user?find_inn_doubles={inn}" target="_blank">найти дубли</a>'}]
 
+  return result
 ajax={
   'brand_id':brand_id,
   'city_id':city_id,
-  'region_id':region_id
+  'region_id':region_id,
+  'inn':inn
 }

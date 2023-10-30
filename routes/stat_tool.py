@@ -1,6 +1,8 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 from lib.CRM.form.get_values_for_select_from_table import get_values_for_select_from_table
+import traceback
+
 router = APIRouter()
 @router.post('/{config}')
 async def get_list(config: str, R:dict): # 
@@ -15,8 +17,14 @@ async def get_list(config: str, R:dict): #
     success=True
     if not len(form.errors):
         #print('filters:',form.filters)
+        filters=[]
 
-        for f in form.filters:
+        if hasattr(form, 'filters'):
+            filters=form.filters
+        elif hasattr(form,'fields'):
+            filters=form.fields
+
+        for f in filters:
             _type=f.get('type')
 
             if f.get('type')=='select_from_table':
@@ -24,8 +32,7 @@ async def get_list(config: str, R:dict): #
                 f['type']='select'
 
         response['title']=form.title
-        response['filters']=form.filters
-
+        response['filters']=filters
     else:
         success=False
 
@@ -102,6 +109,7 @@ async def search(config: str, R: dict):
             """
             return func(form, R)
         except Exception as e:
-            return {'success':False, 'errors':[f'ошибка приложения при выполнении события {search} ({e})']}
+            error_info = traceback.format_exc()
+            return {'success':False, 'errors':[f'ошибка приложения при выполнении события {search} ({e}) {error_info}']}
     else:
         return {'success':False, 'errors':[f'ошибка приложения при выполнении события {search} ({e})']}

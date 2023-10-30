@@ -30,16 +30,15 @@ def get_chatlist(s):
 	shop_id=s.shop['id']
 	#return shop_id
 	userlist=s.db.query(
-		query='''
+		query=f'''
 			SELECT
 				u.id, concat(u.first_name,' ',u.last_name) name, sum(m.readed=0) new_messages
 			FROM
 				user u
-				LEFT JOIN messages m ON m.sender_id=u.tg_id
-			WHERE u.shop_id=%s and m.shop_id=%s
+				LEFT JOIN messages m ON m.sender_id=u.tg_id and m.recipient_id={s.manager['id']}
+			WHERE u.shop_id={shop_id} and m.shop_id={shop_id}
 			GROUP BY u.id
 		''',
-		values=[shop_id, shop_id]
 	)
 	return {
 		'success':True,

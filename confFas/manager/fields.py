@@ -236,12 +236,12 @@ def get_fields():
       'tab':'hr'
     },
     {
-      'description':'Год и месяц рождения',
-      'add_description':'в формате MM/YY',
+      'description':'День и месяц рождения',
+      'add_description':'в формате DD/MM',
       'type':'text',
       'name':'born_date',
       'regexp_rules':[
-          '/^(\d{2}\/\d{2})?$/i','в формате MM/YY',
+          '/^(\d{2}\/\d{2})?$/i','в формате DD/MM',
       ],
       'replace_rules':[
           '/[^0-9\/]/', '',

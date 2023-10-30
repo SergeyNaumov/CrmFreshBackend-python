@@ -5,7 +5,8 @@ def permissions(form):
     perm=form.manager['permissions']
     if perm['admin_paids']:
         form.is_admin=True
-
+        form.read_only=False
+        form.make_delete=True
     
     if form.id:
         form.ov=form.db.query(

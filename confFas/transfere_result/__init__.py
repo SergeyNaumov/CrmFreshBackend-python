@@ -150,7 +150,7 @@ def search(form, R):
 def permissions(form):
     
     _type=int(exists_arg('cgi_params;type',form.R))
-    print('R:',form.R)
+    #print('R:',form.R)
     if(_type==6):
         form.title='Статистика по уклонениям (РегРФ)'
     

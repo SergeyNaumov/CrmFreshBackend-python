@@ -1,4 +1,4 @@
-from lib.core import exists_arg
+from lib.core import exists_arg, join_ids
 
 def links_before_code(form,field):
     
@@ -63,16 +63,21 @@ def brand_id_before_code(form,field):
         field['value']=form.manager_brand
 
 def manager_id_before_code(form,field):
-    if form.manager['permissions']['card_op_make_change_manager']:
+    perm=form.manager['permissions']
+    if perm['card_op_make_change_manager']:
         field['read_only']=0
 
     # Если это руководитель:
-    if form.ov and form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
-        field['read_only']=0
+    if form.ov:
+        if form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
+            field['read_only']=0
+            # даём возможность выбрать менеджера только из своей группы
+            if len(form.manager['CHILD_GROUPS']):
+                field['where']=f"group_id in ({join_ids(form.manager['CHILD_GROUPS'])})"
 
     #form.pre(form.ov)
     #form.pre(form.manager)
-    if form.action in ('new'):
+    if form.action=='new':
         field['value']=form.manager['id']
     
 def region_id_filter_code(form, field, row):
@@ -102,6 +107,9 @@ events={
   },
   'region_id':{
     'filter_code':region_id_filter_code
+  },
+  'inn':{
+    #'before_code': inn_before_code
   }
 
 
