@@ -49,11 +49,11 @@ def permissions(form):
             'description':'Интеграция',
             #'type':'select_values',
             'name':'integration',
-            'type':'text'
-            #'values':[
-            #    {'v':'1','d':'YML-файл'},
-            #    {'v':'2','d':'Retail CRM'},
-            #]
+            'type':'select',
+            'values':[
+                {'v':'1','d':'YML-файл'},
+                {'v':'2','d':'Retail CRM'},
+            ]
         },
         {
             'description':'Домен для интеграции RetailCRM',
@@ -69,6 +69,15 @@ def permissions(form):
             'description':'Url для yml (товары)',
             'type':'text',
             'name':'url_yml',
+        },
+        {
+            'description':'Вариант отображения списка товаров',
+            'type':'select',
+            'name':'catalog_list_view',
+            'values':[
+                {'v':1,'d':'Вариант1'},
+                {'v':2,'d':'Вариант2'},
+            ]
         },
         {
             'description':'Url для yml (услуги)',

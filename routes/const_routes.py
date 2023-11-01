@@ -41,10 +41,13 @@ async def get_list(R:dict): #
               value=values[f['name']]
             
             # Для чекбоксов 
-            if f['type'] in ['checkbox','switch'] and value:
+            if f['type'] in ('checkbox','switch') and value:
                 value=int(value)
 
             if f['name'] in values: item['value']=value
+
+            if f.get('values'):
+                item['values']=f['values']
 
             result_list.append(item)
         response['list']=result_list
@@ -126,7 +129,7 @@ async def save_value(R:dict):
                     form.errors.append('Не известно расширение файла, не загружаем')
             pass
         
-        if const_fld['type'] in ['text','textarea','wysiwyg','checkbox','switch']: # Стандартный тип, просто сохраняем
+        if const_fld['type'] in ['text','textarea','wysiwyg','checkbox','switch','select']: # Стандартный тип, просто сохраняем
             #print('const_fld ok:',const_fld)
             # Получаем старое значение в базе
 

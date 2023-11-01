@@ -44,7 +44,7 @@ def exists_arg(key,dict):
       dict2=dict
       v=False
       for k in keys:
-        if not(k in dict2) or not(dict2[k]):
+        if not(k in dict2):
           return False
         dict2=dict2[k]
       return dict2

@@ -10,7 +10,7 @@ form={
     'sort':True,
     'tree_use':False,
     'max_level':2,
-    'explain':False,
+    'explain':1,
     'make_delete':0,
     'read_only':1,
     'QUERY_SEARCH_TABLES':
