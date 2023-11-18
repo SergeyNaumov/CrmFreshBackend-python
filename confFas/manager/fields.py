@@ -137,7 +137,12 @@ def get_fields():
 
         ]
     },
-
+    {
+      'description':'Уволен',
+      'type':'checkbox',
+      'name':'gone',
+      'tab':'main',
+    },
     {
       'name':'name',
       'description':'ФИО',

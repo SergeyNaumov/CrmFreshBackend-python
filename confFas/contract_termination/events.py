@@ -4,6 +4,8 @@ def permissions(form):
   entity = exists_arg('cgi_params;entity',form.R)
   if entity=='5':
     form.title='Расторжения РегРФ'
+  if entity=='8':
+    form.title='Расторжения НС "Ревизор"'
   elif not(form.id):
     form.errors.append('Неузвестное значение entity')
   
@@ -17,7 +19,7 @@ def permissions(form):
   #  form.explain=1
   if form.manager['login'] in ('akulov','pzm','sed','anna','admin'):
         form.search_links.append({
-          'link':"/vue/admin_table/assignment5",
+          'link':f"/vue/admin_table/assignment{entity}",
           'description':"Менеджеры для распределения",
           'target':'contract_termination_stat'
         })
@@ -25,7 +27,7 @@ def permissions(form):
 def before_search(form):
   entity = exists_arg('cgi_params;entity',form.R)
   qs = form.query_search
-  if entity in ('1','2','3','4','5','6',):
+  if entity>0:
     form.query_search['WHERE'].append(f"tr.type={entity}")
 
 events={

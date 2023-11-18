@@ -19,6 +19,24 @@ form={
     'default_find_filter':'header',
     'fields': [ 
         {
+            'description':'promo title',
+            'type':'text',
+            'name':'promo_title',
+            'filter_on':True
+        },
+        {
+            'description':'promo description',
+            'type':'textarea',
+            'name':'promo_description',
+            'filter_on':True
+        },
+        {
+            'description':'promo keywords',
+            'type':'textarea',
+            'name':'promo_keywords',
+            'filter_on':True
+        },
+        {
             'description':'Url',
             'type':'text',
             'name':'url',

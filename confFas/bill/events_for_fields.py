@@ -1,5 +1,5 @@
-from lib.core import date_to_rus
-from lib.core_crm import get_manager, get_owner
+from lib.core import date_to_rus, cur_date
+from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 from lib.send_mes import send_mes
 
 # Юр.Лицо
@@ -41,9 +41,15 @@ def paid_after_save(form,field):
   to={}
   ov=form.ov
   
-
   if ov and ov['m_id']:
-    if True or ( not(form.ov['paid']) and field['value']):
+    if  not(form.ov['paid']) and form.nv['paid']:
+      paid_date=cur_date()
+      #print(f"ov: {form.ov['paid']} // nv: {form.nv['paid']}")
+      form.db.query(
+        query="UPDATE bill set paid_date=%s where id=%s",
+        values=[paid_date,form.id]
+      )
+
       own=get_owner(
         db=form.db,
         cur_manager={
@@ -52,18 +58,24 @@ def paid_after_save(form,field):
           'group_id': ov['m_group_id'],
 
         }
-
       )
+      #print('owner:',own)
       # отправляем менеджеру счёта
-      if ov['m_email'] and ov['m_id']!=form.manager['id']:
-        to[ form.manager['id'] ]=1
+      to_ids={}
+
+      #print(f"email: {ov['m_email']}")
+
+      if  ov['m_id']!=form.manager['id']:
+        #to[ ov['m_email'] ]=1
+        to_ids[ov['m_id']]=1
 
       # и его руководителю
-      if own and own['email'] and own['id'] != form.manager['id']:
-        to[ own['email'] ]=1
+      if own and own['id'] != form.manager['id']:
+        #to[ own['email'] ]=1
+        to_ids[own['id']]=1
 
-      if len(to.keys()):
-        to_str=', '.join(to.keys())
+      if len(to_ids.keys()):
+        #to_str=', '.join(to.keys())
         #print('to_str:',to_str)
 
         
@@ -77,8 +89,12 @@ def paid_after_save(form,field):
           Для компании <a href="{form.s.config['system_url']}edit_form/user/{ov['user_id']}">{ov['firm']}</a><br>
           <a href="{form.s.config['system_url']}edit_form/bill/{form.id}">Счёт №{ov['number']}</a><br>
           Сумма: {form.new_values['summ']}<br>
-          дата оплаты: {form.new_values['paid_date']}
+          дата оплаты: {cur_date}
         '''
+
+        to=get_email_list_from_manager_id(form.db, to_ids)
+
+
         send_mes(
           from_addr='info@fascrm.ru',
           to=','.join(to.keys()),

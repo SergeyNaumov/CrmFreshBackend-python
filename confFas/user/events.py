@@ -31,7 +31,9 @@ def permissions(form):
       # особый список фильтров для менеджеров ОП
       prepare_filters_for_manager_op(form)
 
-    if inn:=exists_arg('cgi_params;find_inn_doubles',R):
+    # превращаем инструмент в "поиск по ИНН"
+    inn=exists_arg('cgi_params;find_inn_doubles',R)
+    if inn or inn=='':
       prepare_filters_for_find_inn_doubles(form,inn)
 
   if perm['user_delete']:

@@ -11,7 +11,11 @@ form={
     'QUERY_SEARCH_TABLES':[
         {'t':'good','a':'wt'},
         {'t':'category','a':'c','l':'c.id=wt.category_id','lj':1,},
+        {'t':'color','a':'color','l':'color.id=wt.color_id','lj':1,'for_fields':['color_id']},
+        {'t':'model','a':'model','l':'model.id=wt.model_id','lj':1,'for_fields':['model_id']},
+        {'t':'season','a':'season','l':'season.id=wt.season_id','lj':1,'for_fields':['season_id']},
     ],
+    'GROUP_BY':'wt.id',
     'fields': [ 
         {
             'description':'Название',
@@ -61,6 +65,49 @@ form={
                 }
             ],
             'filter_on':False
+        },
+        {
+            'description':'Новинка',
+            'name':'new',
+            'type':'checkbox'
+        },
+        {
+            'description':'ТОП',
+            'name':'top',
+            'type':'checkbox'
+        },
+        {
+            'description':'Распродажа',
+            'name':'sale',
+            'type':'checkbox'
+        },
+        {
+            'description':'Цвет',
+            'name':'color_id',
+            'table':'color',
+            'tablename':'color',
+            'type':'select_from_table',
+            'header_field':'header',
+            'value_field':'id',
+            #'filter_code':lambda form,field,row: row['color__header']
+        },
+        {
+            'description':'Модель',
+            'name':'model_id',
+            'table':'model',
+            'tablename':'model',
+            'type':'select_from_table',
+            'header_field':'header',
+            'value_field':'id',
+        },
+        {
+            'description':'Сезон',
+            'name':'season_id',
+            'table':'season',
+            'tablename':'season',
+            'type':'select_from_table',
+            'header_field':'header',
+            'value_field':'id',
         },
         {
             'description':'Параметры',

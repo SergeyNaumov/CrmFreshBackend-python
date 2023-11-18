@@ -4,6 +4,8 @@ def permissions(form):
   entity = exists_arg('cgi_params;entity',form.R)
   if entity=='6':
     form.title='Уклонения РегРФ'
+  elif entity=='9':
+    form.title='Уклонения НС "Ревизор"'
   elif not(form.id):
     form.errors.append('Неузвестное значение entity')
   form.QUERY_SEARCH_TABLES=[ # перенёс в permissions
@@ -20,7 +22,7 @@ def permissions(form):
 
   if form.manager['login'] in ('akulov','pzm','sed','anna','admin'):
         form.search_links.append({
-          'link':"/vue/admin_table/assignment6",
+          'link':f"/vue/admin_table/assignment{entity}",
           'description':"Менеджеры для распределения",
           'target':'contract_termination_stat'
         })
@@ -28,7 +30,7 @@ def permissions(form):
 def before_search(form):
   entity = exists_arg('cgi_params;entity',form.R)
   qs = form.query_search
-  if entity in ('6',):
+  if entity>0:
     form.query_search['WHERE'].append(f"tr.type={entity}")
     
 

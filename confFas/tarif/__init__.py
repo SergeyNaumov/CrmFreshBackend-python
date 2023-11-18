@@ -30,16 +30,16 @@ form={
 
 
         },
-        {
-          'description':'Кол-во дней',
-          'name':'count_days',
-          'type':'text'
-        },
-        {
-          'description':'Кол-во заявок',
-          'name':'cnt_orders',
-          'type':'text'
-        },
+        # {
+        #   'description':'Кол-во дней',
+        #   'name':'count_days',
+        #   'type':'text'
+        # },
+        # {
+        #   'description':'Кол-во заявок',
+        #   'name':'cnt_orders',
+        #   'type':'text'
+        # },
         {
           'description':'Бланк для договора',
           'table':'blank_document',
@@ -50,7 +50,7 @@ form={
           'name':'blank_dogovor_id',
           #regexp=>'^\d+$',
           'regexp_rules':[
-            '/^\d+$/','Выберите бланк для договора',
+            #'/^\d+$/','Выберите бланк для договора',
           ],
         },
         {

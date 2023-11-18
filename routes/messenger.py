@@ -5,7 +5,8 @@ from lib.engine import s
 from config import config
 import json
 
-messenger_rules = config['messenger_rules']
+messenger_rules = config.get('messenger_rules')
+
 
 router = APIRouter()
 

@@ -3,6 +3,7 @@ def events_permission(form):
     #form.pre()
     if perm['manager_group_edit']:
         form.read_only=0
+        form.not_create=0
     #pass
     #if form.manager['login']!='admin':
     #    form.errors.append('Доступ запрещён')

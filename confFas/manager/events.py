@@ -56,7 +56,7 @@ def before_search(form):
 def events_before_code(form):
     pass
 
-def before_delete(form,opt):
+def before_delete(form):
     pass
 
 events={

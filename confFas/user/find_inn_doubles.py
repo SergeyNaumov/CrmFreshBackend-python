@@ -1,5 +1,6 @@
 def prepare_filters_for_find_inn_doubles(form,inn):
-	form.search_on_load=1
+	if inn:
+		form.search_on_load=1
 	fields_hash={}
 	for f in form.fields:
 		f['filter_on']=0

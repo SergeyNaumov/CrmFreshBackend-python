@@ -48,6 +48,11 @@ form={
             'name':'address'
         },
         {
+            'description':'Юр. Адрес',
+            'type':'text',
+            'name':'ur_address'
+        },
+        {
             'description':'Время работы',
             'type':'text',
             'name':'work_time'

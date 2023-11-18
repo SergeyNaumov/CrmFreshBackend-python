@@ -1,26 +1,22 @@
-def permission(form):
-    perm=form.manager['permissions']
-    for f in form.fields:
-        f['filter_on']=True
-    
+def events_permission1(form):
+    print('form: ',form)
     #if form.manager['login']!='admin':
     #    form.errors.append('Доступ запрещён')
 
 def events_permission2(form):
-    pass
+    print('perm2')
 
 def events_before_code(form):
-    #print('is_before_code')
-    pass
+    print('is_before_code')
 
 def before_delete(form):
-    pass
-    #form.errors.append('Вам запрещено удалять!')
+    print('before_detele STARTED!')
+    form.errors.append('Вам запрещено удалять!')
 
 events={
   'permissions':[
-      permission,
-      
+      events_permission1,
+      events_permission2
   ],
   'before_delete':before_delete,
   'before_code':events_before_code
