@@ -9,6 +9,15 @@ def permissions(form):
     form.foreign_key='shop_id'
     form.foreign_key_value=form.s.shop_id   
 
+    if form.id:
+        form.ov=form.db.query(
+            query='select * from bot_rules where id=%s',
+            values=[form.id],
+            onerow=1
+        )
+    else:
+        form.ov={}
+
     # Определяем ajax для контроля уникальности url-а    
     # def ajax_url(form,v):
     #     error=''

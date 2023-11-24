@@ -54,7 +54,7 @@ def get_branch(**arg):
       item=form.db.query(
         query=query,
         onerow=1,
-        debug=1,
+
         errors=form.errors,
       )
       
@@ -339,10 +339,10 @@ def admin_tree_run(**arg):
         order=''
 
         if form.sort:
-          sort=f'{form.sort_field} sort'
+          sort=f', {form.sort_field} sort'
           order=f'ORDER BY {form.sort_field}'
 
-        #query=f'select {form.work_table_id} id,{form.header_field} header {sort} from {form.work_table} where parent_id={id} {order}'
+        query=f'select {form.work_table_id} id,{form.header_field} header {sort} from {form.work_table} where parent_id={id} {order}'
 
         data_result[id]=form.db.query(
           #query=f'SELECT id,header,sort from {form.work_table} where parent_id={id} order by sort'

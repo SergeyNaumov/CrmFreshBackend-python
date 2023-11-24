@@ -111,20 +111,26 @@ def save_form(form,arg):
   if form.success():
     if form.action=='insert':
       form.run_event('after_insert')
+      form.run_event('after_save')
+
     if form.action=='update':
       form.run_event('after_update')
-    
+      form.run_event('after_save')
+
 
     for f in form.fields:
 
+
       if form.action=='insert':
         form.run_event('after_insert',{'field':f})
+        form.run_event('after_save',{'field':f})
+
       if form.action=='update':
         form.run_event('after_update',{'field':f})
-
+        form.run_event('after_save',{'field':f})
       
 
-      form.run_event('after_save',{'field':f})
 
-    form.run_event('after_save')
+
+
   #form.log.append('save_form не сделана')

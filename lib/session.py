@@ -262,7 +262,6 @@ def child_groups(db,group_id):
 
 
 def get_permissions_for(form,login):
-  print('login:',login)
   manager=form.db.query(
     query="""
         SELECT 

@@ -1,5 +1,6 @@
 def permissions(form):
     db=form.db
+
     form.fields=[
         {
             'description':'Наименование компании',
@@ -46,14 +47,40 @@ def permissions(form):
         #     'name':'need_serv'
         # },
         {
-            'description':'Интеграция',
+            'description':'Отправка заказов в RetailCRM',
             #'type':'select_values',
-            'name':'integration',
+            'name':'send_orders_to_retail',
+            'type':'checkbox',
+        },
+        {
+            'description':'Загрузка товаров',
+            #'type':'select_values',
+            'name':'goods_load',
             'type':'select',
             'values':[
-                {'v':'1','d':'YML-файл'},
-                {'v':'2','d':'Retail CRM'},
+                {'v':'1','d':'из YML-файла'},
+                {'v':'2','d':'из Retail CRM'},
             ]
+        },
+        {
+            'description':'Url YML-файла для товаров',
+            'type':'text',
+            'name':'url_yml',
+        },
+        {
+            'description':'Удалять товары, которых нет в YML',
+            'type':'checkbox',
+            'name':'delete_not_exists_goods'
+        },
+        {
+            'description':'Url YML-файла для услуг',
+            'type':'text',
+            'name':'url_yml_serv',
+        },
+        {
+            'description':'Удалять услуги, которых нет в YML',
+            'type':'checkbox',
+            'name':'delete_not_exists_services'
         },
         {
             'description':'Домен для интеграции RetailCRM',
@@ -65,11 +92,7 @@ def permissions(form):
             'name':'retailcrm_api_key',
             'type':'text',
         },
-        {
-            'description':'Url для yml (товары)',
-            'type':'text',
-            'name':'url_yml',
-        },
+
         {
             'description':'Вариант отображения списка товаров',
             'type':'select',
@@ -79,17 +102,80 @@ def permissions(form):
                 {'v':2,'d':'Вариант2'},
             ]
         },
-        {
-            'description':'Url для yml (услуги)',
-            'type':'text',
-            'name':'url_yml_serv',
-        },
+
+        # {
+        #     'description':'Быстрая оплата для услуг (робокасса)',
+        #     'type':'checkbox',
+        #     'name':'serv_fast_paid_robokassa'
+        # },
+
         #{
         #    'description':'Copyright',
         #    'type':'text',
         #    'name':'copyright',
         #},
     ]
+    if form.s.shop['serv_fast_robokassa']:
+        add_fields=[
+            {
+                'description':'Robokassa работает в тестовом режиме',
+                'type':'checkbox',
+                'name':'robokassa_test',
+            },
+            {
+                'description':'Robokassa - Логин',
+                'type':'text',
+                'name':'robokassa_log',
+            },
+            {
+                'description':'Robokassa - Пароль1',
+                'type':'text',
+                'name':'robokassa_pas1',
+            },
+            {
+                'description':'Robokassa - Пароль2',
+                'type':'text',
+                'name':'robokassa_pas2',
+            },
+            {
+                'description':'Ссылка на файл google docs',
+                'type':'text',
+                'name':'google_docs_sheet',
+            },
+            {
+                'description':'Наименование организации',
+                'type':'text',
+                'name':'orgname'
+            },
+            {
+                'description':'ИНН',
+                'type':'text',
+                'name':'inn'
+            },
+            {
+                'description':'ОГРН/ОГРНИП',
+                'type':'text',
+                'name':'ogrn'
+            },
+            {
+                'description':'Контактный телефон',
+                'type':'text',
+                'name':'contact_phone'
+            },
+            {
+                'description':'Контактный email',
+                'type':'text',
+                'name':'contact_email'
+            },
+            {
+                'description':'Оферта',
+                'type':'file',
+                'name':'oferta'
+            }
+        ]
+        for f in add_fields:
+            form.fields.append(f)
+
 
     # form.fields=db.query(
     #     query='''

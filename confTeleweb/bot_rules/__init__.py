@@ -1,4 +1,5 @@
 from .command import after_html as command_after_html
+from .ajax import ajax
 def url_before_code(form,field):
     #form.pre({'shop':form.shop})
     #field['description']=form.shop['domain']
@@ -28,6 +29,7 @@ form={
             {'description':'Клавиатура','name':'keyboard','hide':False}
         ],
     ],
+    'ajax':ajax,
     'fields': [ 
         {
             'description':'Команда',
@@ -63,6 +65,7 @@ form={
                 {'v':1,'d':'InlineKeyboardMarkup'},
                 {'v':2,'d':'ReplyKeyboardMarkup'},
             ],
+            'frontend':{'ajax':{'name':'keyboard_type','timeout':100}},
             'tab':'keyboard',
             'not_filter':1
         },
@@ -72,20 +75,20 @@ form={
             'type':'checkbox',
             'tab':'keyboard',
             'not_filter':1
-        },
-        {
-            'description':'Всегда показывать (не скрывать) клавиатуру',
-            'name':'is_persistent',
-            'type':'checkbox',
-            'tab':'keyboard',
-            'not_filter':1
-        },
+        },  # только для reply
+        # {
+        #     'description':'Всегда показывать (не скрывать) клавиатуру',
+        #     'name':'is_persistent',
+        #     'type':'checkbox',
+        #     'tab':'keyboard',
+        #     'not_filter':1
+        # },
         {
             'description':'Cкрыть клавиатуру, как только она будет использована',
             'name':'one_time_keyboard',
             'type':'checkbox',
             'tab':'keyboard',
-            'not_filter':1
+            'not_filter':1,
         },
 
         {
@@ -97,20 +100,30 @@ form={
             'foreign_key':'rule_id',
             'sort':1,
             'view_type':'list',
-            'before_code':url_before_code,
+            #'before_code':url_before_code,
             'fields':[
                 {
-                    'description':'Текст кнопки',
+                    'description':'Название кнопки',
                     'name':'header',
                     'type':'text',
                 },
                 {
-                    'description':'Запросить контакт',
+                    'description':'Действие при нажатии на кнопку',
+                    'type':'select_values',
+                    'name':'action',
+                    'values':[
+                        {'v':'3','d':'переход по ссылке'},
+                        {'v':'1','d':'переход по ссылке в web-app'},
+                        {'v':'2','d':'выполнить команду бота'},
+                    ]
+                },
+                {
+                    'description':'Запросить контакт при нажатии кнопки',
                     'type':'checkbox',
                     'name':'request_contact'
                 },
                 {
-                    'description':'Ссылка на web-приложение (только для InlineKeyboardMarkup)',
+                    'description':'Ссылка / Команда',
                     'name':'url',
                     'type':'text',
                 },
