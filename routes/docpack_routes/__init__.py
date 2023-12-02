@@ -9,6 +9,8 @@ from .docpack_delete import action_docpack_delete
 from .create_docpack import action_create_docpack
 from .get_bills import action_get_bills
 from .create_bill import action_create_bill
+from .save_summ_bill import save_summ_bill
+
 from .load_dogovor import load_dogovor
 from .load_bill import load_bill
 
@@ -56,3 +58,6 @@ async def get_list(config:str, field_name:str, R:dict): #
     
     if action == 'create_bill':
         return action_create_bill(form,field, R)
+
+    if action == 'save_summ_bill':
+        return save_summ_bill(form,field, R)

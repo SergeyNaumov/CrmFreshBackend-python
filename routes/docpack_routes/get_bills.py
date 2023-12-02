@@ -1,5 +1,8 @@
 from lib.core import exists_arg
 def get_bills(form,field, R):
+  if optional_sub:=field.get('get_bills'):
+    return optional_sub(form,field,R)
+
   docpack_foreign_key=field['docpack_foreign_key']
   lst=[]
   if exists_arg('dogovor_id',R):

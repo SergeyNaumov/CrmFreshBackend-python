@@ -104,6 +104,8 @@ def save_form(form,arg):
       #print('!!NEW_VALUES:',value)
       if isinstance(value,list):
         multiconnect_save(form,f,value)
+    #elif f['type']=='1_to_1_text':
+    #
     elif f['type']=='in_ext_url':
         save_in_ext_url(form,f,value)
 

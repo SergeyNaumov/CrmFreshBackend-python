@@ -61,7 +61,7 @@ def process_edit_form(**arg):
       need_fields.append(f)
 
   form.fields=need_fields
-  
+
 
 
   
@@ -99,7 +99,7 @@ def process_edit_form(**arg):
     
     
     form.edit_form_process_fields()
-    #form.pre(form.fields[0]['value'])
+
     return {
       'action':form.action,
       'title':form.title,

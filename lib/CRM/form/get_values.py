@@ -80,8 +80,8 @@ def func_get_values(form):
             f['values']=get_values_for_select_from_table(form,f)
             
       if f['type'] == '1_to_m':
-
         get_1_to_m_data(form,f)
+
 
       if f['type']=='get_in_ext_url':
         get_in_ext_url(form,f)

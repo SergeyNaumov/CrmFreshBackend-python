@@ -67,14 +67,17 @@ def get_1_to_m_data(form,f,id=None):
       if exists_arg('not_out_in_slide',c):
           continue
 
-      headers.append(
-        {
+      cur_header={
           'name':c['name'],
           'description': exists_arg('description',c),
           'type':c['type'],
+
           'change_in_slide':exists_arg('change_in_slide',c)
-        }
-      )
+      }
+      if st:=exists_arg('subtype',c):
+        cur_header['subtype']=st
+
+      headers.append(cur_header)
 
   f['headers']=headers
   f['values']=[]

@@ -34,9 +34,15 @@ async def get_list(R:dict): #
             pass
     
         result_list=[]
+
         for f in form.fields:
             value=''
-            item={'header':f['description'],'name':f['name'],'type':f['type']}
+
+            item={'header':f['description']}
+            for attr in ('name','type','tab','add_description'):
+                if v:=f.get(attr):
+                    item[attr]=v
+
             if f['name'] in values:
               value=values[f['name']]
             
@@ -44,9 +50,10 @@ async def get_list(R:dict): #
             if f['type'] in ('checkbox','switch') and value:
                 value=int(value)
 
-            if f['name'] in values: item['value']=value
+            if f['name'] in values:
+                item['value']=value
 
-            if f.get('values'):
+            if 'values' in f:
                 item['values']=f['values']
 
             result_list.append(item)
@@ -59,6 +66,11 @@ async def get_list(R:dict): #
     response['filedir']=form.filedir_http
     response['success']=success
     response['errors']=form.errors
+
+    # отдаём табы (если есть)
+    if hasattr(form,'tabs') and len(form.tabs):
+        response['tabs']=form.tabs
+
     return response
 
     # insert into const()

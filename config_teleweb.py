@@ -1,28 +1,34 @@
 # UPDATE manager set password=sha2('123',256);
 from confTeleweb.messenger_rules import messenger_rules
+
 def after_create_engine(s,errors=[]):
-  # для dev-а переделано!
-  if not(s.manager) or not s.manager['login']:
+  #print('after_create_engine')
+  if not(s.manager):
     return
-  host='eva-victory.assist-ant.su' #s.env['host']
+
+  host=s.env['host']
+
+  host='site1.assist-ant.su' #s.env['host']
 
   d=host.split('.')
   if d[0]=='www':
     host='.'.join(d[1:])
-  host = 'assist.assist-ant.su'
+
   shop=s.db.query(
     query=f'''
       SELECT
-        o.*, s.id shop_id, s.domain, s.template_id, s.botname,
-        s.need_serv, s.need_good, s.token
+        o.*, s.id shop_id, s.domain, s.template_id, s.botname, s.token,
+        s.need_serv, s.need_good, s.serv_fast_robokassa
       FROM
         owner o
         join shop s ON s.owner_id=o.id
-      WHERE o.id=%s 
+      WHERE o.id=%s and s.domain=%s
     ''',
-    values=[s.manager['id']],
-    onerow=1
+    values=[s.manager['id'],host],
+    onerow=1,
+    #debug=1
   )
+  #print('shop:',shop)
   s.manager['filedir_http']=''
   if shop:
     s.manager=shop
@@ -31,11 +37,9 @@ def after_create_engine(s,errors=[]):
     s.template_id=shop['template_id']
     s.manager['filedir_http']=f'/files/project_{s.shop_id}'
 
-
   else:
-
-   s.errors.append(f'У Вас нет права для администрирования {host}')
-   return 
+    s.errors.append(f'У Вас нет права для администрирования {host}')
+    return
 
 def after_read_form_config(form):
   if len(form.s.errors):
