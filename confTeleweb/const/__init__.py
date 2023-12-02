@@ -10,6 +10,10 @@ form={
     'name_field':'name',
     'value_field':'value',
     'default_find_filter':'header',
+    'tabs':[
+        {'name':'main','description':'Общие данные'},
+        {'name':'integration','description':'Интеграция'},
+    ]
 }
       
 

@@ -6,51 +6,45 @@ def permissions(form):
             'description':'Наименование компании',
             'type':'text',
             'name':'orgname',
+            'tab':'main',
         },
         {
             'description':'Телефон',
             'type':'text',
             'name':'phone',
+            'tab':'main',
         },
         {
             'description':'Email',
             'type':'text',
             'name':'email',
+            'tab':'main',
         },
         {
             'description':'Email для форм обратной связи',
             'type':'text',
             'name':'email_for_feedback',
+            'tab':'main',
         },
         {
             'description':'Email для заказов',
             'type':'text',
             'name':'email_for_zakaz',
+            'tab':'main',
         },
         {
             'description':'Сообщение, когда бот не оплачен',
             'type':'textarea',
-            'name':'not_paid_message'
+            'name':'not_paid_message',
+            'tab':'main',
         },
-        # {
-        #     'description':'Главный раздел сайта это',
-        #     'name':'main_page_type'
-        #     'type':'select_values',
-        #     'values':[
-        #         {'v':'1','d':'товары'},
-        #         {'v':'2','d':'услуги'},
-        #     ]
-        # },
-        # {
-        #     'description':'Выводить раздел услуг',
-        #     'type':'checkbox',
-        #     'name':'need_serv'
-        # },
+
         {
             'description':'Отправка заказов в RetailCRM',
             #'type':'select_values',
             'name':'send_orders_to_retail',
             'type':'checkbox',
+            'tab':'integration',
         },
         {
             'description':'Загрузка товаров',
@@ -60,22 +54,29 @@ def permissions(form):
             'values':[
                 {'v':'1','d':'из YML-файла'},
                 {'v':'2','d':'из Retail CRM'},
-            ]
+            ],
+            'add_description':'выберите один из вариантов',
+            'tab':'integration',
         },
         {
-            'description':'Url YML-файла для товаров',
+            'description':'YML для товаров',
+            'add_description':'укажите url по которому мы сможем получить YML файл для обновления товаров',
             'type':'text',
             'name':'url_yml',
+            'tab':'integration',
         },
         {
             'description':'Удалять товары, которых нет в YML',
             'type':'checkbox',
-            'name':'delete_not_exists_goods'
+            'name':'delete_not_exists_goods',
+            'tab':'integration',
         },
         {
-            'description':'Url YML-файла для услуг',
+            'description':'YML для услуг',
+            'add_description':'укажите url по которому мы сможем получить YML файл для обновления услуг',
             'type':'text',
             'name':'url_yml_serv',
+            'tab':'integration',
         },
         {
             'description':'Удалять услуги, которых нет в YML',
@@ -116,61 +117,73 @@ def permissions(form):
         #},
     ]
     if form.s.shop['serv_fast_robokassa']:
+        form.tabs.append({'name':'robokassa','description':'Robokassa'})
         add_fields=[
             {
                 'description':'Robokassa работает в тестовом режиме',
                 'type':'checkbox',
                 'name':'robokassa_test',
+                'tab':'robokassa',
             },
             {
                 'description':'Robokassa - Логин',
                 'type':'text',
                 'name':'robokassa_log',
+                'tab':'robokassa',
             },
             {
                 'description':'Robokassa - Пароль1',
                 'type':'text',
                 'name':'robokassa_pas1',
+                'tab':'robokassa',
             },
             {
                 'description':'Robokassa - Пароль2',
                 'type':'text',
                 'name':'robokassa_pas2',
+                'tab':'robokassa',
             },
             {
                 'description':'Ссылка на файл google docs',
                 'type':'text',
                 'name':'google_docs_sheet',
+                'tab':'robokassa',
             },
             {
                 'description':'Наименование организации',
                 'type':'text',
-                'name':'orgname'
+                'name':'orgname',
+                'tab':'robokassa',
             },
             {
                 'description':'ИНН',
                 'type':'text',
-                'name':'inn'
+                'name':'inn',
+                'tab':'robokassa',
             },
             {
                 'description':'ОГРН/ОГРНИП',
                 'type':'text',
-                'name':'ogrn'
+                'name':'ogrn',
+                'tab':'robokassa',
             },
             {
                 'description':'Контактный телефон',
                 'type':'text',
-                'name':'contact_phone'
+                'name':'contact_phone',
+                'tab':'robokassa',
             },
             {
                 'description':'Контактный email',
                 'type':'text',
-                'name':'contact_email'
+                'name':'contact_email',
+                'tab':'robokassa',
             },
             {
                 'description':'Оферта',
                 'type':'file',
-                'name':'oferta'
+                'name':'oferta',
+                'tab':'robokassa',
             }
         ]
         for f in add_fields:
