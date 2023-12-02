@@ -53,6 +53,11 @@ def otk_before_code(form,field):
     if exists_arg('admin_otk', form.manager['permissions']):
         field['read_only']=False
 
+def archive_before_code(form,field):
+    # Доступ к галке "в архиве" у руководителя, либо у того, у кого есть соответствующая галка
+    if (form.id and form.is_owner_group) or form.manager['permissions'].get('archive_in_card_op'):
+        field['read_only']=0
+
 def brand_id_before_code(form,field):
 
     if form.manager['permissions']['user_change_brand']:
@@ -93,6 +98,9 @@ events={
   'brand_id':{
     'before_code':brand_id_before_code
   },
+  'archive':{
+    'before_code':archive_before_code
+  },
   'manager_id':{
     'before_code':manager_id_before_code
   },
@@ -108,9 +116,9 @@ events={
   'region_id':{
     'filter_code':region_id_filter_code
   },
-  'inn':{
+  #'inn':{
     #'before_code': inn_before_code
-  }
+  #}
 
 
 }

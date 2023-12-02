@@ -21,8 +21,8 @@ def requisits_after_save(form,field,data=None):
     #    values=[form.id],
     #    onevalue=1
     #)
-    print('field:',field)
-    print('VALUES:',field['values'])
+    #print('field:',field)
+    #print('VALUES:',field['values'])
 
     
     data=field['values']

@@ -7,7 +7,7 @@ form={
     'tree_use':True,
     'max_level':2,
     'explain':False,
-    'changed_in_tree':True,
+    #'changed_in_tree':True,
     'fields': [ 
         {
             'description':'Наименование категории',
@@ -25,9 +25,15 @@ form={
             'description':'Описание',
             'type':'wysiwyg',
             'name':'body'
+        },
+        {
+            'description':'Таблица размеров',
+            'type':'1_to_1_text',
+            'table':'catalog_sizes',
+            'db_name':''
+
         }
   ]  
     
 }
-      
 

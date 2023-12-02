@@ -1,3 +1,9 @@
+def inn_before_code(form,field):
+    # разрешаем редактировать только руководителям и сотрудникам с расширенными полномочиями:
+    if form.id:
+        if not(form.is_owner_group or form.manager['permissions'].get('user_edit_all')):
+            field['read_only']=True
+
 fields=[
         {
             'description':'Бренд',
@@ -10,21 +16,30 @@ fields=[
             'tab':'main',
             'read_only':True,
             'frontend':{'ajax':{'name':'brand_id','timeout':100}},
-
             'filter_on':True,
         },
         {
-            'description':'Логин',
-            'name':'login',
-            'type':'text',
-            'tab':'main',
-            'filter_on':False,
+            'description':'В архиве',
+            'type':'checkbox',
+            'name':'archive',
+            'read_only':1,
+            'tab':'main'
         },
+        # {
+        #     'description':'Логин',
+        #    'name':'login',
+        #     'type':'text',
+        #     'tab':'main',
+        #     'filter_on':False,
+        # },
         {
             'description':'Название компании',
             'name':'firm',
             'type':'text',
             'tab':'main',
+            'regexp_rules':[
+                '/[абвгдеёжзийклмнопрстуфхцчшщьыъэюяa-z]+/i','Нужно указать корректное название компании',
+            ],
             'filter_on':True,
         },
         {
@@ -39,14 +54,6 @@ fields=[
             'tab':'main',
 
         },
-        # {
-        #     'description':'Город (старое)',
-        #     'name':'city',
-        #     'type':'text',
-        #     'read_only':1,
-        #     'tab':'main'
-        # },
-
         {
             'description':'Город',
             'name':'city_id',
@@ -83,6 +90,8 @@ fields=[
             'name':'inn',
             'type':'text',
             'tab':'main',
+            'before_code': inn_before_code,
+            'frontend':{'ajax':{'name':'inn','timeout':100}},
             'regexp_rules':[
                 '/^(\d{10}|\d{12})?$/i','Инн может быть 10 или 12 цифр',
             ],
@@ -91,25 +100,31 @@ fields=[
             ],
             'frontend':{'ajax':{'name':'inn','timeout':300}},
         },
-        {
-            'description':'КПП',
-            'name':'kpp',
-            'type':'text',
-            'tab':'main',
-            'regexp_rules':[
-                '/^(\d{9})?$/i','КПП должен содержать 9 цифр',
-            ],
-            'replace_rules':[
-                '/[^0-9]/', ''
-            ],
-            #'subtype':'qr_call',
-        },
+        # {
+        #     'description':'КПП',
+        #     'name':'kpp',
+        #     'type':'text',
+        #     'tab':'main',
+        #     'regexp_rules':[
+        #         '/^(\d{9})?$/i','КПП должен содержать 9 цифр',
+        #     ],
+        #     'replace_rules':[
+        #         '/[^0-9]/', ''
+        #     ],
+        # },
         {
             'description':'Зарегистрирована',
             'name':'registered',
             'type':'date',
             'read_only':True,
             'tab':'main',
+        },
+        {
+            'description':'Телефон',
+            'type':'filter_extend_text',
+            'tablename':'uc',
+            'name':'f_phone',
+            'db_name':'phone'
         },
         {
             'description':'Контакты',
@@ -128,6 +143,7 @@ fields=[
                 {
                     'description':'Email',
                     'name':'email',
+                    'subtype':'email',
                     'type':'text',
                 },
                 {

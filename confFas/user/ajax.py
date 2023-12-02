@@ -6,7 +6,7 @@ def brand_id(form,v):
       query='SELECT * from brand where id=%s',
       values=[brand_id],
       onerow=1,
-      debug=1
+
     )
     if brand:
       after_html=f"<img src='/files/logo/{brand['logo']}'>"
@@ -22,7 +22,7 @@ def region_id(form,v):
   region = form.db.query(
     query='select if(timeshift>0,concat("+",timeshift), timeshift) ts from region where region_id=%s',
     values=[region_id],
-    debug=1,
+
     onerow=1
   )
   #print('region',region)
@@ -68,6 +68,25 @@ def city_id(form,v):
 def inn(form,v):
   result=[]
   inn=v['inn']
+
+  if not(form.id) and (len(inn)==10 or len(inn)==12):
+    # если нет id и inn 10 или 12 цифр, то проверяем, не создана ли та же картах в рамках этого бренда
+    if group_id:=form.manager['group_id']:
+      if brand_id:=form.db.query(query="select brand_id from manager_group where id=%s",values=[group_id],onevalue=1 ):
+        # В рамках бренда запрещено создавать карту с тем же ИНН
+        exists=form.db.query(
+          query="select firm,id from user where inn=%s and brand_id=%s",
+          values=[inn,brand_id],
+          onerow=1
+        )
+
+        if exists:
+          result=['inn',{
+            'after_html':f'<a href="/edit_form/user/{exists["id"]}" target="_blank">{exists["firm"]}</a>',
+            'error':f'в рамках данного бренда уже есть карты с инн {inn}'
+          }]
+          return result
+
   if inn.isnumeric() and (len(inn)==10 or len(inn)==12):
     result=['inn',{'after_html':f'<a href="/vue/admin_table/user?find_inn_doubles={inn}" target="_blank">найти дубли</a>'}]
 

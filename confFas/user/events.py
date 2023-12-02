@@ -23,7 +23,9 @@ def permissions(form):
   perm=form.manager['permissions']
 
 
-  
+  # Убираем поле "бренд" всем, у кого нет прав доступ
+  if not(perm.get('show_brand_in_card_op')):
+    form.remove_field('brand_id')
   # Список фильтров
   if form.script=='admin_table':
 
@@ -77,7 +79,13 @@ def permissions(form):
         form.read_only=0
       
       # Возможность редактировать руководителю
-      if form.ov['manager_id']==form.manager['id'] or form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
+      if form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
+        form.is_owner=True # владелец карты
+        if form.manager['is_owner']:
+          form.is_owner_group=True
+
+
+      if form.ov['manager_id']==form.manager['id'] or form.is_owner:
         form.read_only=0
       #form.read_only=0
   
@@ -107,8 +115,19 @@ def after_insert(form):
       debug=1
     )
 
+def before_search(form):
+  qs=form.query_search
+  #form.pre(qs)
+
+  if not('archive' in qs['on_filters_hash']):
+    #form.add_where.append('wt.archive=0')
+    qs['WHERE'].append('wt.archive=0')
+
+  #form.pre(qs['WHERE'])
+  #form.explain=1
+
 events={
   'permissions':permissions,
-  'after_insert':after_insert
-  #'before_search':before_search
+  'after_insert':after_insert,
+  'before_search':before_search
 }

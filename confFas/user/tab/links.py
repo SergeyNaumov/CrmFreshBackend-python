@@ -18,7 +18,7 @@ def links_before_code(form,field):
         else:
             field['after_html']+=f'<div><a href="/edit_form/teamwork_ofp/{ofp["id"]}" target="_blank">Перейти в карту ОФП</a></div>'
 
-    field['after_html']+=f'<div><a href="/edit_form/buhgalter_card/{form.id}" target="_blank">Карточка бухгалтера</a></div>'
+    field['after_html']+=f'<div><a href="/edit_form/buhgalter_card/{form.id}" target="_blank">Реквизиты компании</a></div>'
     
 fields=[
     {

@@ -13,6 +13,7 @@ form={
     'make_delete':0,
     'read_only':1,
     #'not_create':1,
+    'explain':1,
     'ajax':ajax,
     'is_admin':False,
     'cols':[

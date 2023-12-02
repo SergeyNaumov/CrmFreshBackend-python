@@ -1,5 +1,5 @@
 from .fields import fields
-
+from .ajax import ajax
 form={
     'work_table':'bill',
     'work_table_id':'id',
@@ -13,6 +13,19 @@ form={
     'explain':False,
     'make_delete':0,
     'read_only':1,
+    'ajax':ajax,
+    'cols':[
+              [
+                {
+                  'description':'Общая информация','name':'main','hide':False,
+                },
+              ],
+              [
+                {
+                  'description':'Информация об оплате','name':'paid','hide':False,
+                },
+              ]
+    ],
     'QUERY_SEARCH_TABLES':
       [
           {'t':'bill','a':'wt',},
@@ -26,8 +39,6 @@ form={
           {'t':'ur_lico','a':'ul','l':'ul.id=dp.ur_lico_id','lj':1,'for_fields':['ur_lico_id']},
           {'t':'user','a':'u','l':'dp.user_id=u.id'},
           {'t':'buhgalter_card_requisits','a':'bcr','l':'bcr.id=wt.requisits_id','lj':1},
-         # {'t':'bill_part', 'a':'bp', 'l':'bp.bill_id=wt.id', 'lj':1},
-          #{'t':'bill_part_comment','a':'bpc', 'l':'bpc.id=bp.comment_id','lj':1},
     ],
     'fields': fields
     

@@ -1,3 +1,50 @@
+def get_bills(form,field, R):
+
+  docpack_foreign_key=field['docpack_foreign_key']
+  lst=[]
+  if R.get('dogovor_id'):
+      lst=form.db.query(
+        query=f"""
+          SELECT
+              b.*
+          from
+              docpack dp
+              JOIN bill b ON b.docpack_id=dp.id
+          where
+              dp.{docpack_foreign_key}=%s and b.docpack_id=%s
+          order by b.id desc
+        """,
+        values=[form.id, R['dogovor_id']]
+      )
+      perm=form.manager['permissions']
+
+      #pprint(form.manager['permissions'])
+      # проставляем make_edit_summ:
+      for b in lst:
+
+        # Разрешаем редактировать сумму счёта если:
+        if perm.get('admin_paids'):
+            # Если это менеджер платежей
+            b['make_edit_summ']=True
+
+        elif not(b['paid']) and (b['manager_id']==form.manager['id'] or form.manager['CHILD_GROUPS_HASH'].get(b['group_id']) ) :
+            # или менеджер платежа
+            # или руководитель менелжера платежа
+            b['make_edit_summ']=True
+
+        else:
+            b['make_edit_summ']=False
+
+
+        #from pprint import pprint
+        #pprint(b)
+
+  else:
+    form.errors.append('отсутствует параметр dogovor_id')
+  return lst
+
+
+
 def bill_number_rule(form,field):
     
     #my $company_role=($form->{old_values}->{company_role}==2)?'З':'П';
@@ -48,6 +95,7 @@ fields=[{
   'not_filter':1,
   'docpack_foreign_key':'user_id',
   'dogovor_number_rule':dogovor_number_rule,
-  'bill_number_rule':bill_number_rule
+  'bill_number_rule':bill_number_rule,
+  'get_bills':get_bills
 
 }]

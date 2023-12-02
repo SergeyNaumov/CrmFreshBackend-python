@@ -117,10 +117,23 @@ def paid_before_code(form,field):
 
 # Дата оплаты
 def date_before_code(form,field):
-  if form.is_admin or form.manager['permissions']['admin_paids']:
-    field['read_only']=0
+  if form.script=='admin_table':
+    field['value']=['2023-12-01']
+  if form.id:
+    if form.ov['paid']:
+      field['hide']=False
+    if form.is_admin or form.manager['permissions']['admin_paids']:
+      field['read_only']=0
+
+def paid_summ_before_code(form,field):
+  if form.id:
+    if(form.ov['paid']):
+      field['hide']=False
+    if form.is_admin or form.manager['permissions']['admin_paids']:
+      field['read_only']=0
 
 def paid_to_before_code(form,field):
+
   if form.is_admin: field['read_only']=0
   if form.ov:
     user_id=form.ov['user_id']
@@ -147,6 +160,12 @@ def act_before_code(form,field):
     field['not_create']=0
     field['read_only']=0
     field['link_add']=f'/edit_form/act?bill_id={form.id}'
+
+# Название компании
+def firm_filter_code(form,field,row):
+  if firm:=row.get('u__firm'):
+    return f"<a href='/edit_form/user/{row['u__id']}' target='_blank'>{firm}</a>"
+  return '-'
 
 events={
   'c_ur_lico_id': {
@@ -177,6 +196,9 @@ events={
   'paid_to':{
     'before_code': paid_to_before_code,
   },
+  'paid_summ':{
+    'before_code': paid_summ_before_code,
+  },
   'group_id':{
     'before_code': not_ro_admin,
   },
@@ -185,5 +207,8 @@ events={
   },
   'act':{
     'before_code':act_before_code
-  } 
+  },
+  'firm':{
+    'filter_code':firm_filter_code
+  }
 }

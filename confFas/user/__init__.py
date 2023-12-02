@@ -11,6 +11,8 @@ form={
     'ajax':ajax,
     'is_admin':False,
     #'explain':1,
+    'is_owner':False, # Владелец карты
+    'is_owner_group':False, # Руководитель группы
     'QUERY_SEARCH_TABLES':[
             {'table':'user','alias':'wt'},
             {'t':'manager','a':'m','l':'m.id=wt.manager_id','lj':1,'for_fields':['manager_id','f_manager_group']},
@@ -33,7 +35,7 @@ form={
             ],
             [
               {'description':'Продажи','name':'sale','hide':0},
-              #{'description':'Реквизиты','name':'rekvizits','hide':0},
+              {'description':'Платежи','name':'paids','hide':0, 'not_save_button':1},
               {'description':'Документы','name':'docpack','hide':0},
             ]
     ],

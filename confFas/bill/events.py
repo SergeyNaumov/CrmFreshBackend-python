@@ -5,6 +5,7 @@ def permissions(form):
     form.is_admin=True
 
     perm=form.manager['permissions']
+    #form.pre(perm)
     if perm['admin_paids']:
         form.is_admin=True
         form.read_only=False
@@ -13,9 +14,12 @@ def permissions(form):
     if form.id:
         form.ov=get_values(form)
 
+        if form.ov:
+            form.title=f"Счёт №{form.ov['number']} от {form.ov['registered']}"
 
 def after_save(form):
     form.nv=get_values(form)
+    print('nv:',form.nv)
 
 events={
   'permissions':[

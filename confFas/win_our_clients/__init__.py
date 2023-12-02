@@ -151,9 +151,9 @@ def search(form, R):
         #print("template:",f"./{form.s.config['config_folder']}/{form.config}/template/table.html")
         body=form.template(
             #'confFas/win_our_clients/template/table.html',
-            f"./{form.s.config['config_folder']}/{form.config}/template/table.html",
+            f"./{form.s.config['config_folder']}/{form.config}/paids.html",
             list=_list,
-            count=count
+
         )
         #print('body:',body)
 
@@ -226,7 +226,6 @@ def permissions(form):
 
 def city_autocomplete(form,field,R):
     term=R.get('term')
-    print('term:',term)
     if term and len(term):
         return form.db.query(
             query='select name from city where name like %s order by name limit 20',

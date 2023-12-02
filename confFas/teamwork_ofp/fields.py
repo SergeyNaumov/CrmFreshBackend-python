@@ -89,22 +89,22 @@ fields=[
         # Контакты
         contact_field
         ,
-        {
-          'description':'Статус клиента',
-          'name':'client_status',
-          'type':'select_values',
-          'values':[
-            {'v':3,'d':'В работе'},
-            {'v':6,'d':'Заявка подана'},
-            {'v':2,'d':'Одобрено, получена платежка'},
-            {'v':4,'d':'Одобрено, отказ клиента'},
-            {'v':1,'d':'Отказ Банка/МФО'},
-            {'v':9,'d':'Передан в гр. Тихонова по регламенту'},
-          ],
-          'tab':'work',
-          #'read_only':1,
-          #'before_code':client_status_before_code
-        },
+        # {
+        #   'description':'Статус клиента',
+        #   'name':'client_status',
+        #   'type':'select_values',
+        #   'values':[
+        #     {'v':3,'d':'В работе'},
+        #     {'v':6,'d':'Заявка подана'},
+        #     {'v':2,'d':'Одобрено, получена платежка'},
+        #     {'v':4,'d':'Одобрено, отказ клиента'},
+        #     {'v':1,'d':'Отказ Банка/МФО'},
+        #     {'v':9,'d':'Передан в гр. Тихонова по регламенту'},
+        #   ],
+        #   'tab':'work',
+        #   #'read_only':1,
+        #   #'before_code':client_status_before_code
+        # },
 
         {
             'description':'Вид продукта',
@@ -234,8 +234,8 @@ fields=[
             'order':'name',
             'tablename':'mt',
             'value_field':'id',
-            # 188 -- юрист (lawer)
-            'where':'id IN (select manager_id from manager_permissions mp where permissions_id=188) and id != 172',
+            # 196 -- юрист (lawer)
+            'where':'(group_id IN (select group_id from manager_group_permissions where permissions_id=196))',# OR id (select manager_id from manager_permissions where permissions_id=196))',
             'tab':'work',
         },
         {
@@ -247,7 +247,7 @@ fields=[
             'order':'name',
             'tablename':'mt2',
             'value_field':'id',
-            'where':'id in (select manager_id from manager_permissions mp where permissions_id=188) and id != 172',
+            'where':'(group_id IN (select group_id from manager_group_permissions where permissions_id=196))',# OR id (select manager_id from manager_permissions where permissions_id=196))',
             'read_only':1,
             'tab':'work',         
         },
