@@ -1,5 +1,6 @@
 from lib.core import exists_arg
 from .create_ofp_card import *
+from .create_bbg_card import *
 from .filters_for_manager_op import prepare_filters_for_manager_op
 from .find_inn_doubles import prepare_filters_for_find_inn_doubles
 def permissions(form):
@@ -61,11 +62,15 @@ def permissions(form):
       )
       if form.ov:
         form.title=form.ov['firm']
+
       # Создание карты ОФП
-      #form.pre(exists_arg('cgi_params;action',R))
       if exists_arg('cgi_params;action',R) == 'create_ofp_card':
           create_ofp_card(form)
       
+      # Создание карты ББГ
+      if exists_arg('cgi_params;action',R) == 'create_bbg_card':
+          create_bbg_card(form)
+
       #form.pre({'manager_brand':manager_brand})
       # В карте выбран брэнд
       if not perm['user_show_all_brand']:

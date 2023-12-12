@@ -19,7 +19,7 @@ def links_before_code(form,field):
             field['after_html']+=f'<div><a href="/edit_form/teamwork_ofp/{ofp["id"]}" target="_blank">Перейти в карту ОФП</a></div>'
 
     field['after_html']+=f'<div><a href="/edit_form/buhgalter_card/{form.id}" target="_blank">Реквизиты компании</a></div>'
-    
+    field['after_html']+=f'<div><a href="/edit_form/user/{form.id}?action=create_bbg_card" target="_blank">Создать карточку BBG</a></div>'
 fields=[
     {
             'tab':'links',

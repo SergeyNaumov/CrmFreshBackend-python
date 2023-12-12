@@ -9,18 +9,11 @@ def get_fields():
       
       'type':'text',
       'filter_on':1,
-      #regexp':'^[a-zA-Z\-_0-9\.\@]+$',
-      # filter_code=>sub{
-      #   my $e=shift;
-      #   my $login=$e->{str}->{wt__login};
-      #   $login=~s{([^a-zA-Z\-_0-9\.\@]+)}{<span style="color: red;">$1</span>}gs;
-      #   return $login;
-      # },
-      #'read_only':1,
+
       'unique':1,
       'regexp_rules':[
         '/.{3}/','длина логина должна быть не менее 3 символов',
-        #'/^[a-zA-Z0-9\.\-_@\/]+$/','только символы: a..z,A..Z, 0-9, _, -, @, .'
+
       ],
       'frontend':{'ajax':{'name':'login','timeout':600}},
       'tab':'main'
@@ -147,7 +140,6 @@ def get_fields():
       'name':'name',
       'description':'ФИО',
       'type':'text',
-      #'read_only':1,
       'tab':'main',
       'regexp_rules':[
           '/^.+$/','Полное имя обязательно для заполнения',
