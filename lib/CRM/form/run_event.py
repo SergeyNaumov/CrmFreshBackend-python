@@ -1,4 +1,5 @@
 from lib.core import exists_arg
+import traceback
 
 def run_event(form,event_name,arg={}):
     
@@ -38,5 +39,7 @@ def run_event(form,event_name,arg={}):
             else:
               event(form)
           except AttributeError as e:
-            form.errors.append(str(e))
+            err=traceback.format_exc()
+
+            form.errors.append(f"ошибка в событии {event_name}: {err}")
 
