@@ -1,0 +1,32 @@
+<table class="tbl1">
+	<thead>
+		<tr>
+			<td>№ счёта</td>
+			<td>дата оплаты</td>
+			<td>сумма</td>
+			<td>менеджер</td>
+			<td>тариф</td>
+			<td>юр. лицо</td>
+		</tr>
+	</thead>
+	{%for b in list%}
+	<tr>
+		<td>{{b.number}}</td>
+		<td>{{b.paid_date}}</td>
+		<td>{{b.summ}}</td>
+		<td>{{b.manager}}</td>
+		<td>{{b.tarif}}</td>
+		<td>{{b.ur_lico}}</td>
+	</tr>
+	<tr>
+		<td colspan="6" style="padding-bottom: 20px; border-bottom: 2px solid gray;">
+
+				с печатями: <a href="/backend/docpack/load-bill/{{b.docpack_id}}/{{b.id}}/doc/1">doc</a> | <a href="/backend/docpack/load-bill/{{b.docpack_id}}/{{b.id}}/pdf/1">pdf</a>
+				&nbsp;&nbsp;<br>
+				без печатей: <a href="/backend/docpack/load-bill/{{b.docpack_id}}/{{b.id}}/doc/0">doc</a> | <a href="/backend/docpack/load-bill/{{b.docpack_id}}/{{b.id}}/pdf/0">pdf</a>
+
+		</td>
+
+	</tr>
+	{%endfor%}
+</table>
