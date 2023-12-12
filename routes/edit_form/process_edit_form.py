@@ -16,15 +16,6 @@ def form_update_or_insert(form):
       
       if not len(form.errors):
         form.save()
-      
-        if form.action=='update':
-          form.run_event('after_update')
-
-        if form.action=='insert':
-          form.run_event('after_insert')
-
-        if form.action in ['insert','update']:
-          form.run_event('after_save')
 
     return {
       'success':form.success(),
