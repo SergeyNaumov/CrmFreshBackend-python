@@ -31,10 +31,7 @@ form={
           'name':'next_contact',
           'filter_on':1
         },
-        {
-          'type':'code',
-          'name':'links'
-        },
+
         {
           'description':'Наименование компании',
           'type':'code',
@@ -44,6 +41,10 @@ form={
           'description':'ИНН',
           'type':'code',
           'name':'inn'
+        },
+        {
+          'type':'code',
+          'name':'links'
         },
         {
           'description':'Вид продукта',

@@ -28,10 +28,11 @@ form={
         },
         {
             'description':'Таблица размеров',
-            'type':'1_to_1_text',
-            'table':'catalog_sizes',
-            'db_name':''
-
+            'type':'1_to_1_wysiwyg',
+            'save_table':'category_sizes',
+            'foreign_key':'id',
+            'name':'size_table',
+            'db_name':'body'
         }
   ]  
     

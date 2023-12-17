@@ -48,6 +48,7 @@ def process_edit_form(**arg):
   need_fields=[]
   
   for f in form.fields:
+
     if not('orig_type' in f) or not re.search(r'^filter_extend_',f['orig_type']):
       need_fields.append(f)
 

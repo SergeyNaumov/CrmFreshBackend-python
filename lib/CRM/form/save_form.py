@@ -1,12 +1,64 @@
 from lib.core import exists_arg, is_wt_field, from_datetime_get_date
 #from routes.edit_form.multiconnect import save as multiconnect_save
 from .multiconnect import save as multiconnect_save
+def update_1_to_1(form):
+  if not(form.id):
+    # выходим, если нет form.id
+    return
+
+  tables_1_to_1={}
+  for f in form.fields:
+
+      #print('f:',f)
+      if f['name'] in form.new_values and f['type'] in ('1_to_1_wysiwyg','1_to_m_text','1_to_1_textarea'):
+        if not(f.get('db_name')):
+          f['db_name']=f['name']
+        if table:=f.get('save_table'):
+
+          if not(table in tables_1_to_1):
+            tables_1_to_1[table]={
+              'foreign_key':f['foreign_key'],
+              'data':None
+            }
+
+          if not(tables_1_to_1[table]['data']):
+
+            tables_1_to_1[table]['data']=form.db.query(
+              query=f"select * from {table} WHERE {f['foreign_key']}={form.id}",
+              onerow=1,
+              errors=form.errors
+            )
+            if not(tables_1_to_1[table]['data']):
+              tables_1_to_1[table]['data']={
+                f['foreign_key']: form.id
+              }
+
+            # новое значение в данные
+            tables_1_to_1[table]['data'][f['db_name']]=form.new_values[f['name']]
+            f['value']=form.new_values[f['name']]
+
+
+        else:
+          tables_1_to_1[table]['data'][f['db_name']]=v
+
+  for table in tables_1_to_1:
+    form.db.save(
+      table=table,
+      data=tables_1_to_1[table]['data'],
+      replace=1,
+      debug=1
+    )
+    print('SET 1_to_1:',tables_1_to_1[table])
+
 
 def save_form(form,arg):
   
   if len(form.errors): return
   save_hash={}
   
+  # для сохранения полей 1_to_1
+
+
   for f in form.fields:
      
       if exists_arg('read_only',f) or exists_arg('not_process',f):
@@ -47,6 +99,8 @@ def save_form(form,arg):
 
         save_hash[name]=v
       
+
+
 
       # Если мы только создаём карточку -- пароль также разрешено сохранить
       if(f['type']=='password' and form.action=='insert'):
@@ -91,6 +145,8 @@ def save_form(form,arg):
           log=form.log
         )
         #print('errors:',form.errors)
+
+  update_1_to_1(form)
 
   for f in form.fields:
     name=f['name']

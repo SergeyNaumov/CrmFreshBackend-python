@@ -78,10 +78,10 @@ async def wysiwyg_init_options(config:str,field:str):
   )
   
   response={
-    'project_id':form.s.project_id,
+    #'project_id':form.s.project_id,
     'success':True,
   }
-  print('config:',system_config)
+
   if ('wysiwyg' in system_config) and system_config['wysiwyg']:
     response['step1']=True
     ww=system_config['wysiwyg']

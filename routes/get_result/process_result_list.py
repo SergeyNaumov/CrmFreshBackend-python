@@ -50,9 +50,13 @@ def process_result_list(form,R,result_list):
         continue
       field=form.fields_hash[name]
       type='html' #field['type']
+      if exists_arg('make_change_in_search',field):
+        type=field['type']
+
       tbl = exists_arg('tablename',field) or 'wt'
       db_name=exists_arg('db_name',field) or name
       value=exists_arg(tbl+'__'+db_name,r)
+      print('field:',field.get('name'), exists_arg('type_orig',type))
       if not exists_arg('type_orig',type):
         field['type_orig']=field['type']
       

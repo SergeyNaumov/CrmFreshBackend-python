@@ -51,7 +51,6 @@ def response_doc(template_file, output_filename, format, data, replace_images=[]
             return FileResponse(path = pdf_file, filename=output_filename)
             #remove(pdf_file)
         else:
-            print('response')
             return FileResponse(path = docx_file, filename=output_filename)
     except Exception:
         return "error!"

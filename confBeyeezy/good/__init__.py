@@ -1,7 +1,6 @@
 form={
     'work_table':'good',
     'work_table_id':'id',
-
     'title':'Товары',
     'sort':False,
     'tree_use':False,
@@ -53,15 +52,28 @@ form={
             'table_id':'id',
             'foreign_key':'good_id',
             'sort':1,
-
             'fields':[
                 {
                     'description':'Фото',
                     'preview':1,
                     'type':'file',
                     'name':'photo',
-                    'filedir':'/files/good_galery'
-
+                    'filedir':'./files/good_galery',
+                    'preview':'300x300',
+                    'resize':[
+                        {
+                            'description':'Для спика товаров',
+                            'file':'<%filename_without_ext%>_mini1.<%ext%>',
+                            'size':'300x300',
+                            'quality':'100'
+                        },
+                        {
+                            'description':'Для карточек товара',
+                            'file':'<%filename_without_ext%>_mini2.<%ext%>',
+                            'size':'585x585',
+                            'quality':'100'
+                        },
+                    ]
                 }
             ],
             'filter_on':False
@@ -108,6 +120,17 @@ form={
             'type':'select_from_table',
             'header_field':'header',
             'value_field':'id',
+        },
+        {
+            'description':'Год',
+            'name':'year',
+            'type':'text',
+            'regexp_rules':[
+                '^\d{4}$','укажите год, например 2024'
+            ],
+            'make_change_in_search':1,
+            'filter_on':1,
+
         },
         {
             'description':'Параметры',

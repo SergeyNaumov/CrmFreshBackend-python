@@ -3,8 +3,6 @@ ur_lico_filedir='files/ur_lico'
 form={
     'work_table':'ur_lico',
     'work_table_id':'id',
-    #'work_table_foreign_key':'project_id',
-    #'work_table_foreign_key_value':4664,
     'title':'Юридические лица',
     'sort':True,
     'tree_use':True,
@@ -13,10 +11,10 @@ form={
     'default_find_filter':'header',
     'cols':[
         [
-            {'description':'Реквизиты','name':'main'}
+            {'description':'Реквизиты','name':'main','hide':False}
         ],
         [
-            {'description':'Настройки','name':'addon'},
+            {'description':'Настройки','name':'addon','hide':False},
             #{'description':'Дополнительные соглашения','name':'dop_sogl'},
         ],
     ],
@@ -294,6 +292,26 @@ form={
       'type':'file',
       'filedir':'./files/ur_lico',
       'tab':'main'
+    },
+    {
+      #'before_code': permissions_before_code,
+      'description':'Доступно только для брендов',
+      'type':'multiconnect',
+      #'tree_use':1,
+      'cols':3,
+      'tree_table':'brand',
+      'name':'for_brands',
+      'tablename':'p',
+      'relation_table':'brand',
+      'relation_save_table':'ur_lico_brand',
+      'relation_table_header':'header',
+      'relation_save_table_header':'header',
+      'relation_table_id':'id',
+      'relation_save_table_id_worktable':'ur_lico_id',
+      'relation_save_table_id_relation':'brand_id',
+      'tab':'addon',
+      #'not_order':1,
+      #'read_only':1
     },
     #{
     #  'name':'edo_id',

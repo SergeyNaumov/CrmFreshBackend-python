@@ -25,8 +25,10 @@ def permissions(form):
             errors=form.errors,
             onerow=1
         )
+
         #pre(form.manager)
         if form.ov:
+            #form.pre(form.ov)
             is_manager = form.manager['id'] == form.ov.get('manager_id') or form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id'])
             is_manager_bbg = form.manager['id'] == form.ov.get('manager_bbg') or form.manager['CHILD_GROUPS_HASH'].get(form.ov['bbg_group_id'])
 

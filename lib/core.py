@@ -12,8 +12,6 @@ def cnt_days_period(d1,d2):
   
   if not(isinstance(d1,str)): d1=str(d1)
   if not(isinstance(d2,str)): d2=str(d2)
-  #print('type_d1:',type(d1))
-  #print('type_d2:',type(d2))
   d1=d1.split('-')
   d2=d2.split('-')
   res=str(datetime.date(int(d2[0]),int(d2[1]),int(d2[2]))-datetime.date(int(d1[0]),int(d1[1]),int(d1[2])))
@@ -162,12 +160,12 @@ def del_file_and_resizes(**arg):
   field=arg['field']
   value=arg['value']
   name=field['name']  
-  print('VALUE:',value)
+  #print('VALUE:',value)
   if not value:
     return
   
   filename_without_ext,ext=get_name_and_ext(value)
-  print('filename_without_ext:',filename_without_ext, 'ext:',ext)
+  #print('filename_without_ext:',filename_without_ext, 'ext:',ext)
   if ext:
       # удаляем ресайзы
       if exists_arg('resize',field) and len(field['resize']):
@@ -180,13 +178,11 @@ def del_file_and_resizes(**arg):
           file_for_del=field['filedir']+'/'+f
           #print('rm: ',file_for_del)
           if os.path.isfile(file_for_del):
-            print('remove:',file_for_del)
             os.remove(file_for_del)
 
       # удаляем основной файл
 
       file_for_del=field['filedir']+'/'+value
-      print('del main file:',file_for_del)
       if os.path.isfile(file_for_del):
         os.remove(file_for_del)
         

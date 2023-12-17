@@ -68,7 +68,7 @@ config={
   'after_read_form_config':after_read_form_config, # Вызывается после чтения конфига от CRM
   #'after_all_change_action':alter_all_change_action,
   'system_email':'noname@gmail.com',
-  'system_url':'https://fas.crm-dev.ru/',
+  'system_url':'https://beyeezy.crm-dev.ru/',
   'connects':{
     'crm_read':{
       'user':'beyeezy',

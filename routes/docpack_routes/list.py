@@ -19,7 +19,7 @@ def action_list(form,field):
             """,
             errors=form.errors
         )
-        print(lst)
+        #print(lst)
         id_list=[]
         for l in lst:
             id_list.append(l['id'])

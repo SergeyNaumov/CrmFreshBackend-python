@@ -125,7 +125,7 @@ def get_chat(s,user_id, last_chat_message_id=0):
 
 def send(s,R):
 	# отправляем сообщение в телегу
-	print('send message!')
+	#print('send message!')
 	if not('chat_id' in R) or not(R['chat_id']):
 		return {'success':False,'errors':['отсутствует chat_id']}
 
@@ -151,8 +151,8 @@ def send(s,R):
 
 	global bot_dict
 	token = s.shop['token']
-	print('token:',token)
-	print('bot_dict:',bot_dict)
+	#print('token:',token)
+	#print('bot_dict:',bot_dict)
 	bot = None
 	if token in bot_dict:
 		bot=bot_dict[token]
@@ -174,7 +174,7 @@ def send(s,R):
 	)
 
 	cur_chat=get_chat(s, user['id'], R['last_chat_message_id'])
-	print('cur_chat:',cur_chat)
+	#print('cur_chat:',cur_chat)
 	return {
 		'success':True,
 		'messages':cur_chat['messages']
@@ -182,7 +182,7 @@ def send(s,R):
 
 async def script_send_to_manager(s, shop_id:int, user_id:int, message:str, connections_hash):
 	result={'message_id':None, 'cnt_sockets':0}
-	print(f"shop_id: {shop_id} user_id: {user_id} message: {message}")
+	#print(f"shop_id: {shop_id} user_id: {user_id} message: {message}")
 	
 	db=s.db
 	shop = db.query(
@@ -217,8 +217,6 @@ async def script_send_to_manager(s, shop_id:int, user_id:int, message:str, conne
 		}
 	)
 	owner_id=shop['owner_id']
-	#print('owner_id:',owner_id)
-	#print('connections_hash:',connections_hash)
 
 	# считаем, сколько новых сообщений
 	new_messages = await get_new_messages(db,shop_id,shop['owner_id'])
@@ -226,7 +224,7 @@ async def script_send_to_manager(s, shop_id:int, user_id:int, message:str, conne
 	# Отправляем сообщение через websocket
 	socket_name=get_socket_name(shop_id,owner_id)
 	if socket_name in connections_hash:
-		print(f"send to_socket: {shop_id}.{owner_id}")
+		#print(f"send to_socket: {shop_id}.{owner_id}")
 		for websocket in connections_hash[socket_name]:
 			try:
 				await websocket.send_text(f"chat_id:{user_id}:{new_messages}")

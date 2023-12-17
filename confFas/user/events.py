@@ -60,7 +60,9 @@ def permissions(form):
           WHERE u.id={form.id}""",
         onerow=1
       )
+
       if form.ov:
+
         form.title=form.ov['firm']
 
       # Создание карты ОФП

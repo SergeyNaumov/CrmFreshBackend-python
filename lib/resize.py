@@ -162,21 +162,23 @@ def resize_one(**arg):
     if ox != oy:
       min_len=min(ox,oy)
       img=crop(img,crop_type,min_len,min_len)
-    
-    img=img.resize((width,height),  Image.ANTIALIAS)
+      img=img.resize((width,height), Image.Resampling.LANCZOS)
+    #img=img.resize((width,height),  Image.ANTIALIAS)
     
   elif nx >= width: # горизонтально ориентированная
     
     #$image->Resize(geometry=>'geometry', width=>$nx, height=>$opt->{height});
     
-    img=img.resize( (nx,height), Image.ANTIALIAS)
-
+    #img=img.resize( (nx,height), Image.ANTIALIAS)
+    img=img.resize( (nx,height), Image.Resampling.LANCZOS)
     if ny>height:
       
       #$image->Crop(geometry=>$opt->{width}.'x'.$opt->{height}, gravity=>'center')
       img=crop(img,crop_type,width,height)
     
-    #img=img.resize( (nx,ny), Image.ANTIALIAS)
+
+
+
     if nx >width:
       img=crop(img,crop_type,width,height)
       
@@ -187,8 +189,9 @@ def resize_one(**arg):
     
     if ny < height:
       ny = height
-    img=img.resize( (width,ny), Image.ANTIALIAS ) 
+    #img=img.resize( (width,ny), Image.ANTIALIAS )
 
+    img=img.resize( (width,ny), Image.Resampling.LANCZOS )
     if ny > height or nx > width:
       img=crop(img,crop_type,width,height)
 

@@ -20,7 +20,6 @@ def get_file_list(**arg):
 
     # если нет директории -- создаём её
     if not os.path.isdir(form.manager['files_dir']+path):
-      
       dirname=form.manager['files_dir']
       if path != '/':
         dirname+=path
@@ -33,10 +32,10 @@ def get_file_list(**arg):
         #os.mkdirs(form.manager['files_dir']+path)
 
 
+    #print('path_directory:',path_directory)
+    _list=sorted(os.listdir(path_directory))
 
-    list=sorted(os.listdir(path_directory))
-
-    for l in list:
+    for l in _list:
         
         if(os.path.isdir(path_directory+'/'+l)):
             res_dirs.append({'name':l,'type':'dir'})
@@ -87,6 +86,7 @@ def wysiwyg_process(**arg):
   if not len(errors):
     if action == 'file_list':
         file_list,error=get_file_list(path=path,errors=errors,form=form)
+        #print('file_list:',file_list)
         if error:
           errors.append(error)
         

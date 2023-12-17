@@ -40,7 +40,7 @@ def func_get_values(form):
         if f['type']=='password':
           del values[f['name']]
 
-
+    tables_1_to_1={}
     for f in form.fields:
       if not( 'name' in f ):
         break
@@ -81,6 +81,37 @@ def func_get_values(form):
             
       if f['type'] == '1_to_m':
         get_1_to_m_data(form,f)
+
+
+      # Если это 1_to_1
+      if f['type'].startswith('1_to_1_'):
+        T=f['type'].replace('1_to_1_','')
+
+        if not('db_name' in f):
+          f['db_name']=f.get('name')
+
+        # Проверки
+        if not( f.get('save_table') ):
+          form.errors.append(f"в поле {f.get('description')} - {f.get('name')} отсутствует атрибут save_table")
+          break
+
+        if not( f.get('foreign_key') ):
+          form.errors.append(f"в поле {f.get('description')} - {f.get('name')} отсутствует атрибут foreign_key")
+          break
+
+        table=f.get('save_table')
+        if not(table in tables_1_to_1):
+          tables_1_to_1[table]={
+            'foreign_key': f['foreign_key'],
+            'values':form.db.query(
+              query=f"select * from {f.get('save_table')} WHERE {f.get('foreign_key')}={form.id}",
+              onerow=1
+            )
+          }
+
+        cur_values=tables_1_to_1[table]['values']
+        if cur_values and f['db_name'] in cur_values:
+          f['value']=cur_values[f['db_name']]
 
 
       if f['type']=='get_in_ext_url':

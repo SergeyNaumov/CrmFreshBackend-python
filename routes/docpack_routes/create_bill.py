@@ -17,8 +17,8 @@ def action_create_bill(form,field,R):
 
   if form.success():
       (number_today,number_bill)=field['bill_number_rule'](form, field)
-      print('number_today:',number_today)
-      print('number_bill:',number_bill)
+      #print('number_today:',number_today)
+      #print('number_bill:',number_bill)
       if not(comment): comment=''          
             
       data={
@@ -31,7 +31,6 @@ def action_create_bill(form,field,R):
           'summ':summ,
           'comment':comment
       };
-      print('data:',data)
 
 
             

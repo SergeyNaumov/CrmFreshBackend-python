@@ -106,8 +106,8 @@ form={
             'tab':'price'
         },
         {
-            'description':'Цену умножить на',
-            'name':'price_multiply',
+            'description':'Прибавить % к цене',
+            'name':'price_percent_add',
             'type':'text',
             'tab':'price'
         },

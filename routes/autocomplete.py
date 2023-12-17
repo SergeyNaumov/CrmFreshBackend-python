@@ -30,8 +30,6 @@ async def autocomplete(config:str,R: dict):
     return get_begin_value(form=form,element=element)
   
   elif term:
-    #print('NAME',name)
-    #print('TERM:',term)
     # используем get_name_and_ext для получения name и subname 
     name,sub_name=get_name_and_ext(name)
     field=form.get_field(name)
@@ -44,14 +42,11 @@ async def autocomplete(config:str,R: dict):
     else:
       #field=form.get_field(name)
       if ajax_autocomplete:=exists_arg('ajax;autocomplete',field):
-        #print('ajax_autocomplete:',ajax_autocomplete)
         result_list=ajax_autocomplete(form,field,R)
         return {
           'success':True,
           'list': result_list
         }
-        print('result_list:',result_list)
-      
 
   else: # нет поиска по строке, вывозим по depend_where (зависимый фильтр)
     

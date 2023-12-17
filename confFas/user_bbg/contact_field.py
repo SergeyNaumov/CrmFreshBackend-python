@@ -1,5 +1,5 @@
 def contacts_before_code(form,field):
-  if form.id and form.ov['user_id']:
+  if form.id and form.ov and form.ov['user_id']:
     field['foreign_key_value']=form.ov['user_id']
   else:
     field['foreign_key_value']=''

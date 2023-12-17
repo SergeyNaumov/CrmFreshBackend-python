@@ -48,7 +48,7 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 		values=['%e %M %Y', docpack_id],onerow=1
 	)
 	#return dp
-	#if debug: return out_debug(dp)
+	if debug: return out_debug(dp)
 	if not(dp):
 		return {'error': f'пакет документов №{docpack_id} не найден'}
 	

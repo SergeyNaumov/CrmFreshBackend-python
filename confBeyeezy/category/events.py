@@ -13,14 +13,14 @@ def events_permission1(form):
     #    form.errors.append('Доступ запрещён')
 
 def events_permission2(form):
-    print('perm2')
+    ...
 
 def events_before_code(form):
-    print('is_before_code')
+    ...
 
 def before_delete(form):
     print('before_detele STARTED!')
-    form.errors.append('Вам запрещено удалять!')
+    form.errors.append('Запрещено удалять категории')
 
 events={
   'permissions':[
