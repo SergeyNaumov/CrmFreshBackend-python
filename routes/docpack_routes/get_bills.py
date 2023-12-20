@@ -19,6 +19,8 @@ def get_bills(form,field, R):
         """,
         values=[form.id, R['dogovor_id']]
       )
+      #for l in lst:
+      #  l['act_list']=[]
 
   else:
     form.errors.append('отсутствует параметр dogovor_id')

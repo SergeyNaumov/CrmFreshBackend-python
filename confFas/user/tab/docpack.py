@@ -63,6 +63,13 @@ def get_bills(form,field, R):
         else:
             b['make_edit_summ']=False
 
+        b['act_list']=[
+            {
+                'id':1,
+                'link':f'/edit_form/act/1',
+                'header':'Акт №П008/191223 от 10.12.2023 (25000 руб)'
+            }
+        ]
 
         #from pprint import pprint
         #pprint(b)

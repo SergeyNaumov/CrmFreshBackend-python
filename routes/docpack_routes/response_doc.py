@@ -20,7 +20,10 @@ def response_doc(template_file, output_filename, format, data, replace_images=[]
 
     if replace_images:
         for i in replace_images:
-            doc.replace_pic(i[0],i[1])
+            try:
+                doc.replace_pic(i[0],i[1])
+            except Exception as e:
+                return f"Произошла ошибка при подстановки изображения: {i[0]} при формировании документа"
    
 
     doc.render(data)
@@ -51,8 +54,10 @@ def response_doc(template_file, output_filename, format, data, replace_images=[]
             return FileResponse(path = pdf_file, filename=output_filename)
             #remove(pdf_file)
         else:
+            print('response')
             return FileResponse(path = docx_file, filename=output_filename)
     except Exception:
+
         return "error!"
     
     
