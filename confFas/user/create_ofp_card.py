@@ -1,3 +1,5 @@
+from lib.send_mes import send_mes
+
 def create_ofp_card(form):
         db=form.db
         ov=form.ov
@@ -27,6 +29,19 @@ def create_ofp_card(form):
           table='teamwork_ofp',
           data=data
         )
+
+
+
+        message=f"<p>Только что {form.manager['name']} создал(а) карту ОФП для компании {ov['firm']}( ИНН: {ov['inn']})</p>"+\
+          f"<p><a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{ofp_card_id}'>Перейти в карту</a></p>"
+
+        send_mes(
+          from_addr='info@fascrm.ru',
+          to='pzm@a-u-z.pro',
+          subject=f"Создана новая карта ОФП: {ov['firm']}, ИНН: {ov['inn']}",
+          message=message
+        )
+
         # Убрал копирование контактов, попросили сделать сквозными
         # contact_list=db.query(
         #   query=f'select * from user_contact where user_id={form.id}'

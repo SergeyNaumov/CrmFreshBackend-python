@@ -3,6 +3,8 @@ ur_lico_filedir='files/ur_lico'
 form={
     'work_table':'ur_lico',
     'work_table_id':'id',
+    #'work_table_foreign_key':'project_id',
+    #'work_table_foreign_key_value':4664,
     'title':'Юридические лица',
     'sort':True,
     'tree_use':True,
@@ -25,6 +27,15 @@ form={
       'name':'for_all',
       'type':'checkbox',
       'tab':'addon'
+    },
+    {
+      'description':'Префикс для документов',
+      'type':'text',
+      'name':'prefix',
+      'regexp_rules':[
+          '/^.+?$/i','Необходимо указать префикс',
+      ],
+      'tab':'main'
     },
     {
       'description':'Могут выставлять только',
@@ -298,7 +309,7 @@ form={
       'description':'Доступно только для брендов',
       'type':'multiconnect',
       #'tree_use':1,
-      'cols':3,
+      'cols':2,
       'tree_table':'brand',
       'name':'for_brands',
       'tablename':'p',

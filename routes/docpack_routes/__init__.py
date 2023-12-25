@@ -16,6 +16,7 @@ from .save_summ_bill import save_summ_bill
 
 from .load_dogovor import load_dogovor
 from .load_bill import load_bill
+from .load_act import load_act
 
 #import os
 
@@ -31,6 +32,11 @@ async def load_dog(docpack_id: int, ext: str, need_print: int, debug=0):
 @router.get('/load-bill/{docpack_id}/{bill_id}/{ext}/{need_print}')
 async def load_bl(docpack_id: int, bill_id: int, ext: str, need_print: int, debug=0):
     return load_bill(docpack_id, bill_id, ext, need_print, debug)
+
+# Загрузка акта
+@router.get('/load-act/{docpack_id}/{act_id}/{ext}/{need_print}')
+async def load_at(docpack_id: int, act_id: int, ext: str, need_print: int, debug=0):
+    return load_act(act_id, ext, need_print, debug)
 
 @router.post('/{config}/{field_name}')
 async def get_list(config:str, field_name:str, R:dict): # 

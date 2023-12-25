@@ -4,25 +4,38 @@ def action_create_bill(form,field,R):
   lst=[]
   summ=exists_arg('summ',R)
   comment=exists_arg('comment',R)
-  dogovor_id=exists_arg('dogovor_id',R)
+  docpack_id=exists_arg('dogovor_id',R)
 
 
   if not(summ):
-    form.errors('сумма не указана или указана не верно')
+    form.errors.append('сумма не указана или указана не верно')
 
-  if not(dogovor_id):
-    form.errors('отсутствует параметр dogovor_id')
+  if not(docpack_id):
+    form.errors.append('отсутствует параметр dogovor_id')
+  else:
+    docpack=form.db.query(
+      query="SELECT * from docpack where id=%s",
+      values=[docpack_id],
+      onerow=1
+    )
+    if not(docpack):
+      form.errors.append(f'пакет документов {docpack_id} не найден')
 
-  
+    elif not(docpack.get('ur_lico_id')):
+      form.errors.append(f'не удалось определить юрлицо для пакета документов {docpack_id}')
+
+
+
 
   if form.success():
-      (number_today,number_bill)=field['bill_number_rule'](form, field)
-      #print('number_today:',number_today)
-      #print('number_bill:',number_bill)
+
+
+
+      (number_today,number_bill)=field['bill_number_rule'](form, field, docpack['ur_lico_id'])
       if not(comment): comment=''          
             
       data={
-          'docpack_id':R['dogovor_id'],
+          'docpack_id':docpack_id,
           'registered':'func:curdate()',
           'number_today':number_today,
           'number':number_bill,

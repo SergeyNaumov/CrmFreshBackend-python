@@ -32,7 +32,7 @@ config={
   'BaseUrl':'https://fas.crm-dev.ru/',
   'system_email':'noname@gmail.com',
   'system_url':'https://fas.crm-dev.ru/',
-
+  'BakendBase':'http://dev-crm.test/backend',
   'config_folder':'confFas',
   'title':'CRM Fas',
   'app_components':{ # Компоненты веб-приложения
@@ -132,7 +132,8 @@ config={
       #12039 #ав
       #11691 #Люб
       #4201 # sed
-      585 # Ак ,
+      #585 # Ак ,
+      7576 #pzm
     
     #'manager_id':12039 # О ,
     #'manager_id': 11691 # Г

@@ -16,7 +16,7 @@ def action_create_docpack(form, field, R):
         #form.db}->{connect}->begin_work;
         # начало транзакции
         
-        number,number_today = field['dogovor_number_rule'](form, field)
+        number,number_today = field['dogovor_number_rule'](form, field, R['ur_lico_id'])
 
         
         data={
