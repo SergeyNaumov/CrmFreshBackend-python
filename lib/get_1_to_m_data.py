@@ -16,11 +16,14 @@ def normalize_value_row(form,field,d):
           
         if d_cname:
           filename=''
+          #attach_name=''
           filesplit = d_cname.split(';')
           if len(filesplit)==2:
+            attach_name=filesplit[0]
             filename=filesplit[1]
           else:
             filename=d_cname
+            attach_name=d_cname
           
           #print('filedir:',filedir,"\nfilename:",filename)
           #print(f'preview: {cf["preview"]}\n\n')
@@ -42,7 +45,7 @@ def normalize_value_row(form,field,d):
                 d['preview_img']=fdir+'/'+tmp_file  
 
             else:
-              d['preview_img']=fdir+'/'+filename             
+              d['preview_img']=fdir+'/'+attach_name
           d[c_name+'_filename']=filename
       if exists_arg('slide_code',cf):
         d[c_name]=form.run_event('slide_code',{'field':cf,'data':d})

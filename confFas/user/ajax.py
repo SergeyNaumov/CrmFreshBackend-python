@@ -88,7 +88,11 @@ def inn(form,v):
           return result
 
   if inn.isnumeric() and (len(inn)==10 or len(inn)==12):
-    result=['inn',{'after_html':f'<a href="/vue/admin_table/user?find_inn_doubles={inn}" target="_blank">найти дубли</a>'}]
+    result=['inn',{'after_html':
+      f'<a href="/vue/admin_table/user?find_inn_doubles={inn}" target="_blank">поиск дублей в картах ОП</a><br>'+\
+      f'<a href="/vue/admin_table/org_base?find_inn_doubles={inn}" target="_blank">поиск дублей контактах протоколов</a>'
+      }
+    ]
 
   return result
 ajax={

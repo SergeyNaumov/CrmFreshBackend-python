@@ -151,9 +151,9 @@ def search(form, R):
         #print("template:",f"./{form.s.config['config_folder']}/{form.config}/template/table.html")
         body=form.template(
             #'confFas/win_our_clients/template/table.html',
-            f"./{form.s.config['config_folder']}/{form.config}/paids.html",
+            f"./{form.s.config['config_folder']}/{form.config}/template/table.html",
             list=_list,
-
+            count=count
         )
         #print('body:',body)
 
@@ -176,7 +176,7 @@ def search(form, R):
     #     where=[f""]
     #     ts=exists_arg('filters;ts',R)
 
-        
+
     #     lst=form.db.query(
     #         query="""SELECT
     #             m.id, m.name, sum(if(tr.is_double=0,1,0)) new, sum(if(tr.is_double,1,0)) doubles
@@ -219,13 +219,14 @@ def search(form, R):
     #             },
     #         )
 
-    
+
 
 def permissions(form):
     ...
 
 def city_autocomplete(form,field,R):
     term=R.get('term')
+    print('term:',term)
     if term and len(term):
         return form.db.query(
             query='select name from city where name like %s order by name limit 20',
@@ -268,8 +269,7 @@ form={
         'permissions':permissions,
         'search':search
     }
-    
+
 }
-      
 
 

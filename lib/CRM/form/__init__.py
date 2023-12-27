@@ -162,7 +162,7 @@ class Form():
 
   def delete_file(form):
     
-    return {'success':'1'}
+    return {'success':True}
 
   def save(form,**arg): save_form(form,arg)
 
@@ -177,7 +177,7 @@ class Form():
         config['after_all_change_action'](form)
 
   def success(form): # если нет ошибок -- 1
-    return (1,0)[len(form.errors)>0]
+    return (True,False)[len(form.errors)>0]
 
   def load_data(form,data):
     

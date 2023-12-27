@@ -193,6 +193,25 @@ fields=[
           'filedir':'./files/teamwork_ofp',
         },
         {
+          'description':'Файлы',
+          'tab':'main',
+          'type':'1_to_m',
+          'table':'teamwork_ofp_files',
+          'table_id':'id',
+          'name':'files',
+          'foreign_key':'teamwork_ofp_id',
+          'view_type':'list',
+          'fields':[
+            {
+              'description':'файл',
+              'type':'file',
+              'keep_orig_filename':1,
+              'filedir':'./files/teamwork_ofp',
+              'name':'attach'
+            }
+          ]
+        },
+        {
             'description':'Контактное лицо',
             'type':'text',
             'name':'contact',

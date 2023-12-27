@@ -9,6 +9,7 @@ form={
     'title':'Контакты из протоколов',
     'work_table':'org_base',
     'ajax':ajax,
+    #'explain':1,
     'is_admin':False,
     'QUERY_SEARCH_TABLES':[
         {'t':'org_base','a':'wt'},

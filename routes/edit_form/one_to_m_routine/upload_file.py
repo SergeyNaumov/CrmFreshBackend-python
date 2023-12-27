@@ -133,7 +133,7 @@ def upload_file(form,field,arg):
         return {
           'success':form.success(),
           'errors':form.errors,
-          'values':[value]
+          'values': values
           # 'file_info': [{
           #   'name':filename,
           #   'orig_name':orig_filename,

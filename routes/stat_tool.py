@@ -37,10 +37,11 @@ async def get_list(config: str, R:dict): #
         success=False
 
     response['errors']=form.errors
-    
     response['success']=success
-
-    
+    if(hasattr(form,'log')):
+        response['log']=form.log
+    else:
+        response['log']=[]
 
     
     

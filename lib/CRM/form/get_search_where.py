@@ -131,13 +131,18 @@ def get_search_where(form,query):
         v=values
         if v:
           # form.db.connect.escape_string(v)
-          v='%'+str(v)+'%'
+
           #v="'"+v+"'"
           func=get_func(f)
           if func:
             WHERE.append('('+dn_name+' LIKE %s)')
+            v='%'+str(v)+'%'
           else:
-            WHERE.append('('+table+'.'+db_name+' LIKE %s)')
+            if f.get('filter_type') == 'eq':
+              WHERE.append('('+table+'.'+db_name+' = %s)')
+            else:
+              WHERE.append('('+table+'.'+db_name+' LIKE %s)')
+              v='%'+str(v)+'%'
           VALUES.append(v)
           #print('WHERE:',WHERE)
 

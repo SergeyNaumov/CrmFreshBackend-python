@@ -30,6 +30,7 @@ fields=[
     },
     {
       'name':'inn','description':'ИНН','type':'text','filter_on':1,
+      'filter_type':'eq'
       #sphinx=>{'name':'inn','type':'text'},
       # filter_code=>sub{
       #   my $s=$_[0]->{str};

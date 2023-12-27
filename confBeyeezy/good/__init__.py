@@ -1,3 +1,4 @@
+from .search_multi_action import search_multi_action_list
 form={
     'work_table':'good',
     'work_table_id':'id',
@@ -14,6 +15,7 @@ form={
         {'t':'model','a':'model','l':'model.id=wt.model_id','lj':1,'for_fields':['model_id']},
         {'t':'season','a':'season','l':'season.id=wt.season_id','lj':1,'for_fields':['season_id']},
     ],
+    'search_multi_action':search_multi_action_list, # множественное действие в поиске
     'GROUP_BY':'wt.id',
     'fields': [ 
         {
@@ -42,7 +44,8 @@ form={
             'description':'Цена',
             'type':'text',
             'name':'price',
-            'filter_on':True
+            'filter_on':True,
+            'make_change_in_search':True
         },
         {
             'description':'Фотогалерея',
@@ -121,15 +124,21 @@ form={
             'header_field':'header',
             'value_field':'id',
         },
+        # {
+        #     'description':'Год',
+        #     'name':'year',
+        #     'type':'text',
+        #     'regexp_rules':[
+        #         '^\d{4}$','укажите год, например 2024'
+        #     ],
+        #     'make_change_in_search':1,
+        #     'filter_on':1,
+
+        # },
         {
-            'description':'Год',
-            'name':'year',
-            'type':'text',
-            'regexp_rules':[
-                '^\d{4}$','укажите год, например 2024'
-            ],
-            'make_change_in_search':1,
-            'filter_on':1,
+            'description':'Дата релиза',
+            'name':'release_date',
+            'type':'date',
 
         },
         {

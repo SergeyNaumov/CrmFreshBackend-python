@@ -81,7 +81,9 @@ async def get_filters_controller(config: str, R:dict):
 
   make_create=1
   if form.not_create: make_create=0
-  
+  search_multi_action=[]
+  if hasattr(form,'search_multi_action'):
+    search_multi_action=form.search_multi_action
   return {
     'success':1,
     'title':form.title,
@@ -93,6 +95,7 @@ async def get_filters_controller(config: str, R:dict):
     'filters_groups':form.filters_groups,
     'log':form.log,
     'search_plugin':form.search_plugin,
+    'search_multi_action':search_multi_action,
     'permissions':{
       'make_create':make_create,
       'make_delete':form.make_delete,
