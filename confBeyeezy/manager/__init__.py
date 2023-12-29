@@ -10,7 +10,6 @@ form={
     'explain_exit':1,
     'QUERY_SEARCH_TABLES':[
             {'table':'manager','alias':'wt'},
-            {'t':'manager_email','a':'me','l':'me.manager_id=wt.id','lj':1},
             {'t':'manager_group','a':'mg','l':'wt.group_id=mg.id','lj':1, 'for_fields':['group_id']},
             {'t':'manager_permissions','a':'mp','l':'mp.manager_id=wt.id','lj':1},
             {'t':'permissions','a':'p','l':'p.id=mp.permissions_id','lj':1},
@@ -20,11 +19,9 @@ form={
     'cols':[
             [ # Колонка1
               {'description':'Общая информация','name':'main','hide':0},
-              {'description':'HR','name':'hr','hide':0},
+              #{'description':'HR','name':'hr','hide':0},
             ],
             [
-              #{'description':'Юридические лица','name':'comp','hide':1},
-              #{'description':'Аптеки','name':'apteka','hide':1},
               {'description':'Права','name':'permissions','hide':0},
               
             ]

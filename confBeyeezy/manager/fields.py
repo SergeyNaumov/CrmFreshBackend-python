@@ -32,10 +32,10 @@ def get_fields():
       'min_length':8,
       'symbols':'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
       'methods_send':[
-        {
-          'description':'сохранить и отправить по электронной почте',
-          'method_send':send_new_password
-        },
+        # {
+        #   'description':'сохранить и отправить по электронной почте',
+        #   'method_send':send_new_password
+        # },
         {
           'description':'сохранить и никуда не отправлять',
           'method_send': without_send
@@ -44,116 +44,83 @@ def get_fields():
       #'before_code':password_before_code,
       'tab':'main'
     },
-    {
-        'description':'Группа',
-        'name':'group_id',
-        'type':'select_from_table',
-        'table':'manager_group',
-        'tablename':'mg',
-        'header_field':'header',
-        'value_field':'id',
-        'tab':'main'
-    },
-    {
-      'description':'Email - адреса',
-      'name':'emails',
-      'type':'1_to_m',
-      'table':'manager_email',
-      'table_id':'id',
-      'view_type':'list',
-      'foreign_key':'manager_id',
-      'order':'main desc',
-      'fields':[
-        {
-          'description':'Основной',
-          'type':'checkbox',
-          'name':'main',
-          #'make_change_in_slide':1,
-          #'change_in_slide':1,
-        },
-        {
-          'description':'Бренд',
-          'type':'select_from_table',
-          'name':'brand_id',
-          'table':'brand',
-          'header_field':'header',
-          'value_field':'id'
-        },
-        {
-          'description':'Email',
-          'type':'text',
-          'name':'email',
-        },
-      ],
-      'tab':'main'
+    # {
+    #     'description':'Группа',
+    #     'name':'group_id',
+    #     'type':'select_from_table',
+    #     'table':'manager_group',
+    #     'tablename':'mg',
+    #     'header_field':'header',
+    #     'value_field':'id',
+    #     'tab':'main'
+    # },
 
-    },
-    {
-      'description':'Email',
-      'name':'email',
-      'type':'filter_extend_text',
-      'tablename':'me',
-      'db_name':'group_concat(me.email) SEPARATOR ", "'
-    },
+    # {
+    #   'description':'Email',
+    #   'name':'email',
+    #   'type':'filter_extend_text',
+    #   'tablename':'me',
+    #   'db_name':'group_concat(me.email) SEPARATOR ", "'
+    # },
 
-    {
-      'description':'Телефон',
-      'type':'text',
-      'name':'phone',
-      'tab':'main',
-      #'read_only':1,
-      # 'regexp_rules':[
-      #     '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
-      # ],
-      'replace_rules':[
-          '/[^\d]/g','',
-          '/^(\d{11}).*$/','$1',
-          '/^[87]/','+7',
-          '/^\+7(\d{3})(\d)/','+7 ($1) $2',
-          '/^(\+7 \(\d{3}\))(\d{3})/','$1 $2',
-          '/(\d{3})(\d{2})/',"$1-$2",
-          '/-(\d{2})(\d{2}\d*)$/',"-$1-$2"
+    # {
+    #   'description':'Телефон',
+    #   'type':'text',
+    #   'name':'phone',
+    #   'tab':'main',
+    #   #'read_only':1,
+    #   # 'regexp_rules':[
+    #   #     '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
+    #   # ],
+    #   'replace_rules':[
+    #       '/[^\d]/g','',
+    #       '/^(\d{11}).*$/','$1',
+    #       '/^[87]/','+7',
+    #       '/^\+7(\d{3})(\d)/','+7 ($1) $2',
+    #       '/^(\+7 \(\d{3}\))(\d{3})/','$1 $2',
+    #       '/(\d{3})(\d{2})/',"$1-$2",
+    #       '/-(\d{2})(\d{2}\d*)$/',"-$1-$2"
 
-      ]
-    },
-    {
-        'description':'фото',
-        'type':'file',
+    #   ]
+    # },
+    # {
+    #     'description':'фото',
+    #     'type':'file',
         
-        'name':'photo',
-        #'keep_orig_filename':1,
-        'filedir':'./files/manager',
-        'preview':'200x200',
-        'crops':1,
-        'tab':'main',
-        'resize':[
-            {
-              'description':'Квадратное фото',
-              #'file':'<%filename_without_ext%>_mini1.<%ext%>',
-              'file':'<%filename_without_ext%>.<%ext%>',
-              'size':'200x200',
-              'quality':'95'
-            },
+    #     'name':'photo',
+    #     #'keep_orig_filename':1,
+    #     'filedir':'./files/manager',
+    #     'preview':'200x200',
+    #     'crops':1,
+    #     'tab':'main',
+    #     'resize':[
+    #         {
+    #           'description':'Квадратное фото',
+    #           #'file':'<%filename_without_ext%>_mini1.<%ext%>',
+    #           'file':'<%filename_without_ext%>.<%ext%>',
+    #           'size':'200x200',
+    #           'quality':'95'
+    #         },
 
-        ]
-    },
-    {
-      'description':'Уволен',
-      'type':'checkbox',
-      'name':'gone',
-      'tab':'main',
-    },
-    {
-      'name':'name',
-      'description':'ФИО',
-      'type':'text',
-      #'read_only':1,
-      'tab':'main',
-      'regexp_rules':[
-          '/^.+$/','Полное имя обязательно для заполнения',
-      ],
-      'filter_on':1
-    },
+    #     ]
+    # },
+    # {
+    #   'description':'Уволен',
+    #   'type':'checkbox',
+    #   'name':'gone',
+    #   'tab':'main',
+    # },
+    # {
+    #   'name':'name',
+    #   'description':'ФИО',
+    #   'type':'text',
+    #   #'read_only':1,
+    #   'tab':'main',
+    #   'regexp_rules':[
+    #       '/^.+$/','Полное имя обязательно для заполнения',
+    #   ],
+    #   'filter_on':1
+    # },
     {
       'name':'comment',
       'description':'Комментарий',
@@ -170,39 +137,39 @@ def get_fields():
     },
 
 
-    {
-       'description':'Доступные роли',
-       'name':'access_roles',
-       'type':'1_to_m',
-       'cols':2,
-       'table':'manager_role',
-       'table_id':'id',
-       'foreign_key':'manager_id',
-       'read_only':1,
-       'fields':[
-          {
-            'description':'Роль',
-            'name':'role',
-            'type':'select_from_table',
-            'table':'manager',
-            'header_field':'name',
-            'value_field':'id'
-          }
-       ],
-       'before_code':access_role_before_code,
-       'tab':'permissions',
+    # {
+    #    'description':'Доступные роли',
+    #    'name':'access_roles',
+    #    'type':'1_to_m',
+    #    'cols':2,
+    #    'table':'manager_role',
+    #    'table_id':'id',
+    #    'foreign_key':'manager_id',
+    #    'read_only':1,
+    #    'fields':[
+    #       {
+    #         'description':'Роль',
+    #         'name':'role',
+    #         'type':'select_from_table',
+    #         'table':'manager',
+    #         'header_field':'name',
+    #         'value_field':'id'
+    #       }
+    #    ],
+    #    'before_code':access_role_before_code,
+    #    'tab':'permissions',
 
-    },
-    {
-      'description':'Текущая роль',
-      'type':'select_from_table',
-      'name':'current_role',
-      'table':'manager',
-      'header_field':'name',
-      'value_field':'id',
-      'tab':'permissions',
-      'before_code':current_role_before_code
-    },
+    # },
+    # {
+    #   'description':'Текущая роль',
+    #   'type':'select_from_table',
+    #   'name':'current_role',
+    #   'table':'manager',
+    #   'header_field':'name',
+    #   'value_field':'id',
+    #   'tab':'permissions',
+    #   'before_code':current_role_before_code
+    # },
     {
       'before_code': permissions_before_code,
       'description':'Права учётной записи',
@@ -222,16 +189,6 @@ def get_fields():
       'tab':'permissions',
       #'not_order':1,
       #'read_only':1
-    },
-    {
-      'description':'Юридическое лицо',
-      'name':'ur_lico_id',
-      'type':'select_from_table',
-      'table':'ur_lico',
-      'tablename':'ul',
-      'header_field':'firm',
-      'value_field':'id',
-      'tab':'hr'
     },
     {
       'description':'Должность',

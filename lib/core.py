@@ -1,4 +1,15 @@
 import random, re, time, datetime, os
+
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+def get_triade(x):
+  return '{0:,}'.format(x).replace(',', '`')
+
 def join_ids(ids):
   result=''
   idx=0

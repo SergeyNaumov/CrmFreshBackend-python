@@ -1,0 +1,21 @@
+<style>
+	.tbl1 .r {text-align: right}
+</style>
+<table class="tbl1" style="width: 100%;">
+	<thead>
+		<tr>
+			<td>Менеджер</td>
+			<td>Банк</td>
+		</tr>
+	</thead>
+	{%for l in list%}
+	<tr>
+		<td>{{l.name}}</td>
+		<td class="r">{{l.bank}}</td>
+	</tr>
+	{%endfor%}
+	<tr>
+		<td><b>Итого:</b></td>
+		<td class="r">{{total}}</td>
+	</tr>
+</table>

@@ -12,13 +12,16 @@ def run_event(form,event_name,arg={}):
       field=arg['field']
       if event_name in field: # Если мы в аргументах передаём поле -- событие ищем внутри этого поля
         event_func=field[event_name]
-        
-        if event_name in ('slide_code', 'after_add'):
-          data=exists_arg('data',arg) or {}
-          return event_func(form,field,data)
-        else:
-          return event_func(form,field)
-    
+        try:
+          if event_name in ('slide_code', 'after_add'):
+            data=exists_arg('data',arg) or {}
+            return event_func(form,field,data)
+          else:
+            return event_func(form,field)
+        except Exception as e:
+          err=traceback.format_exc()
+
+          form.errors.append(f"ошибка в событии {event_name}: {err}")
     else:
 
       if event_name in form.events:
@@ -27,10 +30,15 @@ def run_event(form,event_name,arg={}):
         if isinstance(event,list):
 
           for e in event:
-            if arg:
-              e(form,arg)
-            else:
-              e(form)
+            try:
+              if arg:
+                e(form,arg)
+              else:
+                e(form)
+            except Exception as e:
+              err=traceback.format_exc()
+
+              form.errors.append(f"ошибка в событии {event_name}: {err}")
         else:
 
           try:

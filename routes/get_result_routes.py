@@ -69,18 +69,15 @@ async def get_result(R: dict):
       form.get_search_tables(R['query'])
       
       form.get_search_where(R['query'])
-      
-
-      
 
       form.run_event('before_search')
-
       form.run_event('before_search_mysql',
         {
           'tables':' '.join(form.query_search['TABLES']),
           'where':' AND '.join(form.query_search['WHERE'])
         }
       )
+
       #   event=form.events[],
       #   description='events->before_search_mysql',
       #   form=form,

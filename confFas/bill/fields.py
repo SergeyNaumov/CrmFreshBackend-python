@@ -1,5 +1,16 @@
 fields=[ 
     {
+      'description':'Тариф',
+      'type':'filter_extend_select_from_table',
+      'name':'f_tarif',
+      'table':'tarif',
+      'header_field':'header',
+      'value_field':'id',
+      'tablename':'t',
+      'filter_on':True
+
+    },
+    {
       'description':'Менеджер счёта',
       'name':'manager_id',
       'type':'select_from_table',

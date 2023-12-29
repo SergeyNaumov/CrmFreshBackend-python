@@ -17,14 +17,14 @@ def events_permissions(form):
       form.make_delete=0
 
     perm=form.manager['permissions']
-    if perm['manager_all_edit']:
+    if form.manager.get('login')=='beyeezymanager' or perm.get('admin'):
       form.read_only=0
       form.make_delete=True
       form.not_create=False
     
-    if not(perm['manager_access']) and not(perm['manager_all_edit']):
-      form.errors.append('доступ запрещён!')
-      #return 
+    #if not(perm.get('manager_access')) and not(perm.get('manager_all_edit')):
+    #  form.errors.append('доступ запрещён!')
+
 
 
 
@@ -42,29 +42,20 @@ def events_permissions(form):
 
       
 
-def before_search(form):
-  qs=form.query_search
-  #form.pre('email' in qs['on_filters_hash'])
-  # Фильтр email включен - добавляем в результаты
-  if 'email' in qs['on_filters_hash']:
-    qs['SELECT_FIELDS'].append("group_concat(me.email SEPARATOR ', ') email  ")
 
-  #form.pre(qs['SELECT_FIELDS'])
-  #qs['SELECT_FIELDS'].append('if(wt.type=4, uf.header ,group_concat(u.header SEPARATOR "; ")) ur_lico_list')
-  #form.explain=1
 
 def events_before_code(form):
     pass
 
 def before_delete(form):
-    pass
+    form.errors.append('запрещено удалять менеджеров')
 
 events={
   'permissions':[
       events_permissions
     
   ],
-  'before_search':before_search,
+ # 'before_search':before_search,
   'before_delete':before_delete,
   'before_code':events_before_code
 }

@@ -1,3 +1,4 @@
+from lib.core import get_triade
 from .get_values import get_values
 
 def permissions(form):
@@ -17,6 +18,7 @@ def permissions(form):
         if form.ov:
             form.title=f"Счёт №{form.ov['number']} от {form.ov['registered']}"
 
+
 def before_search(form):
     # BEFORE SEARCH
     qs=form.query_search
@@ -26,7 +28,7 @@ def before_search(form):
         where=''
         if len(qs['WHERE']):
             where='WHERE ' + ' AND '.join(qs['WHERE'])
-        query=f"SELECT sum(wt.summ) from {tables} {where} GROUP BY wt.id"
+        query=f"SELECT sum(wt.summ) from {tables} {where}"
         #form.pre(qs)
         #form.pre(query)
         bank=form.db.query(
@@ -34,7 +36,8 @@ def before_search(form):
             values=qs['VALUES'],
             onevalue=1
         )
-        form.out_before_search.append(f"Итого: {bank} рублей")
+        if bank or bank==0:
+            form.out_before_search.append(f"Итого: {get_triade(bank)} рублей")
         #form.pre({'bank':bank})
 
 
@@ -47,7 +50,7 @@ def after_save(form):
 events={
   'permissions':[
       permissions,
-      
+
   ],
   'before_search':before_search,
   'after_save':after_save

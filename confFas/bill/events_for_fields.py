@@ -1,4 +1,4 @@
-from lib.core import date_to_rus, cur_date
+from lib.core import date_to_rus, cur_date, get_triade
 from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 from lib.send_mes import send_mes
 
@@ -167,6 +167,8 @@ def firm_filter_code(form,field,row):
     return f"<a href='/edit_form/user/{row['u__id']}' target='_blank'>{firm}</a>"
   return '-'
 
+#def summ_before_code(form,field,row):
+
 events={
   'c_ur_lico_id': {
     'before_code': c_ur_lico_id_before_code
@@ -195,6 +197,9 @@ events={
   },
   'paid_to':{
     'before_code': paid_to_before_code,
+  },
+  'summ':{
+    'filter_code': lambda form,field,row: get_triade(row['wt__summ'])
   },
   'paid_summ':{
     'before_code': paid_summ_before_code,
