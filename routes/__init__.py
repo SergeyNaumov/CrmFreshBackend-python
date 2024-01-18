@@ -21,6 +21,7 @@ from .table_routes import router as router_table
 from .const_routes import router as router_const
 from .docpack_routes import router as router_docpack
 from .multiaction_routes import router as router_multiaction
+from .parser_excel import router as router_parser_excel
 # messenger
 from .messenger import router as router_messenger
 
@@ -53,7 +54,7 @@ router.include_router(router_memo,prefix='/memo')
 router.include_router(router_const,prefix='/const')
 router.include_router(router_multiaction,prefix='/multiaction')
 router.include_router(router_docpack,prefix='/docpack')
-
+router.include_router(router_parser_excel,prefix='/parser-excel')
 router.include_router(router_messenger,prefix='/messenger')
 
 

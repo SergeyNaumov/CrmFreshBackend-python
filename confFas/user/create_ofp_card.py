@@ -35,12 +35,12 @@ def create_ofp_card(form):
         message=f"<p>Только что {form.manager['name']} создал(а) карту ОФП для компании {ov['firm']}( ИНН: {ov['inn']})</p>"+\
           f"<p><a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{ofp_card_id}'>Перейти в карту</a></p>"
 
-        send_mes(
-          from_addr='info@fascrm.ru',
-          to='pzm@a-u-z.pro',
-          subject=f"Создана новая карта ОФП: {ov['firm']}, ИНН: {ov['inn']}",
-          message=message
-        )
+        # send_mes(
+        #   from_addr='info@fascrm.ru',
+        #   to='pzm@a-u-z.pro',
+        #   subject=f"Создана новая карта ОФП: {ov['firm']}, ИНН: {ov['inn']}",
+        #   message=message
+        # )
 
         # Убрал копирование контактов, попросили сделать сквозными
         # contact_list=db.query(

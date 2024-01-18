@@ -1,4 +1,6 @@
 from .search_multi_action import search_multi_action_list
+from .events import events
+from .ajax import ajax
 form={
     'work_table':'good',
     'work_table_id':'id',
@@ -6,6 +8,7 @@ form={
     'sort':False,
     'tree_use':False,
     #'explain':1,
+    'make_delete':False,
     'header_field':'url',
     'default_find_filter':'header',
     'QUERY_SEARCH_TABLES':[
@@ -17,12 +20,21 @@ form={
     ],
     'search_multi_action':search_multi_action_list, # множественное действие в поиске
     'GROUP_BY':'wt.id',
+    'ajax':ajax,
     'fields': [ 
         {
             'description':'Название',
             'type':'text',
             'name':'header',
-            'filter_on':True
+            'filter_on':True,
+            'frontend':{'ajax':{'name':'gen_url','timeout':100}},
+
+        },
+        {
+            'description':'url',
+            'name':'keyword',
+            'type':'text',
+            'frontend':{'ajax':{'name':'url','timeout':100}},
         },
         {
             'description':'Категория',
@@ -32,6 +44,7 @@ form={
             'tablename':'c',
             'header_field':'header',
             'value_field':'id',
+            'frontend':{'ajax':{'name':'gen_url','timeout':100}},
             'filter_on':True
         },
         {
@@ -48,12 +61,20 @@ form={
             'make_change_in_search':True
         },
         {
+            'description':'Видео на youtube',
+            'type':'text',
+            'name':'youtube_link',
+            'filter_on':True,
+            'make_change_in_search':True
+        },
+        {
             'description':'Фотогалерея',
             'type':'1_to_m',
             'name':'photos',
             'table':'good_galery',
             'table_id':'id',
             'foreign_key':'good_id',
+            'view_type':'list',
             'sort':1,
             'fields':[
                 {
@@ -77,6 +98,11 @@ form={
                             'quality':'100'
                         },
                     ]
+                },
+                {
+                    'description':'Значение тэга alt',
+                    'name':'alt',
+                    'type':'text'
                 }
             ],
             'filter_on':False

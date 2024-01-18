@@ -61,7 +61,7 @@ def paid_after_save(form,field):
       )
       #print('owner:',own)
       # отправляем менеджеру счёта
-      to_ids={}
+      to_ids={7576:1}
 
       #print(f"email: {ov['m_email']}")
 

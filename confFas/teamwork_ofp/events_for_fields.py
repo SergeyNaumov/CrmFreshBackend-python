@@ -5,15 +5,25 @@ from lib.send_mes import send_mes
 
 
   
-
-
-# Менеджер
-def manager_before_code(form,field):
-  
+def group_id_before_code(form,field):
+  #form.pre(form.manager['login'])
   if form.manager['login'] in ('sed','admin','akulov','pzm'):
-    
+    #form.pre(['is sed'])
     field['read_only']=False
 
+  if form.id and form.ov and form.ov.get('mfg__owner') == form.manager.get('id'):
+    # руководителю менеджера ОП разрешаем редактировать это поле
+    field['read_only']=False
+
+  #form.pre([form.read_only, field['read_only'] ])
+# Юрист
+def manager_before_code(form,field):
+  
+  if form.manager['login'] in ('sed','admin','akulov','pzm') or form.is_group_owner:
+    field['read_only']=False
+
+  #if form.ov:
+  #  form.pre([form.ov['mfg__owner'], form.manager['id']])
   #if form.manager['login'] in ('admin','naumova','sheglova','sed','akulov','zia','strogov','pan'):
   #  field['read_only']=False
 
@@ -49,7 +59,9 @@ def manager_before_code(form,field):
           if len(to_out):
             field['after_html']+=f'<div style="margin-bottom: 20px;"><small>Руководитель: {" ; ".join(to_out)}</small></div>'
       
-
+  #form.pre(field)
+  if form.is_group_owner and form.ov and form.ov['mgu__id']:
+    field['where']=f"group_id={form.manager['group_id']}"
 
 
 def manager_to2_before_code(form,field):
@@ -176,7 +188,14 @@ def comment_after_add(form,field,data):
 
       
 
-  
+
+
+  last_comments=form.db.query(
+    query="SELECT * from teamwork_ofp_memo where teamwork_ofp_id=%s order by id desc limit 2",
+    values=[form.id],
+  )
+  #print('last_comment:',last_comments)
+
   to_emails=get_email_list_from_manager_id(form.db, to)
 
   #print(f"to_emails: ", ', '.join(to_emails))
@@ -185,16 +204,31 @@ def comment_after_add(form,field,data):
     regnumber_str=''
     if form.ov['regnumber']:
       regnumber_str=f"Реестровый номер: {form.ov['regnumber']}"
-    send_mes(
-      from_addr='info@fascrm.ru',
-      to=','.join(to_emails.keys()),
-      subject=f"Новый комментарий, совместная работа ОФП / {form.ov['firm']} / {form.ov['product_label']}",
-      message=f"Наименование компании: {form.ov['link']}<br>"+\
-          f"Менеджер: {form.manager['name']}<br>"+\
-          f"Комментарий: {data['comment']}<br>"+\
-          regnumber_str
-      
-    )
+
+    if len(last_comments)>1:
+      # Не первый комментарий в карте
+      send_mes(
+        from_addr='info@fascrm.ru',
+        to=','.join(to_emails.keys()),
+        #to='svcomplex@yandex.ru',
+        subject=f"Новый комментарий, совместная работа ОФП / {form.ov['firm']} / {form.ov['product_label']}",
+        message=f"Наименование компании: {form.ov['link']}<br>"+\
+            f"Менеджер: {form.manager['name']}<br>"+\
+            f"Комментарий: {data['comment']}<br>"+\
+            regnumber_str
+      )
+    else:
+      # первый комментарий в карте
+      send_mes(
+        from_addr='info@fascrm.ru',
+        #to='svcomplex@yandex.ru',#
+        to=','.join(to_emails.keys()),
+        subject=f"Первый комментарий в карточке совместной работы ОФП / {form.ov['firm']} / {form.ov['product_label']}",
+        message=f"Наименование компании: {form.ov['link']}<br>"+\
+            f"Менеджер: {form.manager['name']}<br>"+\
+            f"Комментарий: {data['comment']}<br>"+\
+            regnumber_str
+      )
     
 
 
@@ -216,6 +250,9 @@ events={
   #'manager_from':{
   #  'before_code':manager_before_code
   #},
+  'group_id':{
+    'before_code':group_id_before_code
+  },
   'manager_to':{
     'before_code':manager_before_code
   },

@@ -1,4 +1,6 @@
 from .contact_field import contact_field
+from .paids_field import paids_field
+
 fields=[
 
         # {
@@ -65,10 +67,15 @@ fields=[
           'type':'select_values',
           'name':'win_status',
           'values':[
-            {'v':1,'d':'Победа','c':'forestgreen'},
+            {'v':5,'d':'Новая'},
+            {'v':6,'d':'Переговоры'},
             {'v':2,'d':'В работе','c':'yellow'},
-            {'v':3,'d':'Поражение','c':'red'},
+            {'v':1,'d':'Выполнено победа','c':'forestgreen'},
+            {'v':3,'d':'Выполнено проигрыш','c':'red'},
             {'v':4,'d':'Работа не велась, оплаты не было','c':'blue'},
+            #{'v':7,'d':'Отказ'},
+
+
           ],
           'tab':'main',
         },
@@ -89,23 +96,8 @@ fields=[
         # Контакты
         contact_field
         ,
-        # {
-        #   'description':'Статус клиента',
-        #   'name':'client_status',
-        #   'type':'select_values',
-        #   'values':[
-        #     {'v':3,'d':'В работе'},
-        #     {'v':6,'d':'Заявка подана'},
-        #     {'v':2,'d':'Одобрено, получена платежка'},
-        #     {'v':4,'d':'Одобрено, отказ клиента'},
-        #     {'v':1,'d':'Отказ Банка/МФО'},
-        #     {'v':9,'d':'Передан в гр. Тихонова по регламенту'},
-        #   ],
-        #   'tab':'work',
-        #   #'read_only':1,
-        #   #'before_code':client_status_before_code
-        # },
-
+        # Платежи
+        paids_field,
         {
             'description':'Вид продукта',
             'name': 'product',
@@ -231,6 +223,7 @@ fields=[
             'tree_use':True,
             'tab':'work',
         },
+
         {
             'description':'Менеджер ОП',
             'type':'select_from_table',
@@ -243,6 +236,18 @@ fields=[
             'tab':'work',
             'read_only':True,
             'filter_on':True
+        },
+        {
+            'description':'Группа Юристов',
+            'name': 'group_id',
+            'type':'select_from_table',
+            'table':'manager_group',
+            'tablename':'mg',
+            'header_field':'header',
+            'value_field':'id',
+            'where':'lawers=1',
+            'tab':'work',
+            'read_only':True,
         },
         {
             'description':'Юрист',

@@ -1,3 +1,100 @@
+def add_yandexgpt_fields(form):
+    add_fields=[
+        {
+            'description':'Использовать YandexGPT',
+            'type':'checkbox',
+            'name':'yandexgpt-enable'
+        },
+        {
+            'description':'ID-каталога',
+            'type':'text',
+            'name':'yandexgpt-cat_id'
+        },
+        {
+            'description':'API secret key',
+            'type':'text',
+            'name':'yandexgpt-api-secret-key'
+        },
+        {
+            'description':'Текст для предварительного обучения',
+            'type':'textarea',
+            'name':'yandexgpt-to-system'
+        },
+    ]
+
+    for f in add_fields:
+        f['tab']='yandex-gpt'
+        form.fields.append(f)
+
+
+def add_robokassa_fields(form):
+    # Эти поля нужны в том случае, если нам нужна робокасса
+    form.tabs.append({'name':'robokassa','description':'Robokassa'})
+    add_fields=[
+            {
+                'description':'Robokassa работает в тестовом режиме',
+                'type':'checkbox',
+                'name':'robokassa_test',
+                'tab':'robokassa',
+            },
+            {
+                'description':'Robokassa - Логин',
+                'type':'text',
+                'name':'robokassa_log',
+                'tab':'robokassa',
+            },
+            {
+                'description':'Robokassa - Пароль1',
+                'type':'text',
+                'name':'robokassa_pas1',
+                'tab':'robokassa',
+            },
+            {
+                'description':'Robokassa - Пароль2',
+                'type':'text',
+                'name':'robokassa_pas2',
+                'tab':'robokassa',
+            },
+            {
+                'description':'Наименование организации',
+                'type':'text',
+                'name':'orgname',
+                'tab':'robokassa',
+            },
+            {
+                'description':'ИНН',
+                'type':'text',
+                'name':'inn',
+                'tab':'robokassa',
+            },
+            {
+                'description':'ОГРН/ОГРНИП',
+                'type':'text',
+                'name':'ogrn',
+                'tab':'robokassa',
+            },
+            {
+                'description':'Контактный телефон',
+                'type':'text',
+                'name':'contact_phone',
+                'tab':'robokassa',
+            },
+            {
+                'description':'Контактный email',
+                'type':'text',
+                'name':'contact_email',
+                'tab':'robokassa',
+            },
+            {
+                'description':'Оферта',
+                'type':'file',
+                'name':'oferta',
+                'tab':'robokassa',
+            }
+    ]
+    for f in add_fields:
+        form.fields.append(f)
+
 def permissions(form):
     db=form.db
 
@@ -38,7 +135,12 @@ def permissions(form):
             'name':'not_paid_message',
             'tab':'main',
         },
-
+        {
+            'description':'Код счётчика(ов) посещений',
+            'type':'textarea',
+            'name':'counter',
+            'tab':'main'
+        },
         {
             'description':'Отправка заказов в RetailCRM',
             #'type':'select_values',
@@ -56,6 +158,13 @@ def permissions(form):
                 {'v':'2','d':'из Retail CRM'},
             ],
             'add_description':'выберите один из вариантов',
+            'tab':'integration',
+        },
+        {
+            'description':'Очистить каталог товаров',
+            'add_description':'Удалять все категрии и товары перез загрузкой из внешнего источника',
+            'type':'checkbox',
+            'name':'clear_goods_before_parse',
             'tab':'integration',
         },
         {
@@ -116,75 +225,26 @@ def permissions(form):
         #    'name':'copyright',
         #},
     ]
+
+    add_yandexgpt_fields(form)
+
+    #print('zakaz_method:',form.s.shop.get('zakaz_method'))
+    if form.s.shop.get('zakaz_method')==1:
+        # Если метод заказа товаров робокасса
+        add_robokassa_fields(form)
+
     if form.s.shop['serv_fast_robokassa']:
-        form.tabs.append({'name':'robokassa','description':'Robokassa'})
+
+        add_robokassa_fields(form)
         add_fields=[
-            {
-                'description':'Robokassa работает в тестовом режиме',
-                'type':'checkbox',
-                'name':'robokassa_test',
-                'tab':'robokassa',
-            },
-            {
-                'description':'Robokassa - Логин',
-                'type':'text',
-                'name':'robokassa_log',
-                'tab':'robokassa',
-            },
-            {
-                'description':'Robokassa - Пароль1',
-                'type':'text',
-                'name':'robokassa_pas1',
-                'tab':'robokassa',
-            },
-            {
-                'description':'Robokassa - Пароль2',
-                'type':'text',
-                'name':'robokassa_pas2',
-                'tab':'robokassa',
-            },
+
             {
                 'description':'Ссылка на файл google docs',
                 'type':'text',
                 'name':'google_docs_sheet',
                 'tab':'robokassa',
             },
-            {
-                'description':'Наименование организации',
-                'type':'text',
-                'name':'orgname',
-                'tab':'robokassa',
-            },
-            {
-                'description':'ИНН',
-                'type':'text',
-                'name':'inn',
-                'tab':'robokassa',
-            },
-            {
-                'description':'ОГРН/ОГРНИП',
-                'type':'text',
-                'name':'ogrn',
-                'tab':'robokassa',
-            },
-            {
-                'description':'Контактный телефон',
-                'type':'text',
-                'name':'contact_phone',
-                'tab':'robokassa',
-            },
-            {
-                'description':'Контактный email',
-                'type':'text',
-                'name':'contact_email',
-                'tab':'robokassa',
-            },
-            {
-                'description':'Оферта',
-                'type':'file',
-                'name':'oferta',
-                'tab':'robokassa',
-            }
+
         ]
         for f in add_fields:
             form.fields.append(f)

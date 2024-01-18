@@ -42,6 +42,16 @@ form={
             'tab':'command'
         },
         {
+            'description':'Аргумент',
+            'type':'text',
+            'name':'argument',
+            'unique':1,
+            'after_html':'если аргумент не заполнен, то для всех аргументов',
+            #'frontend':{'ajax':{'name':'url','timeout':600}},
+            'filter_on':True,
+            'tab':'command'
+        },
+        {
             'description':'Изображение',
             'name':'photo',
             'type':'file',

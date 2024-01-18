@@ -24,12 +24,14 @@ form={
             ],
             [
               {'description':'Работа с картой','name':'work','hide':0},
+              {'description':'Платежи','name':'paids','hide':0},
               {'description':'Контакты','name':'contacts','hide':0},
             ]
     ],
     'QUERY_SEARCH_TABLES':[
       {'t':'teamwork_ofp','a':'wt'},
       {'t':'user','a':'u','l':'u.id=wt.user_id','lj':1, 'for_fields':['firm', 'inn', 'f_city','manager_id']},
+      {'t':'manager_group','a':'mg','l':'mg.id=wt.group_id','lj':1, 'for_fields':['group_id']},
       {'t':'manager','a':'m','l':'m.id=u.manager_id','lj':1, 'for_fields':['manager_id']},
 
       {'t':'manager','a':'mf','l':'wt.manager_from=mf.id','lj':1, 'for_fields':['manager_from','managers_groups_name']},

@@ -130,10 +130,11 @@ config={
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     'manager_id':
       #12039 #ав
-      #11691 #Люб
+      11691 #Люб
       #4201 # sed
       #585 # Ак ,
-      7576 #pzm
+      #7576 #pzm
+      #11709
     
     #'manager_id':12039 # О ,
     #'manager_id': 11691 # Г

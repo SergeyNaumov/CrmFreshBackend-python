@@ -13,6 +13,7 @@ form={
     'tabs':[
         {'name':'main','description':'Общие данные'},
         {'name':'integration','description':'Интеграция'},
+        {'name':'yandex-gpt','description':'Yandex GPT'},
     ]
 }
       

@@ -19,10 +19,12 @@ def permissions(form):
   
   #if form.manager['login']=='admin':
   #  form.explain=1
-
-  if form.manager['login'] in ('akulov','pzm','sed','anna','admin'):
+  login=form.manager['login']
+  if login in ('akulov','pzm','sed','anna','admin') \
+    or (entity=='6' and login=='lgf') or \
+    (entity=='9' and login=='sheglova'):
         form.search_links.append({
-          'link':f"/vue/admin_table/assignment{entity}",
+          'link':f"/vue/admin_table/assignment?entity={entity}",
           'description':"Менеджеры для распределения",
           'target':'contract_termination_stat'
         })

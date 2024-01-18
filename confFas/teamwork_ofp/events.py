@@ -40,15 +40,18 @@ def get_old_values(form):
                   mu.name mu__name,
                   mg.header mg__header, mg.id m__group_id,
                   m_oso.id m_oso__id, m_oso.email m_oso__email, m_oso.group_id m_oso__group_id,
-                  ( wt.product in (9,14,15) and wt.dat_session<>'0000-00-00' and date(wt.dat_session)<=curdate() and wt.win_status=0) block_card
+                  ( wt.product in (9,14,15) and wt.dat_session<>'0000-00-00' and date(wt.dat_session)<=curdate() and wt.win_status=0) block_card,
+                  mfg.owner_id mfg__owner, mgu.owner_id mgu__owner, mgu.id mgu__id
                 FROM
                   teamwork_ofp wt
                   LEFT JOIN user u ON (u.id=wt.user_id)
                   LEFT JOIN manager mf ON (mf.id=wt.manager_from)
+                  LEFT JOIN manager_group mfg ON mfg.id=mf.group_id
                   LEFT JOIN manager mt ON (mt.id=wt.manager_to)
                   LEFT JOIN manager mt2 ON (mt2.id=wt.manager_to2)
                   LEFT JOIN manager mu ON (mu.id=u.manager_id)
                   LEFT JOIN manager_group mg ON (mg.id=mu.group_id)
+                  LEFT JOIN manager_group mgu ON (mgu.id=wt.group_id)
                   LEFT JOIN manager m_oso ON (m_oso.id=wt.manager_oso)
                 WHERE wt.teamwork_ofp_id=%s
       ''',
@@ -65,7 +68,7 @@ def get_old_values(form):
     #print('config: ',)
     #ov['link']=f'''<a href="{form.s.config['system_url']}"edit_form/teamwork_ofp/{form.ov['id']}">{form.ov['firm']}</a>'''
     ov['link']=f'''<a href="{form.s.config['system_url']}edit_form/teamwork_ofp/{ov['id']}">{ov["firm"]}</a>'''
-    #form.pre({'link':ov['link']})
+    #form.pre({'ov':ov})
 
     ov['block_card']=0
   form.ov=ov
@@ -77,6 +80,7 @@ def permissions(form):
   form.is_manager_from=False
   form.is_manager_to=False
   form.is_manager_to2=False
+  form.is_group_owner=False # руководитель группы юристов
 
   if form.script=='admin_table':
     user_id=exists_arg('cgi_params;user_id',form.R)
@@ -86,8 +90,13 @@ def permissions(form):
     #return
 
   get_old_values(form)
+
   #form.pre({'ov':form.ov['firm']})
   if form.ov:
+    if form.ov['mgu__owner']==form.manager['id']:
+      #form.pre(['ow',form.ov['mgu__owner'],form.manager['id']])
+      form.is_group_owner=True
+
     #form.pre([form.ov['manager_to'],form.manager['id'],form.ov['manager_to']==form.manager['id']])
     #form.pre(form.manager)
     #form.pre([form.ov['manager_to_group'],])
@@ -113,11 +122,11 @@ def permissions(form):
       form.is_manager_to2=True
 
 
-    if (form.is_admin or form.is_manager_from or form.is_manager_to or form.is_manager_to2):
+    if (form.is_admin or form.is_manager_from or form.is_manager_to or form.is_manager_to2 or form.is_group_owner):
       form.read_only=0
 
 
-    form.title=f"ОФП: {form.ov['firm']}"
+    form.title=f"ОФП: {form.ov.get('firm','')}"
   form.user_id=None
 
 
@@ -126,7 +135,7 @@ def permissions(form):
     if user_id and user_id.isnumeric(): form.user_id=user_id
 
   if form.id:
-    form.user_id=form.ov['user_id']
+    form.user_id=form.ov.get('user_id')
   #form.pre(form.read_only)
 
 
