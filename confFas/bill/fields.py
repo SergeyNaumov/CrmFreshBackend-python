@@ -116,7 +116,7 @@ fields=[
       'tab':'main',
     },
     {
-      'description':'Сумма',
+      'description':'Сумма счёта',
       'type':'text',
       'filter_type':'range',
       'filter_on':1,
@@ -165,5 +165,6 @@ fields=[
         'read_only':1,
         'hide':True,
         'tab':'paid',
+        'filter_on':1,
     },
 ]

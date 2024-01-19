@@ -36,6 +36,7 @@ form={
             'type':'text',
             'frontend':{'ajax':{'name':'url','timeout':100}},
         },
+
         {
             'description':'Категория',
             'type':'select_from_table',
@@ -46,6 +47,25 @@ form={
             'value_field':'id',
             'frontend':{'ajax':{'name':'gen_url','timeout':100}},
             'filter_on':True
+        },
+        {
+
+          'description':'Доп. категории',
+          'type':'multiconnect',
+          'tree_use':1,
+          'tree_table':'category',
+          'name':'good_category',
+          'tablename':'gc',
+          'relation_table':'category',
+          'relation_save_table':'good_category',
+          'relation_table_header':'header',
+          'relation_save_table_header':'header',
+          'relation_table_id':'id',
+          'relation_save_table_id_worktable':'good_id',
+          'relation_save_table_id_relation':'category_id',
+          #'tab':'permissions',
+          #'not_order':1,
+          #'read_only':1
         },
         {
             'description':'Артикул',

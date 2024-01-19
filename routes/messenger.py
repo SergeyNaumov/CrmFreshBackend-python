@@ -37,8 +37,6 @@ class ConnectionManager:
 		if socket_name in self.active_connections_hash:
 			if websocket in self.active_connections_hash[socket_name]:
 				self.active_connections_hash[socket_name].remove(websocket)
-		#else:
-			#print('not manager')
 		self.active_connections.remove(websocket)
 
 

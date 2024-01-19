@@ -82,13 +82,14 @@ def paid_after_save(form,field):
         #send_mes(
 
         #)
-        subject=f"{ov['firm']} счёт №{ov['number']} оплачен "
-        
+        summ=form.new_values['summ']
+
+        subject=f'Платеж компании "{ov["firm"]}" на сумму {summ}'
 
         message=f'''
           Для компании <a href="{form.s.config['system_url']}edit_form/user/{ov['user_id']}">{ov['firm']}</a><br>
           <a href="{form.s.config['system_url']}edit_form/bill/{form.id}">Счёт №{ov['number']}</a><br>
-          Сумма: {form.new_values['summ']}<br>
+          Сумма: {summ}<br>
           дата оплаты: {cur_date}
         '''
 

@@ -30,8 +30,8 @@ def get_old_values(form):
     ov=form.db.query(
       query='''
         SELECT
-                  wt.teamwork_ofp_id as id, wt.regnumber, wt.user_id, wt.product, '' as link, '' as product_label, wt.manager_from, wt.manager_to, wt.manager_to2,  u.firm, u.inn,
-                  mf.id mf__id, mf.group_id manager_from_group, mf.email manager_from_email,
+                  wt.teamwork_ofp_id as id, wt.regnumber, wt.user_id, wt.product, '' as link, '' as product_label, wt.manager_from, wt.manager_to, wt.manager_to2,
+                  wt.group_id, u.firm, u.inn, mf.id mf__id, mf.group_id manager_from_group, mf.email manager_from_email,
                   mf.phone manager_from_phone,
                   mt.group_id manager_to_group, mt2.group_id manager_to2_group,
                   mt.email manager_to_email, mt.phone manager_to_phone,
@@ -108,7 +108,7 @@ def permissions(form):
       form.is_admin=True
 
     # Менеджер
-    if form.ov['manager_from']==form.manager['id'] or (form.ov['manager_from_group'] in form.manager['CHILD_GROUPS_HASH']):
+    if form.ov['manager_from']==form.manager['id'] or (form.ov['manager_from_group'] in form.manager['CHILD_GROUPS_HASH'] ) :
       form.is_manager_from=True
 
 

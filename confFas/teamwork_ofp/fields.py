@@ -258,6 +258,7 @@ fields=[
             'order':'name',
             'tablename':'mt',
             'value_field':'id',
+            'read_only':True,
             # 196 -- юрист (lawer)
             'where':'(group_id IN (select group_id from manager_group_permissions where permissions_id=196))',# OR id (select manager_id from manager_permissions where permissions_id=196))',
             'tab':'work',

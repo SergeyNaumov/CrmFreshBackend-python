@@ -298,6 +298,7 @@ def get_permissions_for(form,login):
   for p in permissions_list:
       manager['permissions'][p['pname']]=p['id']
 
+  manager['CHILD_GROUPS_HASH']={}
   if manager['group_id']:
     group_id=int(manager['group_id'])
     gr_perm_list=form.db.query(
@@ -316,10 +317,10 @@ def get_permissions_for(form,login):
     
     
     manager['CHILD_GROUPS']=child_groups(form.db,[group_id])
-    manager['CHILD_GROUPS_HASH']={}
+
     for g_id in manager['CHILD_GROUPS']:
         manager['CHILD_GROUPS_HASH'][int(g_id)]=1
-    #print('CHILD_GROUPS_HASH:',manager['CHILD_GROUPS_HASH'])
+    print('CHILD_GROUPS_HASH:',manager['CHILD_GROUPS_HASH'])
   manager['files_dir']='./files'
   manager['files_dir_web']='/files'
   return manager

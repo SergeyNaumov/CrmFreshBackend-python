@@ -24,7 +24,7 @@ from .multiaction_routes import router as router_multiaction
 from .parser_excel import router as router_parser_excel
 # messenger
 from .messenger import router as router_messenger
-
+from .gptassist import router as router_gptassist
 
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
@@ -56,22 +56,16 @@ router.include_router(router_multiaction,prefix='/multiaction')
 router.include_router(router_docpack,prefix='/docpack')
 router.include_router(router_parser_excel,prefix='/parser-excel')
 router.include_router(router_messenger,prefix='/messenger')
-
-
 router.include_router(router_extend)
 router.include_router(router_documentation,prefix='/documentation')
-
 router.include_router(router_page,prefix='/page')
 router.include_router(router_table,prefix='/table')
-
 router.include_router(router_video,prefix='/VideoList')
 router.include_router(router_news,prefix='/NewsList')
-
 router.include_router(router_autocomplete,prefix='/autocomplete')
 router.include_router(stat_tool,prefix='/stat-tool')
-
 router.include_router(router_ajax) # /ajax
-
+router.include_router(router_gptassist,prefix='/gpt-assist')
 router.include_router(router_svcms,prefix='/svcms')
 
 

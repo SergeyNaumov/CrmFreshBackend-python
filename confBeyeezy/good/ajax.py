@@ -3,12 +3,12 @@ from transliterate import translit
 
 def exists_url(form,url):
   # если такой url занят, то возвращает ошибку
-  where=''
+  where='where keyword=%s'
   if form.id:
-    where=f"where id<>{form.id}"
+    where+=f" AND id<>{form.id}"
 
   exists=form.db.query(
-    query=f"select id,header,keyword from good where keyword=%s {where}",
+    query=f"select id,header,keyword from good {where}",
     values=[url],
     onerow=1
   )

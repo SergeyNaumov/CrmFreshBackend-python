@@ -23,12 +23,12 @@ def before_search(form):
     # BEFORE SEARCH
     qs=form.query_search
     on_filters_hash=qs.get('on_filters_hash')
-    if on_filters_hash and on_filters_hash.get('summ'):
+    if on_filters_hash and on_filters_hash.get('paid_summ'):
         tables="\n".join(qs['TABLES'])
         where=''
         if len(qs['WHERE']):
             where='WHERE ' + ' AND '.join(qs['WHERE'])
-        query=f"SELECT sum(wt.summ) from {tables} {where}"
+        query=f"SELECT sum(wt.paid_summ) from {tables} {where}"
         #form.pre(qs)
         #form.pre(query)
         bank=form.db.query(

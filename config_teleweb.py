@@ -1,5 +1,6 @@
 # UPDATE manager set password=sha2('123',256);
 from confTeleweb.messenger_rules import messenger_rules
+from confTeleweb.gptassist_rules import gptassist_rules
 
 def after_create_engine(s,errors=[]):
   #print('after_create_engine')
@@ -66,6 +67,7 @@ config={
   'app_components':{
     'navigator':True
   },
+  'BaсkendBase':'http://dev-crm.test/backend',
   'copyright':'copyright 2004 - {{cur_year}}',
    'bottom_menu': [
       #{'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}
@@ -93,7 +95,10 @@ config={
     'use_roles':False,
     'use_permissions':False
   },
+
   'messenger_rules':messenger_rules,
+  'gptassist_rules':gptassist_rules, # функция,
+
   'startpage':{ # указываем, какой компонент будет загружаться на главной странице
     'type':'src',
     'value':'/manager/mainpage.html',

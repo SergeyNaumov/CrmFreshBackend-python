@@ -22,6 +22,10 @@ def manager_before_code(form,field):
   if form.manager['login'] in ('sed','admin','akulov','pzm') or form.is_group_owner:
     field['read_only']=False
 
+  if not(field['read_only']) and form.ov and not(form.ov['group_id']):
+    # Если не выбрана группа юристов, то запрещаем менять
+    field['read_only']=True
+    field['after_html']='<span style="color: red;">запрещено выбирать юриста, потому что не выбрана группа</span>'
   #if form.ov:
   #  form.pre([form.ov['mfg__owner'], form.manager['id']])
   #if form.manager['login'] in ('admin','naumova','sheglova','sed','akulov','zia','strogov','pan'):
@@ -35,7 +39,8 @@ def manager_before_code(form,field):
       #manager_email=f'<a href="mailto:{form.ov["manager_from_email"]}">{form.ov["manager_from_email"]}</a> ;'
       to_out.append(f'<a href="mailto:{form.ov[name+"_email"]}">{form.ov[name+"_email"]}</a>')
     if form.ov[name+'_phone']:
-      to_out.append("тел: "+form.ov[name+'_phone'])
+      if tel:=form.ov[name+'_phone']:
+        to_out.append(f"тел: <a href='tel: {tel}'>{tel}</a>")
 
     if len(to_out):
       field['after_html']=f'''<small> {';'.join(to_out)}</small>'''
@@ -62,6 +67,10 @@ def manager_before_code(form,field):
   #form.pre(field)
   if form.is_group_owner and form.ov and form.ov['mgu__id']:
     field['where']=f"group_id={form.manager['group_id']}"
+
+  if field['where']:
+    if v:=field.get('value'):
+      field['where']+=f" or id={v}"
 
 
 def manager_to2_before_code(form,field):
