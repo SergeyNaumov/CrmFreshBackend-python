@@ -17,28 +17,31 @@ router = APIRouter()
 @router.get('/init/{config}')
 async def init(config: str):
     # Инициализация GPT для формы
-
+    gpt_list=[] ; fields={} ; WS=None
+    need_inited=False
     if gpt_assist_rules:=sysconfig.get('gptassist_rules'):
         rules=gpt_assist_rules(s)
+        print('rules:',rules)
+        gpt_list=rules.get('gpt_list',[])
+        configs=rules.get('configs')
 
-    gpt_list=rules.get('gpt_list',[])
-    configs=rules.get('configs')
 
-    need_inited=False
 
-    fields={}
-    if len(gpt_list) and configs and (config in configs):
-        # Данный конфиг указан в настройках GPTAssist
-        fields=configs[config].get('fields')
-        if len(fields):
-            need_inited=True
+        fields={}
+        if len(gpt_list) and configs and (config in configs):
+            # Данный конфиг указан в настройках GPTAssist
+            fields=configs[config].get('fields')
+            if len(fields):
+                need_inited=True
+
+            WS=rules.get('WS')
 
     return {
         'success':True,
         'gpt_list':gpt_list,
         'need_inited':need_inited, # Инициализация должна происходить тольто тогда, когда это необходимо
         'fields':fields,
-        'WS':rules.get('WS')
+        'WS':WS
     }
 
 
@@ -56,7 +59,7 @@ async def send_request_to_gpt(r:RequestTask):
             'sys_text':r.sys_text,
             'ask':'ask'
         },
-        debug=1
+        #debug=1
     )
     return {
         'success':True,
@@ -72,7 +75,7 @@ async def get_result_from_daemon(d: DaemonResult):
 
     if task_id and status:
         if websocket:=sockets_connector.active_connections_hash.get(task_id):
-            print('websocket:',websocket)
+            #print('websocket:',websocket)
             try:
                 await websocket.send_text(f"{status}|{d.question}")
                 #result['cnt_sockets']+=1

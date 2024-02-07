@@ -2,6 +2,7 @@ import sys
 import os
 from lib.gpt_daemon.get_const import get_const
 from lib.gpt_daemon.yandex import process_yandexgpt
+from lib.gpt_daemon.gigachat import process_gigachat
 
 parent_dir = os.path.dirname(  os.path.dirname(__file__) )
 sys.path.append(parent_dir)
@@ -18,7 +19,7 @@ if not BaсkendBase:
     print('Отсутствует BaсkendBase')
     quit()
 while True:
-    print('.')
+    #print('.')
     const=get_const(db,shop_id)
     _list=db.query(
         query="SELECT * FROM crm_gptassist where status in (0)" # 1,3 -- убрать!
@@ -30,8 +31,9 @@ while True:
 
         if engine==1:
             process_yandexgpt(BaсkendBase, db,const,item)
-        # elif engine==1:
-        #   process_gigachatgpt()
+        elif engine==2:
+            print('engine:giga')
+            process_gigachat(BaсkendBase, db,const,item)
 
     # включить бесконечный цикл
     sleep(1)

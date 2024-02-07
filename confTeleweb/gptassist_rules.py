@@ -41,7 +41,7 @@ rules={
 def get_cnst(shop_id:int, db):
     # получение GPT-констант
     cnst={}
-    for c in db.query( query="select name,value from const where shop_id=%s and name like %s", values=[shop_id, 'yandexgpt%']):
+    for c in db.query( query="select name,value from const where shop_id=%s and (name like %s or name like %s)", values=[shop_id, 'yandexgpt%', 'gigachat%']):
         cnst[c['name']]=c['value']
     return cnst
 
@@ -67,14 +67,38 @@ def initYandexGPT(rules: dict, cnst: dict):
 
     return YandexGPT
 
+def initGigachat(rules: dict, cnst: dict):
+    result={}
+    label='GigaChat'
+    #print('cnst:',cnst)
+    if cnst.get('gigachat-enable')=='1':
+        print('Giga Enable')
+        # YandexGPT
+
+        secret_key=cnst.get('gigachat-api-secret-key')
+        #print(f'cat_id: {cat_id}')
+        if secret_key:
+            rules['gpt_list'].append({'v': 2, 'd':label}) # зазвание в списке у пользователя
+            rules['engines']['GigaChat']={
+                'on':True, 'secret_key':secret_key
+            }
+        else:
+            rules['engines']['GigaChat']={
+                'on':False, 'secret_key':secret_key
+            }
+    else:
+        print('Giga Disable')
+    return result
+
 # Правила поведения для GPT
 def gptassist_rules(s):
     shop_id=s.shop_id ; db=s.db
     cnst=get_cnst(shop_id, db)
 
-
-
+    rules['gpt_list']=[]
     initYandexGPT(rules, cnst)
+    initGigachat(rules, cnst)
+    #print('rules:',rules)
     return rules
 
 

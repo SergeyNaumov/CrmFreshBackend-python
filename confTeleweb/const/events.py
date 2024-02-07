@@ -1,30 +1,5 @@
-def add_yandexgpt_fields(form):
-    add_fields=[
-        {
-            'description':'Использовать YandexGPT',
-            'type':'checkbox',
-            'name':'yandexgpt-enable'
-        },
-        {
-            'description':'ID-каталога',
-            'type':'text',
-            'name':'yandexgpt-cat_id'
-        },
-        {
-            'description':'API secret key',
-            'type':'text',
-            'name':'yandexgpt-api-secret-key'
-        },
-        {
-            'description':'Текст для предварительного обучения',
-            'type':'textarea',
-            'name':'yandexgpt-to-system'
-        },
-    ]
+from .gpt_fields import add_gpt_fields
 
-    for f in add_fields:
-        f['tab']='yandex-gpt'
-        form.fields.append(f)
 
 
 def add_robokassa_fields(form):
@@ -226,7 +201,7 @@ def permissions(form):
         #},
     ]
 
-    add_yandexgpt_fields(form)
+    add_gpt_fields(form)
 
     #print('zakaz_method:',form.s.shop.get('zakaz_method'))
     if form.s.shop.get('zakaz_method')==1:

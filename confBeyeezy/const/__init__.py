@@ -17,6 +17,14 @@ form={
     ],
     'fields':[
         {
+            'description':'Тестирование wysigyg',
+            'type':'wysiwyg',
+            'name':'ww',
+            'full_str':1,
+            'tab':'main',
+            #'add_description':'поясняющий текст'
+        },
+        {
             'description':'Слоган',
             'type':'text',
             'name':'slogan',

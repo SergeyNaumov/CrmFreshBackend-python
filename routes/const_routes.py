@@ -42,15 +42,15 @@ async def get_list(R:dict): #
             for attr in ('name','type','tab','add_description'):
                 if v:=f.get(attr):
                     item[attr]=v
-
-            if f['name'] in values:
+            name=f.get('name')
+            if name in values:
               value=values[f['name']]
             
             # Для чекбоксов 
             if f['type'] in ('checkbox','switch') and value:
                 value=int(value)
 
-            if f['name'] in values:
+            if name in values:
                 item['value']=value
 
             if 'values' in f:
@@ -62,7 +62,7 @@ async def get_list(R:dict): #
     success=True
     if len(form.errors):
         success=False
-    
+    #if hasattr(form, 'filedir_http'):
     response['filedir']=form.filedir_http
     response['success']=success
     response['errors']=form.errors
@@ -91,7 +91,7 @@ async def save_value(R:dict):
         form.errors.append('параметры name и value обязательны, обратитесь к разработчику')
     else:
         for f in form.fields:
-            if f['name']==R['name']:
+            if f.get('name')==R['name']:
                 const_fld=f
         if not(const_fld):
             form.errors.append('"не найдено поле с именем $R->{name}"')

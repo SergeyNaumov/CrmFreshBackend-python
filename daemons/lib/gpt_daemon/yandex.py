@@ -73,8 +73,8 @@ def process_yandexgpt(BaсkendBase:str, db, const:dict, item:dict):
         )
         #Придумай описание для товара: sonyericsson k750
         #response = requests.post(url, headers=headers, json=prompt)
-        #error, result = parse_response(response)
-        error, result = ('', "9382982989282892892\ndkosjkjskljkljsjksjsjkj\nioshjsdhjkshjhsjhsjkhsjkhsjhsjkhsjsjhsjkshj")
+        error, result = parse_response(response)
+        #error, result = ('', "9382982989282892892\ndkosjkjskljkljsjksjsjkj\nioshjsdhjkshjhsjhsjkhsjkhsjhsjkhsjsjhsjkshj")
 
 
         if error:
@@ -86,7 +86,7 @@ def process_yandexgpt(BaсkendBase:str, db, const:dict, item:dict):
             # ошибка в cms
             sent_to_cms(BaсkendBase, {'task_id':item['task_id'], 'status':2,  'question': error} )
         elif result:
-            print(result)
+            #print(result)
             db.query(
                 query="UPDATE crm_gptassist set status=1, question=%s, error='' where id=%s",
                 values=[result, item['id']]

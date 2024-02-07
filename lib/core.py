@@ -115,7 +115,7 @@ def create_fields_hash(form):
   for f in form.fields:
     if 'name' in f:
       form.fields_hash[f['name']]=f
-    else:
+    elif not f.get('type') in ('header'):
       form.errors.append(f'Отсутствует name в поле: {f["description"]}')
 
 

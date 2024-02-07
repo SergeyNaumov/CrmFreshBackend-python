@@ -2,8 +2,8 @@ def get_const(db,shop_id):
     const={}
 
     const_list=db.query(
-        query='select name,value from const where name like (%s) and shop_id=%s',
-        values=["yandexgpt%",shop_id]
+        query='select name,value from const where (name like %s or name like %s) and shop_id=%s',
+        values=["yandexgpt%",'gigachat%', shop_id]
 
     )
     if len(const_list):
