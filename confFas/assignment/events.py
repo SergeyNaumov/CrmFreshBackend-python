@@ -6,8 +6,10 @@ def permission(form):
     login=manager['login']
     perm=manager['permissions']
     title=''
+
     if entity=='6':
         title='Уклонения РегРф (список менеджеров)'
+
     elif entity=='9':
         title='Уклонения Ревизор (список менеджеров)'
     elif entity=='5':
@@ -18,6 +20,15 @@ def permission(form):
         title='Реестр РНП РегРф (список менеджеров)'
     elif entity=='10':
         title='Реестр РНП Ревизор (список менеджеров)'
+
+    if entity:
+        form.add_where=f"wt.type={entity}"
+        form.foreign_key_value=int(entity)
+
+    if not(entity) and form.script!='delete_element' and not(form.script=='edit_form' and form.id):
+        form.errors.append(f'не указано entity!')
+    #form.explain=1
+
 
     if login in ('akulov','pzm','sed','anna','admin') or login=='lgf' and entity in ('6','5','7') or login=='sheglova' and entity in ('9','8','10'):
         form.read_only=0
