@@ -76,28 +76,30 @@ class error():
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
   errors=[]
+  module_dir=conflib_dir.replace('/','.')
+
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
-      
-      module=importlib.import_module(conflib_dir+'.'+arg['config'])
+      print(f"import_module: {module_dir}.{arg['config']}")
+      module=importlib.import_module(f"{module_dir}.{arg['config']}")
 
       form_data=copy.deepcopy(module.form)
 
     except SyntaxError as e:
-      errors.append(f"Ошибка при загрузке конфига {arg['config']}: {e}")
+      errors.append(f"Ошибка при загрузке конфига - 1 {arg['config']}: {e}")
     except ModuleNotFoundError as e:
-      errors.append(f"Ошибка при загрузке конфига {arg['config']}: {e}")
+      errors.append(f"Ошибка при загрузке конфига - 2 {arg['config']}: {e}")
     except Exception as e:
-      errors.append(f"ошибка при обработке конфига {arg['config']}: {e}")
+      errors.append(f"ошибка при обработке конфига - 3 {arg['config']}: {e}")
 
     if not len(errors) and os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
       try:
-        module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events')
+        module=importlib.import_module(module_dir+'.'+arg['config']+'.events')
         form_data['events']=module.events
       except SyntaxError as e:
-        errors.append(f"Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+        errors.append(f"Ошибка при загрузке конфига - 4 {arg['config']}/events.py: {e}")
       except ModuleNotFoundError as e:
-        errors.append(f"Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+        errors.append(f"Ошибка при загрузке конфига - 5 {arg['config']}/events.py: {e}")
       except Exception as e:
         errors.append(f"ошибка при обработке конфига {arg['config']}: {e}")
     
@@ -107,7 +109,7 @@ def load_form_from_dir(confdir,conflib_dir, arg):
     
     if not len(errors) and  os.path.isfile(f"{confdir}/{arg['config']}/events_for_fields.py"):
       try:
-        module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events_for_fields')
+        module=importlib.import_module(module_dir+'.'+arg['config']+'.events_for_fields')
         events=module.events
         for f in form.fields:
           if 'name' not in f:

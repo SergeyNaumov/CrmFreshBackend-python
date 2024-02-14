@@ -1,4 +1,4 @@
-from lib.core import exists_arg, get_func, from_datetime_get_date
+from lib.core import exists_arg, get_func, from_datetime_get_date, join_ids
 import re
 import shlex
 def get_search_where(form,query):
@@ -189,7 +189,7 @@ def get_search_where(form,query):
         user_id = exists_arg('user_id',v)
         if user_id:
 
-          WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+','.join(user_id)+') )')
+          WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+join_ids(user_id)+') )')
       elif f['type'] in ['checkbox','filter_extend_checkbox']:
         if type(values) is list:
           map_rezult=[]

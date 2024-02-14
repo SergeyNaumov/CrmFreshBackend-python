@@ -27,7 +27,8 @@ def alter_all_change_action(form):
 
 config={
   'BaseUrl':'',
-  'config_folder':'confBeyeezy', # точки нельзя
+  #'config_folder':'confBeyeezy', # точки нельзя
+  'config_folder':'configs/beyeezy',
   'title':'CRM Beyeezy',
   'copyright':'copyright 2005 - {{cur_year}}',
    'bottom_menu': [

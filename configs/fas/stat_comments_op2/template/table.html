@@ -1,0 +1,44 @@
+<table class="tbl1 sm" style="width: 100%;">
+
+
+
+	{%for l in list%}
+		{%if l.new_hour%}
+			<tr>
+				<td>итого</td>
+				<td>менеджер</td>
+				<td>время написания</td>
+				<td>комментарий</td>
+				<td>результат<br>за час</td>
+				<td>Номер телефона</td>
+				<td>Компания</td>
+
+			</tr>
+		{%endif%}
+		<tr>
+			<td>{{l.j}}</td>
+			<td>{{l.name}}</td>
+			<td>{{l.registered}}</td>
+			<td>{{l.body}}</td>
+			<td>{%for r in l.records%}
+					<div>
+						{{r.registered}} {{r.direction}}
+						{%if r.src%}
+			            <audio controls>
+			              <source src="{{r.src}}" type="audio/ogg">
+			              <source src="{{r.src}}" type="audio/mpeg">
+			            </audio>
+			            {%endif%}
+					</div>
+				{%endfor%}
+			</td>
+			<td>
+				{{l.phone}}<br>
+				{{l.contact_name}}
+			</td>
+			<td><a href="/edit_form/user/{{l.user_id}}" target="_blank">{{l.firm}}</a></td>
+
+		</tr>
+
+	{%endfor%}
+</table>

@@ -1,6 +1,6 @@
 # UPDATE manager set password=sha2('123',256);
-from confTeleweb.messenger_rules import messenger_rules
-from confTeleweb.gptassist_rules import gptassist_rules
+from configs.teleweb.messenger_rules import messenger_rules
+from configs.teleweb.gptassist_rules import gptassist_rules
 
 def after_create_engine(s,errors=[]):
   #print('after_create_engine')
@@ -108,7 +108,7 @@ config={
   'system_email':'svcomplex@gmail.com',
   'after_all_change_action':alter_all_change_action,
   'system_url':'https://adminbot.assist-ant.su/',
-  'config_folder':'confTeleweb',
+  'config_folder':'configs/teleweb',
   #'stat_log':1, # Записываем статистику посещений
   'connects':{
     'crm_read':{

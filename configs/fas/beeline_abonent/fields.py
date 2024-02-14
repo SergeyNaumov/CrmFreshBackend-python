@@ -1,0 +1,45 @@
+
+fields=[ 
+    {
+      'description':'Идентификатор',
+      'type':'text',
+      'name':'userId',
+      'filter_on':1
+    },
+    {
+      'description':'Телефон',
+      'type':'text',
+      'name':'phone',
+      'filter_on':1
+    },
+    {
+      'description':'Имя',
+      'type':'text',
+      'name':'firstName',
+      'filter_on':1
+    },
+    {
+      'description':'Фамилия',
+      'type':'text',
+      'name':'lastName',
+      'filter_on':1
+    },
+    {
+      'description':'Департамент',
+      'type':'text',
+      'name':'department',
+      'filter_on':1
+    },
+    {
+      'description':'Менеджер',
+      #'type':'filter_extend_select_from_table',
+      'type':'select_from_table',
+      'table':'manager',
+      'tablename':'m',
+      'name':'manager_id',
+      'header_field':'name',
+      'value_field':'id',
+      'tablename':'m',
+      'filter_on':1
+    },
+]

@@ -33,7 +33,8 @@ config={
   'system_email':'noname@gmail.com',
   'system_url':'https://fas.crm-dev.ru/',
   'BakendBase':'http://dev-crm.test/backend',
-  'config_folder':'confFas',
+  #'config_folder':'confFas',
+  'config_folder':'configs/fas',
   'title':'CRM Fas',
   'app_components':{ # Компоненты веб-приложения
     'messenger':{

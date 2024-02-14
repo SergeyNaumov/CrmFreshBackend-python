@@ -1,0 +1,12 @@
+<div style="font-size: 10pt;">
+{%for p in list%}
+	{{p.name}}<br>
+	{%if p.inn%}ИНН: {{p.inn}}<br>{%endif%}
+	{%if p.kpp%}КПП: {{p.kpp}}<br>{%endif%}
+	{%if p.address%}Адрес: {{p.address}}<br>{%endif%}
+	{%if p.okved%}ОКВЭД: {{p.okved}}<br>{%endif%}
+	{%if p.fio%}ОКВЭД: {{p.fio}}<br>{%endif%}
+	{%if phones%}Телефоны: {{p.phones}}<br>{%endif%}
+	-<br>
+{%endfor%}
+</div>

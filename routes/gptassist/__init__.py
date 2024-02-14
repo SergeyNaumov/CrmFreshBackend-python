@@ -14,26 +14,18 @@ router = APIRouter()
 
 
 
-@router.get('/init/{config}')
-async def init(config: str):
+@router.get('/init')
+async def init():
     # Инициализация GPT для формы
     gpt_list=[] ; fields={} ; WS=None
     need_inited=False
     if gpt_assist_rules:=sysconfig.get('gptassist_rules'):
         rules=gpt_assist_rules(s)
-        print('rules:',rules)
         gpt_list=rules.get('gpt_list',[])
-        configs=rules.get('configs')
 
-
-
-        fields={}
-        if len(gpt_list) and configs and (config in configs):
+        if len(gpt_list):
             # Данный конфиг указан в настройках GPTAssist
-            fields=configs[config].get('fields')
-            if len(fields):
-                need_inited=True
-
+            need_inited=True
             WS=rules.get('WS')
 
     return {
@@ -57,7 +49,7 @@ async def send_request_to_gpt(r:RequestTask):
             'engine_id': r.engine,
             'temperature':r.temperature,
             'sys_text':r.sys_text,
-            'ask':'ask'
+            'ask':r.ask
         },
         #debug=1
     )
