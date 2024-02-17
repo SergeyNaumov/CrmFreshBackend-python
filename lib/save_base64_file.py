@@ -70,7 +70,8 @@ def save_base64_file(**arg):
           
           if not os.path.isdir(field['filedir']):
             try:
-              os.mkdir(field['filedir'])
+              #os.mkdir(field['filedir'])
+              os.makedirs(field['filedir'], exist_ok=True)
             except FileExistsError:
               errors.append(f'не удалось создать директорию {field["filedir"]}')
 

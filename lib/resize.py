@@ -133,7 +133,7 @@ def resize_one(**arg):
   #size=(width,height)
   if not(os.path.isfile(fr)):
     return 
-  
+  #print('fr:',fr)
   img = Image.open(fr).convert('RGB')
   ox, oy = img.size
   k=nx=ny=0
@@ -162,15 +162,20 @@ def resize_one(**arg):
     if ox != oy:
       min_len=min(ox,oy)
       img=crop(img,crop_type,min_len,min_len)
-      img=img.resize((width,height), Image.Resampling.LANCZOS)
-    #img=img.resize((width,height),  Image.ANTIALIAS)
+      #img=img.resize((width,height), Image.Resampling.LANCZOS)
+      img=img.resize( (width,height), resample=Image.BICUBIC)
+
+      #img=img.resize((width,height),  Image.ANTIALIAS)
     
   elif nx >= width: # горизонтально ориентированная
     
     #$image->Resize(geometry=>'geometry', width=>$nx, height=>$opt->{height});
     
     #img=img.resize( (nx,height), Image.ANTIALIAS)
-    img=img.resize( (nx,height), Image.Resampling.LANCZOS)
+    print('img:',img)
+    #img=img.resize( (nx,height), Image.Resampling.LANCZOS)
+    img=img.resize( (nx,height), resample=Image.BICUBIC)
+
     if ny>height:
       
       #$image->Crop(geometry=>$opt->{width}.'x'.$opt->{height}, gravity=>'center')
@@ -191,7 +196,8 @@ def resize_one(**arg):
       ny = height
     #img=img.resize( (width,ny), Image.ANTIALIAS )
 
-    img=img.resize( (width,ny), Image.Resampling.LANCZOS )
+    #img=img.resize( (width,ny), Image.Resampling.LANCZOS )
+    img=img.resize( (width,ny), resample=Image.BICUBIC )
     if ny > height or nx > width:
       img=crop(img,crop_type,width,height)
 

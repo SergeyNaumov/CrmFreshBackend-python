@@ -40,7 +40,7 @@ form={
             'value_field':'id',
             'tablename':'snt',
             'regexp_rules':[
-                '^\d+$','Поле, обязательное для заполнения'
+                '/^[1-9][0-9]*$/','Поле, обязательное для заполнения'
             ],
             'filter_on':True
         },
@@ -49,7 +49,7 @@ form={
             'type':'text',
             'name':'login',
             'regexp_rules':[
-                '^.+$','заполните поле'
+                '/^.+$/','заполните поле'
             ],
             'filter_on':True
         },

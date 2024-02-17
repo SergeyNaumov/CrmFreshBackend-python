@@ -80,7 +80,7 @@ def load_form_from_dir(confdir,conflib_dir, arg):
 
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
-      print(f"import_module: {module_dir}.{arg['config']}")
+      #print(f"import_module: {module_dir}.{arg['config']}")
       module=importlib.import_module(f"{module_dir}.{arg['config']}")
 
       form_data=copy.deepcopy(module.form)

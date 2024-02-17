@@ -14,6 +14,10 @@ form={
     'explain':False,
     'header_field':'url',
     'default_find_filter':'header',
+    'QUERY_SEARCH_TABLES':[
+        {'t':'news','a':'wt'},
+        {'t':'snt','a':'snt', 'l':'wt.snt_id=snt.id'},
+    ],
     'fields': [ 
             {
             'description':'СНТ',
@@ -24,7 +28,7 @@ form={
             'value_field':'id',
             'tablename':'snt',
             'regexp_rules':[
-                '^\d+$','Поле, обязательное для заполнения'
+                '/^[1-9][0-9]*$/','Поле, обязательное для заполнения'
             ],
             'filter_on':True
         },
@@ -34,9 +38,30 @@ form={
             'name':'header',
             'filter_on':True
         },
+        # {
+        #     'description':'Большое фото',
+        #     'name':'photo',
+        #     'type':'file',
+        #     'filedir':'',
+        # },
+        {
+            'description':'Фото для списка',
+            'name':'photo2',
+            'type':'file',
+            'filedir':'',
+            'preview':'352x280',
+            'resize':[
+                {
+                    'description':'Для спика новостей',
+                    'file':'<%filename_without_ext%>_mini1.<%ext%>',
+                    'size':'352x280',
+                    'quality':'100'
+                },
+            ]
+        },
         {
             'description':'Краткое описание новости',
-            'type':'text',
+            'type':'textarea',
             'name':'anons',
             'filter_on':True
         },

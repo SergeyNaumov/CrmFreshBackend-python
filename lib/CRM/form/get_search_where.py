@@ -206,6 +206,13 @@ def get_search_where(form,query):
               WHERE.append(' (wt.'+db_name+' IN ('+','.join(map_rezult)+'))')
 
       elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
+
+        db_name=exists_arg('db_name',f)
+        if not(db_name) and f['type']=='filter_extend_select_from_table':
+          db_name=f.get('value_field','id')
+        else:
+          db_name=name
+
         if type(values) is int or type(values)=='str':
           values=[values]
         if type(values) is list:

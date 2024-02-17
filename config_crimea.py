@@ -34,6 +34,7 @@ config={
    'bottom_menu': [
       #{'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}
    ],
+  'filedir_http':'/files',
   #'encrypt_method':'mysql_sha2',
   #'encrypt_method':'encrypt',
   'use_project':False,

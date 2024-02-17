@@ -73,7 +73,10 @@ def wysiwyg_process(**arg):
   id=''
   if 'id' in arg:
     id=arg['id']
-
+  if 'id' in R:
+    id=R['id']
+  if 'config' in R:
+    config=R['config']
   form=read_config(
     action=action,
     config=config,
@@ -101,6 +104,10 @@ def wysiwyg_process(**arg):
         new_folder_name=R['new_folder_name']
         if re.match(r'^[a-zA-Z0-9\.\-_]+$',new_folder_name):
             try:
+                print('files_dir:',form.manager['files_dir'])
+                print('path:',path)
+                print('new_folder_name:',new_folder_name)
+
                 os.mkdir(form.manager['files_dir']+path+'/'+new_folder_name)
             except FileExistsError:
                 errors.append('уже существует файл или папка с таким именем')
@@ -147,7 +154,7 @@ def wysiwyg_process(**arg):
         if arg['path']:
             P= path[:0] + path[(0+1):] # удаляем начальный слэш
             full_path=f"{form.manager['files_dir']}/{P}{file.filename}"
-
+        print('upload_to:',full_path)
         with open(full_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 

@@ -10,21 +10,22 @@ router = APIRouter()
 
 
 # Загрузка файла в wysiwyg
-@router.post('/wysiwyg/{config}/{field_name}/{id}/upload')
+@router.post('/wysiwyg/{config}/{field_name}/{_id}/upload')
 async def wysiwyg_upload(
   config:str,
   field_name:str,
-  id:int,
+  _id:int,
   path: str=Form(...),
   file: UploadFile = File(...)
 ): # 
 
-  #print('path:',path)
+
   return wysiwyg_process(
     action='upload',
     path=path,
     file=file,
     config=config,
+    id=_id,
     field_name=field_name,
     script='wysiwyg',
     R={}
