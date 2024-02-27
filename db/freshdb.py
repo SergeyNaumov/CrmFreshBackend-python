@@ -3,6 +3,7 @@ import json
 import re
 from .transform import tree_use_transform, massive_transform
 from lib.core import print_console_error
+from time import sleep
 def rez_to_str(rez):
   if rez:
     for k in rez:
@@ -122,10 +123,21 @@ def to_json(data):
 
 class FreshDB():
     def go_connect(self,arg):
-      #self.connect = pymysql.connect(arg['host'], arg['user'], arg['password'], arg['dbname'])
-      self.connect = pymysql.connect(user=arg['user'], password=arg['password'], host=arg['host'], database=arg['dbname'])
-      self.connect.ping(reconnect=True)
-      self.query(query='set lc_time_names="ru_RU"')
+      connected=False
+      try_cnt=0
+      while not(connected):
+
+        try:
+          self.connect = pymysql.connect(user=arg['user'], password=arg['password'], host=arg['host'], database=arg['dbname'])
+          self.connect.ping(reconnect=True)
+          self.query(query='set lc_time_names="ru_RU"')
+          connected=True
+          print("FreshDB connected")
+
+        except pymysql.err.OperationalError as e:
+          try_cnt+=1
+          print(f"FreshDB connect error try...{try_cnt}")
+          sleep(1)
 
     def __init__(self, **arg):
       self.tmpl_saver = None;
