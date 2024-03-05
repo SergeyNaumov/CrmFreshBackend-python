@@ -42,6 +42,11 @@ async def get_memo(config:str, field_name:str,id:int): #
       values=[form.id],
       errors=form.errors
     )
+
+
+    if 'before_out_tags' in field:
+      field['before_out_tags'](form,data)
+
     for d in data:
       d['date']=date_to_rus(d['date'])
 
@@ -90,17 +95,35 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
       data=data
     )
     data['id']=memo_id
+
     form.run_event('after_add',{'field':field,'data':data})
 
   success=1
   if len(form.errors): success=0
+
+  data={
+    'id':memo_id,
+    'date': dt.datetime.now(),
+    'user_id':form.manager.get('id'),
+    'user_name':form.manager.get('name'),
+    'message':data.get(field['memo_table_comment'],'')
+  }
+
+  if 'before_out_tags' in field:
+    tags=[data]
+    field['before_out_tags'](form, tags)
+
+  for t in tags:
+    t['date']=date_to_rus(t['date'])
+
   return {
-    'user_id': form.manager['id'],
-    'user_name': form.manager['name'],
-    'now':dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    'user_id': form.manager['id'], # legacy
+    'user_name': form.manager['name'], # legacy
+    'now':dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), # legacy
     'errors':errors,
     'success':success,
-    'memo_id':memo_id
+    'memo_id':memo_id, # legacy
+    'data':data # new format
 
   }
 # Обновление записи
