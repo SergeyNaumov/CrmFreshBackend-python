@@ -15,9 +15,13 @@ def get_data(form,field):
     for f in field['fields']:
         
         if f['type'] in ['code','file','picture']: continue
-        if exists_arg('read_only',f): continue
 
-        v=exists_arg(f['name'],values)
+        if f.get('read_only'):
+          continue
+        v=values.get(f['name'])
+        #if exists_arg('read_only',f): continue
+
+        #v=exists_arg(f['name'],values)
 
         #if f['type'] in ['checkbox','switch']:
         #  print('checkbox:', v)
