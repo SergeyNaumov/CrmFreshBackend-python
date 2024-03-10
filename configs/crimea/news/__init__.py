@@ -43,18 +43,34 @@ form={
         #     'name':'photo',
         #     'type':'file',
         #     'filedir':'',
+        #     'cropper':True,
+        #     'resize':[
+        #         {
+        #             'description':'Для спика новостей',
+        #             'file':'<%filename_without_ext%>_mini1.<%ext%>',
+        #             'size':'1120x450',
+        #             'quality':'100'
+        #         },
+        #     ]
         # },
         {
             'description':'Фото для списка',
-            'name':'photo2',
+            'name':'photo',
             'type':'file',
             'filedir':'',
             'preview':'352x280',
+            'cropper':True,
             'resize':[
                 {
                     'description':'Для спика новостей',
                     'file':'<%filename_without_ext%>_mini1.<%ext%>',
                     'size':'352x280',
+                    'quality':'100'
+                },
+                {
+                    'description':'Большое фото',
+                    'file':'<%filename_without_ext%>_mini2.<%ext%>',
+                    'size':'1120x450',
                     'quality':'100'
                 },
             ]
@@ -69,7 +85,7 @@ form={
             'description':'Подробное описание новости',
             'type':'wysiwyg',
             'name':'body',
-            'filter_on':True
+            'filter_on':False
         },
         {
             'description':'Дата и время публикации',

@@ -41,6 +41,9 @@ config={
 
     }
   },
+  'main_page_components':[
+    {'component':'birth-days','cols':6}
+  ],
   'copyright':'copyright 2005 - {{cur_year}}',
    'bottom_menu': [
       #{'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}
@@ -130,11 +133,11 @@ config={
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     'manager_id':
-      1
+      #1
       #11691 #Люб
       #4201 # sed
       #585 # Ак ,
-      #7576 #pzm
+      7576 #pzm
       #11709
     
     #'manager_id':12039 # О ,

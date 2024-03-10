@@ -5,7 +5,7 @@ from lib.core import exists_arg
 def events_permissions(form):
     perm=form.manager['permissions']
 
-    if('manager_admin' in perm) or (form.manager['login']=='admin'):
+    if('admin' in perm) or (form.manager['login']=='admin'):
       form.is_admin=1
       form.read_only=0
       form.make_delete=1

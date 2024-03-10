@@ -1,3 +1,16 @@
+from datetime import datetime
+
+def memo_before_out_tags(form,data):
+    #print('data:',data)
+    today=datetime.now().date()
+    manager_id=form.manager.get('id')
+    for d in data:
+        # Если комментарий сегодняшний, то разрешаем его менять или удалять
+        #print
+        if (d['user_id']==manager_id) and (today==d['date'].date()):
+            d['make_edit']=True
+            d['make_delete']=True
+        #print('d:',d)
 fields=[
       
         {
@@ -47,8 +60,9 @@ fields=[
             'memo_table_alias':'memo',
             'auth_table_alias':'m_memo',
             'make_delete':False,
-            'make_edit':False,
+            'make_edit':True,
             'tab':'sale',
+            'before_out_tags':memo_before_out_tags,
             'show_type':'html'
         },
         {

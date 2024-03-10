@@ -1,3 +1,4 @@
+from lib.core import join_ids
 def permissions(form):
 	manager=form.manager
 	perm=manager.get('permissions')
@@ -6,7 +7,7 @@ def permissions(form):
 	form.admin_all_snt=False
 	form.ov=False
 	print('PERMISSIONS:: ',form.id)
-	if perm.get('admin_all_snt') or perm.get('owner_all_snt'):
+	if perm.get('admin') or perm.get('owner_all_snt'):
 		# Если это администратор всех СНТ
 		form.admin_all_snt=True
 	else:

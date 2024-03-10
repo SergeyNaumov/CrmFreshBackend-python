@@ -14,6 +14,10 @@ form={
     'explain':False,
     'header_field':'url',
     'default_find_filter':'header',
+    'QUERY_SEARCH_TABLES':[
+        {'t':'snt','a':'wt'},
+        {'t':'manager','a':'m','l':'m.id=wt.owner_id','lj':1}
+    ],
     'fields': [ 
         {
             'description':'Название СНТ',

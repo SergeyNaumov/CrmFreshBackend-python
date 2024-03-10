@@ -4,6 +4,8 @@ alter table article add promo_description varchar(255) not null default '';
 alter table article add promo_keywords varchar(255) not null default '';
 """
 from .query_search_tables import *
+from .ajax import ajax
+
 def without_send(form,field,newpass):
     return
 
@@ -19,6 +21,7 @@ form={
     'header_field':'url',
     'default_find_filter':'header',
     'QUERY_SEARCH_TABLES':query_search_tables,
+    'ajax':ajax,
 # """
 # | id       | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
 # | snt_id   | int(10) unsigned | YES  | MUL | NULL    |                |
@@ -51,6 +54,12 @@ form={
             'regexp_rules':[
                 '/^.+$/','заполните поле'
             ],
+            'replace_rules':[
+                '/[^a-zA-Z0-9]/g',''
+            ],
+            'frontend':{'ajax':
+                {'name':'login','timeout':100}
+            },
             'filter_on':True
         },
         {
