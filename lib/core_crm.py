@@ -1,5 +1,26 @@
 from lib.core import exists_arg
+def get_role(db, manager_id: int):
 
+  manager_table='manager'
+  manager_role_table='manager_role'
+
+  r=db.query(
+    query="""
+      SELECT
+        m2.id
+      FROM
+        """+manager_table+' m JOIN '+manager_role_table+""" mr ON (m.id = mr.manager_id)
+        JOIN """+manager_table+""" m2  ON (m2.id = mr.role AND m.current_role = m2.id)
+      WHERE m.id=%s
+    """,
+    values=[manager_id],
+    onevalue=1,
+  )
+
+  if r:
+    return r
+  else:
+    return manager_id
 def get_triade(num):
 	if isinstance(num, int) or isinstance(num, float):
 		return '{:,}'.format(num).replace(',', ' ')

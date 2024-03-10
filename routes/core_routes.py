@@ -9,49 +9,7 @@ router = APIRouter()
 @router.get('/test')
 async def test():
   return {'okay':s.db.query(query="SELECT * from managers where login='naumov'",onerow=1)}
-# Главная
-@router.get('/mainpage')
-async def mainpage():
-  curdate=cur_date(format="%d.%m.%Y")
-  response={'curdate':curdate,'errors':[],'success':1}
-  if not('manager_table_id' in config['auth']):
-    config["auth"]["manager_table_id"]='id'
-  if s.project:
-    response['manager']=s.db.query(
-      query=f'SELECT id,login,name,position, concat("/edit-form/project_manager/",{config["auth"]["manager_table_id"]}) link from project_manager where project_id=%s and id=%s',
-      values=[s.project['id']],
-      onerow=1
-    )
 
-    #response['news_list']=s.db.query(
-    #  query='SELECT header,DATE_FORMAT(a.registered, "%e.%m.%y") registered,body from project_crm_news WHERE project_id=%s order by registered desc limit 5',
-    #  values=[s.project['id']]
-    #)
-  else:
-    
-    response['manager']=s.db.getrow(
-      table=config['auth']['manager_table'],
-      #select_fields=f' {config["auth"]["manager_table_id"]} id,login,name,"" position, concat("/edit-form/manager/",id) link',
-      select_fields=f'{config["auth"]["manager_table_id"]} id,login, "" link',
-      where=f'{config["auth"]["manager_table_id"]}=%s',
-      values=[s.manager['id']],
-      errors=response['errors'],
-      str=1,
-    )
-    response['news_list']=[]
-    #response['news_list']=s.db.query(
-    #  query='SELECT header,DATE_FORMAT(registered, %s) registered, body from crm_news order by registered desc limit 5',
-    #  values=["%e.%m.%y"]
-    #)
-    
-  if not len(response['errors']) and not response['manager']:
-    response['errors'].append('отсутствует запись с manager.id=='+str(s.manager['id']))
-  
-  if len(response['errors']):
-    response['success']=0
-
-
-  return response
 # Левое меню по-умолчанию
 @router.get('/left-menu')
 async def leftmenu():

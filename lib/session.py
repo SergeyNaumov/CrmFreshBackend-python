@@ -173,6 +173,8 @@ def session_start(s,**arg):
             onerow=1,errors=errors
           );
 
+          print('manager:',manager)
+
   if manager:
   #  manager['id']=str(manager['id'])
     

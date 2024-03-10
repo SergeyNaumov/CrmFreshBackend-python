@@ -2,6 +2,7 @@ from fastapi import APIRouter
 #from config import config
 from lib.engine import s
 from .core_routes import router as router_core
+from .mainpage import router as router_mainpage
 from .register import router as router_register
 from .admin_tree_routes import router as router_admin_tree
 from .get_filters_routes import router as router_get_filters
@@ -26,6 +27,7 @@ from .parser_excel import router as router_parser_excel
 from .messenger import router as router_messenger
 from .gptassist import router as router_gptassist
 
+
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
 from .svcms import router as router_svcms
@@ -34,6 +36,9 @@ from .svcms import router as router_svcms
 from .extend_routes import router as router_extend
 
 router = APIRouter()
+
+router.include_router(router_mainpage,prefix='/mainpage')
+
 # /register /remember
 router.include_router(router_register)
 router.include_router(router_password)
@@ -50,6 +55,7 @@ router.include_router(router_get_result)
 router.include_router(router_admin_tree)
 router.include_router(router_edit_form)
 router.include_router(router_one_to_m)
+
 router.include_router(router_memo,prefix='/memo')
 router.include_router(router_const,prefix='/const')
 router.include_router(router_multiaction,prefix='/multiaction')
@@ -66,23 +72,24 @@ router.include_router(router_autocomplete,prefix='/autocomplete')
 router.include_router(stat_tool,prefix='/stat-tool')
 router.include_router(router_ajax) # /ajax
 router.include_router(router_gptassist,prefix='/gpt-assist')
-router.include_router(router_svcms,prefix='/svcms')
+#router.include_router(router_svcms,prefix='/svcms')
+
 
 
 
 
 #router.include_router(router_admin_table)
 
-@router.get("/")
-async def mainpage():
-  permissions=s.db.query(
-         query='SELECT login from manager',
-         massive=1
-  )
+# @router.get("/")
+# async def mainpage():
+#   permissions=s.db.query(
+#          query='SELECT login from manager',
+#          massive=1
+#   )
 
-  return {
-    'permissions':permissions
-  }
+#   return {
+#     'permissions':permissions
+#   }
 
 
 
