@@ -42,7 +42,8 @@ config={
     }
   },
   'main_page_components':[
-    {'component':'birth-days','cols':6}
+    {'component':'birth-days','cols':12},
+    {'component':'notifications','cols':12}
   ],
   'copyright':'copyright 2005 - {{cur_year}}',
    'bottom_menu': [
