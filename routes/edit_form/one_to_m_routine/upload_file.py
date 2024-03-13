@@ -92,6 +92,7 @@ def upload_file(form,field,arg):
         )
         # Сделать ресайз!
         if form.success():
+          field['_id']=arg["one_to_m_id"]
           form.run_event('after_update_code',{'field':field})
           form.run_event('after_save_code',{'field':field})
         get_1_to_m_data(form,field)

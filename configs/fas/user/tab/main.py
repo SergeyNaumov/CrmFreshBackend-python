@@ -5,6 +5,15 @@ def inn_before_code(form,field):
             field['read_only']=True
 
 fields=[
+        # {
+        #     'description':'Динамический компонент',
+        #     'type':'component',
+        #     'name':'tc1',
+        #     'tab':'main',
+        #     'object':'/files/test-component/object.js',
+        #     'template':'/files/test-component/template.html',
+        #     'methods':'/files/test-component/methods.js',
+        # },
         {
             'description':'Бренд',
             'name':'brand_id',

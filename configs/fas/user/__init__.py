@@ -30,7 +30,10 @@ form={
     ],
     'cols':[
             [ # Колонка1
-              {'description':'Ссылки','name':'links','hide':0, 'not_save_button':1},
+              {
+                'description':'Ссылки','name':'links','hide':0, 'not_save_button':1,
+                #'on_show':'console.log("this is show")'
+              },
               {'description':'Общая информация','name':'main','hide':0},
             ],
             [

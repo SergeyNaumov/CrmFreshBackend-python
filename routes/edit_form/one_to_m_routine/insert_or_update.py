@@ -33,7 +33,7 @@ def insert_or_update(form,field,arg):
             data=data,
             errors=form.errors,
           )
-
+          field['_id']=data[field['table_id']]
           form.run_event('after_insert_code',{'field':field,'data':data})
           form.run_event('after_save_code',{'field':field,'data':data})    
 
@@ -64,6 +64,8 @@ def insert_or_update(form,field,arg):
           normalize_value_row(form,field,data)
           #print('data1:',data)
           field['values']=data
+
+          field['_id']=arg["one_to_m_id"]
           form.run_event('after_update_code',{'field':field,'data':data})
           form.run_event('after_save_code',{'field':field,'data':data})
 
