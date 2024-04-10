@@ -54,6 +54,7 @@ class Form():
     self.on_filters=[]
     self.default_find_filter=[]
     self.engine='mysql'
+    self.response=None
     self.javascript={
       'admin_table':'','find_objects':'','edit_form':'',
       'page':''

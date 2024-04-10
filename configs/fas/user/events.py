@@ -3,10 +3,37 @@ from .create_ofp_card import *
 from .create_bbg_card import *
 from .filters_for_manager_op import prepare_filters_for_manager_op
 from .find_inn_doubles import prepare_filters_for_find_inn_doubles
+from .components_actions import components_actions
+
 def permissions(form):
   
   R=form.R
   db=form.db
+
+  form.ov={}
+
+  if form.id:
+
+    form.ov=db.query(
+      query=f"""
+        SELECT
+          u.*, m.group_id
+        FROM
+          user u
+          LEFT JOIN manager m ON m.id=u.manager_id
+        WHERE u.id={form.id}""",
+      onerow=1
+    )
+
+  # Для работы компонентов (статистика и т.п.)
+  components_actions(form)
+
+  if form.response:
+    # если есть кастомный ответ, тогда завершаем permissions
+
+    return
+
+
 
   # Смотрим, какой бренд у данного менеджера
   manager_group=db.query(
@@ -22,6 +49,7 @@ def permissions(form):
   form.manager_brand=manager_brand
   
   perm=form.manager['permissions']
+
 
 
   # Убираем поле "бренд" всем, у кого нет прав доступ
@@ -47,20 +75,9 @@ def permissions(form):
   if not perm['user_show_all_brand']:
     form.add_where=f'wt.brand_id={manager_brand}'
 
-  form.ov={}
+
+
   if form.id:
-
-      form.ov=db.query(
-        query=f"""
-          SELECT
-            u.*, m.group_id
-          FROM
-            user u
-            LEFT JOIN manager m ON m.id=u.manager_id
-          WHERE u.id={form.id}""",
-        onerow=1
-      )
-
       if form.ov:
 
         form.title=form.ov['firm']
@@ -86,14 +103,15 @@ def permissions(form):
         form.read_only=0
       
       # Возможность редактировать руководителю
-      if form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
-        form.is_owner=True # владелец карты
-        if form.manager['is_owner']:
-          form.is_owner_group=True
+      if form.ov:
+        if form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
+          form.is_owner=True # владелец карты
+          if form.manager['is_owner']:
+            form.is_owner_group=True
 
 
-      if form.ov['manager_id']==form.manager['id'] or form.is_owner:
-        form.read_only=0
+        if form.ov['manager_id']==form.manager['id'] or form.is_owner:
+          form.read_only=0
       #form.read_only=0
   
   if form.action in ('new', 'insert'):
@@ -119,7 +137,7 @@ def after_insert(form):
       values=[form.id],
       #errors=form.errors,
       #debug=form.explain,
-      debug=1
+      #debug=1
     )
 
 def before_search(form):

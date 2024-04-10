@@ -30,11 +30,12 @@ form={
     ],
     'cols':[
             [ # Колонка1
-              {
-                'description':'Ссылки','name':'links','hide':0, 'not_save_button':1,
-                #'on_show':'console.log("this is show")'
-              },
+              {'description':'Ссылки','name':'links','hide':0, 'not_save_button':1},
               {'description':'Общая информация','name':'main','hide':0},
+              {
+                'description':'Статистика','name':'stat','hide':0,
+                'on_show':'window.edit_form.load_stat()'
+              },
             ],
             [
               {'description':'Продажи','name':'sale','hide':0},

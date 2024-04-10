@@ -138,71 +138,77 @@ def resize_one(**arg):
   ox, oy = img.size
   k=nx=ny=0
 
-  if height==0:
-    if width > ox:
-      img.save(to)
-      return
+  if width>0 and height>0:
+      if height==0:
+        if width > ox:
+          img.save(to)
+          return
 
-    k = oy / ox
-    height = int(width * k)
+        k = oy / ox
+        height = int(width * k)
 
-  elif width==0:
-    k = ox / oy
-    width = int(height * k)
+      elif width==0:
+        k = ox / oy
+        width = int(height * k)
 
-  elif width==height:
-    nx=ny=width
-    k=1
+      elif width==height:
+        nx=ny=width
+        k=1
 
-  else:
-    ny= int( (oy / ox) * width)
-    nx= int( (ox / oy) * height)
-  
-  if width == height:
-    if ox != oy:
-      min_len=min(ox,oy)
-      img=crop(img,crop_type,min_len,min_len)
-      #img=img.resize((width,height), Image.Resampling.LANCZOS)
-      img=img.resize( (width,height), resample=Image.BICUBIC)
+      else:
+        ny= int( (oy / ox) * width)
+        nx= int( (ox / oy) * height)
 
-      #img=img.resize((width,height),  Image.ANTIALIAS)
-    
-  elif nx >= width: # горизонтально ориентированная
-    
-    #$image->Resize(geometry=>'geometry', width=>$nx, height=>$opt->{height});
-    
-    #img=img.resize( (nx,height), Image.ANTIALIAS)
-    print('img:',img)
-    #img=img.resize( (nx,height), Image.Resampling.LANCZOS)
-    img=img.resize( (nx,height), resample=Image.BICUBIC)
+      if width == height:
+        if ox != oy:
+          min_len=min(ox,oy)
+          img=crop(img,crop_type,min_len,min_len)
+          #img=img.resize((width,height), Image.Resampling.LANCZOS)
+          img=img.resize( (width,height), resample=Image.BICUBIC)
 
-    if ny>height:
-      
-      #$image->Crop(geometry=>$opt->{width}.'x'.$opt->{height}, gravity=>'center')
-      img=crop(img,crop_type,width,height)
-    
+          #img=img.resize((width,height),  Image.ANTIALIAS)
 
+      elif nx >= width: # горизонтально ориентированная
 
+        #$image->Resize(geometry=>'geometry', width=>$nx, height=>$opt->{height});
 
-    if nx >width:
-      img=crop(img,crop_type,width,height)
-      
-      #nnx = int( (nx - width) / 2 )
+        #img=img.resize( (nx,height), Image.ANTIALIAS)
+        print('img:',img)
+        #img=img.resize( (nx,height), Image.Resampling.LANCZOS)
+        img=img.resize( (nx,height), resample=Image.BICUBIC)
+
+        if ny>height:
+
+          #$image->Crop(geometry=>$opt->{width}.'x'.$opt->{height}, gravity=>'center')
+          img=crop(img,crop_type,width,height)
 
 
-  else: # вертикально ориентированная
-    
-    if ny < height:
-      ny = height
-    #img=img.resize( (width,ny), Image.ANTIALIAS )
 
-    #img=img.resize( (width,ny), Image.Resampling.LANCZOS )
-    img=img.resize( (width,ny), resample=Image.BICUBIC )
-    if ny > height or nx > width:
-      img=crop(img,crop_type,width,height)
+
+        if nx >width:
+          img=crop(img,crop_type,width,height)
+
+          #nnx = int( (nx - width) / 2 )
+
+
+      else: # вертикально ориентированная
+
+        if ny < height:
+          ny = height
+        #img=img.resize( (width,ny), Image.ANTIALIAS )
+
+        #img=img.resize( (width,ny), Image.Resampling.LANCZOS )
+        img=img.resize( (width,ny), resample=Image.BICUBIC )
+        if ny > height or nx > width:
+          img=crop(img,crop_type,width,height)
 
   if composite_file:
     composite_gravity=exists_arg('composite_gravity',arg)
+
+    if not (width+height):
+      # Можно указать размер 0x0, чтобы был watermark без ресайза
+      # в этом случае, берём реальные размеры фото
+      width,height=img.size[0],img.size[1]
     
     if not composite_gravity:
       composite_gravity='center'

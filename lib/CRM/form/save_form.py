@@ -9,37 +9,48 @@ def update_1_to_1(form):
   tables_1_to_1={}
   for f in form.fields:
 
+      if f['read_only']:
+        continue
+
       #print('f:',f)
-      if f['name'] in form.new_values and f['type'] in ('1_to_1_wysiwyg','1_to_m_text','1_to_1_textarea'):
-        if not(f.get('db_name')):
-          f['db_name']=f['name']
-        if table:=f.get('save_table'):
+      if f['name'] in form.new_values and f['type'].startswith('1_to_1_'):
+        subtype=f['type'].replace('1_to_1_','')
 
-          if not(table in tables_1_to_1):
-            tables_1_to_1[table]={
-              'foreign_key':f['foreign_key'],
-              'data':None
-            }
+        if subtype in ('wysiwyg','text','textarea', 'checkbox', 'switch'):
+          if not(f.get('db_name')):
+            f['db_name']=f['name']
 
-          if not(tables_1_to_1[table]['data']):
+          if table:=f.get('save_table'):
 
-            tables_1_to_1[table]['data']=form.db.query(
-              query=f"select * from {table} WHERE {f['foreign_key']}={form.id}",
-              onerow=1,
-              errors=form.errors
-            )
-            if not(tables_1_to_1[table]['data']):
-              tables_1_to_1[table]['data']={
-                f['foreign_key']: form.id
+            if not(table in tables_1_to_1):
+              tables_1_to_1[table]={
+                'foreign_key':f['foreign_key'],
+                'data':None
               }
 
+            if not(tables_1_to_1[table]['data']):
+
+              tables_1_to_1[table]['data']=form.db.query(
+                query=f"select * from {table} WHERE {f['foreign_key']}={form.id}",
+                onerow=1,
+                errors=form.errors
+              )
+              if not(tables_1_to_1[table]['data']):
+                tables_1_to_1[table]['data']={
+                  f['foreign_key']: form.id
+                }
+
+
+
+            value=form.new_values[f['name']]
+            #if f['type'] in ('checkbox', '1_to_1')
             # новое значение в данные
-            tables_1_to_1[table]['data'][f['db_name']]=form.new_values[f['name']]
+            tables_1_to_1[table]['data'][f['db_name']]=value
             f['value']=form.new_values[f['name']]
 
 
-        else:
-          tables_1_to_1[table]['data'][f['db_name']]=v
+          else:
+            tables_1_to_1[table]['data'][f['db_name']]=v
 
   for table in tables_1_to_1:
     form.db.save(

@@ -13,12 +13,7 @@ def brand_id(form,v):
     
 
   
-  return [
-    'brand_id',
-    {
-      'after_html':after_html
-    }
-  ]
+  return ['brand_id',{'after_html':after_html}]
 
 def region_id(form,v):
   region_id=v['region_id']

@@ -5,15 +5,6 @@ def inn_before_code(form,field):
             field['read_only']=True
 
 fields=[
-        # {
-        #     'description':'Динамический компонент',
-        #     'type':'component',
-        #     'name':'tc1',
-        #     'tab':'main',
-        #     'object':'/files/test-component/object.js',
-        #     'template':'/files/test-component/template.html',
-        #     'methods':'/files/test-component/methods.js',
-        # },
         {
             'description':'Бренд',
             'name':'brand_id',
@@ -136,6 +127,13 @@ fields=[
             'db_name':'phone'
         },
         {
+            'description':'Email',
+            'type':'filter_extend_text',
+            'tablename':'uc',
+            'name':'f_email',
+            'db_name':'email'
+        },
+        {
             'description':'Контакты',
             'name':'contacts',
             'type':'1_to_m',
@@ -179,7 +177,7 @@ fields=[
 
                     ],
                     'regexp_rules':[
-                        '/^(\+\d{6,12})(,\s\+\d{6,12})*$/','Номер должен быть в формате: +[код]XXXXXXXXXX, например: +74951234567',
+                        '/^(\+\d{6,12})$/','Номер должен быть в формате: +[код]XXXXXXXXXX, например: +74951234567',
                        
                     ],
                 },

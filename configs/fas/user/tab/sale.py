@@ -1,3 +1,4 @@
+from .beeline_records import *
 from datetime import datetime
 
 def memo_before_out_tags(form,data):
@@ -11,6 +12,14 @@ def memo_before_out_tags(form,data):
             d['make_edit']=True
             d['make_delete']=True
         #print('d:',d)
+
+def manager_id_before_code(form,field):
+
+    manager=form.manager
+    #form.pre({'manager':manager})
+    if (manager['CHILD_GROUPS_HASH'] and manager['is_owner']) or (manager['login']=='admin'):
+        field['make_change_in_search']=True
+
 fields=[
       
         {
@@ -22,6 +31,8 @@ fields=[
             'header_field':'name',
             'value_field':'id',
             'tab':'sale',
+            #'make_change_in_search':True,
+            'before_code':manager_id_before_code,
             'read_only':True,
             'filter_on':True
         },
@@ -36,9 +47,20 @@ fields=[
             'value_field':'id'
         },
         {
-            'description':'Дата контакта',
+            'description':'Дата и время контакта',
             'name':'contact_date',
             'type':'date',
+            'tab':'sale',
+        },
+        {
+            'description':'Важность',
+            'name':'interest',
+            'type':'select_values',
+            'values':[
+                {'v':1,'d':'Минимальная'},
+                {'v':2,'d':'Средняя'},
+                {'v':3,'d':'Высокая'},
+            ],
             'tab':'sale',
         },
         { # Memo
@@ -60,11 +82,14 @@ fields=[
             'memo_table_alias':'memo',
             'auth_table_alias':'m_memo',
             'make_delete':False,
-            'make_edit':True,
+            'make_edit':False,
             'tab':'sale',
             'before_out_tags':memo_before_out_tags,
-            'show_type':'html'
+            'show_type':'html',
+
         },
+
+        beeline_records, # записи телефонных переговоров
         {
             'description':'Состояние2',
             'name':'state2',

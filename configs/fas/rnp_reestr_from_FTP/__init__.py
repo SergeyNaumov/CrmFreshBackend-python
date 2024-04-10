@@ -6,7 +6,7 @@ def manager_otk_is_double_fc(form,field,row):
 def is_double_filter_code(form,field,row):
     if row['wt__is_double']:
         firm = row.get('u__firm') or '---'
-        return f"да<br><a href='/edit_form/user/{row['u__id']}' target='_blank'>{firm}</a>"
+        return f"да<br><a href='/edit_form/user/{row['wt__user_id']}' target='_blank'>{firm}</a>"
     else:
         return 'нет'
 
@@ -30,7 +30,7 @@ form={
     'QUERY_SEARCH_TABLES':[
         {'t':'rnp_reestr_from_FTP','a':'wt'},
         {'t':'manager','a':'m','l':'wt.manager_id=m.id','lj':1},
-        {'t':'user','a':'u','l':'wt.user_id=u.id','lj':1},
+        {'t':'user','a':'u','l':'wt.user_id=u.id','lj':0},
         {'t':'manager','a':'m_otk','l':'wt.manager_otk=m_otk.id','lj':1,'for_fields':['manager_otk']},
         {'t':'manager','a':'m_dt2','l':'wt.manager_dt2=m_dt2.id','lj':1,'for_fields':['manager_dt2']},
         {'t':'user','a':'u_otk','l':'wt.manager_otk_users_id=u_otk.id','lj':1,'for_fields':['manager_otk_is_double']},

@@ -42,6 +42,9 @@ def process_edit_form(**arg):
     values=values,
     script='edit_form'
   )
+
+  if hasattr(form, 'response') and form.response:
+    return form.response
   
   if len(form.errors): return {'success':False,'errors':form.errors}
 

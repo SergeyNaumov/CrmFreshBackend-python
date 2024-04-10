@@ -100,18 +100,21 @@ def func_get_values(form):
           break
 
         table=f.get('save_table')
-        if not(table in tables_1_to_1):
-          tables_1_to_1[table]={
-            'foreign_key': f['foreign_key'],
-            'values':form.db.query(
-              query=f"select * from {f.get('save_table')} WHERE {f.get('foreign_key')}={form.id}",
-              onerow=1
-            )
-          }
+        if form.id:
+          if not(table in tables_1_to_1):
+            tables_1_to_1[table]={
+              'foreign_key': f['foreign_key'],
+              'values':form.db.query(
+                query=f"select * from {f.get('save_table')} WHERE {f.get('foreign_key')}={form.id}",
+                onerow=1
+              )
+            }
 
-        cur_values=tables_1_to_1[table]['values']
-        if cur_values and f['db_name'] in cur_values:
-          f['value']=cur_values[f['db_name']]
+          cur_values=tables_1_to_1[table]['values']
+          if cur_values and f['db_name'] in cur_values:
+            f['value']=cur_values[f['db_name']]
+        else:
+          f['value']=''
 
 
       if f['type']=='get_in_ext_url':

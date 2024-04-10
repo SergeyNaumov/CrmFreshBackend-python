@@ -108,7 +108,7 @@ def process_result_list(form,R,result_list):
           
           if exists_arg('make_change_in_search',field):
             type='select'
-            value=r[tbk+'__'+field['value_field']]
+            value=r[tbl+'__'+field['value_field']]
             if not exists_arg(name,form.SEARCH_RESULT['selects']):
                 form.SEARCH_RESULT['selects'][name]=field['values']
           else:

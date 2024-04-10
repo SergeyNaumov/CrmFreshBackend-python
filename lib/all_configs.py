@@ -168,33 +168,7 @@ def read_config(**arg):
     if len(errors): return error(errors)
 
   if not(form):
-    
     return error([f'конфиг {arg["config"]} не найден'])
-  #else:
-  #  print('NOT RETURN ERROR')
-  
-  # confdir='./conf'
-  # conflib_dir='conf'
-  # if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
-  #   try:
-  #     module=dynamic_import(conflib_dir+'.'+arg['config'])
-  #     form_data=module.form
-  #   except SyntaxError as e:
-  #     return error(f"Ошибка при загрузке конфига {arg['config']}: {e}")
-  #   except ModuleNotFoundError as e:
-  #     return error(f"Ошибка при загрузке конфига {arg['config']}: {e}")
-
-  #     #print("Except!",
-
-  #   if os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
-  #     module=dynamic_import(conflib_dir+'.'+arg['config']+'.events')
-  #     form_data['events']=module.events
-    
-    
-  #   form.load_data(form_data)
-  # else:
-  #   return error(arg['config'])
-  #form=config_class(arg)
   
   form.s=s
   s.form=form
@@ -238,6 +212,11 @@ def read_config(**arg):
   if not form.work_table: form.work_table=arg['config']
   
   form.run_event('permissions')
+
+  # вызываем permissions для полей (если есть)
+  for field in form.fields:
+    if 'permissions' in field:
+      field['permissions'](form,field)
 
   form.default_config_attr(arg)
   form.set_orig_types()

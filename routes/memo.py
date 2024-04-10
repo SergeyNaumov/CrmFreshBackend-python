@@ -109,8 +109,8 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
     'message':data.get(field['memo_table_comment'],'')
   }
 
+  tags=[data]
   if 'before_out_tags' in field:
-    tags=[data]
     field['before_out_tags'](form, tags)
 
   for t in tags:

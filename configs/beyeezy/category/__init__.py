@@ -15,17 +15,17 @@ form={
             'name':'header',
             
         },
-        {
-            'description':'Ключевое слово',
-            'type':'text',
-            'name':'keyword',
+        # {
+        #     'description':'Ключевое слово',
+        #     'type':'text',
+        #     'name':'keyword',
             
-        },
-        {
-            'description':'Описание',
-            'type':'wysiwyg',
-            'name':'body'
-        },
+        # },
+        # {
+        #     'description':'Описание',
+        #     'type':'wysiwyg',
+        #     'name':'body'
+        # },
         {
             'description':'Таблица размеров',
             'type':'1_to_1_wysiwyg',
@@ -33,7 +33,27 @@ form={
             'foreign_key':'id',
             'name':'size_table',
             'db_name':'body'
-        }
+        },
+        {
+
+            'description':'Гермес',
+            'type':'1_to_1_checkbox',
+            'foreign_key':'id',
+            'name':'opt_germes',
+            'db_name':'opt_germes',
+            #'permissions':opt_germes_permissions,
+            'save_table':'category_options',
+        },
+        {
+
+            'description':'test sel',
+            'type':'1_to_1_select_values',
+            'foreign_key':'id',
+            'name':'sel',
+            'db_name':'sel',
+            #'permissions':opt_germes_permissions,
+            'save_table':'category_options',
+        },
   ]  
     
 }
