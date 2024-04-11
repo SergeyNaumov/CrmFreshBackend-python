@@ -134,11 +134,12 @@ config={
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     'manager_id':
-      #1
+#      12066 # mai
+      1
       #11691 #Люб
       #4201 # sed
       #585 # Ак ,
-      7576 #pzm
+      #7576 #pzm
       #11709
     
     #'manager_id':12039 # О ,

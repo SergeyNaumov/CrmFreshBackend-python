@@ -50,6 +50,7 @@ fields=[
             'description':'Дата и время контакта',
             'name':'contact_date',
             'type':'date',
+            'make_change_in_search':True,
             'tab':'sale',
         },
         {

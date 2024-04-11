@@ -13,11 +13,9 @@ def get_triade(x):
 def join_ids(ids):
   result=''
   idx=0
-  for id in ids:
-    ids[idx]=str(id)
-    idx+=1
+  str_list=[str(_id) for _id in ids]
+  return ','.join(str_list)
 
-  return ','.join(ids)
 def cnt_days_period(d1,d2):
   # Ввычисляет кол-во дней между датами
   
@@ -105,10 +103,13 @@ def date_to_rus(d):
 
 def from_datetime_get_date(dt):
   if not dt: return False
-  rez=re.search('^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2}(:\d{2})?)?$',dt)
+  rez=re.search('^(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}(:\d{2})?)?$',dt)
   if rez:
     return rez[0]
-  return False
+  else:
+    if rez:=re.search('^(\d{4}-\d{2}-\d{2}).*$',dt):
+      print('res: ',rez)
+      return rez[1]
 
 def create_fields_hash(form):
   form.fields_hash={}

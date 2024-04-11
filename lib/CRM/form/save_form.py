@@ -9,7 +9,7 @@ def update_1_to_1(form):
   tables_1_to_1={}
   for f in form.fields:
 
-      if f['read_only']:
+      if f.get('read_only'):
         continue
 
       #print('f:',f)
@@ -57,9 +57,9 @@ def update_1_to_1(form):
       table=table,
       data=tables_1_to_1[table]['data'],
       replace=1,
-      debug=1
+      #debug=1
     )
-    print('SET 1_to_1:',tables_1_to_1[table])
+    #print('SET 1_to_1:',tables_1_to_1[table])
 
 
 def save_form(form,arg):
@@ -94,7 +94,8 @@ def save_form(form,arg):
         if f['type'] in ['date','datetime'] :
           
           date_value=from_datetime_get_date(v)
-          #print(f['name'],'(date_value): ',date_value)
+          print(f"v: {v} ; date_value: {date_value}")
+
           if date_value:
             v=date_value
             
