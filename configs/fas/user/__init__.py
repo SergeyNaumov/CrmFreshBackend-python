@@ -10,7 +10,7 @@ form={
     'work_table':'user',
     'ajax':ajax,
     'is_admin':False,
-    #'explain':1,
+    'explain':1,
     'is_owner':False, # Владелец карты
     'is_owner_group':False, # Руководитель группы
     'QUERY_SEARCH_TABLES':[
@@ -33,7 +33,7 @@ form={
               {'description':'Ссылки','name':'links','hide':0, 'not_save_button':1},
               {'description':'Общая информация','name':'main','hide':0},
               {
-                'description':'Статистика','name':'stat','hide':0,
+                'description':'Статистика','name':'stat','hide':1,
                 'on_show':'window.edit_form.load_stat()'
               },
             ],

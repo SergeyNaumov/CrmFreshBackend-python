@@ -3,6 +3,8 @@ from .create_ofp_card import *
 from .create_bbg_card import *
 from .filters_for_manager_op import prepare_filters_for_manager_op
 from .find_inn_doubles import prepare_filters_for_find_inn_doubles
+from .components_actions import components_actions
+
 def permissions(form):
 
   R=form.R ; db=form.db ; manager=form.manager
@@ -84,6 +86,8 @@ def permissions(form):
           WHERE u.id={form.id}""",
         onerow=1
       )
+      # Для работы компонентов (статистика и т.п.)
+      components_actions(form)
 
       if form.ov:
 

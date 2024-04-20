@@ -1,4 +1,8 @@
 from lib.core import exists_arg, join_ids
+def contact_date_before_code(form,field):
+    if form.script=='admin_table':
+        field['type']='date'
+
 
 def links_before_code(form,field):
     
@@ -64,11 +68,12 @@ def brand_id_before_code(form,field):
         # может менять бренд в картах ОП
         field['read_only']=0
 
-    if form.action in ('new'):
-        field['value']=form.manager_brand
+    if form.action=='new' and form.script=='edit_form' and len(form.manager_brand)>1:
+        field['value']=form.manager_brand[1]
 
 def manager_id_before_code(form,field):
     perm=form.manager['permissions']
+    #field['read_only']=True
     if perm['card_op_make_change_manager']:
         field['read_only']=0
 
@@ -85,6 +90,10 @@ def manager_id_before_code(form,field):
     if form.action=='new':
         field['value']=form.manager['id']
     
+    # if form.script in ('find_result', 'admin_table'):
+    #     field['make_change_in_search']=1
+    #     field['read_only']=0
+
 def region_id_filter_code(form, field, row):
     if row['r__header']:
         ts=row['r__timeshift']
@@ -104,6 +113,9 @@ events={
   'manager_id':{
     'before_code':manager_id_before_code
   },
+  'contact_date': {
+    'before_code':contact_date_before_code
+  },
   'firm':{
     'filter_code':firm_filter_code
   },
@@ -116,6 +128,7 @@ events={
   'region_id':{
     'filter_code':region_id_filter_code
   },
+
   #'inn':{
     #'before_code': inn_before_code
   #}

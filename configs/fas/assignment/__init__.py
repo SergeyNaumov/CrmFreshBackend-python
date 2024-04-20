@@ -1,4 +1,3 @@
-type_value=5 # rejection3
 """
 # В эту таблица пишем результату распределения
 create table transfere_result(
@@ -12,15 +11,15 @@ create table transfere_result(
 ) engine=innodb default charset=utf8 comment 'результаты распределений';
 """
 form={
-    'type_value':type_value,
+    #'type_value':type_value,
     'work_table':'assignment',
     'work_table_id':'id',
     'foreign_key':'type',
-    'foreign_key_value':type_value,
+    #'foreign_key_value':type_value,
 
     'title':'',
     #'explain':1,
-    'add_where':f'wt.type={type_value}',
+    #'add_where':f'wt.type={type_value}',
     'QUERY_SEARCH_TABLES':[
         {'t':'assignment','a':'wt'},
         {'t':'manager','a':'m','l':'wt.manager_id=m.id'},

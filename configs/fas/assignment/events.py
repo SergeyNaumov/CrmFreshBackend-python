@@ -2,36 +2,44 @@ from lib.core import exists_arg
 
 def permission(form):
     entity = exists_arg('cgi_params;entity',form.R)
+    if entity:
+        form.type_value=entity
     manager=form.manager
     login=manager['login']
     perm=manager['permissions']
     title=''
+    entity_dict={
+        '6':'Уклонения РегРф (список менеджеров)',
+        '7':'Реестр РНП РегРф (список менеджеров)',
+        '8':'Расторжения Ревизор (список менеджеров)',
+        '9':'Уклонения Ревизор (список менеджеров)',
+        '10':'Реестр РНП Ревизор (список менеджеров)',
+        '11':'Ответчики РегРФ (список менеджеров)',
+        '12':'Ответчики НС Ревизор (список менеджеров)',
+        '13':'Ответчики BzInfo(список менеджеров)',
+        '14':'Расторжения BzInfo (список менеджеров)',
+        '15':'Уклонения BzInfo (список менеджеров)',
+        '16':'Реестр РНП BzInfo (список менеджеров)',
+        '17':'Уклонения ФАС-сервис (список менеджеров)',
+        '18':'Расторжения ФАС-сервис (список менеджеров)',
+        '19':'РНП ФАС-сервис (список менеджеров)',
+        '20':'Ответчики ФАС-сервис (список менеджеров)'
+    }
+    if form.id:
+        form.ov=form.db.query(
+            query=f"select * from {form.work_table} where id=%s",
+            values=[form.id],
+            onerow=1
+        )
+        if t:=form.ov.get('type'):
+            entity=t
+            form.foreign_key_value=t
+        else:
+            form.errors.append('Ошибка, не указан type, обратитесь к программисту')
 
-    if entity=='6':
-        title='Уклонения РегРф (список менеджеров)'
+    if entity in entity_dict:
+        title=entity_dict.get(entity)
 
-    elif entity=='9':
-        title='Уклонения Ревизор (список менеджеров)'
-    elif entity=='5':
-        title='Расторжения РегРф (список менеджеров)'
-    elif entity=='8':
-        title='Расторжения Ревизор (список менеджеров)'
-    elif entity=='7':
-        title='Реестр РНП РегРф (список менеджеров)'
-    elif entity=='10':
-        title='Реестр РНП Ревизор (список менеджеров)'
-    elif entity=='11':
-        title='Ответчики РегРФ (список менеджеров)'
-    elif entity=='12':
-        title='Ответчики НС Ревизор (список менеджеров)'
-    elif entity=='13':
-        title='Ответчики BzInfo(список менеджеров)'
-    elif entity=='14':
-        title='Расторжения BzInfo (список менеджеров)'
-    elif entity=='15':
-        title='Уклонения BzInfo (список менеджеров)'
-    elif entity=='16':
-        title='Реестр РНП BzInfo (список менеджеров)'
     if entity:
         form.add_where=f"wt.type={entity}"
         form.foreign_key_value=int(entity)
@@ -65,11 +73,16 @@ def before_delete(form):
     pass
     #form.errors.append('Вам запрещено удалять!')
 
+def after_update(form):
+    form.pre({'form.ov':form.ov, 'values':form.values})
+    #form.db.query()
+
 events={
   'permissions':[
       permission,
       
   ],
   'before_delete':before_delete,
-  'before_code':events_before_code
+  'before_code':events_before_code,
+  #'before_update':before_update
 }

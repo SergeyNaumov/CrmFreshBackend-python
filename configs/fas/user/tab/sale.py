@@ -13,13 +13,6 @@ def memo_before_out_tags(form,data):
             d['make_delete']=True
         #print('d:',d)
 
-def manager_id_before_code(form,field):
-
-    manager=form.manager
-    #form.pre({'manager':manager})
-    if (manager['CHILD_GROUPS_HASH'] and manager['is_owner']) or (manager['login']=='admin'):
-        field['make_change_in_search']=True
-
 fields=[
       
         {
@@ -31,8 +24,7 @@ fields=[
             'header_field':'name',
             'value_field':'id',
             'tab':'sale',
-            #'make_change_in_search':True,
-            'before_code':manager_id_before_code,
+            'make_change_in_search':1,
             'read_only':True,
             'filter_on':True
         },
@@ -49,8 +41,8 @@ fields=[
         {
             'description':'Дата и время контакта',
             'name':'contact_date',
-            'type':'date',
-            'make_change_in_search':True,
+            'type':'datetime',
+            'make_change_in_search':1,
             'tab':'sale',
         },
         {

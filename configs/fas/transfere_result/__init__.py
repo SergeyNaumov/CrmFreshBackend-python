@@ -68,7 +68,7 @@ def search(form, R):
         _type=int(exists_arg('cgi_params;type',R))
     except Exception as e:
         return {'success':False,'errors':[str(e)]}
-    if _type in (5,6):
+    if _type>=5 and _type<=20:
         where=[f""]
         ts=exists_arg('filters;ts',R)
 
@@ -149,17 +149,52 @@ def search(form, R):
 
 def permissions(form):
     
-    _type=int(exists_arg('cgi_params;type',form.R))
-    #print('R:',form.R)
-    if(_type==6):
-        form.title='Статистика по уклонениям (РегРФ)'
-    
-    if(_type==5):
-        form.title='Статистика по расторжениям (РегРФ)'
+    _type=exists_arg('cgi_params;type',form.R)
+    if _type.isnumeric():
+        _type=int(_type)
+        #print('R:',form.R)
+        if(_type==6):
+            form.title='Статистика по уклонениям (РегРФ)'
+        elif(_type==5):
+            form.title='Статистика по расторжениям (РегРФ)'
 
-    for f in form.filters:
-        if f['name']=='ts':
-            f['value']=cur_date()
+        elif(_type==8):
+            form.title='Статистика по расторжениям (Ревизор)'
+        elif(_type==9):
+            form.title='Статистика по уклонениям (Ревизор)'
+        elif(_type==10):
+            form.title='Статистика РНП (Ревизор)'
+        elif(_type==11):
+            form.title='Статистика по ответчикам (РегРФ)'
+        elif(_type==12):
+            form.title='Статистика по ответчикам (Ревизор)'
+        elif(_type==13):
+            form.title='Статистика по ответчикам (BzInfo)'
+        elif(_type==14):
+            form.title='Статистика по расторжениям (BzInfo)'
+        elif(_type==15):
+            form.title='Статистика по уклонениям (BzInfo)'
+        elif(_type==16):
+            form.title='Статистика РНП (BzInfo)'
+
+        elif(_type==17):
+            form.title='Статистика по уклонениям (ФАС-сервис)'
+        elif(_type==18):
+            form.title='Статистика по расторжениям (ФАС-сервис)'
+
+        elif(_type==7):
+            form.title='Статистика РНП (РегРФ)'
+
+
+        elif(_type==19):
+            form.title='Статистика РНП (ФАС-сервис)'
+        elif(_type==20):
+            form.title='Статистика по ответчикам (ФАС-сервис)'
+        for f in form.filters:
+            if f['name']=='ts':
+                f['value']=cur_date()
+    else:
+        form.errors.append('неизвестный type')
     
 
 form={

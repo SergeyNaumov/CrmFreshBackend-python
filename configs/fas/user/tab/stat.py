@@ -25,24 +25,26 @@ def default_component_before_code(form,field):
 		}
 	}
 
+nc=20240411
+
 fields=[
-	# {
-	# 	'name':'stat',
-	# 	'not_filter':1,
-	# 	'type':'component',
-	# 	'template':f'{stat_component_folder}/template.html',
-	# 	#'methods':f'{stat_component_folder}/methods.js',
-	# 	'object':f'{stat_component_folder}/object.js',
-	# 	'tab':'stat'
-	# },
 	{
-		'name':'default_component',
+		'name':'stat',
 		'not_filter':1,
 		'type':'component',
-		'template':f'{default_component_folder}/template.html',
+		'template':f'{stat_component_folder}/template.html?nc={nc}',
 		#'methods':f'{stat_component_folder}/methods.js',
-		'before_code': default_component_before_code,
-		'object':f'{default_component_folder}/object.js?nc=1',
+		'object':f'{stat_component_folder}/object.js?nc={nc}',
 		'tab':'stat'
 	},
+	# {
+	# 	'name':'default_component',
+	# 	'not_filter':1,
+	# 	'type':'component',
+	# 	'template':f'{default_component_folder}/template.html',
+	# 	#'methods':f'{stat_component_folder}/methods.js',
+	# 	'before_code': default_component_before_code,
+	# 	'object':f'{default_component_folder}/object.js?nc=1',
+	# 	'tab':'stat'
+	# },
 ]
