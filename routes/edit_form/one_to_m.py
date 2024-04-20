@@ -9,6 +9,7 @@ from .one_to_m_routine.slide_sort import slide_sort
 from .one_to_m_routine.delete_record import delete_record
 from .one_to_m_routine.upload_file import upload_file
 from .one_to_m_routine.get_slide_data import get_slide_data
+from .one_to_m_routine.delete_file import *
 def process_one_to_m(**arg):
   R={}
   if exists_arg('R',arg): R=arg['R']
@@ -42,8 +43,17 @@ def process_one_to_m(**arg):
     
     return upload_file(form,field,arg)
   
-  
   elif form.action == 'get_slide_data': # Получение данных слайда
     return get_slide_data(form,field)
+
+  elif form.action == 'delete_file':
+    child_field=None
+    for f in field['fields']:
+      if f['name']==arg['child_field_name']:
+        child_field=f
+        break
+
+
+    return delete_file(form,field,child_field, arg.get('one_to_m_id'))
 
 

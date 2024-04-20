@@ -79,6 +79,19 @@ def upload_file(form,field,arg):
             os.remove(child_field['filedir']+'/'+oldfile)
 
 
+        save_data={
+          child_field['name']: db_value
+        }
+        if field.get('sort'):
+          save_data['sort']=form.db.query(
+            query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
+            onevalue=1
+          )
+          if save_data['sort']:
+            save_data['sort']+=10
+          else:
+            save_data['sort']=1
+
 
 
         form.db.save(
@@ -86,9 +99,7 @@ def upload_file(form,field,arg):
           update=1,
           where=f'{field["foreign_key"]}={form.id} and {field["table_id"]}={arg["one_to_m_id"]}',
           
-          data={
-            child_field['name']: db_value
-          }
+          data=save_data
         )
         # Сделать ресайз!
         if form.success():
@@ -108,13 +119,27 @@ def upload_file(form,field,arg):
         db_value=filename
         if exists_arg('keep_orig_filename',child_field):
           db_value+=";"+orig_filename
-        
-        id = form.db.save(
-          table=field['table'],
-          data={
+        save_data={
             field['foreign_key']:form.id,
             child_field_name:db_value
-          }
+        }
+        if field.get('sort'):
+          save_data['sort']=form.db.query(
+            query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
+            onevalue=1
+          )
+          if save_data['sort']:
+            save_data['sort']+=10
+          else:
+            save_data['sort']=1
+
+
+        print('sort:',field.get('sort'))
+
+        id = form.db.save(
+          table=field['table'],
+          data=save_data,
+          debug=1
         )
 
         # value={

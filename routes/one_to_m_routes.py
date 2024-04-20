@@ -135,7 +135,16 @@ async def download(
     'filename':filename,
     'view':view
   }
-
+@router.get('/1_to_m/delete_file/{config}/{field_name}/{child_field_name}/{id}/{one_to_m_id}')
+async def delete_file(config: str, field_name:str, child_field_name:str, id:int, one_to_m_id:int):
+  return process_one_to_m(
+    config=config,
+    field_name=field_name,
+    child_field_name=child_field_name,
+    id=id,
+    action='delete_file',
+    one_to_m_id=one_to_m_id,
+  )
   #return {'success':'delete'}
 
 
