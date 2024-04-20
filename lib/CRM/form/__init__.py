@@ -214,6 +214,7 @@ class Form():
         
         #form.run_event(form,'before_code for '+f['name'],f)
         try:
+
           new_field=field['before_code'](form=form,field=field)
           if new_field:
             # если в before_code подменили имя поля -- подменяем его и в fields_hash

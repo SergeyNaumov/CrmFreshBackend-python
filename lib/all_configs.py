@@ -222,7 +222,7 @@ def read_config(**arg):
   form.set_orig_types()
   
   # Перенёс из routes.edit_form.process_edit_form.py
-  #form.get_values()
+
   
   form.get_values()
   form.run_all_before_code()
