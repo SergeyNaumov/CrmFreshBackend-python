@@ -145,7 +145,6 @@ def search(form, R):
 
         _list=db.query(
             query=query,
-            debug=1,
             #values=values
         )
         #print("template:",f"./{form.s.config['config_folder']}/{form.config}/template/table.html")
@@ -176,7 +175,7 @@ def search(form, R):
     #     where=[f""]
     #     ts=exists_arg('filters;ts',R)
 
-
+        
     #     lst=form.db.query(
     #         query="""SELECT
     #             m.id, m.name, sum(if(tr.is_double=0,1,0)) new, sum(if(tr.is_double,1,0)) doubles
@@ -188,7 +187,6 @@ def search(form, R):
     #         GROUP BY tr.manager_id
     #         ORDER BY m.name""",
     #         values=[_type, f"{ts} 00:00:00",f"{ts} 23:59:59",],
-    #         #debug=1,
     #         #error=form.errors
     #     )
     #     #print(query)
@@ -219,7 +217,7 @@ def search(form, R):
     #             },
     #         )
 
-
+    
 
 def permissions(form):
     ...
@@ -269,7 +267,8 @@ form={
         'permissions':permissions,
         'search':search
     }
-
+    
 }
+      
 
 

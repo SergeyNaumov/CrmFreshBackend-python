@@ -17,7 +17,7 @@ def adding_select_fields_in_desc(form,db_field,t):
 
   
 
-def get_search_tables(form,query):
+async def get_search_tables(form,query):
   TABLES=[]
   #if not form.QUERY_SEARCH and len(form.QUERY_SEARCH_TABLES):
     # for f in form.fields:
@@ -65,7 +65,7 @@ def get_search_tables(form,query):
       TABLES.append(t_str)
       
       if not exists_arg('not_add_in_select_fields', t):
-        desc = form.db.query(
+        desc = await form.db.query(
           query = f"desc {t['table']}",
           errors=form.log
         )

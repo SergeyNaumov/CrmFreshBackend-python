@@ -1,6 +1,6 @@
 import re
 from lib.core import exists_arg
-def move(form,R):
+async def move(form,R):
       to=exists_arg('to',R) or ''
     
       if not form.id:
@@ -18,7 +18,7 @@ def move(form,R):
       else:
           from_path, to_path='',''
           if to:
-            to_item=form.db.query(
+            to_item=await form.db.query(
               query=f'SELECT * from {form.work_table} WHERE {form.work_table_id}=%s',
               values=[to],
               onerow=1
@@ -28,7 +28,7 @@ def move(form,R):
             else:
               form.errors.append('в базе отсутствует элемент-приёмник. Возможно, состояние базы было изменено')
 
-          from_item=form.db.query(
+          from_item=await form.db.query(
             query=f'SELECT * from {form.work_table} WHERE {form.work_table_id}=%s',
             values=[form.id],
             onerow=1
@@ -43,12 +43,12 @@ def move(form,R):
             if to: to_path+='/'+to
             else: to='null'
 
-            form.db.query(
+            await form.db.query(
                 query=f'UPDATE {form.work_table} SET parent_id=%s, path=%s WHERE {form.work_table_id}=%s',
                 values=[to,to_path,id]
             );
 
-            childs=form.db.query(
+            childs=await form.db.query(
               query=f'SELECT {form.work_table_id} id, path from {form.work_table} WHERE path=%s OR path like %s',
               values=[from_path+'/'+form.id, from_path+'/'+id+'/%']
             )
@@ -60,7 +60,7 @@ def move(form,R):
                 path = re.sub(reg1,to_path,path)
                 path = re.sub(reg2,to_path+'/',path)
 
-                form.db.query(
+                await form.db.query(
                     query=f'UPDATE {form.work_table} SET path=%s WHERE {form.work_table_id}=%s',
                     values=[path,c['id']]
                 )

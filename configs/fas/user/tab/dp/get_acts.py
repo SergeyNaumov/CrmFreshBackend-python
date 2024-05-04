@@ -1,12 +1,12 @@
 from lib.core_crm import get_manager, get_owner
-def get_acts(form,field, R):
+async def get_acts(form,field, R):
   db=form.db
   perm=form.manager['permissions']
 
   docpack_foreign_key=field['docpack_foreign_key']
   lst=[]
   if R.get('bill_id'):
-    lst=db.query(
+    lst=await db.query(
       query="""
         SELECT
           a.id, concat('/edit_form/act/',a.id) link,
@@ -28,13 +28,13 @@ def get_acts(form,field, R):
     for act in lst:
 
       # менежер акта
-      act_manager=get_manager(db=db, id=act['manager_id'])
+      act_manager=await get_manager(db=db, id=act['manager_id'])
       #print('act_manager:',act_manager, act['manager_id'])
 
       # руководитель менеджера акта
       act_owner=None
       if act['manager_id']:
-        act_owner=get_owner(db=db, manager_id=act['manager_id'])
+        act_owner=await get_owner(db=db, manager_id=act['manager_id'])
 
       if act_manager and act_manager['id']==form.manager['id']:
         # менеджер акта

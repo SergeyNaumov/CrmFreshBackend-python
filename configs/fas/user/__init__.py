@@ -10,7 +10,7 @@ form={
     'work_table':'user',
     'ajax':ajax,
     'is_admin':False,
-    'explain':1,
+    #'explain':1,
     'is_owner':False, # Владелец карты
     'is_owner_group':False, # Руководитель группы
     'QUERY_SEARCH_TABLES':[

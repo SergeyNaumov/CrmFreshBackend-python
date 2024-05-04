@@ -54,7 +54,7 @@ def search(form, R):
 
     query=f"""
         SELECT
-            m.name, sum(summ) bank
+            m.name, sum(wt.paid_summ) bank
         FROM
             bill wt
             join docpack dp ON wt.docpack_id = dp.id

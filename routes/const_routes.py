@@ -110,7 +110,6 @@ async def save_value(R:dict):
             query=query_for_old_record,
             values=values_for_old_record,
             errors=form.errors,
-            debug=1,
             onerow=1
         )
 
@@ -165,7 +164,6 @@ async def save_value(R:dict):
                 form.db.save(
                     table=form.work_table,
                     data=data,
-                    debug=1,
                     errors=form.errors
                 )
             

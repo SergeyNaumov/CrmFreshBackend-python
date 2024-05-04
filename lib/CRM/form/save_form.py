@@ -1,7 +1,7 @@
 from lib.core import exists_arg, is_wt_field, from_datetime_get_date
 #from routes.edit_form.multiconnect import save as multiconnect_save
 from .multiconnect import save as multiconnect_save
-def update_1_to_1(form):
+async def update_1_to_1(form):
   if not(form.id):
     # выходим, если нет form.id
     return
@@ -30,7 +30,7 @@ def update_1_to_1(form):
 
             if not(tables_1_to_1[table]['data']):
 
-              tables_1_to_1[table]['data']=form.db.query(
+              tables_1_to_1[table]['data'] = await form.db.query(
                 query=f"select * from {table} WHERE {f['foreign_key']}={form.id}",
                 onerow=1,
                 errors=form.errors
@@ -53,7 +53,7 @@ def update_1_to_1(form):
             tables_1_to_1[table]['data'][f['db_name']]=v
 
   for table in tables_1_to_1:
-    form.db.save(
+    await form.db.save(
       table=table,
       data=tables_1_to_1[table]['data'],
       replace=1,
@@ -62,7 +62,7 @@ def update_1_to_1(form):
     #print('SET 1_to_1:',tables_1_to_1[table])
 
 
-def save_form(form,arg):
+async def save_form(form,arg):
   
   if len(form.errors): return
   save_hash={}
@@ -117,7 +117,7 @@ def save_form(form,arg):
       # Если мы только создаём карточку -- пароль также разрешено сохранить
       if(f['type']=='password' and form.action=='insert'):
         if form.s.config['auth']['encrypt_method'] == 'mysql_sha2':
-          save_hash[name]=form.db.query(
+          save_hash[name] = await form.db.query(
             query="select sha2(%s,256)",
             values=[v],
             onevalue=1
@@ -136,7 +136,7 @@ def save_form(form,arg):
             where=where + f' AND {form.work_table_foreign_key}={form.work_table_foreign_key_value}'
         
         
-        form.db.save(
+        await form.db.save(
           table=form.work_table,
           where=where,
           update=1,
@@ -149,7 +149,7 @@ def save_form(form,arg):
         if form.work_table_foreign_key and form.work_table_foreign_key_value:
             save_hash[form.work_table_foreign_key]=form.work_table_foreign_key_value
         
-        form.id = form.db.save(
+        form.id = await form.db.save(
           table=form.work_table,
           data=save_hash,
           errors=form.errors,
@@ -158,7 +158,7 @@ def save_form(form,arg):
         )
         #print('errors:',form.errors)
 
-  update_1_to_1(form)
+  await update_1_to_1(form)
 
   for f in form.fields:
     name=f['name']
@@ -171,7 +171,7 @@ def save_form(form,arg):
     if f['type']=='multiconnect':
       #print('!!NEW_VALUES:',value)
       if isinstance(value,list):
-        multiconnect_save(form,f,value)
+        await multiconnect_save(form,f,value)
     #elif f['type']=='1_to_1_text':
     #
     elif f['type']=='in_ext_url':
@@ -180,24 +180,24 @@ def save_form(form,arg):
   # события после сохранения формы
   if form.success():
     if form.action=='insert':
-      form.run_event('after_insert')
-      form.run_event('after_save')
+      await form.run_event('after_insert')
+      await form.run_event('after_save')
 
     if form.action=='update':
-      form.run_event('after_update')
-      form.run_event('after_save')
+      await form.run_event('after_update')
+      await form.run_event('after_save')
 
 
     for f in form.fields:
 
 
       if form.action=='insert':
-        form.run_event('after_insert',{'field':f})
-        form.run_event('after_save',{'field':f})
+        await form.run_event('after_insert',{'field':f})
+        await form.run_event('after_save',{'field':f})
 
       if form.action=='update':
-        form.run_event('after_update',{'field':f})
-        form.run_event('after_save',{'field':f})
+        await form.run_event('after_update',{'field':f})
+        await form.run_event('after_save',{'field':f})
       
 
 

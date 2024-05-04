@@ -14,7 +14,7 @@ from .delete_file import delete_file as func_delete_file
 from .template import template as func_template
 from config import config
 import copy
-
+import inspect # для определения асинхронных функций
 
 class Form():
   #def info(self):
@@ -146,18 +146,18 @@ class Form():
     if params: return exists_arg(name,params)
     return ''
 
-  def get_search_tables(form,query):
-    get_search_tables(form,query)
+  async def get_search_tables(form,query):
+    await get_search_tables(form,query)
   
-  def get_search_where(form,query):
+  async def get_search_where(form,query):
     get_search_where(form,query)
   
   def default_config_attr(form,arg):
     default_config_attr(form,arg)
 
-  def edit_form_process_fields(form): # в perl-версии process_edit_form_fields
+  async def edit_form_process_fields(form): # в perl-версии process_edit_form_fields
     
-    return func_edit_form_process_fields(form)
+    return await func_edit_form_process_fields(form)
     
     
 
@@ -165,11 +165,11 @@ class Form():
     
     return {'success':True}
 
-  def save(form,**arg): save_form(form,arg)
+  async def save(form,**arg): await save_form(form,arg)
 
-  def run_event(form,event_name,field=None):
+  async def run_event(form,event_name,field=None):
     #print('RUN event:', event_name)
-    func_run_event(form,event_name,field)
+    await func_run_event(form,event_name,field)
     
     # Если были изменения -- запускаем из конфига общую функцию обработки
     # (нужно для сроса кэша у сайтов)
@@ -192,14 +192,14 @@ class Form():
   def set_orig_types(form):
     func_set_orig_types(form)
 
-  def get_values(form):
-    func_get_values(form)
+  async def get_values(form):
+    await func_get_values(form)
   
-  def get_fields_values(form):
-    func_get_fields_values(form)
+  async def get_fields_values(form):
+    await func_get_fields_values(form)
 
-  def UploadFile(form):
-    return func_upload_file(form)
+  async def UploadFile(form):
+    return await func_upload_file(form)
 
   def check(form): # проверяем new_values
     for field in form.fields:
@@ -207,15 +207,21 @@ class Form():
         check_field(form,field,form.new_values[field['name']])
   
   # запускаем before_code для всех полей
-  def run_all_before_code(form): 
+  async def run_all_before_code(form):
     field_idx=0
     for field in form.fields:
       if 'before_code' in field:
-        
         #form.run_event(form,'before_code for '+f['name'],f)
         try:
+          bc=field['before_code']
 
-          new_field=field['before_code'](form=form,field=field)
+          if inspect.iscoroutinefunction(bc):
+            print(f"await bc {field['name']}")
+            new_field=await bc(form=form,field=field)
+          else:
+            print(f"bc {field['name']}")
+            new_field=bc(form=form,field=field)
+
           if new_field:
             # если в before_code подменили имя поля -- подменяем его и в fields_hash
             if new_field['name'] != field['name']:
@@ -228,6 +234,7 @@ class Form():
             field=new_field
           
         except AttributeError as e:
+          print(f"ошибка в before_code {field['name']} {e}")
           form.errors.append(str(e))
         # except ValueError as e:
         #   form.errors.append(str(e))
@@ -236,7 +243,8 @@ class Form():
 
       field_idx+=1
 
-  def DeleteFile(form): return func_delete_file(form)
+  async def DeleteFile(form):
+    return await func_delete_file(form)
 
   def pre(form,data):
     form.log.append(copy.deepcopy(data))

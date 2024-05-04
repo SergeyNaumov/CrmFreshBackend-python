@@ -1,7 +1,7 @@
 from config import config
 from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 from lib.core import cur_date, date_to_rus, exists_arg
-from lib.send_mes import send_mes
+from lib.send_mes import send_mes, send_mes
 
 
   
@@ -191,7 +191,7 @@ def comment_after_add(form,field,data):
       manager=get_manager(id=recipent_id, db=form.db)
       if manager: 
         owner=get_owner(cur_manager=manager,db=form.db)
-        if owner: #and manager_id!=owner['id']:
+        if owner and owner['id']: #and manager_id!=owner['id']:
           to[owner['id']]=True
 
 
@@ -203,10 +203,10 @@ def comment_after_add(form,field,data):
     query="SELECT * from teamwork_ofp_memo where teamwork_ofp_id=%s order by id desc limit 2",
     values=[form.id],
   )
-  #print('last_comment:',last_comments)
+  #print('to:',to)
 
   to_emails=get_email_list_from_manager_id(form.db, to)
-
+  #print(f"to_emails: ", ', ',to_emails)
   #print(f"to_emails: ", ', '.join(to_emails))
   #to_emails={}
   if len(to_emails):
@@ -216,16 +216,28 @@ def comment_after_add(form,field,data):
 
     if len(last_comments)>1:
       # Не первый комментарий в карте
+      #print('subject:',f"Новый комментарий, совместная работа ОФП {form.ov['brand']} / {form.ov['firm']} / {form.ov['product_label']}")
       send_mes(
         from_addr='info@fascrm.ru',
         to=','.join(to_emails.keys()),
         #to='svcomplex@yandex.ru',
-        subject=f"Новый комментарий, совместная работа ОФП / {form.ov['firm']} / {form.ov['product_label']}",
+        subject=f"Новый комментарий, совместная работа ОФП {form.ov['brand']} / {form.ov['firm']} / {form.ov['product_label']}",
         message=f"Наименование компании: {form.ov['link']}<br>"+\
             f"Менеджер: {form.manager['name']}<br>"+\
             f"Комментарий: {data['comment']}<br>"+\
             regnumber_str
       )
+      # if form.id==1:
+      #   send_mes0(
+      #     from_addr='info@fascrm.ru',
+      #     to=','.join(to_emails.keys()),
+      #     #to='svcomplex@yandex.ru',
+      #     subject=f"Новый комментарий, совместная работа ОФП {form.ov['brand']} / {form.ov['firm']} / {form.ov['product_label']}",
+      #     message=f"Наименование компании: {form.ov['link']}<br>"+\
+      #         f"Менеджер: {form.manager['name']}<br>"+\
+      #         f"Комментарий: {data['comment']}<br>"+\
+      #         regnumber_str
+      #   )
     else:
       # первый комментарий в карте
       send_mes(

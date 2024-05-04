@@ -1,7 +1,7 @@
 from .fields import get_fields
 
 form={
-    'work_table':'arbotrage_case',
+    'work_table':'arbitrage_case',
     'work_table_id':'id',
     #'work_table_foreign_key':'project_id',
     #'work_table_foreign_key_value':4664,

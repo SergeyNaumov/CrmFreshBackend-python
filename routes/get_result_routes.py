@@ -15,18 +15,18 @@ router = APIRouter()
 @router.post('/get-result')
 async def get_result(R: dict):
   try:
-      form=read_config(
+      print('GR0')
+      form=await read_config(
         R=R,
         config=R['config'],
         script='find_objects'
       )
-
+      print('GR1')
       if exists_arg('page',R):
         page=str(R['page'])
         if page.isnumeric(): form.page=page
       else:
         page=1
-
 
         #form.pre(f)
 
@@ -40,7 +40,7 @@ async def get_result(R: dict):
 
       if form.GROUP_BY:
         form.query_search['GROUP'].append(form.GROUP_BY)
-      
+
       form.SEARCH_RESULT={
         'log':form.log,
         'config':form.config,
@@ -58,25 +58,19 @@ async def get_result(R: dict):
         form.query_search['on_filters_hash'][values[0]]=values[1]
 
       
-      # 
-
-
-
-
       # если требуется подменить фильтры
-      form.run_event('before_search_tables')
+      await form.run_event('before_search_tables')
 
-      form.get_search_tables(R['query'])
-      
-      form.get_search_where(R['query'])
-
-      form.run_event('before_search')
-      form.run_event('before_search_mysql',
+      await form.get_search_tables(R['query'])
+      await form.get_search_where(R['query'])
+      await form.run_event('before_search')
+      await form.run_event('before_search_mysql',
         {
           'tables':' '.join(form.query_search['TABLES']),
           'where':' AND '.join(form.query_search['WHERE'])
         }
       )
+
 
       #   event=form.events[],
       #   description='events->before_search_mysql',
@@ -90,7 +84,7 @@ async def get_result(R: dict):
       
       #print('query:',query,"\n\nquery_count:",query_count)
       if query_count:
-        total_count=form.db.query(
+        total_count=await form.db.query(
           query='select sum(cnt) from ('+query_count+') x',
           onevalue=1,
           values=form.query_search['VALUES'],
@@ -101,7 +95,7 @@ async def get_result(R: dict):
           total_count=int(total_count)
         else:
           total_count=0
-        
+
         form.SEARCH_RESULT['count_total']=total_count
         
         
@@ -122,28 +116,24 @@ async def get_result(R: dict):
         print('===')
         print(form.explain_query)
         print('===')
-      print('get_result_list')
-      result_list=form.db.query(
+
+      result_list=await form.db.query(
         query=query,
         #debug=1,
         values=form.query_search['VALUES'],
         errors=form.errors,
       )
       
-
-
       if len(form.errors):
         return {'success':0,'errors':form.errors}
-
-
-
-
-      output=process_result_list(form,R,result_list)
+      print('BEFORE PROCESS RESULT LIST')
+      output=await process_result_list(form,R,result_list)
+      print('AFTER PROCESS RESULT LIST')
       #print('output:',output)
 
       form.SEARCH_RESULT['log']=form.log
       form.SEARCH_RESULT['output']=output
-      form.run_event('after_search')
+      await form.run_event('after_search')
       
       if form.plugin_output:
         return form.plugin_output

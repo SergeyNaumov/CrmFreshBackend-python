@@ -7,7 +7,6 @@ def emails_after_save_code(form,field):
     v=field['values'][0]
     form.db.query(
       query=f"UPDATE manager_email set main=0 where manager_id={form.id} and id<>{v['id']}",
-      debug=1
     )
 
 def password_before_code(form,field):

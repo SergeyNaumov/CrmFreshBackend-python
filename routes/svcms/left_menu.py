@@ -140,7 +140,6 @@ def get_extended_service(errors):
     serv_list=s.db.query(
       query='select header,json from project_menu where project_id=%s order by sort',
       values=[s.project_id],
-      debug=1,
       errors=errors,
     )
     for srv in serv_list:

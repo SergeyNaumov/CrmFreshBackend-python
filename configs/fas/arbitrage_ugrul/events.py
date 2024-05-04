@@ -22,6 +22,12 @@ def after_save(form):
     pass
     # form.nv=get_values(form)
     # #print('nv:',form.nv)
+def before_search(form):
+  qs=form.query_search
+  #form.pre(qs['SELECT_FIELDS'])
+  qs['SELECT_FIELDS'].append('group_concat( distinct p.phone ) phones')
+  qs['SELECT_FIELDS'].append('group_concat( distinct e.email ) emails')
+
 def after_search(form):
   result_plaintiff={} ; result_resp={}
   output = form.SEARCH_RESULT.get('output')
@@ -112,7 +118,8 @@ events={
       permissions,
       
   ],
-  'after_search':after_search
+  'after_search':after_search,
+  'before_search':before_search
   #'before_delete':before_delete,
   #'before_code':events_before_code
 }

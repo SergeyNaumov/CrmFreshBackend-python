@@ -2,7 +2,7 @@ from lib.resize import resize_one
 from lib.core import exists_arg, get_ext, random_filename
 from lib.save_base64_file import save_base64_file, b64_split
 
-def upload_file(form):
+async def upload_file(form):
     R=form.R
     name=exists_arg('name',R)
     field=None
@@ -55,7 +55,7 @@ def upload_file(form):
 
 
       if src and not len(form.errors):
-        save_base64_file(
+        await save_base64_file(
           form=form,
           src=src,
           field=field,

@@ -43,6 +43,20 @@ fields=[
       'filter_on':1
     },
     {
+      'description':'Телефон',
+      'type':'filter_extend_text',
+      'name':'phone',
+      'tablename':'p',
+      'filter_on':1
+    },
+    {
+      'description':'Email',
+      'type':'filter_extend_text',
+      'name':'email',
+      'tablename':'e',
+      'filter_on':1
+    },
+    {
       'description':'Адрес',
       'name':'address',
       'type':'text',
@@ -52,18 +66,18 @@ fields=[
       'description':'ОКТМО',
       'name':'oktmo',
       'type':'text',
-      'filter_on':1
+      'filter_on':0
     },
     {
       'description':'ОКАТО',
       'name':'okato',
       'type':'text',
-      'filter_on':1
+      'filter_on':0
     },
     {
       'description':'ОКПО',
       'name':'okpo',
       'type':'text',
-      'filter_on':1
+      'filter_on':0
     },
 ]

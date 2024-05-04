@@ -8,6 +8,8 @@ def permissions(form):
     form.title='Расторжения НС "Ревизор"'
   elif entity=='14':
     form.title='Расторжения BzInfo'
+  elif entity=='18':
+    form.title='Расторжения ФАС-сервис'
   elif not(form.id):
     form.errors.append('Неузвестное значение entity')
   

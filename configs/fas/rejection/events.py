@@ -1,6 +1,7 @@
 from lib.core import exists_arg
 
 def permissions(form):
+  #form.explain=1
   entity = exists_arg('cgi_params;entity',form.R)
   if entity=='6':
     form.title='Уклонения РегРФ'
@@ -8,6 +9,8 @@ def permissions(form):
     form.title='Уклонения НС "Ревизор"'
   elif entity=='15':
     form.title='Уклонения BzInfo'
+  elif entity=='17':
+    form.title='Уклонения Фас-сервис'
   elif not(form.id):
     form.errors.append('Неузвестное значение entity')
   form.QUERY_SEARCH_TABLES=[ # перенёс в permissions

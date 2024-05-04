@@ -54,7 +54,6 @@ def get_table_for_manager(form, _type, manager_id, ts):
                 tr.type=%s and tr.ts>=%s and tr.ts<=%s and tr.manager_id=%s
         """,
         values=[_type, f"{ts} 00:00:00",f"{ts} 23:59:59",manager_id],
-        debug=1
 
     )
     get_comments(form, lst)

@@ -42,4 +42,10 @@ fields=[
       'tablename':'m',
       'filter_on':1
     },
+    {
+      'description':'Добавочный номер',
+      'name':'extension',
+      'type':'text',
+      'filter_on':1
+    }
 ]

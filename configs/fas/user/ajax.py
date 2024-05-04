@@ -1,8 +1,8 @@
-def brand_id(form,v):
+async def brand_id(form,v):
   brand_id=v['brand_id']
   after_html=''
   if brand_id:
-    brand=form.db.query(
+    brand = await form.db.query(
       query='SELECT * from brand where id=%s',
       values=[brand_id],
       onerow=1,
@@ -15,11 +15,11 @@ def brand_id(form,v):
   
   return ['brand_id',{'after_html':after_html}]
 
-def region_id(form,v):
+async def region_id(form,v):
   region_id=v['region_id']
   result=[]
   
-  region = form.db.query(
+  region = await form.db.query(
     query='select if(timeshift>0,concat("+",timeshift), timeshift) ts from region where region_id=%s',
     values=[region_id],
 
@@ -35,7 +35,7 @@ def region_id(form,v):
   if city_id=='0': return result
   
   # если регион поменялся и город в этом регионе отсутствует, тогда город обнуляем
-  city=form.db.query(
+  city = await form.db.query(
     query="select city_id from city where city_id=%s and region_id=%s",
     values=[city_id,region_id],onevalue=1
   )
@@ -47,14 +47,14 @@ def region_id(form,v):
 
   return result
 
-def city_id(form,v):
+async def city_id(form,v):
   city_id=v['city_id']
   
   if city_id=='0': return [] # для исключения цикличных запросов
 
   region_id=0
   if city_id:
-    region_id=form.db.query(
+    region_id = await form.db.query(
       query='select region_id from city where city_id=%s',
       values=[city_id],
       onevalue=1
@@ -65,16 +65,17 @@ def city_id(form,v):
     return ['region_id',{'value':str(region_id) }]  
   else:
     return []
-def inn(form,v):
+
+async def inn(form,v):
   result=[]
   inn=v['inn']
 
   if not(form.id) and (len(inn)==10 or len(inn)==12):
     # если нет id и inn 10 или 12 цифр, то проверяем, не создана ли та же картах в рамках этого бренда
     if group_id:=form.manager['group_id']:
-      if brand_id:=form.db.query(query="select brand_id from manager_group where id=%s",values=[group_id],onevalue=1 ):
+      if brand_id:=await form.db.query(query="select brand_id from manager_group where id=%s",values=[group_id],onevalue=1 ):
         # В рамках бренда запрещено создавать карту с тем же ИНН
-        exists=form.db.query(
+        exists=await form.db.query(
           query="select firm,id from user where inn=%s and brand_id=%s",
           values=[inn,brand_id],
           onerow=1

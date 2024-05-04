@@ -6,7 +6,7 @@ from base64 import b64decode
 def session_project_create(s): # создание сессии для проекта
     pass
 
-def session_create(s,**arg):
+async def session_create(s,**arg):
 
   errors=[]
   if not(exists_arg('login',arg)):
@@ -47,7 +47,7 @@ def session_create(s,**arg):
       add_where += ' AND '+arg['where']
 
   if exists_arg('max_fails_login',auth) and exists_arg('max_fails_login_interval',auth):
-      fails=db.query(
+      fails=await db.query(
         query=f'select count(*) from {auth["session_fails_table"]} where login=%s and registered>=now() - interval %s second',
         values=[arg['login'],auth['max_fails_login_interval']],
         onevalue=True,
@@ -58,7 +58,7 @@ def session_create(s,**arg):
   
   # проверяем, сколько было попыток зайти с данного ip под данным паролем
   if exists_arg('max_fails_ip',auth) and exists_arg('max_fails_login_interval',auth):
-      fails=s.db.query(
+      fails=await s.db.query(
         query=f'select count(*) from {auth["session_fails_table"]} where ip=%s and registered>=now() - interval %s second',
         values=[arg['ip'],auth['max_fails_ip_interval']],
         onevalue=True,
@@ -72,19 +72,19 @@ def session_create(s,**arg):
   auth_id=None
 
   if auth['encrypt_method']=='mysql_sha2':
-      auth_id=s.db.query(
+      auth_id=await s.db.query(
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=sha2(%s,256)'+add_where,
         values=[arg['login'],arg['password']],
         onevalue=True,
       )
   elif auth['encrypt_method']=='mysql_encrypt':
-      auth_id=s.db.query(
+      auth_id=await s.db.query(
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=encrypt(%s,password)'+add_where,
         values=[arg['login'],arg['password']],
         onevalue=True,
       )
   else:
-      auth_id=s.db.query(
+      auth_id=await s.db.query(
           query="SELECT "+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=%s '+add_where,
           values=[arg['login'], arg['password']],
           onevalue=True
@@ -98,7 +98,7 @@ def session_create(s,**arg):
 
     key=gen_pas(200)
 
-    db.save(
+    await db.save(
       table=auth['session_table'],
       data={
         'auth_id':auth_id,
@@ -215,8 +215,8 @@ def session_logout(s):
 
 
 
-def project_get_permissions_for(form,login):
-  manager=form.db.query(
+async def project_get_permissions_for(form,login):
+  manager=await form.db.query(
       query="""
         SELECT 
           m.*,
@@ -263,8 +263,8 @@ def child_groups(db,group_id):
 
 
 
-def get_permissions_for(form,login):
-  manager=form.db.query(
+async def get_permissions_for(form,login):
+  manager=await form.db.query(
     query="""
         SELECT 
           m.*,
@@ -279,12 +279,12 @@ def get_permissions_for(form,login):
     """,
     values=[login],onerow=1,log=form.log
   )
+
   #manager['id']=str(manager['id'])
-  
   if manager and manager['password']:
     del manager['password']
   
-  permissions_list=form.db.query(
+  permissions_list=await form.db.query(
     query='''
       SELECT 
         p.pname, mp.permissions_id id
@@ -293,17 +293,19 @@ def get_permissions_for(form,login):
         LEFT JOIN manager_permissions mp ON p.id = mp.permissions_id and mp.manager_id = %s
       order by p.pname
     ''',
-    #debug=1,
+
     values=[manager['id']]
   );
+
   manager['permissions']={};
   for p in permissions_list:
       manager['permissions'][p['pname']]=p['id']
 
   manager['CHILD_GROUPS_HASH']={}
+
   if manager['group_id']:
     group_id=int(manager['group_id'])
-    gr_perm_list=form.db.query(
+    gr_perm_list=await form.db.query(
       query="""
         SELECT
           p.id, p.pname
@@ -317,7 +319,7 @@ def get_permissions_for(form,login):
     for p in gr_perm_list:
         manager['permissions'][p['pname']]=p['id']
     
-    
+    print('gpf5')
     manager['CHILD_GROUPS']=child_groups(form.db,[group_id])
 
     for g_id in manager['CHILD_GROUPS']:

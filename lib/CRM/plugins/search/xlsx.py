@@ -12,11 +12,11 @@ config={
 }
 
 
-def before_search(form):
+async def before_search(form):
     if form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
         
         form.not_perpage=1
-def after_search(form):
+async def after_search(form):
     if form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
         filename=form.config+'_'+form.manager['login']+'.xlsx'
         full_path='files/tmp/'+filename

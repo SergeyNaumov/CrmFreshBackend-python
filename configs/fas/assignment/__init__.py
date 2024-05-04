@@ -34,7 +34,8 @@ form={
             'header_field':'name',
             'value_field':'id',
             'tablename':'m',
-            'filter_on':1
+            'filter_on':1,
+            'where':'gone=0'
             
         },
         {

@@ -1,9 +1,9 @@
-from lib.core import get_triade
+from lib.core import get_triade, join_ids
 from .get_values import get_values
 
 def permissions(form):
     form.ov=None
-    form.is_admin=True
+    form.is_admin=False
 
     perm=form.manager['permissions']
     #form.pre(perm)
@@ -12,6 +12,9 @@ def permissions(form):
         form.read_only=False
         form.make_delete=True
     
+    # if form.manager['login']=='buh':
+    #     form.explain=True
+    #     form.pre(form.manager)
     if form.id:
         form.ov=get_values(form)
 
@@ -22,8 +25,26 @@ def permissions(form):
 def before_search(form):
     # BEFORE SEARCH
     qs=form.query_search
+    manager=form.manager ; perm=manager['permissions']
+
+    #form.pre(perm)
     on_filters_hash=qs.get('on_filters_hash')
-    if on_filters_hash and on_filters_hash.get('paid_summ'):
+
+    if not(perm.get('admin_paids') or perm.get('view_all_paids') or form.is_admin):
+        
+        # если это не менеджер платежей и не админ
+        if manager['is_owner'] and len(manager['CHILD_GROUPS']):
+            # Руководитель
+            group_ids=join_ids(manager['CHILD_GROUPS'])
+            qs['WHERE'].append(f"(m.group_id in ({group_ids}) )")
+
+        else:
+            # Менеджер
+            manager_id=manager['id']
+            qs['WHERE'].append(f"(wt.manager_id={manager_id})")
+
+    #form.pre(qs)
+    if on_filters_hash and 'paid_summ' in on_filters_hash:
         tables="\n".join(qs['TABLES'])
         where=''
         if len(qs['WHERE']):

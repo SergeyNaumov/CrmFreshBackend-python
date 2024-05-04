@@ -1,6 +1,6 @@
 from lib.core import get_name_and_ext, exists_arg
 import re
-def edit_form_process_fields(form):
+async def edit_form_process_fields(form):
 
   for f in form.fields:
     # для новой формы очищаем поля

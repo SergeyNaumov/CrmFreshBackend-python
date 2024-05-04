@@ -19,7 +19,7 @@ def get_values(form,field):
   else:
     return []
 
-def save(form,field,new_values):
+async def save(form,field,new_values):
   old_values=get_values(form,field)
   old_values_hash={}
   for ov in old_values:
@@ -44,7 +44,7 @@ def save(form,field,new_values):
   # сохраняем то, чего ещё нет
   for v in new_values:
     if not v in old_values_hash:
-      form.db.save(
+      await form.db.save(
         table=field['relation_save_table'],
         ignore=1,
         data={

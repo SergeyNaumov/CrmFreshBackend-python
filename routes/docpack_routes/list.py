@@ -1,8 +1,8 @@
 from lib.core import join_ids
-def action_list(form,field):
+async def action_list(form,field):
         #field=form.fields_hash[field_name]
         
-        lst=form.db.query(
+        lst=await form.db.query(
             query=f"""
                 select
                     dp.id, dp.ur_lico_id, dp.tarif_id, t.header tarif, ul.firm ur_lico, dp.registered, m.name manager,
@@ -30,14 +30,14 @@ def action_list(form,field):
             
             query=f"select * from dogovor where docpack_id in ({join_ids(id_list)}) ORDER BY registered desc"
             
-            dogovor_list=form.db.query(
+            dogovor_list = await form.db.query(
                 query=f"select * from dogovor where docpack_id in ({join_ids(id_list)}) ORDER BY registered desc",
                 #debug=1
             )
             #print('dogovor_list:',dogovor_list)
             
             for dp in lst:
-                dp['cnt_bill']=form.db.query(
+                dp['cnt_bill'] = await form.db.query(
                     query='select count(*) from bill where docpack_id=%s',
                     values=[dp['id']],
                     errors=form.errors,

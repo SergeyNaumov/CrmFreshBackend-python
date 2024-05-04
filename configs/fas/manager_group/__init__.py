@@ -35,6 +35,12 @@ form={
             'value_field':'id'
         },
         {
+            'description':'Группа Юристов',
+            'type':'checkbox',
+            'name':'lawers',
+
+        },
+        {
           'before_code': permissions_before_code,
           'description':'Права учётной записи',
           'add_description':'для юрлиц и аптек',

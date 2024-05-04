@@ -64,7 +64,6 @@ def search(form, R):
         result=form.db.query(
             query=query,
             values=values,
-            debug=1,
             #log=log
         )
         managers_hash={}
@@ -151,7 +150,6 @@ def search(form, R):
 #        GROUP BY tr.manager_id
 #        ORDER BY m.name""",
 #        values=[_type, f"{ts} 00:00:00",f"{ts} 23:59:59",],
-        #debug=1,
         #error=form.errors
 #    )
     #print(query)

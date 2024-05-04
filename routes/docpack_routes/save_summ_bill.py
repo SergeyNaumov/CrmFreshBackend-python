@@ -1,10 +1,11 @@
 from lib.core import exists_arg
-def save_summ_bill(form,field, R):
+async def save_summ_bill(form,field, R):
+  #print('save_summ_bill!')
   bill_id=R.get('bill_id')
   summ=R.get('summ')
 
   if not( len(form.errors)):
-    bill=form.db.query(
+    bill=await form.db.query(
       query="select * from bill where id=%s",
       values=[bill_id],
       onerow=1
@@ -12,7 +13,7 @@ def save_summ_bill(form,field, R):
 
 
     if bill:
-      form.db.query(
+      await form.db.query(
         query="UPDATE bill set summ=%s where id=%s",
         values=[summ,bill_id]
       )

@@ -9,6 +9,6 @@ from .tab.stat import fields as fields_stat
 fields= fields_links + \
 		fields_main + \
 		fields_stat + \
-		fields_sale  + \
+		fields_sale + \
 		fields_paids  + \
 		fields_docpack

@@ -6,7 +6,6 @@ def brand_id(form,v):
       query='SELECT * from brand where id=%s',
       values=[brand_id],
       onerow=1,
-      debug=1
     )
     if brand:
       after_html=f"<img src='/files/logo/{brand['logo']}'>"

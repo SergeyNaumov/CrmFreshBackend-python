@@ -55,14 +55,14 @@ def get_email_list_from_manager_id(db, to: dict):
 
 
 
-def child_groups(**arg):
+async def child_groups(**arg):
 	list_hash={}
 	db=arg['db']
 	if exists_arg('group_id',arg):
 		if isinstance(arg['group_id'], int):
 			list_hash[arg['group_id']]=1
 
-			_list=db.query(
+			_list = await db.query(
 				query='select id from manager_group where parent_id=%s',
 				values=[arg['group_id']],
 				massive=1
@@ -74,13 +74,13 @@ def child_groups(**arg):
 			for g in arg['group_id']:
 				list_hash[g]=1
 				#print('g:',g)
-				_list=child_groups(db=arg['db'],group_id=g)
+				_list = await child_groups(db=arg['db'],group_id=g)
 				if _list:
 					for gl in _list:
 						list_hash[gl]=1
 	return list(list_hash.keys())
 
-def get_manager(**arg):
+async def get_manager(**arg):
 	where=[]
 	values=[]
 	if exists_arg('login',arg):
@@ -123,7 +123,7 @@ def get_manager(**arg):
 	#print('ERRORS:',errors, exists_arg('errors',arg), arg)
 	#quit()
 
-	m=db.query(
+	m = await db.query(
 		**args_for_query
 	)
 	
@@ -132,10 +132,10 @@ def get_manager(**arg):
 
 	# роль
 	if m and exists_arg('use_role',m) and m['current_role']:
-		m=get_manager(id=m['current_role'],db=arg['db'])
+		m=await get_manager(id=m['current_role'],db=arg['db'])
 
 	# руководитель?
-	m['owner']=db.query(
+	m['owner'] = await db.query(
 		query=f'SELECT id from manager_group where owner_id={m["id"]}',
 		onevalue=1
 	)
@@ -143,9 +143,9 @@ def get_manager(**arg):
 
 	if exists_arg('child_groups',arg) or exists_arg('use_role',arg):
 		if m['owner']:
-			m['CHILD_GROUPS']=child_groups(db=db,group_id=m['owner'])
+			m['CHILD_GROUPS'] = await child_groups(db=db,group_id=m['owner'])
 		elif m['group_id']:
-			m['CHILD_GROUPS']=child_groups(db=db,group_id=m['group_id'])
+			m['CHILD_GROUPS'] = await child_groups(db=db,group_id=m['group_id'])
 
 	# получаем права менеджера
 	if True and exists_arg('options_hash',arg):
@@ -162,12 +162,12 @@ def get_manager(**arg):
 
 
 
-def get_owner(**arg):
+async def get_owner(**arg):
 	db=arg['db']
 	cur_manager=exists_arg('cur_manager',arg)
 	
 	if not(cur_manager) and arg['manager_id']:
-		cur_manager=get_manager(
+		cur_manager=await get_manager(
 			id=arg['manager_id'],
 			db=db,
 			include_gone=exists_arg('include_gone',arg)
@@ -178,7 +178,7 @@ def get_owner(**arg):
 		for group_id in list(reversed(path.split('/'))):
 
 			if not(group_id): next
-			r=db.query(
+			r=await db.query(
 				query=f'''
 					SELECT
 						m.id, m.name, m.group_id, m.phone, mg.id group_owner, me.email

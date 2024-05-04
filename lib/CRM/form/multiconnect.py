@@ -1,11 +1,11 @@
-def get_values(form,field):
+async def get_values(form,field):
   if form.id:
     select_fields=field["relation_save_table_id_relation"]
     #print(field);
     #if form.read_only or ('read_only' in field and field['read_only']):
     #  select_fields+=', 1 read_only '
     #print('select_fields:',select_fields)
-    res=form.db.query(
+    res = await form.db.query(
       query=f"""
         SELECT
           {select_fields}
@@ -25,8 +25,8 @@ def get_values(form,field):
   else:
     return []
 
-def save(form,field,new_values):
-  old_values=get_values(form,field)
+async def save(form,field,new_values):
+  old_values = await get_values(form,field)
   old_values_hash={}
   new_values=[str(x) for x in new_values]
   for ov in old_values:
@@ -37,7 +37,7 @@ def save(form,field,new_values):
   if values_joined:
     add_where=f' AND {field["relation_save_table_id_relation"]} not in ({values_joined})'
   
-  form.db.query(
+  await form.db.query(
     query=f"""
       DELETE
       FROM
@@ -52,7 +52,7 @@ def save(form,field,new_values):
   # сохраняем то, чего ещё нет
   for v in new_values:
     if not v in old_values_hash:
-      form.db.save(
+      await form.db.save(
         table=field['relation_save_table'],
         ignore=1,
         #debug=1,
@@ -62,4 +62,4 @@ def save(form,field,new_values):
         }
       )
 
-  form.run_event('after_save_multiconnect')
+  await form.run_event('after_save_multiconnect')

@@ -2,6 +2,7 @@ from lib.core import cur_date, join_ids
 from lib.core_crm import child_groups
 from datetime import datetime
 from config import config
+from pprint import pprint
 # получаем комментарии для списка
 
 
@@ -11,19 +12,21 @@ def search(form, R):
     log=[]
     form.errors.append('111')
 
-    where=[]
+    where=[] ; where_records=[]
     values=[]
 
     registered=filters.get('registered','').split(' ')[0]
 
     if registered:
 
-        where.append('( (um.registered>=%s and um.registered<=%s) and  (r.date>=%s and r.date<=%s) )')
+        where.append('( (um.registered>=%s and um.registered<=%s) )')
+        where_records.append('( (r.date>=%s and r.date<=%s) )')
+
         # um.registered>='2024-02-08 00:00:00' and um.registered<='2024-02-08 23:59:59' and r.date>='2024-02-08 00:00:00' and r.date<='2024-02-08 23:59:59'
-        values.append(f"{registered} 00:00:00")
-        values.append(f"{registered} 23:59:59")
-        values.append(f"{registered} 00:00:00")
-        values.append(f"{registered} 23:59:59")
+        #values.append(f"{registered} 00:00:00")
+        #values.append(f"{registered} 23:59:59")
+        #values.append(f"{registered} 00:00:00")
+        #values.append(f"{registered} 23:59:59")
 
     # фильтр "менеджер"
     manager_id=filters.get('manager_id',[])
@@ -35,6 +38,7 @@ def search(form, R):
 
         if len(manager_list):
             where.append(f"m.id IN ({join_ids(manager_list)})")
+            where_records.append(f"m.id IN ({join_ids(manager_list)})")
 
     #фильтр "группа"
     group_id=filters.get('group_id',[])
@@ -45,6 +49,7 @@ def search(form, R):
         #log.append({'hash':group_hash})
         if len(group_list):
             where.append(f"m.group_id IN ({join_ids(group_list)})")
+            where_records.append(f"m.group_id IN ({join_ids(group_list)})")
 
     result_list=[]
     accordion_data=[]
@@ -53,31 +58,117 @@ def search(form, R):
 
     if registered:
         # Комментарии с записями
+        # query=f"""
+        #     select
+        #         u.id user_id, u.firm, m.name, hour(um.registered) hour, um.registered, um.body,
+        #         uc.phone, if(uc.fio,uc.fio,'') contact_name,
+        #         group_concat( concat(time(r.date),';',r.download_link,';',if(r.direction='OUTBOUND','исх','вх'),';',r.duration) SEPARATOR ';;;' ) records,
+        #         um.id um_id
+        #     from
+        #         user_memo um
+        #         join manager m ON m.id=um.manager_id
+        #         join user u ON u.manager_id=m.id and um.user_id=u.id
+        #         LEFT join beeline_records r ON r.manager_id=m.id and (r.date>=%s and r.date<=%s)
+        #         join user_contact uc ON uc.user_id=u.id and uc.phone=r.phone
+        #     WHERE
+        #         {' AND '.join(where)}
+        #     GROUP BY um.id
+        #     ORDER BY um.registered
+        # """
+
+        # #print('query:',query)
+        # result=form.db.query(
+        #     query=query,
+        #     values=values,
+        #     #debug=1,
+        #     #log=log
+        # )
+
         query=f"""
             select
                 u.id user_id, u.firm, m.name, hour(um.registered) hour, um.registered, um.body,
-                uc.phone, if(uc.fio,uc.fio,'') contact_name,
-                group_concat( concat(time(r.date),';',r.download_link,';',if(r.direction='OUTBOUND','исх','вх'),';',r.duration) SEPARATOR ';;;' ) records
+                '' phone, '' contact_name,
+                group_concat(uc.phone) phones, unix_timestamp(um.registered) ts
             from
-                manager m
-                join user u ON u.manager_id=m.id
-                join user_memo um ON um.user_id=u.id and um.manager_id=m.id
-                join user_contact uc ON uc.user_id=u.id
-                LEFT join beeline_records r ON r.manager_id=m.id and r.phone=uc.phone and (r.date>=%s and r.date<=%s)
+                user_memo um
+                join manager m ON m.id=um.manager_id
+                join user u ON u.manager_id=m.id and um.user_id=u.id
+                left join user_contact uc ON uc.user_id=u.id
             WHERE
-                (um.registered>=%s and um.registered<=%s)
+                {' AND '.join(where)}
             GROUP BY um.id
             ORDER BY um.registered
         """
 
-
+        # Комментарии без записей
         result=form.db.query(
             query=query,
-            values=values,
+            values=[f"{registered} 00:00:00", f"{registered} 23:59:59"],
             #debug=1,
             #log=log
         )
+        all_phones=[]
 
+        phone_dict={} # список item-ов для memo, привязанных к телефону
+
+        for memo_item in result:
+            memo_item['records']=[]
+            if memo_item['phones']:
+                memo_item['phones']=memo_item['phones'].split(',')
+                for p in memo_item['phones']:
+                    if p:
+                        if not phone_dict.get(p):
+                            phone_dict[p]=[]
+
+                        all_phones.append(p)
+                        phone_dict[p].append(memo_item)
+            else:
+                memo_item['phones']=[]
+
+            #print(memo_item)
+
+
+        if len(all_phones):
+            # Дёргаем звонки
+            where_records.append(f"""r.phone in ("{'","'.join(all_phones)}")""")
+            #print('where_records:',where_records)
+            records=form.db.query(
+                query=f"""
+                    SELECT
+                        r.id, concat('',time(r.date)) registered, if(r.direction='OUTBOUND','исх','вх') direction,
+                        r.duration, r.download_link src, r.phone, uc.fio,
+                        unix_timestamp(r.date) ts
+                    from
+                        manager m
+                        join beeline_records r ON r.manager_id=m.id
+                        join user_contact uc on uc.phone=r.phone
+                    WHERE {' AND '.join(where_records)} GROUP BY r.id
+
+                """,
+                #debug=1,
+                values=[f"{registered} 00:00:00", f"{registered} 23:59:59"],
+            )
+            for rec in records:
+                #print('r:',r)
+                if memo_items:=phone_dict[rec['phone']]:
+                    # Здесь получаем список всех записей из memo, привязанных к телефону
+                    min_ts=10000 ; act_item=None
+                    for mitem in memo_items:
+                        cur_ts=abs(rec['ts'] - mitem['ts'])
+
+                        if cur_ts < min_ts:
+                            min_ts=cur_ts
+                            act_item=mitem
+
+                    if act_item:
+                        act_item['records'].append(rec)
+
+
+                    #print(memo_item)
+
+
+
+        #print('result ok')
         # result_comments=form.db.query(
         #     query=f"""
         #         select
@@ -108,7 +199,7 @@ def search(form, R):
             prev_hour=-1
             j=0
             for r in result:
-                records=[]
+                #records=[]
                 #print(r)
                 if prev_hour != r['hour']:
                     r['new_hour']=1
@@ -118,26 +209,13 @@ def search(form, R):
                     r['new_hour']=0
 
                 r['j']=j
-                if not(r['records']):
-                    r['records']=''
 
-                for i in r['records'].split(';;;'):
-                    i=i.split(';')
-                    if len(i)>2:
 
-                        records.append({
-                            'id':rid,
-                            'registered':i[0],
-                            'src':i[1],
-                            'direction':i[2],
-                            'duration':i[3]
-                        })
-                        rid+=1
-
-                r['records']=records
                 j+=1
 
+            #pprint(result[0:10])
 
+            #print('END result')
             result_list.append(
                 {
                     'type':'html',
@@ -210,11 +288,11 @@ def search(form, R):
 
     }
 
-    
+
 
 def permissions(form):
     ...
-    
+
 form={
         'title':'Комментарии и звонки',
         'filters':[
@@ -247,6 +325,6 @@ form={
         },
         #'javascript':"""window.toggle=(sel)=>{el=document.querySelector(sel);if(el){el.style.display=(el.style.display=='none')?'':'none'};return false}"""
 
-    
+
 }
 

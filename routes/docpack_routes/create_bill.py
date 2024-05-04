@@ -1,6 +1,6 @@
 from lib.core import exists_arg
 from .get_bills import get_bills
-def action_create_bill(form,field,R):
+async def action_create_bill(form,field,R):
   lst=[]
   summ=exists_arg('summ',R)
   comment=exists_arg('comment',R)
@@ -13,7 +13,7 @@ def action_create_bill(form,field,R):
   if not(docpack_id):
     form.errors.append('отсутствует параметр dogovor_id')
   else:
-    docpack=form.db.query(
+    docpack=await form.db.query(
       query="SELECT * from docpack where id=%s",
       values=[docpack_id],
       onerow=1
@@ -31,7 +31,7 @@ def action_create_bill(form,field,R):
 
 
 
-      (number_today,number_bill)=field['bill_number_rule'](form, field, docpack['ur_lico_id'])
+      (number_today,number_bill)=await field['bill_number_rule'](form, field, docpack['ur_lico_id'])
       if not(comment): comment=''          
             
       data={
@@ -51,6 +51,6 @@ def action_create_bill(form,field,R):
         table='bill',
         data=data,
       );
-      lst=get_bills(form,field,R);
+      lst=await get_bills(form,field,R);
 
   return {'success':form.success(),'errors':form.errors, 'list':lst}

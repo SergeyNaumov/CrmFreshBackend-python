@@ -26,8 +26,8 @@ from .response_doc import response_doc
                 b.number bill_number,
                 DATE_FORMAT(b.registered,%s) bill_from, b.summ bill_summ
 """
-def load_act(act_id,ext:str,need_print: int, debug=0):
-    dp = db.query(
+async def load_act(act_id,ext:str,need_print: int, debug=0):
+    dp = await db.query(
         query=f'''
             SELECT
                 bcr.*,

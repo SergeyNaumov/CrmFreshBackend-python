@@ -10,10 +10,10 @@ from .one_to_m_routine.delete_record import delete_record
 from .one_to_m_routine.upload_file import upload_file
 from .one_to_m_routine.get_slide_data import get_slide_data
 from .one_to_m_routine.delete_file import *
-def process_one_to_m(**arg):
+async def process_one_to_m(**arg):
   R={}
   if exists_arg('R',arg): R=arg['R']
-  form=read_config(
+  form = await read_config(
     action=exists_arg('action',arg),
     config=exists_arg('config',arg),
     id=exists_arg('id',arg),
@@ -28,23 +28,23 @@ def process_one_to_m(**arg):
     return {'success':0,errors:'имя поля не указано или указано не верно'}
 
   if form.action in ['insert','update']:
-    return insert_or_update(form,field,arg)
+    return await insert_or_update(form,field,arg)
 
   elif form.action == 'update_field':
-    return update_field(form,field,arg)
+    return await update_field(form,field,arg)
 
   elif form.action == 'sort':
-    return slide_sort(form,field)
+    return await slide_sort(form,field)
 
   elif form.action == 'delete':
-    return delete_record(form,field,arg)
+    return await delete_record(form,field,arg)
 
   elif form.action == 'upload_file':
     
-    return upload_file(form,field,arg)
+    return await upload_file(form,field,arg)
   
   elif form.action == 'get_slide_data': # Получение данных слайда
-    return get_slide_data(form,field)
+    return await get_slide_data(form,field)
 
   elif form.action == 'delete_file':
     child_field=None
@@ -54,6 +54,6 @@ def process_one_to_m(**arg):
         break
 
 
-    return delete_file(form,field,child_field, arg.get('one_to_m_id'))
+    return await delete_file(form,field,child_field, arg.get('one_to_m_id'))
 
 

@@ -1,8 +1,6 @@
 import re
 from lib.core import exists_arg, tree_to_list
-def get_values_for_select_from_table(form,f,debug=False):
-
-
+async def get_values_for_select_from_table(form,f,debug=False):
   if not exists_arg('value_field',f):
     f['value_field'] = 'id'
   
@@ -11,9 +9,7 @@ def get_values_for_select_from_table(form,f,debug=False):
   
   select_fields=f'{f["value_field"]} v, {f["header_field"]} d'
   
-  #if f['name']=='domain_id':
-  #    print('F:',f)
-  #    print(f'SF: ',select_fields)
+
   if exists_arg('tree_use',f):
     select_fields+=', parent_id'
 
@@ -62,11 +58,13 @@ def get_values_for_select_from_table(form,f,debug=False):
   
 
   lst=[]
-
+  #print(f"{f['name']}: 000")
   if exists_arg('list',f) and len(f['list']):
+
     _lst = f['list']
   else:
-    lst=form.db.query(
+
+    lst=await form.db.query(
       query=query,
       errors=form.errors,
 
@@ -78,6 +76,7 @@ def get_values_for_select_from_table(form,f,debug=False):
     if not len(lst): lst=[]
     if form.script not in ('admin_table','find_objects'):
       lst.insert(0,{'v':'0','d':'выберите значение'})
+
     # else:
     #   _list.append({'v':'0','d':'выберите значение'})
 
@@ -100,7 +99,10 @@ def get_values_for_select_from_table(form,f,debug=False):
         else:
           tree_list.append(l)
       lst=[]
+
       tree_to_list(tree_list,lst,0)
 
   
+  #print(f"{f['name']}: 002")
+
   return lst

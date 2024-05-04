@@ -1,4 +1,4 @@
-def permission(form):
+async def permission(form):
     perm=form.manager['permissions']
     if not(perm['brand']):
         form.errors.append('Доступ запрещён')
@@ -6,14 +6,14 @@ def permission(form):
     #if form.manager['login']!='admin':
     #    form.errors.append('Доступ запрещён')
 
-def events_permission2(form):
+async def events_permission2(form):
     pass
 
-def events_before_code(form):
+async def events_before_code(form):
     #print('is_before_code')
     pass
 
-def before_delete(form):
+async def before_delete(form):
     pass
     #form.errors.append('Вам запрещено удалять!')
 

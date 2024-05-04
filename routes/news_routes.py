@@ -26,7 +26,6 @@ async def post_actions(config:str, R:dict): #
         'video_id':R['id'],
         'ts':'func:(now())'
       },
-      #debug=1
     )
 
     return {
@@ -70,12 +69,10 @@ async def news_videos(config:str, limit: int = 0): #
             enabled=1 and registered<=curdate() order by reg desc limit {limit}
         ''',
         values=['%d.%m.%Y'],
-        debug=1
       )
     else:
       data_list=form.db.query(
         query=f'select * from {form.work_table} order by registered desc' ,
-        #debug=1,
         #table=config,
         #order='sort',
         #where='parent_id is null',        

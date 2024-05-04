@@ -51,6 +51,24 @@ fields=[
       'name': 'summa',
       'filter_on':1
     },
+    {
+      'description':'Организация',
+      'type':'filter_extend_text',
+      'name':'firm',
+      'tablename':'u',
+      'filter_on':1
+    },
+    {
+      'description':'Юр. лицо',
+      'type':'filter_extend_select_from_table',
+      'name':'ur_lico_id',
+      'table':'ur_lico',
+      'tablename':'ul',
+      'header_field':'firm',
+      'value_field':'id',
+      'db_name':'id',
+      'filter_on':1
+    },
 #    {
     #   'description':'Организация',
     #   'type':'filter_extend_text',

@@ -20,7 +20,7 @@ async def wysiwyg_upload(
 ): # 
 
 
-  return wysiwyg_process(
+  return await wysiwyg_process(
     action='upload',
     path=path,
     file=file,
@@ -41,7 +41,7 @@ async def wysiwyg_upload(
 ): # 
 
   #print('path:',path)
-  return wysiwyg_process(
+  return await wysiwyg_process(
     action='upload',
     path=path,
     file=file,
@@ -53,7 +53,7 @@ async def wysiwyg_upload(
 
 @router.post('/wysiwyg/{config}/{field_name}')
 async def wysiwyg1(config:str,field_name:str,R:dict):
-  return wysiwyg_process(
+  return await wysiwyg_process(
     config=config,
     field_name=field_name,
     script='wysiwyg',
@@ -62,7 +62,7 @@ async def wysiwyg1(config:str,field_name:str,R:dict):
 
 @router.post('/wysiwyg/{config}/{field_name}/{id}')
 async def wysiwyg2(config:str,field_name:str,id:int,R:dict):
-  return wysiwyg_process(
+  return await wysiwyg_process(
     config=config,
     field_name=field_name,
     id=id,
@@ -73,7 +73,7 @@ async def wysiwyg2(config:str,field_name:str,id:int,R:dict):
 # опции инициализации
 @router.get('/wysiwyg/{config}/{field}/init_options')
 async def wysiwyg_init_options(config:str,field:str):
-  form=read_config(
+  form = await read_config(
     script='wysiwyg', config=config,
     R={},
   )
@@ -100,7 +100,7 @@ async def wysiwyg_init_options(config:str,field:str):
 # загрузка шаблона в wysiwyg
 @router.get('/wysiwyg/load-template/{config}/{field}/{template_id}')
 async def load_template(config:str,field:str,template_id:int):
-  form=read_config(
+  form = await read_config(
     script='wysiwyg', config=config,
     R={},
   )

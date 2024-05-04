@@ -2,8 +2,8 @@
 #    form.pre(d)
 from lib.CRM.plugins.search.xlsx import go as init_search_plugin
 from lib.core import exists_arg
-def events_permissions(form):
-    #form.pre(form.manager)
+async def events_permissions(form):
+
     #return 
     if ('superadmin' in form.manager['permissions']) or (form.manager['login']=='admin'):
       form.is_admin=1
@@ -30,7 +30,7 @@ def events_permissions(form):
 
 
     if form.id:
-      ov=form.db.query(
+      ov=await form.db.query(
         query="select * from manager where id=%s",
         values=[form.id],
         onerow=1
@@ -42,7 +42,7 @@ def events_permissions(form):
 
       
 
-def before_search(form):
+async def before_search(form):
   qs=form.query_search
   #form.pre('email' in qs['on_filters_hash'])
   # Фильтр email включен - добавляем в результаты
@@ -53,10 +53,10 @@ def before_search(form):
   #qs['SELECT_FIELDS'].append('if(wt.type=4, uf.header ,group_concat(u.header SEPARATOR "; ")) ur_lico_list')
   #form.explain=1
 
-def events_before_code(form):
+async def events_before_code(form):
     pass
 
-def before_delete(form):
+async def before_delete(form):
     pass
 
 events={

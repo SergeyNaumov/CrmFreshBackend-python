@@ -1,4 +1,4 @@
-from lib.core import exists_arg
+from lib.core import exists_arg, join_ids
 from lib.send_mes import send_mes
 from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 
@@ -41,10 +41,11 @@ def get_old_values(form):
                   mg.header mg__header, mg.id m__group_id,
                   m_oso.id m_oso__id, m_oso.email m_oso__email, m_oso.group_id m_oso__group_id,
                   ( wt.product in (9,14,15) and wt.dat_session<>'0000-00-00' and date(wt.dat_session)<=curdate() and wt.win_status=0) block_card,
-                  mfg.owner_id mfg__owner, mgu.owner_id mgu__owner, mgu.id mgu__id
+                  mfg.owner_id mfg__owner, mgu.owner_id mgu__owner, mgu.id mgu__id, if(b.header is null,'',b.header) brand
                 FROM
                   teamwork_ofp wt
                   LEFT JOIN user u ON (u.id=wt.user_id)
+                  LEFT JOIN brand b ON u.brand_id=b.id
                   LEFT JOIN manager mf ON (mf.id=wt.manager_from)
                   LEFT JOIN manager_group mfg ON mfg.id=mf.group_id
                   LEFT JOIN manager mt ON (mt.id=wt.manager_to)
@@ -90,9 +91,14 @@ def permissions(form):
     #return
 
   get_old_values(form)
+  # Админ ОФП
+  if form.manager['login'] in ('admin', 'akulov','sed','pzm'):
+    form.is_admin=True
 
+  #form.pre({'is_admin':form.is_admin})
   #form.pre({'ov':form.ov['firm']})
   if form.ov:
+
     if form.ov['mgu__owner']==form.manager['id']:
       #form.pre(['ow',form.ov['mgu__owner'],form.manager['id']])
       form.is_group_owner=True
@@ -103,9 +109,6 @@ def permissions(form):
     #print('CHILD_GROUPS_HASH:',form.manager['CHILD_GROUPS_HASH'])
 
 
-    # Админ ОФП
-    if form.manager['login'] in ('admin', 'akulov','sed','pzm'):
-      form.is_admin=True
 
     # Менеджер
     if form.ov['manager_from']==form.manager['id'] or (form.ov['manager_from_group'] in form.manager['CHILD_GROUPS_HASH'] ) :
@@ -148,11 +151,21 @@ def before_update(form):
 
     subject=f"Создана карточка совместной работы: {form.ov['firm']}, ИНН: {form.ov['inn']}"
     message=f"{form.manager['name']} назначил(а) Вас юристом в карточке <a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{form.id}'>{form.ov['firm']}</a>"
-    to_hash={manager_id: 1}
+    to_hash={
+      manager_id: 1,
+      7576: 1 # pzm
+    }
+
+    if manager_from:=form.ov.get('mf__id'):
+      to_hash[manager_from]=1
+      manager=get_manager( id=manager_from, db=form.db)
+      if owner:=get_owner(cur_manager=manager,db=form.db):
+        to_hash[owner['id']]=1
+
 
     manager=get_manager( id=manager_id, db=form.db)
-    owner=get_owner(cur_manager=manager,db=form.db)
-    if owner:
+
+    if owner:=get_owner(cur_manager=manager,db=form.db):
       to_hash[owner['id']]=1
 
     to=get_email_list_from_manager_id(form.db, to_hash)
@@ -168,18 +181,65 @@ def before_update(form):
   if values:
     old_manager_to=0
     old_manager_to2=0
+    old_group_id=0
     if form.ov:
       old_manager_to=form.ov['manager_to']
       old_manager_to2=form.ov['manager_to2']
+      old_group_id=form.ov['group_id']
 
     new_manager_to=values['manager_to']
     new_manager_to2=values['manager_to2']
+    new_group_id=values['group_id']
+
     #print(f"new_manager_to: {new_manager_to} ; old_manager_to: {old_manager_to}")
     if new_manager_to and int(new_manager_to)!=old_manager_to:
       send_lawer_mes(int(new_manager_to))
 
     if new_manager_to2 and int(new_manager_to2)!=old_manager_to2:
       send_lawer_mes(int(new_manager_to2))
+
+    if new_group_id and int(new_group_id)!=old_group_id:
+      lower_group=form.db.query(
+        query="select header, owner_id from manager_group where id=%s",
+        values=[new_group_id],
+        onerow=1,
+      )
+      if lower_group:
+        subject=f"Изменена группа юристов: {form.ov['firm']}, ИНН: {form.ov['inn']}"
+        message=f"Только что <b>{form.manager['name']}</b> установил(а) группу юристов <b>{lower_group['header']}</b><br>"+\
+        f"В карте ОФП: <a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{form.id}'>{form.ov['firm']}</a>"
+        #print(subject)
+        #print(message)
+        to_hash={
+          7576: 1 # pzm
+        }
+
+        #print('manager_op:',form.ov['manager_from'])
+        if manager_op:=form.ov['manager_from']:
+          # менеджер ОП
+          to_hash[manager_op]=1
+
+          if owner_op:=get_owner(manager_id=manager_op,db=form.db):
+            to_hash[owner_op['id']]=1
+
+        #if owner:=get_owner(manager_id=manager,db=form.db):
+        #  to_hash[owner['id']]=1
+        # руководитель группы юристов
+        if lower_group['owner_id']:
+          to_hash[lower_group['owner_id']]=1
+
+        to=get_email_list_from_manager_id(form.db, to_hash)
+        if len(to):
+          send_mes(
+            from_addr='info@fascrm.ru',
+            to=','.join(to.keys()),
+            subject=subject,
+            message=message
+          )
+        #print('to:',to)
+        #if owner:=get_owner(cur_manager=manager,db=form.db):
+        #form.pre({'lower_group':lower_group})
+
 
 def after_save(form):
   manager_id=exists_arg('values;manager_id', form.R)
@@ -197,12 +257,28 @@ def after_save(form):
   #form.errors.append('test')
 
 def before_search(form):
-
+  manager=form.manager
   user_id=exists_arg('cgi_params;user_id',form.R)
+  qs=form.query_search
+
   if user_id:
-    qs=form.query_search
+    
     qs['WHERE'].append(f'wt.user_id={user_id}')
 
+  if not(form.is_admin) and not(manager['permissions'].get('lawer')):
+    # Если это не админ и не юрист  
+    if manager['is_owner'] and len(manager['CHILD_GROUPS']):
+      # Если это руководитель
+      group_ids=join_ids(manager['CHILD_GROUPS'])
+
+      qs['WHERE'].append(f"(mf.group_id in ({group_ids}) or m.group_id in ({group_ids}))")
+    else:
+      # Если это менеджер
+      manager_id=manager['id']
+      qs['WHERE'].append(f"(wt.manager_from={manager_id} or u.manager_id={manager_id})")
+    
+
+  #form.pre(form.manager)
   #form.pre(qs['WHERE'])
   #firm=exists_arg('on_filters_hash;firm',form.query_search)
 

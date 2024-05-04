@@ -38,7 +38,7 @@ fields=[
       'tablename':'m',
       'header_field':'name',
       'value_field':'id',
-      'db_name':'id',
+      #'db_name':'id',
       'where':'id in (select manager_id from beeline_abonent)',
       'filter_on':1
     },

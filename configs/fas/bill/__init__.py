@@ -14,6 +14,7 @@ form={
     'make_delete':0,
     'read_only':1,
     'ajax':ajax,
+    #'explain':0,
     'cols':[
               [
                 {

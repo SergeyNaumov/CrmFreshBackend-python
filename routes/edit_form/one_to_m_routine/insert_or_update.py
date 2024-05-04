@@ -2,7 +2,7 @@ from lib.core import exists_arg
 from lib.get_1_to_m_data import normalize_value_row, get_1_to_m_data
 from .get_data import get_data
 
-def insert_or_update(form,field,arg):
+async def insert_or_update(form,field,arg):
     R=form.R
     field['values']=[]
     if not exists_arg('values',R) or not len(R['values']):
@@ -24,27 +24,27 @@ def insert_or_update(form,field,arg):
 
       # INSERT
       if form.action=='insert':
-        form.run_event('before_insert_code',{'field':field,'data':data})
-        form.run_event('before_save_code',{'field':field,'data':data})
+        await form.run_event('before_insert_code',{'field':field,'data':data})
+        await form.run_event('before_save_code',{'field':field,'data':data})
 
         if form.success():
-          data[field['table_id']]=form.db.save(
+          data[field['table_id']] = await form.db.save(
             table=field['table'],
             data=data,
             errors=form.errors,
           )
           field['_id']=data[field['table_id']]
-          form.run_event('after_insert_code',{'field':field,'data':data})
-          form.run_event('after_save_code',{'field':field,'data':data})    
+          await form.run_event('after_insert_code',{'field':field,'data':data})
+          await form.run_event('after_save_code',{'field':field,'data':data})
 
       elif form.action=='update':
         data[field['table_id']]=arg['one_to_m_id']
-        form.run_event('before_update_code',{'field':field,'data':data})
-        form.run_event('before_save_code',{'field':field,'data':data})
+        await form.run_event('before_update_code',{'field':field,'data':data})
+        await form.run_event('before_save_code',{'field':field,'data':data})
         
         if form.success():
 
-          form.db.save(
+          await form.db.save(
             table=field['table'],
             where=f'{field["foreign_key"]}={foreign_key_value} and {field["table_id"]}={arg["one_to_m_id"]}',
             update=1,
@@ -52,9 +52,8 @@ def insert_or_update(form,field,arg):
             data=data,
           )
 
-          data=form.db.query(
+          data = await form.db.query(
             query=f'SELECT * from {field["table"]} WHERE {field["table_id"]}=%s',
-            debug=1,
             values=[arg["one_to_m_id"]]
           )
           #print('data0:',data)
@@ -66,10 +65,10 @@ def insert_or_update(form,field,arg):
           field['values']=data
 
           field['_id']=arg["one_to_m_id"]
-          form.run_event('after_update_code',{'field':field,'data':data})
-          form.run_event('after_save_code',{'field':field,'data':data})
+          await form.run_event('after_update_code',{'field':field,'data':data})
+          await form.run_event('after_save_code',{'field':field,'data':data})
 
-      get_1_to_m_data(form,field)
+      await get_1_to_m_data(form,field)
 
       return {
         'success':form.success(),

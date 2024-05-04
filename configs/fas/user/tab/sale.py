@@ -1,7 +1,7 @@
 from .beeline_records import *
 from datetime import datetime
 
-def memo_before_out_tags(form,data):
+async def memo_before_out_tags(form,data):
     #print('data:',data)
     today=datetime.now().date()
     manager_id=form.manager.get('id')
@@ -24,8 +24,9 @@ fields=[
             'header_field':'name',
             'value_field':'id',
             'tab':'sale',
-            'make_change_in_search':1,
+            #'make_change_in_search':True,
             'read_only':True,
+            'where':"gone=0",
             'filter_on':True
         },
         {
@@ -89,22 +90,6 @@ fields=[
             'type':'textarea',
             'tab':'sale'
         },
-        # {
-        #     'description':'ОТК',
-        #     'name':'otk',
-        #     'type':'checkbox',
-        #     'read_only':True,
-        #     #'before_code':otk_before_code,
-        #     'tab':'sale',
-        # },
-        # {
-        #     'description':'ДТ2',
-        #     'name':'dt2',
-        #     'type':'checkbox',
-        #     'read_only':True,
-        #     #'before_code':dt2_before_code,
-        #     'tab':'sale',
-        # },
         {
             'description':'Презентация заявки',
             'name':'prez_order',

@@ -4,7 +4,7 @@ def contact_date_before_code(form,field):
         field['type']='date'
 
 
-def links_before_code(form,field):
+async def links_before_code(form,field):
     
     if not(form.action == 'edit' and form.id):
         return
@@ -12,9 +12,8 @@ def links_before_code(form,field):
     field['after_html']=f'<div><a href="/edit_form/user/{form.id}?action=create_ofp_card" target="_blank">Создать карту ОФП</a></div>'
 
     # вывод карт ОФП в блоке ссылок
-    ofp=form.db.query(
+    ofp = await form.db.query(
         query=f"select teamwork_ofp_id id,count(*) cnt from teamwork_ofp where user_id={form.id} limit 1",
-        debug=1,
         onerow=1
     )
     #form.pre({'ofp':ofp})
@@ -26,10 +25,10 @@ def links_before_code(form,field):
         
             
 
-def firm_filter_code(form,field,row):
+async def firm_filter_code(form,field,row):
     return f"<a href='/edit_form/user/{row['wt__id']}' target='_blank'>{row['wt__firm']}</a>"
 
-def kladr_after_search(data):
+async def kladr_after_search(data):
     i=0
     list=[]
     if not data:
@@ -49,20 +48,20 @@ def kladr_after_search(data):
         list.append({'header':h})
     return list
 
-def dt2_before_code(form,field):
+async def dt2_before_code(form,field):
     if exists_arg('admin_dt2', form.manager['permissions']):
         field['read_only']=False
 
-def otk_before_code(form,field):
+async def otk_before_code(form,field):
     if exists_arg('admin_otk', form.manager['permissions']):
         field['read_only']=False
 
-def archive_before_code(form,field):
+async def archive_before_code(form,field):
     # Доступ к галке "в архиве" у руководителя, либо у того, у кого есть соответствующая галка
     if (form.id and form.is_owner_group) or form.manager['permissions'].get('archive_in_card_op'):
         field['read_only']=0
 
-def brand_id_before_code(form,field):
+async def brand_id_before_code(form,field):
 
     if form.manager['permissions']['user_change_brand']:
         # может менять бренд в картах ОП
@@ -71,19 +70,23 @@ def brand_id_before_code(form,field):
     if form.action=='new' and form.script=='edit_form' and len(form.manager_brand)>1:
         field['value']=form.manager_brand[1]
 
-def manager_id_before_code(form,field):
+async def manager_id_before_code(form,field):
+
+    #return
     perm=form.manager['permissions']
-    #field['read_only']=True
     if perm['card_op_make_change_manager']:
         field['read_only']=0
+        field['make_change_in_search']=True
 
+    #form.pre(form.manager)
     # Если это руководитель:
     if form.ov:
-        if form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
-            field['read_only']=0
+        if form.manager.get('is_owner') and form.manager['CHILD_GROUPS_HASH'].get(form.ov['group_id']):
+            field['read_only']=False
+            field['make_change_in_search']=True
             # даём возможность выбрать менеджера только из своей группы
             if len(form.manager['CHILD_GROUPS']):
-                field['where']=f"group_id in ({join_ids(form.manager['CHILD_GROUPS'])})"
+                field['where']=f"gone=0 and group_id in ({join_ids(form.manager['CHILD_GROUPS'])})"
 
     #form.pre(form.ov)
     #form.pre(form.manager)

@@ -33,7 +33,7 @@ async def ajax_get(config:str,ajax_name:str):
 async def ajax(config:str,ajax_name:str,R: dict):
   success=1
   errors=[]
-  form=read_config(
+  form=await read_config(
     script='ajax', config=config,
     R=R,
     id=R['id']
@@ -41,7 +41,7 @@ async def ajax(config:str,ajax_name:str,R: dict):
   result=[];
   
   if exists_arg(ajax_name,form.ajax):
-    result = form.ajax[ajax_name](form,R.get('values'))
+    result = await form.ajax[ajax_name](form,R.get('values'))
   else:
     errors.append(f'не найден ajax-контроллер с именем: {ajax_name} обратитесь к разработчику')
   

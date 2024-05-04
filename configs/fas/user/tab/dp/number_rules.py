@@ -1,6 +1,6 @@
-def dogovor_number_rule(form,field, ur_lico_id):
+async def dogovor_number_rule(form,field, ur_lico_id):
 
-    prefix=form.db.query(
+    prefix = await form.db.query(
         query="select prefix from ur_lico where id=%s",
         values=[ur_lico_id],
         onevalue=1
@@ -16,7 +16,7 @@ def dogovor_number_rule(form,field, ur_lico_id):
             dp.ur_lico_id=%s and d.registered=curdate()
     """
 
-    item=form.db.query(
+    item = await form.db.query(
         query=query,
         values=['%d%m%y',ur_lico_id],
         onerow=1,
@@ -34,16 +34,16 @@ def dogovor_number_rule(form,field, ur_lico_id):
 
     return dogovor_number,number_today;
 
-def bill_number_rule(form,field,ur_lico_id):
+async def bill_number_rule(form,field,ur_lico_id):
 
     #my $company_role=($form->{old_values}->{company_role}==2)?'З':'П';
-    prefix=form.db.query(
+    prefix = await form.db.query(
         query="select prefix from ur_lico where id=%s",
         values=[ur_lico_id],
         onevalue=1
     )
 
-    item=form.db.query(
+    item = await form.db.query(
       query='''
         SELECT
             if(max(b.number_today),max(b.number_today)+1,1) number_today,
@@ -67,14 +67,14 @@ def bill_number_rule(form,field,ur_lico_id):
 
     return number_today, bill_number
 
-def act_number_rule(form,field,registered, ur_lico_id):
-    prefix=form.db.query(
+async def act_number_rule(form,field,registered, ur_lico_id):
+    prefix = await form.db.query(
         query="select prefix from ur_lico where id=%s",
         values=[ur_lico_id],
         onevalue=1
     )
 
-    item=form.db.query(
+    item = await form.db.query(
       query='''
         SELECT
             if(max(a.number_today),max(a.number_today)+1,1) number_today,

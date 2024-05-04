@@ -1,4 +1,4 @@
-def links_before_code(form,field):
+async def links_before_code(form,field):
     
     if not(form.action == 'edit' and form.id):
         return
@@ -6,9 +6,8 @@ def links_before_code(form,field):
     field['after_html']=f'<div><a href="/edit_form/user/{form.id}?action=create_ofp_card" target="_blank">Создать карту ОФП</a></div>'
 
     # вывод карт ОФП в блоке ссылок
-    ofp=form.db.query(
+    ofp = await form.db.query(
         query=f"select teamwork_ofp_id id,count(*) cnt from teamwork_ofp where user_id={form.id} limit 1",
-        debug=1,
         onerow=1
     )
     #form.pre({'ofp':ofp})

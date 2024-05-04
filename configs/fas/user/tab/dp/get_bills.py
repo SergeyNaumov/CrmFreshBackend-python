@@ -1,9 +1,9 @@
-def get_bills(form,field, R):
+async def get_bills(form,field, R):
 
   docpack_foreign_key=field['docpack_foreign_key']
   lst=[]
   if R.get('dogovor_id'):
-      lst=form.db.query(
+      lst = await form.db.query(
         query=f"""
           SELECT
               b.*

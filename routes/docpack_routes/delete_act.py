@@ -1,6 +1,6 @@
 from lib.core_crm import get_manager, get_owner
 from lib.core import exists_arg
-def action_delete_act(form,field,R):
+async def action_delete_act(form,field,R):
 
   act_id=exists_arg('act_id',R)
   db=form.db
@@ -12,20 +12,20 @@ def action_delete_act(form,field,R):
   
 
   if form.success():
-    act=db.query(
+    act=await db.query(
       query="SELECT * from act where id=%s",
       values=[act_id],
       onerow=1
     )
     if act:
       # менежер акта
-      act_manager=get_manager(db=db, id=act['manager_id'])
+      act_manager=await get_manager(db=db, id=act['manager_id'])
       #print('act_manager:',act_manager, act['manager_id'])
 
       # руководитель менеджера акта
       act_owner=None
       if act['manager_id']:
-        act_owner=get_owner(db=db, manager_id=act['manager_id'])
+        act_owner=await get_owner(db=db, manager_id=act['manager_id'])
 
       make_delete=False
       if act_manager and act_manager['id']==form.manager['id']:
@@ -43,7 +43,7 @@ def action_delete_act(form,field,R):
         make_delete=False
 
       if make_delete:
-        db.query(
+        await db.query(
           query='delete from act where id=%s',
           values=[act_id]
         )

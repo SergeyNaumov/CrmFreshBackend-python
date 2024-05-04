@@ -14,8 +14,8 @@ def get_values_for_select_from_table(f,form):
 @router.post('/get-filters/{config}')
 async def get_filters_controller(config: str, R:dict):
   response={}
-  #print('R0:',R)
-  form=read_config(
+
+  form=await read_config(
     config=config,
     R=R,
     script='admin_table'
@@ -32,8 +32,6 @@ async def get_filters_controller(config: str, R:dict):
   order=1
   
   for f in form.fields:
-    if f.get('name')=='brand_id':
-      print(f"{f['name']} {f.get('value')}")
     # if(ref($f->{before_code}) eq 'CODE'){
     #   run_event(event=>$f->{before_code},description=>'before_code for '.$f->{name},form=>$form,arg=>$f);
     # }
@@ -58,7 +56,7 @@ async def get_filters_controller(config: str, R:dict):
         f['values']=get_values_for_select_from_table(f,form)
 
     elif f['type']=='memo':
-      f['users']=form.db.query(
+      f['users']=await form.db.query(
         query='SELECT '+f['auth_id_field']+' v, '+f['auth_name_field']+' d from '+f['auth_table']+' ORDER BY '+f['auth_name_field'],
         errors=form.log
       )

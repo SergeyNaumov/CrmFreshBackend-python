@@ -8,7 +8,7 @@ router = APIRouter()
 
 @router.get('/get/{config}/{field_name}/{id}')
 async def get_memo(config:str, field_name:str,id:int): # 
-  form=read_config(
+  form = await read_config(
     action='get',
     config=config,
     id=id,
@@ -26,7 +26,7 @@ async def get_memo(config:str, field_name:str,id:int): #
   
   if not len(errors):
 
-    data=form.db.query(
+    data = await form.db.query(
       query=f"""
         SELECT
           memo.{field['memo_table_id']} id, user.{field['auth_id_field']} user_id,
@@ -45,7 +45,7 @@ async def get_memo(config:str, field_name:str,id:int): #
 
 
     if 'before_out_tags' in field:
-      field['before_out_tags'](form,data)
+      await field['before_out_tags'](form,data)
 
     for d in data:
       d['date']=date_to_rus(d['date'])
@@ -67,7 +67,7 @@ async def get_memo(config:str, field_name:str,id:int): #
 
 @router.post('/add/{config}/{field_name}/{id}')
 async def get_memo(config:str, field_name:str,id:int, R:dict): 
-  form=read_config(
+  form = await read_config(
     action='add',
     config=config,
     id=id,
@@ -90,13 +90,13 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
         field['memo_table_auth_id']:form.manager['id'],
         field['memo_table_comment']:R['message']
     }
-    memo_id=form.db.save(
+    memo_id = await form.db.save(
       table=field['memo_table'],
       data=data
     )
     data['id']=memo_id
 
-    form.run_event('after_add',{'field':field,'data':data})
+    await form.run_event('after_add',{'field':field,'data':data})
 
   success=1
   if len(form.errors): success=0
@@ -129,7 +129,7 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
 # Обновление записи
 @router.post('/update/{config}/{field_name}/{id}/{memo_id}')
 async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
-  form=read_config(
+  form = await read_config(
     config=config,
     id=id,
     #R=R,
@@ -145,7 +145,7 @@ async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
     errors.append('вы не можете изменить эту запись')
 
   if not len(errors) and 'message' in R and R['message']:
-    form.db.query(
+    await form.db.query(
       query=f"""
         UPDATE
           {field['memo_table']}
@@ -175,7 +175,7 @@ async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
 
 @router.get('/delete/{config}/{field_name}/{id}/{memo_id}')
 async def delete_from_memo(config:str, field_name:str,id:int, memo_id:int):
-  form=read_config(
+  form = await read_config(
     action='delete',
     config=config,
     id=id,
@@ -189,7 +189,7 @@ async def delete_from_memo(config:str, field_name:str,id:int, memo_id:int):
     errors.append('вы не можете удалить эту запись')
 
   if not len(errors):
-    form.db.query(
+    await form.db.query(
       query=f"""
         DELETE FROM {field['memo_table']} WHERE {field['memo_table_id']}=%s and {field['memo_table_foreign_key']}=%s
       """,

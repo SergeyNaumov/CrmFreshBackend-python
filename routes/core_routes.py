@@ -8,7 +8,7 @@ from lib.session import *
 router = APIRouter()
 @router.get('/test')
 async def test():
-  return {'okay':s.db.query(query="SELECT * from managers where login='naumov'",onerow=1)}
+  return {'okay':await s.db.query(query="SELECT * from managers where login='naumov'",onerow=1)}
 
 # Левое меню по-умолчанию
 @router.get('/left-menu')
@@ -19,25 +19,25 @@ async def leftmenu():
   left_menu=[]
 
   if(config['use_project']):
-      manager=s.db.query(
+      manager=await s.db.query(
         query=f'select *,concat("/edit_form/project_manager/",{config["auth"]["manager_table_id"]}) link from project_manager where project_id=%s and login=%s',
         values=[s.project_id,s.login]
       )
       manager_menu_table='project_manager_menu'
-      left_menu=s.db(
+      left_menu=await s.db(
         query='SELECT * from '+manager_menu_table+'  order by sort',
         errors=errors,
         tree_use=1
       )
   else:
       
-      manager=s.db.query(
+      manager=await s.db.query(
         query=f"select *,concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link from {config['auth']['manager_table']} where login=%s",
         values=[s.login],
         onerow=1,
       )
       
-      manager['permissions']=s.db.query(
+      manager['permissions']=await s.db.query(
         query='SELECT permissions_id from manager_permissions where manager_id=%s',
         values=[manager['id']],
         massive=1
@@ -54,7 +54,7 @@ async def leftmenu():
       if len(manager['permissions']):
         perm_str=','.join(manager['permissions'])
 
-      left_menu=s.db.query(
+      left_menu=await s.db.query(
         query="""
           SELECT
             mm.*,group_concat(concat(mmp.permission_id,':',denied) SEPARATOR ';') perm
@@ -96,17 +96,20 @@ async def startpage():
   manager=None
   manager_menu_table=None
   left_menu=[]
+  print(111)
   if hasattr(s,'login'):
+
     if(config['use_project']):
-        manager=s.db.query(
+        print(222)
+        manager=await s.db.query(
           query=f'select *,concat("/edit_form/project_manager/",{config["auth"]["manager_table_id"]}) link from project_manager where project_id=%s and login=%s',
           values=[s.project_id,s.login]
         )
         manager_menu_table='project_manager_menu'
 
     else:
-        
-        manager=s.db.query(
+        print(333)
+        manager=await s.db.query(
           query=f"select *,concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link from {config['auth']['manager_table']} where login=%s",
           values=[s.login],
           onerow=1,
@@ -130,7 +133,7 @@ async def startpage():
   if config['auth']['use_roles'] and manager['current_role']:
     
 
-    if role_login:=s.db.query(
+    if role_login:=await s.db.query(
       query=f"select {auth['auth_log_field']} from {auth['manager_table']} where {auth['manager_table_id']}=%s",
       values=[manager['current_role']],
       onevalue=1

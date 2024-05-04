@@ -3,18 +3,17 @@ from lib.get_1_to_m_data import get_1_to_m_data
 from .get_values_for_select_from_table import get_values_for_select_from_table
 
 
-def get_in_ext_url(form,f):
+async def get_in_ext_url(form,f):
   print('get_in_ext_url не готова')
 
-def func_get_values(form):
-
+async def func_get_values(form):
     values={}
+
     if(hasattr(form,'values')):
       values=form.values
-    
 
     if form.id:
-      values=form.db.getrow(
+      values=await form.db.getrow(
         table=form.work_table,
         where=f'{form.work_table_id}=%s',
         values=[form.id],
@@ -63,6 +62,7 @@ def func_get_values(form):
           if f['type']=='datetime' and values[name]=='0000-00-00 00:00:00':
             values[name]=''    
       
+
       set_from_nv=True
       if form.script=='edit_form' and (form.action in ('new')) and ('value' in f ):
         #print('f:',f)
@@ -80,7 +80,7 @@ def func_get_values(form):
             f['values']=get_values_for_select_from_table(form,f)
             
       if f['type'] == '1_to_m':
-        get_1_to_m_data(form,f)
+        await get_1_to_m_data(form,f)
 
 
       # Если это 1_to_1
@@ -102,12 +102,13 @@ def func_get_values(form):
         table=f.get('save_table')
         if form.id:
           if not(table in tables_1_to_1):
-            tables_1_to_1[table]={
-              'foreign_key': f['foreign_key'],
-              'values':form.db.query(
+            values=await form.db.query(
                 query=f"select * from {f.get('save_table')} WHERE {f.get('foreign_key')}={form.id}",
                 onerow=1
-              )
+            )
+            tables_1_to_1[table]={
+              'foreign_key': f['foreign_key'],
+              'values':values
             }
 
           cur_values=tables_1_to_1[table]['values']
@@ -118,7 +119,7 @@ def func_get_values(form):
 
 
       if f['type']=='get_in_ext_url':
-        get_in_ext_url(form,f)
+        await get_in_ext_url(form,f)
         #values[name]=f['value']
 
 
@@ -133,15 +134,16 @@ def func_get_values(form):
 
 
 # Получаем значения для select_from_table, 1_to_m
-def func_get_fields_values(form):
+async def func_get_fields_values(form):
   form.set_orig_types()
   for f in form.fields:
+
     if f['type'] == '1_to_m':
-      get_1_to_m_data(form,f)
+      await get_1_to_m_data(form,f)
 
     elif f['type']=='get_in_ext_url':
-      get_in_ext_url(form,f)
+      await get_in_ext_url(form,f)
     elif exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
-
-      f['values']=get_values_for_select_from_table(form,f)
-      
+      #print(f"name: {f['name']}")
+      f['values'] = await get_values_for_select_from_table(form,f)
+      #print(f)

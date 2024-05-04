@@ -21,8 +21,8 @@ def requisits_after_save(form,field,data=None):
     #    values=[form.id],
     #    onevalue=1
     #)
-    #print('field:',field)
-    #print('VALUES:',field['values'])
+    print('field:',field)
+    print('VALUES:',field['values'])
 
     
     data=field['values']
@@ -33,7 +33,6 @@ def requisits_after_save(form,field,data=None):
               form.db.query(
                   query=f"UPDATE {field['table']} SET main=0 where {field['foreign_key']}={form.id} and id<>{d['id']}",
                   values=[],
-                  debug=1
               )
 
 

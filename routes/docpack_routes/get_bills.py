@@ -1,12 +1,12 @@
 from lib.core import exists_arg
-def get_bills(form,field, R):
+async def get_bills(form,field, R):
   if optional_sub:=field.get('get_bills'):
-    return optional_sub(form,field,R)
+    return await optional_sub(form,field,R)
 
   docpack_foreign_key=field['docpack_foreign_key']
   lst=[]
   if exists_arg('dogovor_id',R):
-      lst=form.db.query(
+      lst=await form.db.query(
         query=f"""
           SELECT
               b.*
@@ -26,6 +26,6 @@ def get_bills(form,field, R):
     form.errors.append('отсутствует параметр dogovor_id')
   return lst
 
-def action_get_bills(form,field, R):
-  lst=get_bills(form,field, R)
+async def action_get_bills(form,field, R):
+  lst = await get_bills(form,field, R)
   return {'success':form.success(),'errors':form.errors, 'list':lst}

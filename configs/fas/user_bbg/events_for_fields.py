@@ -48,6 +48,7 @@ def memo_after_add(form,field,data):
     if len(list(manager_dict.keys())):
       #print('manager_dict:',manager_dict)
       to=get_email_list_from_manager_id(form.db, manager_dict)
+      to['dmn@reg-rf.pro']=True
       message=f"Только что {form.manager['name']} добавил комментарий: {data.get('body')}<br>"+\
       f"в карту ББГ: <a href='{form.s.config['system_url']}edit_form/user_bbg/{form.id}'>{firm}</a>"
 

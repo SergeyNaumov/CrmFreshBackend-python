@@ -3,7 +3,7 @@ from lib.CRM.form.get_values_for_select_from_table import get_values_for_select_
 #from lib.CRM.form.run_event import run_event
 import re
 
-def normalize_value_row(form,field,d):
+async def normalize_value_row(form,field,d):
   for cf in field['fields']:
       c_name=cf['name']
       filedir=''
@@ -48,7 +48,7 @@ def normalize_value_row(form,field,d):
               d['preview_img']=fdir+'/'+attach_name
           d[c_name+'_filename']=filename
       if exists_arg('slide_code',cf):
-        d[c_name]=form.run_event('slide_code',{'field':cf,'data':d})
+        d[c_name]=await form.run_event('slide_code',{'field':cf,'data':d})
 
 
 
@@ -56,13 +56,13 @@ def normalize_value_row(form,field,d):
 
 
 
-def get_1_to_m_data(form,f,id=None):
+async def get_1_to_m_data(form,f,id=None):
   #print('f:',f)
   if not exists_arg('fields',f): f['fields']=[]
 
   for cf in f['fields']:
       if cf['type'] == 'select_from_table':
-          cf['values']=get_values_for_select_from_table(form,cf)
+          cf['values']=await get_values_for_select_from_table(form,cf)
       
   headers=[]
   for c in f['fields']:
@@ -110,7 +110,7 @@ def get_1_to_m_data(form,f,id=None):
         where+=f' AND {f["table_id"]}={id}'
     
       #query=f'SELECT * from {f["table"]} {where} {order'
-      data=form.db.get(
+      data=await form.db.get(
         table=f["table"],
         where=where,
         order=order,
@@ -123,7 +123,7 @@ def get_1_to_m_data(form,f,id=None):
       #element_fields={}
       for d in data:
         #print('f:',f,"\nD:",d)
-        normalize_value_row(form,f,d)
+        await normalize_value_row(form,f,d)
         
         f['values'].append(d)
   else:

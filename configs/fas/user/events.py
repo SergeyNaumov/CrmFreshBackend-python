@@ -5,15 +5,18 @@ from .filters_for_manager_op import prepare_filters_for_manager_op
 from .find_inn_doubles import prepare_filters_for_find_inn_doubles
 from .components_actions import components_actions
 
-def permissions(form):
+async def permissions(form):
+  form.ov={}
 
   R=form.R ; db=form.db ; manager=form.manager
-
+  #if form.manager['login']=='admin':
+  #  form.explain=1
+    #form.pre(form.manager)
   # Здесь собираем ограничения
   add_where=[]
 
   # Смотрим, какой бренд у группы менеджера
-  manager_group=db.query(
+  manager_group = await db.query(
     query="select * from manager_group where id=%s",
     values=[form.manager['group_id']], #
     onerow=1
@@ -23,8 +26,8 @@ def permissions(form):
   manager_brand=[0]
   if manager_group and manager_group['brand_id']:
       manager_brand.append(manager_group['brand_id'])
-
-  for brand_id in (db.query(query=f"select brand_id from manager_brand where manager_id={manager.get('id')}",massive=1)):
+  brand_list = await db.query(query=f"select brand_id from manager_brand where manager_id={manager.get('id')}",massive=1)
+  for brand_id in brand_list:
       if not(brand_id in manager_brand):
         manager_brand.append(int(brand_id))
 
@@ -73,10 +76,10 @@ def permissions(form):
   if len(add_where):
     form.add_where=' AND '.join(add_where)
 
-  form.ov={}
+
   if form.id:
 
-      form.ov=db.query(
+      form.ov = await db.query(
         query=f"""
           SELECT
             u.*, m.group_id
@@ -86,6 +89,7 @@ def permissions(form):
           WHERE u.id={form.id}""",
         onerow=1
       )
+      print('ov:',form.ov)
       # Для работы компонентов (статистика и т.п.)
       components_actions(form)
 
@@ -135,7 +139,7 @@ def permissions(form):
   if form.action in ('new', 'insert'):
       form.read_only=0
 
-def after_insert(form):
+async def after_insert(form):
   set_str=[]
   #print('after_insert!!!')
 
@@ -150,7 +154,7 @@ def after_insert(form):
 
 
   if len(set_str):
-    form.db.query(
+    await form.db.query(
       query=f"UPDATE user set {', '.join(set_str)} where id=%s",
       values=[form.id],
       #errors=form.errors,
@@ -158,7 +162,7 @@ def after_insert(form):
       #debug=1
     )
 
-def before_search(form):
+async def before_search(form):
   qs=form.query_search
   #form.pre(qs)
 

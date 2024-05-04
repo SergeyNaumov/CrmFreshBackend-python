@@ -9,11 +9,18 @@ def get_fields():
       
       'type':'text',
       'filter_on':1,
-
+      #regexp':'^[a-zA-Z\-_0-9\.\@]+$',
+      # filter_code=>sub{
+      #   my $e=shift;
+      #   my $login=$e->{str}->{wt__login};
+      #   $login=~s{([^a-zA-Z\-_0-9\.\@]+)}{<span style="color: red;">$1</span>}gs;
+      #   return $login;
+      # },
+      #'read_only':1,
       'unique':1,
       'regexp_rules':[
         '/.{3}/','длина логина должна быть не менее 3 символов',
-
+        #'/^[a-zA-Z0-9\.\-_@\/]+$/','только символы: a..z,A..Z, 0-9, _, -, @, .'
       ],
       'frontend':{'ajax':{'name':'login','timeout':600}},
       'tab':'main'
@@ -110,6 +117,12 @@ def get_fields():
       ]
     },
     {
+      'description':'Сохранять запись',
+      'type':'checkbox',
+      'name':'cloud_ats',
+      'tab':'main'
+    },
+    {
         'description':'фото',
         'type':'file',
         
@@ -140,6 +153,7 @@ def get_fields():
       'name':'name',
       'description':'ФИО',
       'type':'text',
+      #'read_only':1,
       'tab':'main',
       'regexp_rules':[
           '/^.+$/','Полное имя обязательно для заполнения',
@@ -165,7 +179,6 @@ def get_fields():
     {
        'description':'Доступные роли',
        'name':'access_roles',
-       'tab':'permissions',
        'type':'1_to_m',
        'cols':2,
        'table':'manager_role',
@@ -197,9 +210,28 @@ def get_fields():
       'before_code':current_role_before_code
     },
     {
+      'before_code': manager_brand_access_before_code,
+      'description':'Дополнительный доступ к брендам (по умолчанию задаётся в карте группы)',
+      'type':'multiconnect',
+      'tree_use':False,
+      'tree_table':'permissions',
+      'name':'manager_brand_access',
+      'tablename':'p',
+      'cols':3,
+      'relation_table':'brand',
+      'relation_save_table':'manager_brand',
+      'relation_table_header':'header',
+      'relation_save_table_header':'header',
+      'relation_table_id':'id',
+      'relation_save_table_id_worktable':'manager_id',
+      'relation_save_table_id_relation':'brand_id',
+      'tab':'permissions',
+      #'not_order':1,
+      #'read_only':1
+    },
+    {
       'before_code': permissions_before_code,
       'description':'Права учётной записи',
-      'add_description':'для юрлиц и аптек',
       'type':'multiconnect',
       'tree_use':1,
       'tree_table':'permissions',
@@ -266,16 +298,10 @@ def get_fields():
 def ur_lico_id_filter_code(form,field,row):
   return row["ur_lico_list"]
   
-def anna_manager_id_filter_code(form,field,row):
-  if row['ma__id']:
-    return row['ma__name_f']+' '+row['ma__name_i']+row['ma__name_o']
-  else:
-    return 'не указан'
-
 def without_send(form,field,newpass):
     return 
 
-def send_new_password(form,field,newpass):
+async def send_new_password(form,field,newpass):
   #print('ov:',form.ov)
   #print('send: ',field,newpass)
   if form.ov['email']:
@@ -302,6 +328,8 @@ def permissions_before_code(**arg):
     field['read_only']=0
   
     
+def manager_brand_access_before_code(form,field):
+  ...
 
 def type_before_code(**arg):
   form=arg['form']
@@ -320,20 +348,24 @@ def enabled_before_code(**arg):
 
 def access_to_video_bc(form,field):
   if form.action=='new': field['value']=1
+
 def access_role_before_code(form,field):
   if form.manager['permissions'].get('manager_make_change_role'):
     field['read_only']=0
+    field['make_delete']=1
 #
-def current_role_before_code(form,field):
+async def current_role_before_code(form,field):
   field['read_only']=1
   
   if form.manager['permissions'].get('manager_make_change_role'):
     field['read_only']=0
-  ids=form.db.query(
+  ids = await form.db.query(
     query=f"select role from manager_role where manager_id={form.manager['id']}",
     massive=1,
     str=1
   )
+
+
   if len(ids):
     field['where']=f"id in ({','.join(ids)})"
   else:

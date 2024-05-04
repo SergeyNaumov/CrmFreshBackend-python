@@ -11,8 +11,8 @@ from .response_doc import response_doc
 
 
 
-def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
-	dp = db.query(
+async def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
+	dp = await db.query(
 		query=f'''
 			SELECT
 				bcr.*,

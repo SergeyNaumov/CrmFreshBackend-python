@@ -32,7 +32,7 @@ form={
       {'t':'teamwork_ofp','a':'wt'},
       {'t':'user','a':'u','l':'u.id=wt.user_id','lj':1, 'for_fields':['firm', 'inn', 'f_city','manager_id']},
       {'t':'manager_group','a':'mg','l':'mg.id=wt.group_id','lj':1, 'for_fields':['group_id']},
-      {'t':'manager','a':'m','l':'m.id=u.manager_id','lj':1, 'for_fields':['manager_id']},
+      {'t':'manager','a':'m','l':'m.id=u.manager_id','lj':1},
 
       {'t':'manager','a':'mf','l':'wt.manager_from=mf.id','lj':1, 'for_fields':['manager_from','managers_groups_name']},
       {'t':'manager','a':'mt','l':'wt.manager_to=mt.id','lj':1},

@@ -3,11 +3,10 @@ from lib.all_configs import read_config
 from lib.CRM.form.multiconnect import get_values
 
 
-def get_tag_id(form,header):
-    return form.db.query(
+async def get_tag_id(form,header):
+    return await form.db.query(
       query=f'SELECT {field["relation_table_id"]} FROM {field["relation_table"]} WHERE {field["relation_table_header"]}=%s',
       values=[R['header']],
-      debug=1,
       onevalue=1,
       errors=form.errors
     )
@@ -27,7 +26,7 @@ def check_defaults(form,field):
 
 
 
-def get(form,field):
+async def get(form,field):
   where=exists_arg('relation_table_where',field)
   if not where: where=''
   select_fields=''
@@ -46,28 +45,27 @@ def get(form,field):
   
   if 'query' in field and field['query']:
     #print('USE QUERY')
-    _list=form.db.query(
+    _list = await form.db.query(
       query=field['query']
     )
   else:
     #print('errors:',form.errors)
     #print('get begin')
-    _list=form.db.get(
+    _list = await form.db.get(
       select_fields=select_fields,
       table=field["relation_table"],
       where=where,
-      #debug=1,
       order=exists_arg('relation_tree_order',field),
       tree_use=exists_arg('tree_use',field),
       errors=form.errors
     )
   
   
-  value=get_values(form,field)
+  value = await get_values(form,field)
   
   return _list,value
 
-def multiconnect_process(**arg):
+async def multiconnect_process(**arg):
   R={}
   action=''
   id=''
@@ -79,7 +77,7 @@ def multiconnect_process(**arg):
   if 'field_name' in arg: field_name=arg['field_name']
   
   #print('R:',R)
-  form=read_config(
+  form = await read_config(
     script='multiconnect',
     config=arg['config'],
     action=action,
@@ -97,10 +95,10 @@ def multiconnect_process(**arg):
       if not R['header']:
         form.errors.append('новый тэг не указан')
       if form.success():
-        tag_id=get_tag_id(form,R['header'])
+        tag_id = await get_tag_id(form,R['header'])
 
       if not tag_id and form.success():
-        tag_id=form.db.save(
+        tag_id = await form.db.save(
           table=field["relation_table"],
           data={
             field['relation_table_header']:R['header']
@@ -113,12 +111,12 @@ def multiconnect_process(**arg):
         'log':form.log
       }
   elif action == 'autocomplete':
-      _list=form.db.query(
+      _list = await form.db.query(
           query=f'SELECT {field["relation_table_id"]} v, {field["relation_table_header"]} d FROM {field["relation_table"]} WHERE {field["relation_table_header"]} like %s',
           values=['%'+R["header"]+'%'],
           errors=form.errors
       )
-      exists_tag=get_tag_id(form,R["header"])
+      exists_tag = await get_tag_id(form,R["header"])
       return {
         'success':form.success,
         'list':_list,
@@ -127,7 +125,7 @@ def multiconnect_process(**arg):
         'log':form.log
       }
   elif action == 'get':
-    (_list,value) = get(form,field)
+    (_list,value) = await get(form,field)
     return {
         'success':form.success(),
         'list':_list,

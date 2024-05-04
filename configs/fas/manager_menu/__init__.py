@@ -51,6 +51,7 @@ form={
             {'v':'const','d':'const'},
             {'v':'parser-excel','d':'parser-excel'},
             {'v':'documentation','d':'documentation'},
+            {'v':'stat-tool','d':'stat-tool'},
           ],
           'tab':'main'
         },

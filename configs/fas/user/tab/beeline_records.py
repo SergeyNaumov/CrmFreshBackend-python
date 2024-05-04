@@ -1,10 +1,10 @@
 from lib.core import join_ids
-def beeline_records_before_code(form,field):
+async def beeline_records_before_code(form,field):
     if form.id:
 
 
 
-        contacts=form.db.query(
+        contacts = await form.db.query(
            query="select phone from user_contact where user_id=%s and phone<>''",
            values=[form.id]
         )
@@ -23,25 +23,34 @@ def beeline_records_before_code(form,field):
             if manager['login'] not in ('pzm','akulov','admin','sed'):
                 
                 if form.is_owner_group:
-                    manager_ids=form.db.query(query=f'select id from manager where group_id in ({join_ids(manager["CHILD_GROUPS"])})',massive=1)
+                    manager_ids = await form.db.query(query=f'select id from manager where group_id in ({join_ids(manager["CHILD_GROUPS"])})',massive=1)
                     where+=f' and manager_id in ({join_ids(manager_ids)})'
                 else:
                     where+=f' and manager_id={manager["id"]}'
 
-            records=form.db.query(
+            records = await form.db.query(
                    query=f"select * from beeline_records where {where}",
-                   debug=1
             )
 
             #form.pre(records)
             if len(records):
                 records_html=""
                 for r in records:
+                    #if r['downloaded'] and r['date']:
+                    full_name=f"/files/beeline/{r['date'].strftime('%Y/%m/%d')}/{r['id']}.mp3"
+                    # result=f"""{result}
+                    # <div style='padding-top: 5px'>
+                    #     <audio controls>
+                    #       <source src="{full_name}" type="audio/ogg">
+                    #       <source src="{full_name}" type="audio/mpeg">
+                    #     </audio>
+                    # </div>
+                    #     """
                     records_html+=\
                     "<div style='padding-top: 5px'>"+\
                         "<audio controls>"+\
-                            f"<source src='{r['download_link']}' type='audio/ogg'>"+\
-                            f"<source src='{r['download_link']}' type='audio/mpeg'>"+\
+                          f"<source src='{full_name}' type='audio/ogg'>"+\
+                          f"<source src='{full_name}'' type='audio/mpeg'>"+\
                         "</audio>"+\
                     "</div>"
 

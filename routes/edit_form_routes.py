@@ -15,7 +15,7 @@ async def new_or_insert_form(config: str,R: dict):
   if 'action' in R:
     if R['action'] in ('insert'):
       action=R['action']
-  return process_edit_form(
+  return await process_edit_form(
     action=action,
     config=config,
     R=R
@@ -27,7 +27,7 @@ async def new_or_insert_form(config: str,R: dict):
 # update изменений в карте
 @router.put('/edit-form/{config}/{id}')
 async def update_form(config: str,id: int,R: dict):
-  return process_edit_form(
+  return await process_edit_form(
     action='update',
     config=config,
     id=id,
@@ -42,7 +42,8 @@ async def work_form(config:str,id:int,R:dict):
   if 'action' in R: action=R['action']
   else:
     action='edit'
-  return process_edit_form(
+  #print('action:',action)
+  return await process_edit_form(
     action=action,
     config=config,
     id=id,
@@ -53,7 +54,7 @@ async def work_form(config:str,id:int,R:dict):
 
 @router.get('/delete-element/{config}/{id}')
 async def delete_element(config: str,id:int):
-  form=read_config(
+  form = await read_config(
     config=config,
     id=id,
     script='delete_element',
@@ -62,9 +63,9 @@ async def delete_element(config: str,id:int):
   if not form.make_delete:
     form.errors.append('удаление запрещено')
 
-  form.run_event('before_delete')
+  await form.run_event('before_delete')
   if form.work_table_foreign_key and form.work_table_foreign_key_value:
-    cnt=form.db.query(
+    cnt = await form.db.query(
       query=f'select count(*) from {form.work_table} WHERE {form.work_table_id}=%s and {form.work_table_foreign_key}=%s',
       values=[form.id,form.work_table_foreign_key_value],
       onevalue=1
@@ -74,27 +75,23 @@ async def delete_element(config: str,id:int):
 
   
   if form.success():
-    form.db.query(
+    await form.db.query(
       query=f'DELETE FROM {form.work_table} WHERE {form.work_table_id}=%s',
       values=[form.id],
       errors=form.errors
     )
 
-    form.run_event('after_delete')
+    await form.run_event('after_delete')
 
     for f in form.fields:
       if 'after_delete' in f:
-        form.run_event('after_delete',
-          {
-          'field':f
-          }
-        )
+        await form.run_event('after_delete',{'field':f})
 
   return {'success':form.success(),'errors':form.errors,'log':form.log}
 
 @router.post('/multiconnect/{config}/{field_name}')
 async def multiconnect(config:str,field_name:str,R:dict):
-  return multiconnect_process(
+  return await multiconnect_process(
     config=config,
     field_name=field_name,
     R=R

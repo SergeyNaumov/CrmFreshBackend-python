@@ -1,9 +1,9 @@
-def paids_forere_code(form,field):
+async def paids_forere_code(form,field):
     if not(form.id):
         return ''
 
     # Счета
-    _list=form.db.query(query="""
+    _list = await form.db.query(query="""
         SELECT
             b.id, b.docpack_id, b.number,  DATE_FORMAT(b.paid_date,%s) paid_date, b.paid_summ summ,
             m.name manager, t.header tarif, ul.firm ur_lico, b.paid_type
@@ -30,7 +30,7 @@ def paids_forere_code(form,field):
         field['after_html']='<p align="center">Оплаченных счетов нет</p>'
 
     # Акты:
-    _list=form.db.query(
+    _list = await form.db.query(
         query="""
             select
                 a.id, a.ur_lico_id, a.number,

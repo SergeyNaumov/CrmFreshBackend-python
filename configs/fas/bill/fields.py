@@ -149,6 +149,16 @@ fields=[
         'frontend':{'ajax':{'name':'paid','timeout':100}},
     },
     {
+        'description':'Тип оплаты',
+        'tab':'paid',
+        'name':'paid_type',
+        'type':'select_values',
+        'values':[
+          {'v':1,'d':'Безналичные'},
+          {'v':2,'d':'Наличные'},
+        ]
+    },
+    {
         'description':'Дата оплаты',
         'type':'date',
         'name':'paid_date',

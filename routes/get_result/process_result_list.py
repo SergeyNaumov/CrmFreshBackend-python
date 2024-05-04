@@ -1,12 +1,12 @@
+import inspect
 from lib.core import exists_arg, date_to_rus
-def process_result_list(form,R,result_list):
+async def process_result_list(form,R,result_list):
   # Обрабатывает результат, возвращает output
   if not result_list: result_list=[]
   output=[]
   memo_values={}
   multiconnect_values={}
   id_list=[]
-
 
   for r in result_list:
     id_fields=form.work_table_id.split(',')
@@ -25,7 +25,7 @@ def process_result_list(form,R,result_list):
 
         field=form.fields_hash[name]
         if field['type'] == 'multiconnect':
-            multiconnect_arr=form.db.query(
+            multiconnect_arr=await form.db.query(
               query=f'''
                 SELECT
                     rst.{field['relation_save_table_id_worktable']} id,
@@ -69,8 +69,12 @@ def process_result_list(form,R,result_list):
             value='не выбрано'
 
       if not exists_arg('make_change_in_search',field) and exists_arg('filter_code',field) and not (isinstance(field['filter_code'],str)):
-        value=field['filter_code'](form=form,field=field,row=r)
-        
+        func=field['filter_code']
+        if inspect.iscoroutinefunction(func):
+          value = await field['filter_code'](form=form,field=field,row=r)
+        else:
+          value = field['filter_code'](form=form,field=field,row=r)
+
       else:
 
         if field['type']=='memo':

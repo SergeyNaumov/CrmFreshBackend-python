@@ -11,10 +11,11 @@ hostname=socket.gethostname()
 
 class Engine():
   def __init__(self,**arg):
+
     self.manager={}
     self.errors=[]
     
-  def reset(self,**arg):
+  async def reset(self,**arg):
     self.db=db
     self.db_read=db_read
     self.db_write=db_write
@@ -60,13 +61,13 @@ class Engine():
           where=f"login='{config['debug']['login']}'"
         
 
-        self.manager=db.getrow(
+        self.manager=await db.getrow(
           table=auth['manager_table'],
           where=where,
-          values=values
+          values=values,
+
         )
         
-
         if self.manager:
           self.manager['id']=self.manager[auth['manager_table_id']]
           self.login=self.manager['login']

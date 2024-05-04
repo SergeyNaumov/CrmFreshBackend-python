@@ -1,4 +1,4 @@
-def name(form,v):
+async def name(form,v):
   value=v['name']
   if not ('name_f' in v): v['name_f']=''
   if not ('name_i' in v): v['name_i']=''
@@ -12,7 +12,7 @@ def name(form,v):
 
   ]
 
-def login(form,v):
+async def login(form,v):
   error=''
 
   where=[]
@@ -21,7 +21,7 @@ def login(form,v):
 
   where.append(f'login=%s')
   
-  exists=form.db.getrow(
+  exists=await form.db.getrow(
     table='manager',
     where=(' and '.join(where)),
     values=[v['login']]

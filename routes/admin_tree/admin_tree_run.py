@@ -2,7 +2,7 @@ from lib.core import exists_arg
 from lib.all_configs import read_config
 from .move import move
 
-def get_branch(**arg):
+async def get_branch(**arg):
   
   form=arg['form']
   parent_id=str(exists_arg('parent_id',arg) or '')
@@ -19,7 +19,7 @@ def get_branch(**arg):
     if len(where):
       query_path+=' WHERE '+' AND '.join(where)
 
-    pathstr=form.db.query(
+    pathstr=await form.db.query(
       query=query_path,
       onevalue=1,
       errors=form.errors
@@ -51,7 +51,7 @@ def get_branch(**arg):
           query+=' WHERE '+' AND '.join(where)
       
       query+=' LIMIT 1000'
-      item=form.db.query(
+      item = await form.db.query(
         query=query,
         onerow=1,
 
@@ -96,7 +96,7 @@ def get_branch(**arg):
   
   sql_query+' LIMIT 1000' # защита от дурака
 
-  result_lst=form.db.query(
+  result_lst= await form.db.query(
     query=sql_query,
     errors=form.errors
   )
@@ -141,7 +141,7 @@ def add_where_to_query(query,where):
     query+=' WHERE '+' AND '.join(where)
   return query
 
-def admin_tree_run(**arg):
+async def admin_tree_run(**arg):
   
   R=arg['R']
   action=exists_arg('action',R) or ''
@@ -150,7 +150,7 @@ def admin_tree_run(**arg):
     parent_id=''
   id=exists_arg('id',R) or ''
   
-  form=read_config(
+  form = await read_config(
     config=arg['config'],
     script='admin_tree',
     action=action,
@@ -176,7 +176,7 @@ def admin_tree_run(**arg):
           cur_path=''
           cur_sort=0
           if parent_id and parent_id.isnumeric():
-            cur_path=form.db.query(
+            cur_path = await form.db.query(
               query=f'SELECT path from {form.work_table} where {form.work_table_id}=%s',
               values=[parent_id],
               onevalue=1
@@ -191,7 +191,7 @@ def admin_tree_run(**arg):
               else:
                 qw+=' WHERE parent_id is null'
             
-            cur_sort=form.db.query(query=qw,onevalue=1)
+            cur_sort = await form.db.query(query=qw,onevalue=1)
             
             if not cur_sort:
               cur_sort='1'
@@ -217,10 +217,10 @@ def admin_tree_run(**arg):
 
           # EVENTS!
           form.new_values=data
-          form.run_event('before_insert')
-          form.run_event('before_save')
+          await form.run_event('before_insert')
+          await form.run_event('before_save')
           
-          form.id=form.db.save(
+          form.id = await form.db.save(
             table=form.work_table,
             data=data
           )
@@ -233,8 +233,8 @@ def admin_tree_run(**arg):
           if not form.id:
             form.errors.append('произошла ошибка при добавлении раздела. Возможно, превышен максимальный уровень вложенности')
 
-          form.run_event('after_insert')
-          form.run_event('after_save')
+          await form.run_event('after_insert')
+          await form.run_event('after_save')
           
       return {
         'success':form.success(),
@@ -257,12 +257,12 @@ def admin_tree_run(**arg):
 
       query=add_where_to_query(f'UPDATE {form.work_table} SET sort=%s',where)
       for id in R['obj_sort'].keys():
-        form.db.query(
+        await form.db.query(
           query=query,
           values=[R['obj_sort'][id],id],
           errors=form.errors
         )
-      form.run_event('after_sort')
+      await form.run_event('after_sort')
       return {'success':form.success(),'errors':form.errors}
     else:
       return {'success':'0','errors':['сортировка запрещена']}
@@ -275,15 +275,15 @@ def admin_tree_run(**arg):
         where = [f'{form.work_table_id}={id}']
         values=[]
         add_where_foreign_key(form,where)
-        cur_branch=form.db.query(
+        cur_branch = await form.db.query(
           query=f'SELECT * from {form.work_table} where {form.work_table_id}=%s',
           values=[form.id],
           onerow=1
         )
 
         query=add_where_to_query(f'DELETE FROM {form.work_table}',where)
-        form.run_event('after_delete')
-        form.db.query(query=query,errors=form.errors)
+        await form.run_event('after_delete')
+        await form.db.query(query=query,errors=form.errors)
 
         cur_count='0'
         if form.tree_use:
@@ -293,13 +293,13 @@ def admin_tree_run(**arg):
           add_where_foreign_key(form,where)
 
           if  cur_branch and exists_arg('parent_id',cur_branch):
-            cur_count=form.db.query(
+            cur_count=await form.db.query(
               query=f'SELECT count(*) from {form.work_table} where parent_id=%s',
               values=[cur_branch['parent_id']],
               onevalue=1
             )
           else:
-            cur_count=form.db.query(
+            cur_count=await form.db.query(
               query=f'SELECT count(*) from {form.work_table}',
               onevalue=1
             )
@@ -317,7 +317,7 @@ def admin_tree_run(**arg):
       return {'success':0,'error':'Редактирование запрещено!'}
     else:
       if form.id:
-        form.db.query(
+        await form.db.query(
           query=f'UPDATE {form.work_table} SET {form.header_field}=% WHERE {form.work_table_id}=%s',
           values=[R['header'],form.id]
         )
@@ -327,7 +327,7 @@ def admin_tree_run(**arg):
 
 
   elif form.action=='move':
-    return move(form,R)
+    return await move(form,R)
   
   elif form.action=='load_many_childs':
     obj_list=R['list']
@@ -344,7 +344,7 @@ def admin_tree_run(**arg):
 
         query=f'select {form.work_table_id} id,{form.header_field} header {sort} from {form.work_table} where parent_id={id} {order}'
 
-        data_result[id]=form.db.query(
+        data_result[id]=await form.db.query(
           #query=f'SELECT id,header,sort from {form.work_table} where parent_id={id} order by sort'
           query=query
         )#get_branch(form=form,get_childs=0,parent_id=id)
@@ -352,7 +352,7 @@ def admin_tree_run(**arg):
 
 
   else: # по умолчанию
-    branch=get_branch(form=form,get_childs=1,parent_id='')
+    branch=await get_branch(form=form,get_childs=1,parent_id='')
     if len(form.errors):
       return {'success':0,'errors':form.errors}
 

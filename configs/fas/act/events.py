@@ -6,6 +6,7 @@ def permissions(form):
 
     perm=form.manager['permissions']
     #form.pre(perm)
+    #form.explain=1
     if perm['admin_paids']:
         form.is_admin=True
         form.read_only=False

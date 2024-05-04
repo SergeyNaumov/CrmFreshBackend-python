@@ -1,6 +1,6 @@
 import os
 from lib.core import exists_arg, get_name_and_ext
-def delete_file(form,field,child_field,one_to_m_id):
+async def delete_file(form,field,child_field,one_to_m_id):
   form.errors=[]
   query=f"""
         SELECT
@@ -10,7 +10,7 @@ def delete_file(form,field,child_field,one_to_m_id):
         WHERE
             {field['foreign_key']}={form.id} and {field['table_id']}={one_to_m_id}
   """
-  oldfile=form.db.query(
+  oldfile=await form.db.query(
     query=f"""
         SELECT
             {child_field['name']}
@@ -44,7 +44,7 @@ def delete_file(form,field,child_field,one_to_m_id):
     if os.path.exists(fullname):
         os.remove(fullname)
 
-    form.db.query(
+    await form.db.query(
         query=f"""
             UPDATE
                 {field['table']}

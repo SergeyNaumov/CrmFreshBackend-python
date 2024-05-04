@@ -47,7 +47,7 @@ def get_file_list(**arg):
     #['file1.png','file2.png','file3.png']
     return res,error
 
-def wysiwyg_process(**arg):
+async def wysiwyg_process(**arg):
   #print('wysiwyg_process - реализовать')
   config=arg['config']
   field_name=arg['field_name']
@@ -77,7 +77,7 @@ def wysiwyg_process(**arg):
     id=R['id']
   if 'config' in R:
     config=R['config']
-  form=read_config(
+  form = await read_config(
     action=action,
     config=config,
     id=id,
@@ -154,7 +154,7 @@ def wysiwyg_process(**arg):
         if arg['path']:
             P= path[:0] + path[(0+1):] # удаляем начальный слэш
             full_path=f"{form.manager['files_dir']}/{P}{file.filename}"
-        print('upload_to:',full_path)
+        #print('upload_to:',full_path)
         with open(full_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 

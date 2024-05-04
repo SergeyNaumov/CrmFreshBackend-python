@@ -3,18 +3,21 @@ from fastapi import Depends, FastAPI, Request, Response
 from starlette.responses import JSONResponse, Response
 from routes import router
 from lib.engine import s
-
+from db import db
 # uvicorn main:app --reload --port=5000
 app = FastAPI(Debug=True)
 
-
+@app.on_event("startup")
+async def startup():
+    await db.create_pool()
+    print('create_pool end')
 
 
 @app.middleware("http") # ""
 async def for_all_requests(request: Request,call_next, response=Response):
   
   response_obj=response()
-  s.reset(
+  await s.reset(
     request=request,
     status_code=200
     #response=response_obj
@@ -27,6 +30,7 @@ async def for_all_requests(request: Request,call_next, response=Response):
     return Response(s.to_json(s._content))
   else:
     response = await call_next(request)
+
     # set cookies
     for k in s.cookies.keys():
       response.set_cookie(key=k,value=s.cookies[k])
@@ -41,7 +45,6 @@ async def for_all_requests(request: Request,call_next, response=Response):
   return response
 
 
-
-
-
 app.include_router(router)
+
+

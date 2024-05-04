@@ -139,7 +139,7 @@ fields=[
           'name':'exhibitor_id',
           'table':'manager',
           'tablename':'me',
-          'where':'group_id in (select id from manager_group where parent_id=347 or path regexp "/347/")', # группа 
+          'where':'gone=0 and group_id in (select id from manager_group where parent_id=347 or path regexp "/347/")', # группа
           'header_field':'name',
           'value_field':'id',
           'tab':'main',
@@ -234,6 +234,7 @@ fields=[
             'value_field':'id',
             'tablename':'mf',
             'tab':'work',
+            'where':"gone=0",
             'read_only':True,
             'filter_on':True
         },
@@ -260,7 +261,7 @@ fields=[
             'value_field':'id',
             'read_only':True,
             # 196 -- юрист (lawer)
-            'where':'(group_id IN (select group_id from manager_group_permissions where permissions_id=196))',# OR id (select manager_id from manager_permissions where permissions_id=196))',
+            'where':'gone=0 and (group_id IN (select group_id from manager_group_permissions where permissions_id=196))',# OR id (select manager_id from manager_permissions where permissions_id=196))',
             'tab':'work',
         },
         {
@@ -272,7 +273,7 @@ fields=[
             'order':'name',
             'tablename':'mt2',
             'value_field':'id',
-            'where':'(group_id IN (select group_id from manager_group_permissions where permissions_id=196))',# OR id (select manager_id from manager_permissions where permissions_id=196))',
+            'where':'gone=0 and (group_id IN (select group_id from manager_group_permissions where permissions_id=196))',# OR id (select manager_id from manager_permissions where permissions_id=196))',
             'read_only':1,
             'tab':'work',         
         },
