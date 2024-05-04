@@ -12,6 +12,10 @@ def permissions(form):
         form.title='Ответчики НС "Ревизор"'
     elif entity=='13':
         form.title='Ответчики BzInfo'
+    elif entity=='20':
+        form.title='Ответчики FAS'
+    elif entity=='24':
+        form.title='Ответчики AUZ'
     else:
         entity=''
 

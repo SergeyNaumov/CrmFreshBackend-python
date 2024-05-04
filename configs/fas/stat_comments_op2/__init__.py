@@ -18,7 +18,7 @@ def search(form, R):
 
     if registered:
 
-        where.append('um.registered>=%s and um.registered<=%s and r.date>=%s and r.date<=%s')
+        where.append('( (um.registered>=%s and um.registered<=%s) and  (r.date>=%s and r.date<=%s) )')
         # um.registered>='2024-02-08 00:00:00' and um.registered<='2024-02-08 23:59:59' and r.date>='2024-02-08 00:00:00' and r.date<='2024-02-08 23:59:59'
         values.append(f"{registered} 00:00:00")
         values.append(f"{registered} 23:59:59")
@@ -46,14 +46,13 @@ def search(form, R):
         if len(group_list):
             where.append(f"m.group_id IN ({join_ids(group_list)})")
 
-    #log.append({
-    #    'where':where,
-    #    'values':values
-    #})
     result_list=[]
     accordion_data=[]
-    if registered and len(where):
-        # u.registered>='2024-02-08 00:00:00' and um.registered<='2024-02-08 23:59:59' and r.date>='2024-02-08 00:00:00' and r.date<='2024-02-08 23:59:59'
+
+
+
+    if registered:
+        # Комментарии с записями
         query=f"""
             select
                 u.id user_id, u.firm, m.name, hour(um.registered) hour, um.registered, um.body,
@@ -63,26 +62,54 @@ def search(form, R):
                 manager m
                 join user u ON u.manager_id=m.id
                 join user_memo um ON um.user_id=u.id and um.manager_id=m.id
-                LEFT join user_contact uc ON uc.user_id=u.id
-                LEFT join beeline_records r ON r.manager_id=m.id and r.phone=uc.phone
+                join user_contact uc ON uc.user_id=u.id
+                LEFT join beeline_records r ON r.manager_id=m.id and r.phone=uc.phone and (r.date>=%s and r.date<=%s)
             WHERE
-                {' AND '.join(where)}
+                (um.registered>=%s and um.registered<=%s)
             GROUP BY um.id
             ORDER BY um.registered
         """
-        #log=query
+
+
         result=form.db.query(
             query=query,
             values=values,
-            debug=1,
+            #debug=1,
             #log=log
         )
+
+        # result_comments=form.db.query(
+        #     query=f"""
+        #         select
+        #             u.id user_id, u.firm, m.name, hour(um.registered) hour, um.registered, um.body,
+        #             uc.phone, if(uc.fio,uc.fio,'') contact_name,
+        #             group_concat( concat(time(r.date),';',r.download_link,';',if(r.direction='OUTBOUND','исх','вх'),';',r.duration) SEPARATOR ';;;' ) records
+        #         from
+        #             manager m
+        #             join user u ON u.manager_id=m.id
+        #             join user_memo um ON um.user_id=u.id and um.manager_id=m.id
+        #             LEFT join user_contact uc ON uc.user_id=u.id
+        #             LEFT join beeline_records r ON r.manager_id=m.id and r.phone=uc.phone and (r.date>=%s and r.date<=%s)
+        #         WHERE
+        #             (um.registered>=%s and um.registered<=%s)
+        #         GROUP BY um.id
+        #         ORDER BY um.registered
+        #     """,
+        #     values=[f"{registered} 00:00:00", f"{registered} 23:59:59"]
+
+        # )
+
+
+
+        #
+        #print('result:',result)
+        rid=1
         if len(result):
             prev_hour=-1
             j=0
             for r in result:
                 records=[]
-                print(r)
+                #print(r)
                 if prev_hour != r['hour']:
                     r['new_hour']=1
                     prev_hour=r['hour']
@@ -97,13 +124,15 @@ def search(form, R):
                 for i in r['records'].split(';;;'):
                     i=i.split(';')
                     if len(i)>2:
-                        print(i)
+
                         records.append({
+                            'id':rid,
                             'registered':i[0],
                             'src':i[1],
                             'direction':i[2],
                             'duration':i[3]
                         })
+                        rid+=1
 
                 r['records']=records
                 j+=1
@@ -215,7 +244,9 @@ form={
         'events':{
             'permissions':permissions,
             'search':search
-        }
+        },
+        #'javascript':"""window.toggle=(sel)=>{el=document.querySelector(sel);if(el){el.style.display=(el.style.display=='none')?'':'none'};return false}"""
+
     
 }
 
