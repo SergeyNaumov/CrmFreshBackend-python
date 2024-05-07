@@ -47,7 +47,7 @@ async def action_create_bill(form,field,R):
 
 
             
-      form.db.save(
+      await form.db.save(
         table='bill',
         data=data,
       );

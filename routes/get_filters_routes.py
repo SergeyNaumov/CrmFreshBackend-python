@@ -6,7 +6,7 @@ router = APIRouter()
 
 
 
-def get_values_for_select_from_table(f,form):
+async def get_values_for_select_from_table(f,form):
   return []
 
 
@@ -53,7 +53,7 @@ async def get_filters_controller(config: str, R:dict):
       if not(exists_arg('value_field',f)): f['value_field']='id'
       
       if not exists_arg('values',f):
-        f['values']=get_values_for_select_from_table(f,form)
+        f['values']=await get_values_for_select_from_table(f,form)
 
     elif f['type']=='memo':
       f['users']=await form.db.query(

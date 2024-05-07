@@ -216,10 +216,8 @@ class Form():
           bc=field['before_code']
 
           if inspect.iscoroutinefunction(bc):
-            print(f"await bc {field['name']}")
             new_field=await bc(form=form,field=field)
           else:
-            print(f"bc {field['name']}")
             new_field=bc(form=form,field=field)
 
           if new_field:

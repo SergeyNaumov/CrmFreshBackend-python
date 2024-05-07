@@ -74,15 +74,17 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
     #R=R,
     script='memo'
   )
+
   field=form.get_field(field_name)
   errors=form.errors
   if not(field):
     errors.append(f"Поле {field_name} не найдено")
   
   if form.read_only or ('read_only' in field and field['read_only']):
-    errors.append('вы не можете добавлять записи в это поле')
+    errors.append(f"вы не можете добавлять записи в это поле form: {form.read_only} ")
 
   memo_id=None
+  data={}
   if not len(errors) and 'message' in R and R['message']:
     data={
         field['memo_table_foreign_key']:form.id,
@@ -111,7 +113,7 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
 
   tags=[data]
   if 'before_out_tags' in field:
-    field['before_out_tags'](form, tags)
+    await field['before_out_tags'](form, tags)
 
   for t in tags:
     t['date']=date_to_rus(t['date'])

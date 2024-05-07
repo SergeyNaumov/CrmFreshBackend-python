@@ -1,7 +1,7 @@
 from lib.core import get_triade, join_ids
 from .get_values import get_values
 
-def permissions(form):
+async def permissions(form):
     form.ov=None
     form.is_admin=False
 
@@ -16,13 +16,13 @@ def permissions(form):
     #     form.explain=True
     #     form.pre(form.manager)
     if form.id:
-        form.ov=get_values(form)
+        form.ov=await get_values(form)
 
         if form.ov:
             form.title=f"Счёт №{form.ov['number']} от {form.ov['registered']}"
 
 
-def before_search(form):
+async def before_search(form):
     # BEFORE SEARCH
     qs=form.query_search
     manager=form.manager ; perm=manager['permissions']
@@ -52,7 +52,7 @@ def before_search(form):
         query=f"SELECT sum(wt.paid_summ) from {tables} {where}"
         #form.pre(qs)
         #form.pre(query)
-        bank=form.db.query(
+        bank=await form.db.query(
             query=query,
             values=qs['VALUES'],
             onevalue=1
@@ -63,8 +63,8 @@ def before_search(form):
 
 
 
-def after_save(form):
-    form.nv=get_values(form)
+async def after_save(form):
+    form.nv=await get_values(form)
 
     #print('nv:',form.nv)
 

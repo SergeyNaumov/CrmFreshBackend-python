@@ -1,11 +1,19 @@
+from celery import Celery
+#from fastapi import BackgroundTasks
+from time import sleep
 import smtplib, socket
 #import email.message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
+celery=Celery('tasks',broker="redis://localhost:6379")
 
-def send_mes(**opt):
+@celery.task
+def send_mes_background(opt):
+  sleep(5)
+  print('opt:',opt)
+  return
   msg = MIMEMultipart('related')
   #MIMEMultipart('alternative')
   
@@ -67,3 +75,7 @@ def send_mes(**opt):
       print("\033[31m {}" .format('ошибка при отправке почты:'),e,"\033[0m")
     except smtplib.SMTPRecipientsRefused as e:
       print('SMTPRecipientsRefused: ', e)
+
+
+def send_mes(**opt):
+  send_mes_background.delay(opt)

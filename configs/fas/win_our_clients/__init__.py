@@ -8,7 +8,7 @@ def gen_tmpl_prefix():
     return str(int(time.time())) + \
     '_' +  ''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456780') for i in range(5))
 
-def search(form, R):
+async def search(form, R):
     result_list=[]
     filters=R['filters']
     city=filters.get('city')
@@ -29,7 +29,7 @@ def search(form, R):
 
         city=city.strip()
         cityes=[]
-        for city_id in db.query(
+        for city_id in await db.query(
             query="select city_id from city where country_id=1 and name like %s",
             values=[city+'%'],massive=1 ):
 
@@ -86,7 +86,7 @@ def search(form, R):
         data=[
             ['Компания','ИНН','Представитель','Юрист1','Юрист2','Юрист3','Город','Город заседания','Дата заседания','Вид продукта','Реестровый №','Председатель комиссии']
         ]
-        for itt in db.query(query=query):
+        for itt in await db.query(query=query):
 
             if not(itt['born']):
                 itt['born']=''
@@ -136,14 +136,14 @@ def search(form, R):
         query+=f" LIMIT {page},{perpage}"
 
         query_count=f"SELECT count(*) from teamwork_ofp wt join user u ON u.id=wt.user_id {where}"
-        count=db.query(
+        count=await db.query(
             query=query_count,
             values=values,
             onevalue=1
 
         )
 
-        _list=db.query(
+        _list=await db.query(
             query=query,
             #values=values
         )
@@ -219,14 +219,13 @@ def search(form, R):
 
     
 
-def permissions(form):
+async def permissions(form):
     ...
 
-def city_autocomplete(form,field,R):
+async def city_autocomplete(form,field,R):
     term=R.get('term')
-    print('term:',term)
     if term and len(term):
-        return form.db.query(
+        return await form.db.query(
             query='select name from city where name like %s order by name limit 20',
             values=[term+'%'],
             massive=1

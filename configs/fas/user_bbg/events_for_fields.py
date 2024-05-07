@@ -1,10 +1,10 @@
 from lib.send_mes import send_mes
 from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 
-def links_before_code(form,field):
+async def links_before_code(form,field):
   if form.ov:
     out=[f"<div><a href='/edit_form/user/{form.ov['user_id']}' target='_blank'>Карточка ОП</a></div>"]
-    exists_ids=form.db.query(
+    exists_ids=await form.db.query(
       query="SELECT teamwork_ofp_id from teamwork_ofp where user_id=%s",
       values=[form.ov['user_id']],
       massive=1
@@ -28,26 +28,25 @@ def manager_before_code(form,field):
   return field
 #print('is events for fields')
 
-def memo_after_add(form,field,data):
+async def memo_after_add(form,field,data):
   if ov:=form.ov:
     firm=form.ov['firm']
-
     manager_dict={}
     if manager_id:=ov['manager_id']:
       manager_dict[manager_id]=1
-      cur_manager=get_manager( id=manager_id, db=form.db )
-      if owner:=get_owner(cur_manager=cur_manager,db=form.db):
+      cur_manager=await get_manager( id=manager_id, db=form.db )
+      if owner:=await get_owner(cur_manager=cur_manager,db=form.db):
         manager_dict[owner['id']]=1
 
     if manager_id:=ov['manager_bbg']:
       manager_dict[manager_id]=1
-      cur_manager=get_manager( id=manager_id, db=form.db )
-      if owner:=get_owner(cur_manager=cur_manager,db=form.db):
+      cur_manager=await get_manager( id=manager_id, db=form.db )
+      if owner:=await get_owner(cur_manager=cur_manager,db=form.db):
         manager_dict[owner['id']]=1
 
     if len(list(manager_dict.keys())):
       #print('manager_dict:',manager_dict)
-      to=get_email_list_from_manager_id(form.db, manager_dict)
+      to=await get_email_list_from_manager_id(form.db, manager_dict)
       to['dmn@reg-rf.pro']=True
       message=f"Только что {form.manager['name']} добавил комментарий: {data.get('body')}<br>"+\
       f"в карту ББГ: <a href='{form.s.config['system_url']}edit_form/user_bbg/{form.id}'>{firm}</a>"

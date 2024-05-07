@@ -7,13 +7,15 @@ router = APIRouter()
 # Инициализация
 @router.post('/{config}')
 async def get_list(config: str, R:dict): # 
-    form=read_config(
+    print('stat_tool -1')
+    form=await read_config(
         action='init',
         config=config,
         #id=exists_arg('id',arg),
         R=R,
         script='stat_tool'
     )
+    print('stat_tool 0')
     response={}
     success=True
     if not len(form.errors):
@@ -29,7 +31,7 @@ async def get_list(config: str, R:dict): #
             _type=f.get('type')
 
             if f.get('type')=='select_from_table':
-                f['values']=get_values_for_select_from_table(form, f)
+                f['values']=await get_values_for_select_from_table(form, f)
                 f['type']='select'
 
         response['title']=form.title
@@ -54,7 +56,7 @@ async def get_list(config: str, R:dict): #
 # Поиск
 @router.post('/{config}/search')
 async def search(config: str, R: dict):
-    form=read_config(
+    form=await read_config(
         action='search',
         config=config,    
         script='stat_tool',
@@ -110,7 +112,7 @@ async def search(config: str, R: dict):
                     }
                 ]
             """
-            return func(form, R)
+            return await func(form, R)
         except Exception as e:
             error_info = traceback.format_exc()
             return {'success':False, 'errors':[f'ошибка приложения при выполнении события {search} ({e}) {error_info}']}

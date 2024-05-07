@@ -18,7 +18,7 @@ async def password(config:str,field_name:str,id:int,R: dict):
   response={'success':1,'errors':errors}
 
   if R['action'] == 'change':
-      form=read_config(
+      form = await read_config(
         script='password', config=config,
         action=R['action'], R=R, id=id
       )
@@ -35,7 +35,7 @@ async def password(config:str,field_name:str,id:int,R: dict):
 
       if not len(errors):
         if form.s.config['encrypt_method'] == 'mysql_sha2':
-          form.db.query(
+          await form.db.query(
             query=f'UPDATE {form.work_table} SET {field_name}=sha2(%s,256) where id=%s',
             values=[R['new_password'],form.id]
           )

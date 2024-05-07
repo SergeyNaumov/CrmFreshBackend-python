@@ -16,8 +16,10 @@ async def admin_tree(config: str):
 
 @router.post('/admin-tree/{config}')
 async def admin_tree(config: str,R:dict):
-  return await admin_tree_run(
+  result = await admin_tree_run(
     config=config,
     R=R
   )
+  print('after await')
+  return result
   

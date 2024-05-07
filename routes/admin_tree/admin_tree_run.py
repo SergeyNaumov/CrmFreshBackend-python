@@ -112,7 +112,7 @@ async def get_branch(**arg):
     el['sort']=exists_arg('sort',item) or ''
     if form.tree_use:
       if exists_arg('get_childs',arg):
-        el['childs']=get_branch(
+        el['childs']=await get_branch(
           form=form,
           get_childs=0,
           parent_id=id
@@ -123,7 +123,7 @@ async def get_branch(**arg):
   if 0 and form.tree_use and exists_arg('get_childs',arg): 
     for item in branch['list']:
       ids.append(item['id'])
-    child_list=get_branch(
+    child_list=await get_branch(
       form=form,
       get_childs=0,
       parents=ids
@@ -267,7 +267,7 @@ async def admin_tree_run(**arg):
     else:
       return {'success':'0','errors':['сортировка запрещена']}
   elif form.action == 'get_branch' and parent_id and parent_id.isnumeric():
-    return {'success':1,'data':get_branch(form=form,parent_id=parent_id)}
+    return {'success':1,'data': await get_branch(form=form,parent_id=parent_id)}
 
   elif form.action == 'delete_branch':
     if form.make_delete:
@@ -371,7 +371,7 @@ async def admin_tree_run(**arg):
             'max_level':form.max_level,
             'changed_in_tree':hasattr(form,'changed_in_tree')
         },
-        'log':form.log,
+         'log':form.log,
         'errors':form.errors,
         'tree':branch
     }

@@ -76,7 +76,7 @@ class Engine():
           self.manager={'id':0,'login':'nonelogin','name':'менеджер не найден'}
       else:
         
-        session_start(self);
+        await session_start(self);
 
             
             

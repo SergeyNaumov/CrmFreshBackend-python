@@ -1,4 +1,4 @@
-def regnumber(form,v):
+async def regnumber(form,v):
   v['regnumber']
   return_hash={}
 
@@ -23,7 +23,7 @@ def regnumber(form,v):
 
   #print('ajax regnumber:',v)
 
-def product(form,v):
+async def product(form,v):
   firm=v['firm']
   product=v['product']
   bgcolor=''

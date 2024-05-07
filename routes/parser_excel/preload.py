@@ -8,7 +8,7 @@ from .go_parse import go_parse
 def error(e):
     return { 'success':0, 'errors':[e] }
     
-def preload(parser, R):
+async def preload(parser, R):
     orig_name=R.get('orig_name','')
     src=R.get('src','')
 
@@ -40,7 +40,7 @@ def preload(parser, R):
             except Exception as e:
                 return error(f"произошла ошибка при записи в {fullname}: {str(e)}")
 
-            return go_parse(
+            return await go_parse(
                 filename=filename,
                 tmp_dir=tmp_dir,
                 limit=30

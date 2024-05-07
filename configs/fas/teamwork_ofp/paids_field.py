@@ -1,8 +1,8 @@
-def paids_before_code(form,field):
+async def paids_before_code(form,field):
     if not(form.ov) or not(form.ov.get('user_id')):
         return ''
     user_id=form.ov.get('user_id')
-    _list=form.db.query(query="""
+    _list=await form.db.query(query="""
         SELECT
             b.id, b.docpack_id, b.number,  DATE_FORMAT(b.paid_date,%s) paid_date, b.paid_summ summ,
             m.name manager, t.header tarif, ul.firm ur_lico
@@ -29,7 +29,7 @@ def paids_before_code(form,field):
         field['after_html']='<p align="center">Оплаченных счетов нет</p>'
 
     # Акты:
-    _list=form.db.query(
+    _list=await form.db.query(
         query="""
             select
                 a.id, a.ur_lico_id, a.number,

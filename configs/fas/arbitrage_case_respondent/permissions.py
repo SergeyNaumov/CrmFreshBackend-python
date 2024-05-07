@@ -1,7 +1,7 @@
 from .query_search_tables import get_query_search_tables
 from lib.core import exists_arg
 
-def permissions(form):
+async def permissions(form):
     form.QUERY_SEARCH_TABLES=get_query_search_tables()
 
     entity = exists_arg('cgi_params;entity',form.R)

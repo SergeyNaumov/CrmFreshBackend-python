@@ -20,7 +20,7 @@ async def process_parser_excel(config: str, R:dict):
         config_folder='conf'
 
     arg={'config':config}
-    load_result=load_parser_from_config(config_folder,config_folder, arg)
+    load_result=await load_parser_from_config(config_folder,config_folder, arg)
     parser=load_result[0]
     errors=load_result[1]
 
@@ -35,7 +35,7 @@ async def process_parser_excel(config: str, R:dict):
         }
 
     if action == 'preload':
-        return preload(parser, R)
+        return await preload(parser, R)
 
     if action == 'load':
-        return load(parser, R)
+        return await load(parser, R)

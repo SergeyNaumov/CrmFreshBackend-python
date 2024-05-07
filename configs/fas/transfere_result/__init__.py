@@ -1,14 +1,14 @@
 from lib.core import cur_date, exists_arg
 
 # получаем комментарии для списка
-def get_comments(form,lst):
+async def get_comments(form,lst):
     ids=[]
     for u in lst: ids.append(str(u['id']))
     #print('ids:',ids)
     comments={}
 
     if len(ids):
-        comments_list=form.db.query(
+        comments_list=await form.db.query(
                 query=f"""
                     SELECT
                         memo.user_id, memo.registered ts, m.name, memo.body 
@@ -40,8 +40,8 @@ def get_comments(form,lst):
 
 
 # Возвращает таблицу компаний для менеджера
-def get_table_for_manager(form, _type, manager_id, ts):
-    lst=form.db.query(
+async def get_table_for_manager(form, _type, manager_id, ts):
+    lst=await form.db.query(
         query=f"""
             SELECT
                 u.id, u.firm, u.inn, c.name city, u.contact_date,
@@ -56,12 +56,12 @@ def get_table_for_manager(form, _type, manager_id, ts):
         values=[_type, f"{ts} 00:00:00",f"{ts} 23:59:59",manager_id],
 
     )
-    get_comments(form, lst)
+    await get_comments(form, lst)
     #print('lst:',lst)
     
 
     return form.template('./conf/transfere_result/template/table.html',list=lst)
-def search(form, R):
+async def search(form, R):
     #R['cgi_params']['type']='43'
     try:
         _type=int(exists_arg('cgi_params;type',R))
@@ -72,7 +72,7 @@ def search(form, R):
         ts=exists_arg('filters;ts',R)
 
         
-        lst=form.db.query(
+        lst=await form.db.query(
             query="""SELECT
                 m.id, m.name, sum(if(tr.is_double=0,1,0)) new, sum(if(tr.is_double,1,0)) doubles
             FROM
@@ -99,7 +99,7 @@ def search(form, R):
                     {
                         'type':'html',
 
-                        'body': get_table_for_manager(form, _type,  m['id'], ts)
+                        'body': await get_table_for_manager(form, _type,  m['id'], ts)
                     }
                 ]
             })
@@ -146,7 +146,7 @@ def search(form, R):
         return {'success':False, 'errors':['Ошибка при поиске (неверный type)']}
     
 
-def permissions(form):
+async def permissions(form):
     
     _type=exists_arg('cgi_params;type',form.R)
     if _type.isnumeric():
@@ -189,6 +189,8 @@ def permissions(form):
             form.title='Статистика РНП (ФАС-сервис)'
         elif(_type==20):
             form.title='Статистика по ответчикам (ФАС-сервис)'
+        elif(_type==23):
+            form.title='Статистика РНП (АУЗ)'
         for f in form.filters:
             if f['name']=='ts':
                 f['value']=cur_date()

@@ -5,7 +5,7 @@ from config import config
 # получаем комментарии для списка
 
 
-def search(form, R):
+async def search(form, R):
     #R['cgi_params']['type']='43'
     filters=R['filters']
     log=[]
@@ -38,7 +38,7 @@ def search(form, R):
     if isinstance(group_id, list):
         group_list=[]
         group_hash={}
-        group_list=child_groups(db=form.db, group_id=group_id)
+        group_list=await child_groups(db=form.db, group_id=group_id)
         #log.append({'hash':group_hash})
         if len(group_list):
             where.append(f"m.group_id IN ({join_ids(group_list)})")
@@ -61,7 +61,7 @@ def search(form, R):
             WHERE {' AND '.join(where)} ORDER BY wt.registered
         """
         #log=query
-        result=form.db.query(
+        result=await form.db.query(
             query=query,
             values=values,
             #log=log
@@ -86,7 +86,7 @@ def search(form, R):
 
         if len(managers_ids):
             managers_hash={}
-            for m in form.db.query(query=f"select name, id from manager where id in ({join_ids(managers_ids)}) order BY name"):
+            for m in await form.db.query(query=f"select name, id from manager where id in ({join_ids(managers_ids)}) order BY name"):
                 item={'name':m['name'],'comments':[]}
 
                 for r in result:
@@ -133,25 +133,6 @@ def search(form, R):
         )
 
 
-    #form.get_search_where(R['query'])
-
-    #where=[f""]
-#    ts=exists_arg('filters;ts',R)
-
-
-#    lst=form.db.query(
-#        query="""SELECT
-#            m.id, m.name, sum(if(tr.is_double=0,1,0)) new, sum(if(tr.is_double,1,0)) doubles
-#        FROM
-#            transfere_result tr
-#            LEFT JOIN manager m ON m.id=tr.manager_id
-#        WHERE
-#            tr.type=%s and tr.ts>=%s and tr.ts<=%s
-#        GROUP BY tr.manager_id
-#        ORDER BY m.name""",
-#        values=[_type, f"{ts} 00:00:00",f"{ts} 23:59:59",],
-        #error=form.errors
-#    )
     #print(query)
     accordion_data=[]
     # for m in lst:
@@ -188,8 +169,8 @@ def search(form, R):
 
     
 
-def permissions(form):
-    ...
+# async def permissions(form):
+#     ...
     
 form={
         'title':'Комментарии за день',
@@ -218,7 +199,7 @@ form={
           }
         ],
         'events':{
-            'permissions':permissions,
+            #'permissions':permissions,
             'search':search
         }
     

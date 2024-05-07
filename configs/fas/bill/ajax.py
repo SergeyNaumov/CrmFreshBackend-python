@@ -1,5 +1,5 @@
 from lib.core import cur_date
-def paid(form,values):
+async def paid(form,values):
   paid=values.get('paid',0)
   ov=form.ov
   print('ov_paid:',ov['paid'], 'paid: ',paid )

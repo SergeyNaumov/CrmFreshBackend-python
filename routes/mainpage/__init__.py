@@ -8,7 +8,7 @@ router = APIRouter()
 
 async def get_email_list():
 	# учитываем роль
-	manager_id=get_role(s.db, s.manager['id'])
+	manager_id = await get_role(s.db, s.manager['id'])
 
 	return await s.db.query(
 		query="select email from manager_email where manager_id=%s and email like %s",
@@ -38,7 +38,7 @@ async def get_notifications():
 		#return email_list
 		_list=await s.db.query(
 			query="SELECT id, registered,subject,message, to_addr, readed FROM mail_send WHERE to_addr in ('"+"','".join(email_list)+"') and registered>=now() - interval 2 day order by registered desc limit 100",
-			#debug=1
+			debug=1
 		)
 	return {'success':True,'list':_list}
 
@@ -64,7 +64,7 @@ async def set_readed(_id:int, v:int):
 		v=1
 	else:
 		v=0
-	email_list=get_email_list()
+	email_list=await get_email_list()
 	if len(email_list):
 		await s.db.query(
 			query="UPDATE mail_send set readed=%s where id=%s and to_addr in ('"+"','".join(email_list)+"')" ,

@@ -67,13 +67,13 @@ async def process_result_list(form,R,result_list):
 
           if not values_finded:
             value='не выбрано'
-
-      if not exists_arg('make_change_in_search',field) and exists_arg('filter_code',field) and not (isinstance(field['filter_code'],str)):
-        func=field['filter_code']
-        if inspect.iscoroutinefunction(func):
-          value = await field['filter_code'](form=form,field=field,row=r)
+      if not field.get('make_change_in_search') and field.get('filter_code'):
+        fnc=field['filter_code']
+        #print(f"run filter_code: {field}")
+        if inspect.iscoroutinefunction(fnc):
+          value = await fnc(form=form,field=field,row=r)
         else:
-          value = field['filter_code'](form=form,field=field,row=r)
+          value = fnc(form=form,field=field,row=r)
 
       else:
 

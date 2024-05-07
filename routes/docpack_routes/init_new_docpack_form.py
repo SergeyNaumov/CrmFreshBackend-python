@@ -1,7 +1,7 @@
 from .lib import need_manager_fld
 
 
-def action_init_new_docpack_form(form,field):
+async def action_init_new_docpack_form(form,field):
     # выводим поле "менеджер"
     need_manager=need_manager_fld(form)
         
@@ -14,14 +14,14 @@ def action_init_new_docpack_form(form,field):
         ur_lico_list=field['ur_lico_list'](form,field)
 
     else:
-        ur_lico_list=form.db.query(query='select id v,firm d from ur_lico order by firm')
+        ur_lico_list=await form.db.query(query='select id v,firm d from ur_lico order by firm')
     
-    tarif_list=form.db.query(
+    tarif_list=await form.db.query(
         query='select id v,header d from tarif where enabled=1 order by header'
     )
     
     if need_manager:
-        manager_list=form.db.query(
+        manager_list=await form.db.query(
             query='select id v,name d from manager where enabled=1 order by name',
         )
             

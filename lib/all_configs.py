@@ -101,7 +101,7 @@ def load_form_from_dir(confdir,conflib_dir, arg):
       except ModuleNotFoundError as e:
         errors.append(f"Ошибка при загрузке конфига - 5 {arg['config']}/events.py: {e}")
       except Exception as e:
-        errors.append(f"ошибка при обработке конфига {arg['config']}: {e}")
+        errors.append(f"ошибка при обработке конфига -6 {arg['config']}: {e}")
 
     if not len(errors):
       form=Form(arg)  
@@ -136,9 +136,9 @@ def load_form_from_dir(confdir,conflib_dir, arg):
                 f[event_name]=events[f['name']][event_name]
 
       except SyntaxError as e:
-          errors.append(f"Ошибка при загрузке конфига {arg['config']}/events_for_fields.py: {e}")
+          errors.append(f"Ошибка при загрузке конфига -7 {arg['config']}/events_for_fields.py: {e}")
       except ModuleNotFoundError as e:
-          errors.append(f"Ошибка при загрузке конфига {arg['config']}/events_for_fields: {e}")
+          errors.append(f"Ошибка при загрузке конфига -8 {arg['config']}/events_for_fields: {e}")
           
       #print('FIELDS:',form.fields)
         
@@ -210,7 +210,6 @@ async def read_config(**arg):
   if exists_arg('action',arg): form.action=arg['action']
   if not form.work_table: form.work_table=arg['config']
   
-  print('RUN PERMISSIONS')
   await form.run_event('permissions')
 
   # вызываем permissions для полей (если есть)

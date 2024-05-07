@@ -12,7 +12,7 @@ router = APIRouter()
 @router.get('/{config}')
 async def wysiwyg_upload(config:str): # 
 
-  form=read_config(
+  form = await read_config(
     action='',
     config=config,
     #id=id,
@@ -21,7 +21,7 @@ async def wysiwyg_upload(config:str): #
   )
   errors=form.errors
 
-  data_list=form.db.query(
+  data_list=await form.db.query(
     query=f'select * from {form.work_table} order by sort' ,
     #debug=1,
     #table=config,

@@ -7,7 +7,8 @@ from lib.engine import s
 from lib.all_configs import read_config
 from .get_result.process_result_list import process_result_list
 from .get_result.gen_query_search import gen_query_search
-import math
+import math, traceback
+
 
 router = APIRouter()
 #def get_search_tables(form):
@@ -15,13 +16,11 @@ router = APIRouter()
 @router.post('/get-result')
 async def get_result(R: dict):
   try:
-      print('GR0')
       form=await read_config(
         R=R,
         config=R['config'],
         script='find_objects'
       )
-      print('GR1')
       if exists_arg('page',R):
         page=str(R['page'])
         if page.isnumeric(): form.page=page
@@ -126,10 +125,7 @@ async def get_result(R: dict):
       
       if len(form.errors):
         return {'success':0,'errors':form.errors}
-      print('BEFORE PROCESS RESULT LIST')
       output=await process_result_list(form,R,result_list)
-      print('AFTER PROCESS RESULT LIST')
-      #print('output:',output)
 
       form.SEARCH_RESULT['log']=form.log
       form.SEARCH_RESULT['output']=output
@@ -158,5 +154,6 @@ async def get_result(R: dict):
 
       return form.SEARCH_RESULT
   except Exception as e:
-    form.errors.append(str(e))
+    err=traceback.format_exc()
+    form.errors.append(f"{err}")
     return {'success':False, 'errors':form.errors}

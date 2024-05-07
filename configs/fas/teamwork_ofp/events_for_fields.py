@@ -1,7 +1,7 @@
 from config import config
 from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 from lib.core import cur_date, date_to_rus, exists_arg
-from lib.send_mes import send_mes, send_mes
+from lib.send_mes import send_mes
 
 
   
@@ -17,7 +17,7 @@ def group_id_before_code(form,field):
 
   #form.pre([form.read_only, field['read_only'] ])
 # Юрист
-def manager_before_code(form,field):
+async def manager_before_code(form,field):
   
   if form.manager['login'] in ('sed','admin','akulov','pzm') or form.is_group_owner:
     field['read_only']=False
@@ -47,12 +47,12 @@ def manager_before_code(form,field):
 
     # для поля "менеджер" выводим руководителя
     if name=='manager_from':
-      manager_from=get_manager(
+      manager_from=await get_manager(
         id=form.ov['manager_from'],
         db=form.db
       )
       if manager_from:
-        owner_from=get_owner(
+        owner_from=await get_owner(
           cur_manager=manager_from,
           db=form.db
         )
@@ -174,7 +174,7 @@ def manager_id_before_code(form,field):
     #form.pre(form.ov)
 
 # После добавления комментария:
-def comment_after_add(form,field,data):
+async def comment_after_add(form,field,data):
   # сообщение должно уходить: Юристу, менеджеру ср, руководителю менеджера
   manager_id=form.manager['id']
 
@@ -188,9 +188,9 @@ def comment_after_add(form,field,data):
       to[recipent_id]=True
 
       # для отправки руководителям
-      manager=get_manager(id=recipent_id, db=form.db)
+      manager=await get_manager(id=recipent_id, db=form.db)
       if manager: 
-        owner=get_owner(cur_manager=manager,db=form.db)
+        owner=await get_owner(cur_manager=manager,db=form.db)
         if owner and owner['id']: #and manager_id!=owner['id']:
           to[owner['id']]=True
 
@@ -199,13 +199,13 @@ def comment_after_add(form,field,data):
 
 
 
-  last_comments=form.db.query(
+  last_comments=await form.db.query(
     query="SELECT * from teamwork_ofp_memo where teamwork_ofp_id=%s order by id desc limit 2",
     values=[form.id],
   )
   #print('to:',to)
 
-  to_emails=get_email_list_from_manager_id(form.db, to)
+  to_emails=await get_email_list_from_manager_id(form.db, to)
   #print(f"to_emails: ", ', ',to_emails)
   #print(f"to_emails: ", ', '.join(to_emails))
   #to_emails={}

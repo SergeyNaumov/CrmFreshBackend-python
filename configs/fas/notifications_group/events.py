@@ -6,8 +6,6 @@ async def events_permission1(form):
       form.read_only=0
       form.not_create=0
 
-
-
 async def event_after_insert(form):
 
     await form.db.query(

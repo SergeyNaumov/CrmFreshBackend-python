@@ -1,6 +1,6 @@
 from .get_values import get_values
 
-def permissions(form):
+async def permissions(form):
     form.ov=None
     form.is_admin=True
 
@@ -13,13 +13,13 @@ def permissions(form):
         form.make_delete=True
     
     if form.id:
-        form.ov=get_values(form)
+        form.ov=await get_values(form)
 
         if form.ov:
             form.title=f"Акт №{form.ov['number']} от {form.ov['registered']}"
 
-def after_save(form):
-    form.nv=get_values(form)
+async def after_save(form):
+    form.nv=await get_values(form)
     #print('nv:',form.nv)
 
 events={

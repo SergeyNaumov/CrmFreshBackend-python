@@ -15,13 +15,13 @@ def gen_tmpl_prefix():
 
 
 
-def permissions(form):
+async def permissions(form):
     manager=form.manager
     perm=manager['permissions']
     #form.pre(manager)
     if perm['admin_paids']:
         # менеджеру платежей выводим  всё
-        list_groups=form.db.query(
+        list_groups=await form.db.query(
             query="select id, header from manager_group order by header"
         )
         values_groups=[]
@@ -33,7 +33,7 @@ def permissions(form):
                 on_groups_id.append(g['id'])
 
         values_managers=[]
-        list_managers=form.db.query(
+        list_managers=await form.db.query(
             query="select id, name from manager order by name"
         )
         for g in list_managers:
@@ -62,7 +62,7 @@ def permissions(form):
         )
     elif manager.get('is_owner') and len(manager['CHILD_GROUPS']):
         # руководитель, выводим доп. фильтры
-        list_groups=form.db.query(
+        list_groups=await form.db.query(
             query="select id, header from manager_group where id in ("+join_ids(manager['CHILD_GROUPS'])+') order by header'
         )
         values_groups=[]
@@ -72,7 +72,7 @@ def permissions(form):
             values_groups.append({'v':g['id'],'d':g['header']})
             on_groups_id.append(g['id'])
         values_managers=[]
-        list_managers=form.db.query(
+        list_managers=await form.db.query(
             query="select id, name from manager where group_id in ("+join_ids(manager['CHILD_GROUPS'])+') order by name'
         )
         for g in list_managers:

@@ -1,6 +1,6 @@
-def ur_lico_list(form,field):
+async def ur_lico_list(form,field):
 
-    brand_list=form.db.query(
+    brand_list=await form.db.query(
         query="SELECT brand_id from manager_email where manager_id=%s",
         values=[form.manager['id']],
         massive=1,
@@ -9,7 +9,7 @@ def ur_lico_list(form,field):
     )
 
     if len(brand_list):
-        return form.db.query(
+        return await form.db.query(
             query=f"""
             SELECT
                 ul.id v,ul.firm d

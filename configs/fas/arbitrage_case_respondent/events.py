@@ -7,7 +7,7 @@ def after_save(form):
     # form.nv=get_values(form)
     # #print('nv:',form.nv)
 
-def before_search(form):
+async def before_search(form):
   qs=form.query_search
   qs['SELECT_FIELDS'].append('group_concat(pl.name) plaintiff_names')
   qs['SELECT_FIELDS'].append('group_concat(distinct email.email) email, group_concat(distinct phone.phone) phone')

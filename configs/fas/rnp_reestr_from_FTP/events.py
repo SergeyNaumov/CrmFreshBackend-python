@@ -1,6 +1,6 @@
 from lib.core import exists_arg
 
-def permission(form):
+async def permission(form):
     perm=form.manager['permissions']
     #form.explain=1
     for f in form.fields:
@@ -14,6 +14,8 @@ def permission(form):
         form.title='Реестр РНП BzInfo'
     elif entity=='19':
         form.title='Реестр РНП ФАС-сервис'
+    elif entity=='23':
+        form.title='Реестр РНП AUZ'
     elif not(form.id):
         form.errors.append('Неузвестное значение entity')
 
@@ -45,9 +47,7 @@ def permission(form):
 def events_permission2(form):
     pass
 
-def events_before_code(form):
-    #print('is_before_code')
-    pass
+
 
 def before_delete(form):
     pass
@@ -63,7 +63,6 @@ events={
       permission,
       
   ],
-  'before_search':before_search,
-  'before_delete':before_delete,
-  'before_code':events_before_code
+  #'before_search':before_search,
+  #'before_delete':before_delete,
 }

@@ -3,9 +3,9 @@ from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 from lib.send_mes import send_mes
 
 # Юр.Лицо
-def c_ur_lico_id_before_code(form,field):
+async def c_ur_lico_id_before_code(form,field):
       if form.ov:
-        comment=form.db.query(
+        comment=await form.db.query(
           query='SELECT comment from ur_lico where id=%s',
           values=[form.ov['ur_lico_id']],
           onevalue=1
@@ -37,7 +37,7 @@ def not_ro_admin(form,field):
   if form.is_admin: field['read_only']=0
 
 
-def paid_after_save(form,field):
+async def paid_after_save(form,field):
   to={}
   ov=form.ov
   
@@ -45,12 +45,12 @@ def paid_after_save(form,field):
     if  not(form.ov['paid']) and form.nv['paid']:
       paid_date=cur_date()
       #print(f"ov: {form.ov['paid']} // nv: {form.nv['paid']}")
-      form.db.query(
+      await form.db.query(
         query="UPDATE bill set paid_date=%s where id=%s",
         values=[paid_date,form.id]
       )
 
-      own=get_owner(
+      own=await get_owner(
         db=form.db,
         cur_manager={
           'id': ov['m_id'],
@@ -93,7 +93,7 @@ def paid_after_save(form,field):
           дата оплаты: {cur_date}
         '''
 
-        to=get_email_list_from_manager_id(form.db, to_ids)
+        to=await get_email_list_from_manager_id(form.db, to_ids)
 
 
         send_mes(
@@ -133,12 +133,12 @@ def paid_summ_before_code(form,field):
     if form.is_admin or form.manager['permissions']['admin_paids']:
       field['read_only']=0
 
-def paid_to_before_code(form,field):
+async def paid_to_before_code(form,field):
 
   if form.is_admin: field['read_only']=0
   if form.ov:
     user_id=form.ov['user_id']
-    max_paid_to=form.db.query(
+    max_paid_to=await form.db.query(
       query='''
         SELECT
           paid_to

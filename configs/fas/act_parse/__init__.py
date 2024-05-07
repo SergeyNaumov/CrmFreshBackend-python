@@ -1,12 +1,12 @@
 from lib.engine import s
 import re
 
-def before_loopback(data):
+async def before_loopback(data):
   if dogovor_number:=data.get('dogovor_number'):
     data['dogovor_number']=re.sub(r"от .+$",'',dogovor_number.replace('№',''))
     data['dogovor_number']=re.sub(r"\s+$",'',data['dogovor_number'])
     data['dogovor_number']=re.sub(r"^\s+",'',data['dogovor_number'])
-    docpack_id=s.db.query(
+    docpack_id = await s.db.query(
       query="select docpack_id from dogovor where number=%s",
       values=[data['dogovor_number']],
       onevalue=1
@@ -26,36 +26,38 @@ def before_loopback(data):
   #print('data:',data)
 
 
-parser={
-  'title':'Парсер актов',
-  'work_table':'act2',
-  'work_table_id':'id',
-  'tmp_dir':'./tmp/act_parse',
-  'livetime_tmp':'3600',# время жизни временных файлов
-  'before_loopback':before_loopback,
-  'loopback':None, # собственная функция для сохранения
+async def get_parser():
+  ur_lico_values = await s.db.query(query="select id v, firm d from ur_lico order by firm")
+  return {
+    'title':'Парсер актов',
+    'work_table':'act2',
+    'work_table_id':'id',
+    'tmp_dir':'./tmp/act_parse',
+    'livetime_tmp':'3600',# время жизни временных файлов
+    'before_loopback':before_loopback,
+    'loopback':None, # собственная функция для сохранения
 
-  'before_load_fields_message': 'для продолжения работы выберите юрлицо',
-  
-  'unique_fields':['number'],
-  'before_load_fields':[
-    {
-      'description':'Выберите юридическое лицо',
-      'name':'ur_lico_id',
-      'type':'select',
-      'values':s.db.query(query="select id v, firm d from ur_lico order by firm")
-    }
-  ],
-  'fields':[
+    'before_load_fields_message': 'для продолжения работы выберите юрлицо',
 
-    {'name':'number','description':'Номер документа'},
-    {'name':'dat','description':'Дата'},
-    {'name':'inn','description':'ИНН'},
-    {'name':'dogovor_number','description':'Договор'},
-    {'name':'service','description':'Услуга'},
-    {'name':'summa','description':'Сумма'},
+    'unique_fields':['number'],
+    'before_load_fields':[
+      {
+        'description':'Выберите юридическое лицо',
+        'name':'ur_lico_id',
+        'type':'select',
+        'values': ur_lico_values
+      }
+    ],
+    'fields':[
+
+      {'name':'number','description':'Номер документа'},
+      {'name':'dat','description':'Дата'},
+      {'name':'inn','description':'ИНН'},
+      {'name':'dogovor_number','description':'Договор'},
+      {'name':'service','description':'Услуга'},
+      {'name':'summa','description':'Сумма'},
 
 
-  ]
+    ]
 
-}
+  }

@@ -77,7 +77,7 @@ async def func_get_values(form):
 
           if set_from_nv:  f['value']=exists_arg(f['name'],values);
           if not exists_arg('values',f) or not len(f['values']):
-            f['values']=get_values_for_select_from_table(form,f)
+            f['values']=await get_values_for_select_from_table(form,f)
             
       if f['type'] == '1_to_m':
         await get_1_to_m_data(form,f)

@@ -14,13 +14,9 @@ def manager_id_c_before_code(form,field):
 # def firm_c_before_code(form,field):
 #   if form.ov: field['after_html']=form.ov['mg__header']
 
-def requisits_after_save(form,field,data=None):
+async def requisits_after_save(form,field,data=None):
 
-    #exists_main=form.db.query(
-    #    query=f"select main from {field['table']} where {field['foreign_key']}=%s",
-    #    values=[form.id],
-    #    onevalue=1
-    #)
+
     print('field:',field)
     print('VALUES:',field['values'])
 
@@ -30,7 +26,7 @@ def requisits_after_save(form,field,data=None):
     if data and len(data)==1:
           d=data[0]
           if d['main']==1:
-              form.db.query(
+              await form.db.query(
                   query=f"UPDATE {field['table']} SET main=0 where {field['foreign_key']}={form.id} and id<>{d['id']}",
                   values=[],
               )

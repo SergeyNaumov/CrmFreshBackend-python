@@ -117,7 +117,7 @@ async def session_create(s,**arg):
     'errors':errors
   }
 
-def session_start(s,**arg):
+async def session_start(s,**arg):
   
   user_id=s.get_cookie('auth_user_id')
   key=s.get_cookie('auth_key')
@@ -145,7 +145,7 @@ def session_start(s,**arg):
       log=log_pas[0]
       
       if 'remote_user' in s.env:
-        m=s.db.query(
+        m=await s.db.query(
           query=f"select *,{auth['manager_table_id']} id from {auth['manager_table']} WHERE {auth['login_field']} = %s ",
           values=[log],
           onerow=1,
@@ -160,14 +160,14 @@ def session_start(s,**arg):
         manager_table='project_manager'
 
       
-      ok=s.db.query(
+      ok=await s.db.query(
         query=f'SELECT count(*) FROM {auth["session_table"]} WHERE auth_id=%s and session_key=%s',
         values=[user_id, key],
         onevalue=1,
         errors=errors
       )
       if ok:
-          manager=s.db.query(
+          manager=await s.db.query(
             query=f'select *,{auth["manager_table_id"]} id from {auth["manager_table"]} where {auth["manager_table_id"]}=%s',
             values=[user_id],
             onerow=1,errors=errors
@@ -198,17 +198,17 @@ def session_start(s,**arg):
     s._content['success']=0
     s.end()
 
-def session_logout(s):
+async def session_logout(s):
   user_id=s.get_cookie('auth_user_id')
   key=s.get_cookie('auth_key')
   if user_id and user_id.isdigit() and int(user_id) and key :
       if config['use_project']:
-        s.db.query(
+        await s.db.query(
           query='DELETE FROM project_session WHERE auth_id=%s and session_key=%s',
           values=[user_id,key]
         )
       else:
-          s.db.query(
+          await s.db.query(
             query='DELETE FROM session WHERE auth_id=%s and session_key=%s',
             values=[user_id,key]
           )

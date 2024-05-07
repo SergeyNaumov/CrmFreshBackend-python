@@ -8,7 +8,7 @@ import os
 router = APIRouter()
 @router.post('/get')
 async def get_list(R:dict): # 
-    form=read_config(
+    form=await read_config(
         action='get',
         config=R['config'],
         #id=exists_arg('id',arg),
@@ -23,7 +23,7 @@ async def get_list(R:dict): #
         if hasattr(form,'foreign_key') and form.foreign_key:
             where=f'WHERE {form.foreign_key}={form.foreign_key_value}'
         values={}
-        for v in form.db.query(
+        for v in await form.db.query(
             query=f"select {form.name_field} name, {form.value_field} value from {form.work_table} {where}",
             errors=form.errors
         ):
@@ -106,7 +106,7 @@ async def save_value(R:dict):
             values_for_old_record.append(form.foreign_key_value)
 
         # Пытаемся получить уже существующую запись
-        const_record=form.db.query(
+        const_record=await form.db.query(
             query=query_for_old_record,
             values=values_for_old_record,
             errors=form.errors,
@@ -147,7 +147,7 @@ async def save_value(R:dict):
             if const_record:
                # print('const_record exists:',const_record)
                 
-                form.db.query(
+                await form.db.query(
                     query=f"UPDATE {form.work_table} SET {form.value_field}=%s where {form.work_table_id}=%s",
                     values=[R['value'],const_record[form.work_table_id]]
                 )
@@ -161,13 +161,13 @@ async def save_value(R:dict):
                 if form.foreign_key:
                     data[form.foreign_key]=form.foreign_key_value
                 
-                form.db.save(
+                await form.db.save(
                     table=form.work_table,
                     data=data,
                     errors=form.errors
                 )
             
-            form.run_event('after_save_const')
+            await form.run_event('after_save_const')
 
 
     success=( True if len(form.errors) else False)

@@ -1,6 +1,6 @@
 from lib.core import exists_arg
 
-def permission(form):
+async def permission(form):
     entity = exists_arg('cgi_params;entity',form.R)
     if entity:
         form.type_value=entity
@@ -26,7 +26,7 @@ def permission(form):
         '20':'Ответчики ФАС-сервис (список менеджеров)'
     }
     if form.id:
-        form.ov=form.db.query(
+        form.ov=await form.db.query(
             query=f"select * from {form.work_table} where id=%s",
             values=[form.id],
             onerow=1
@@ -62,20 +62,20 @@ def permission(form):
 
     form.title=title
 
-def events_permission2(form):
+async def events_permission2(form):
     pass
 
-def events_before_code(form):
+async def events_before_code(form):
     #print('is_before_code')
     pass
 
-def before_delete(form):
+async def before_delete(form):
     pass
     #form.errors.append('Вам запрещено удалять!')
 
-def after_update(form):
+async def after_update(form):
     form.pre({'form.ov':form.ov, 'values':form.values})
-    #form.db.query()
+
 
 events={
   'permissions':[

@@ -1,8 +1,8 @@
-def brand_id(form,v):
+async def brand_id(form,v):
   brand_id=v['brand_id']
   after_html=''
   if brand_id:
-    brand=form.db.query(
+    brand=await form.db.query(
       query='SELECT * from brand where id=%s',
       values=[brand_id],
       onerow=1,

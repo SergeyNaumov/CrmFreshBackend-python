@@ -1,4 +1,4 @@
-def permissions_before_code(form,field):
+async def permissions_before_code(form,field):
   pass
 
 form={
@@ -41,7 +41,7 @@ form={
 
         },
         {
-          'before_code': permissions_before_code,
+          #'before_code': permissions_before_code,
           'description':'Права учётной записи',
           'add_description':'для юрлиц и аптек',
           'type':'multiconnect',

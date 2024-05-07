@@ -1,10 +1,10 @@
 from lib.core import exists_arg
-def get_role(db, manager_id: int):
+async def get_role(db, manager_id: int):
 
   manager_table='manager'
   manager_role_table='manager_role'
 
-  r=db.query(
+  r=await db.query(
     query="""
       SELECT
         m2.id
@@ -28,14 +28,14 @@ def get_triade(num):
 		return num
 
 # получает словарь получателей, 
-def get_email_list_from_manager_id(db, to: dict):
+async def get_email_list_from_manager_id(db, to: dict):
 	ids=[]
 	for manager_id in to:
 		ids.append(str(manager_id))
 	
 	if len(ids):
 		to_emails={}
-		for email in db.query(
+		for email in await db.query(
 			query=f'''
 				SELECT
 					me.email

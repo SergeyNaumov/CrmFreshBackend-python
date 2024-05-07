@@ -2,10 +2,6 @@ from .get_values import get_values
 from .after_search import after_search
 from .permissions import permissions
 
-def after_save(form):
-    pass
-    # form.nv=get_values(form)
-    # #print('nv:',form.nv)
 
 events={
   'permissions':[

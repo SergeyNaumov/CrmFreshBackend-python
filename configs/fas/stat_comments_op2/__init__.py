@@ -6,7 +6,7 @@ from pprint import pprint
 # получаем комментарии для списка
 
 
-def search(form, R):
+async def search(form, R):
     #R['cgi_params']['type']='43'
     filters=R['filters']
     log=[]
@@ -45,7 +45,7 @@ def search(form, R):
     if isinstance(group_id, list):
         group_list=[]
         group_hash={}
-        group_list=child_groups(db=form.db, group_id=group_id)
+        group_list=await child_groups(db=form.db, group_id=group_id)
         #log.append({'hash':group_hash})
         if len(group_list):
             where.append(f"m.group_id IN ({join_ids(group_list)})")
@@ -58,31 +58,6 @@ def search(form, R):
 
     if registered:
         # Комментарии с записями
-        # query=f"""
-        #     select
-        #         u.id user_id, u.firm, m.name, hour(um.registered) hour, um.registered, um.body,
-        #         uc.phone, if(uc.fio,uc.fio,'') contact_name,
-        #         group_concat( concat(time(r.date),';',r.download_link,';',if(r.direction='OUTBOUND','исх','вх'),';',r.duration) SEPARATOR ';;;' ) records,
-        #         um.id um_id
-        #     from
-        #         user_memo um
-        #         join manager m ON m.id=um.manager_id
-        #         join user u ON u.manager_id=m.id and um.user_id=u.id
-        #         LEFT join beeline_records r ON r.manager_id=m.id and (r.date>=%s and r.date<=%s)
-        #         join user_contact uc ON uc.user_id=u.id and uc.phone=r.phone
-        #     WHERE
-        #         {' AND '.join(where)}
-        #     GROUP BY um.id
-        #     ORDER BY um.registered
-        # """
-
-        # #print('query:',query)
-        # result=form.db.query(
-        #     query=query,
-        #     values=values,
-        #     #debug=1,
-        #     #log=log
-        # )
 
         query=f"""
             select
@@ -101,7 +76,7 @@ def search(form, R):
         """
 
         # Комментарии без записей
-        result=form.db.query(
+        result=await form.db.query(
             query=query,
             values=[f"{registered} 00:00:00", f"{registered} 23:59:59"],
             #debug=1,
@@ -132,7 +107,7 @@ def search(form, R):
             # Дёргаем звонки
             where_records.append(f"""r.phone in ("{'","'.join(all_phones)}")""")
             #print('where_records:',where_records)
-            records=form.db.query(
+            records=await form.db.query(
                 query=f"""
                     SELECT
                         r.id, concat('',time(r.date)) registered, if(r.direction='OUTBOUND','исх','вх') direction,
@@ -164,36 +139,6 @@ def search(form, R):
                         act_item['records'].append(rec)
 
 
-                    #print(memo_item)
-
-
-
-        #print('result ok')
-        # result_comments=form.db.query(
-        #     query=f"""
-        #         select
-        #             u.id user_id, u.firm, m.name, hour(um.registered) hour, um.registered, um.body,
-        #             uc.phone, if(uc.fio,uc.fio,'') contact_name,
-        #             group_concat( concat(time(r.date),';',r.download_link,';',if(r.direction='OUTBOUND','исх','вх'),';',r.duration) SEPARATOR ';;;' ) records
-        #         from
-        #             manager m
-        #             join user u ON u.manager_id=m.id
-        #             join user_memo um ON um.user_id=u.id and um.manager_id=m.id
-        #             LEFT join user_contact uc ON uc.user_id=u.id
-        #             LEFT join beeline_records r ON r.manager_id=m.id and r.phone=uc.phone and (r.date>=%s and r.date<=%s)
-        #         WHERE
-        #             (um.registered>=%s and um.registered<=%s)
-        #         GROUP BY um.id
-        #         ORDER BY um.registered
-        #     """,
-        #     values=[f"{registered} 00:00:00", f"{registered} 23:59:59"]
-
-        # )
-
-
-
-        #
-        #print('result:',result)
         rid=1
         if len(result):
             prev_hour=-1
@@ -223,56 +168,7 @@ def search(form, R):
                 }
             )
 
-        # managers_hash={}
-        # managers_ids=[]
-        # hour=-1
-        # for r in result:
-        #     if not(r['firm']):
-        #         r['firm']='***'
-        #     if(r['hour'] != hour):
-        #         r['new_hour']=1
-        #         hour=r['hour']
-        #     else:
-        #         r['new_hour']=0
 
-        #     if manager_id:=r.get('manager_id'):
-
-        #         if not(managers_hash.get(manager_id)):
-        #             managers_ids.append(manager_id)
-        #             managers_hash[manager_id]=1
-
-        # if len(managers_ids):
-        #     managers_hash={}
-        #     for m in form.db.query(query=f"select name, id from manager where id in ({join_ids(managers_ids)}) order BY name"):
-        #         item={'name':m['name'],'comments':[]}
-
-        #         for r in result:
-        #             if r['manager_id']==manager_id:
-        #                 item['comments'].append(r)
-
-        #         managers_hash[m['id']]=item
-
-        #         accordion_data.append({
-        #             "header": m['name'],
-
-        #             #"header_links":[{'url':'sasa','style':'','header':'link1'}],
-        #             'not_container':True,
-        #             "content":[
-        #                 {
-        #                     'type':'html',
-
-        #                     'body': form.template(
-        #                             filename=f'./{config["config_folder"]}/stat_comments_op2/template/table.html', list_comments=item['comments']
-        #                     ),
-        #                 }
-        #             ]
-        #         })
-
-
-
-        #log=[managers_hash]
-        #print("all_managers :", join_ids(managers_ids) )
-        #log.append({'hash': managers_hash.keys() });
     else:
         form.errors.append('Необходимо выбрать дату')
 
@@ -290,7 +186,7 @@ def search(form, R):
 
 
 
-def permissions(form):
+async def permissions(form):
     ...
 
 form={

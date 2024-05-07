@@ -3,7 +3,7 @@ from lib.core import exists_arg
 
 # Создание пакета документов + договора
 
-def action_create_docpack(form, field, R):
+async def action_create_docpack(form, field, R):
     need_manager=need_manager_fld(form)
     manager_id=form.manager['id']
         
@@ -13,9 +13,6 @@ def action_create_docpack(form, field, R):
     docpack_foreign_key=field['docpack_foreign_key']
 
     if form.success():
-        #form.db}->{connect}->begin_work;
-        # начало транзакции
-        
         number,number_today = field['dogovor_number_rule'](form, field, R['ur_lico_id'])
 
         
@@ -27,7 +24,7 @@ def action_create_docpack(form, field, R):
             'registered':'func:now()'
         };
 
-        docpack_id=form.db.save(
+        docpack_id=await form.db.save(
                     table='docpack',
                     data=data,
                     errors=form.errors
@@ -40,15 +37,10 @@ def action_create_docpack(form, field, R):
             'number':number
         }
 
-        form.db.save(
+        await form.db.save(
             table='dogovor',
             data=data,
         );
         
-        # Закрыть транзакцию
-        #$form->{db}->{connect}->commit;
-        #$form->{db}->{connect}->{AutoCommit}=1;
 
-        
-        #print_response($s,$form);
     return {'success':form.success(),'errors':form.errors}

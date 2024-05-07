@@ -1,6 +1,6 @@
 from lib.core import get_child_field,exists_arg
 from lib.get_1_to_m_data import get_1_to_m_data
-def update_field(form,field,arg):
+async def update_field(form,field,arg):
   R=form.R
   child_field_name=exists_arg('child_field_name',arg)
 
@@ -26,7 +26,7 @@ def update_field(form,field,arg):
       
 
   if form.success():
-    form.db.query(
+    await form.db.query(
       query=f"""
         UPDATE
           {field["table"]}
@@ -36,7 +36,7 @@ def update_field(form,field,arg):
       values=[value,id]
 
     )
-    get_1_to_m_data(form,field)
+    await get_1_to_m_data(form,field)
 
   return {
     'success':1,

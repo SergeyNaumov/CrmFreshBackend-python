@@ -1,4 +1,4 @@
-def after_search(form):
+async def after_search(form):
   result_plaintiff={} ; result_resp={}
   output = form.SEARCH_RESULT.get('output')
 
@@ -17,7 +17,7 @@ def after_search(form):
   if not len(ids):
     return
   # собираем исцов
-  plaintiff_list=form.db.query(
+  plaintiff_list=await form.db.query(
     query=f"""
       select
         pl.case_id, pl.name, e.inn, e.kpp, e.shortname, e.fullname,
@@ -49,7 +49,7 @@ def after_search(form):
       fld['value']+=form.template('./conf/arbitrage_case/templates/plaintiff.html',list=_list)
 
   # собирает ответчиков
-  respondent_list=form.db.query(
+  respondent_list=await form.db.query(
     query=f"""
       select
         pl.case_id, pl.name, e.inn, e.kpp, e.shortname, e.fullname,

@@ -1,6 +1,6 @@
 from lib.core import exists_arg
 
-def permissions(form):
+async def permissions(form):
   entity = exists_arg('cgi_params;entity',form.R)
   if entity=='5':
     form.title='Расторжения РегРФ'
@@ -10,6 +10,8 @@ def permissions(form):
     form.title='Расторжения BzInfo'
   elif entity=='18':
     form.title='Расторжения ФАС-сервис'
+  elif entity=='22':
+    form.title='Расторжения AUZ'
   elif not(form.id):
     form.errors.append('Неузвестное значение entity')
   
@@ -30,11 +32,11 @@ def permissions(form):
           'target':'contract_termination_stat'
         })
 
-def before_search(form):
-  entity = exists_arg('cgi_params;entity',form.R)
-  qs = form.query_search
-  if entity.isnumeric():
-    form.query_search['WHERE'].append(f"tr.type={entity}")
+# async def before_search(form):
+#   entity = exists_arg('cgi_params;entity',form.R)
+#   qs = form.query_search
+#   if entity.isnumeric():
+#     form.query_search['WHERE'].append(f"tr.type={entity}")
 
 events={
   'permissions':permissions

@@ -1,9 +1,9 @@
-from .get_values import get_values
+#from .get_values import get_values
 
-def permissions(form):
+async def permissions(form):
     pass
 
-def after_save(form):
+async def after_save(form):
     pass
     # form.nv=get_values(form)
     # #print('nv:',form.nv)

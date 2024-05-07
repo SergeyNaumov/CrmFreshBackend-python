@@ -1,6 +1,6 @@
-from .get_values import get_values
+#from .get_values import get_values
 
-def permissions(form):
+async def permissions(form):
     pass
     # form.ov=None
     # form.is_admin=True
@@ -18,17 +18,17 @@ def permissions(form):
     #     if form.ov:
     #         form.title=f"Акт №{form.ov['number']} от {form.ov['registered']}"
 
-def after_save(form):
+async def after_save(form):
     pass
     # form.nv=get_values(form)
     # #print('nv:',form.nv)
-def before_search(form):
+async def before_search(form):
   qs=form.query_search
   #form.pre(qs['SELECT_FIELDS'])
   qs['SELECT_FIELDS'].append('group_concat( distinct p.phone ) phones')
   qs['SELECT_FIELDS'].append('group_concat( distinct e.email ) emails')
 
-def after_search(form):
+async def after_search(form):
   result_plaintiff={} ; result_resp={}
   output = form.SEARCH_RESULT.get('output')
 
@@ -47,7 +47,7 @@ def after_search(form):
   if not len(ids):
     return
   # собираем исцов
-  plaintiff_list=form.db.query(
+  plaintiff_list=await form.db.query(
     query=f"""
       select
         pl.case_id, pl.name, e.inn, e.kpp, e.shortname, e.fullname,
@@ -79,7 +79,7 @@ def after_search(form):
       fld['value']+=form.template('./conf/arbitrage_case/templates/plaintiff.html',list=_list)
 
   # собирает ответчиков
-  respondent_list=form.db.query(
+  respondent_list=await form.db.query(
     query=f"""
       select
         pl.case_id, pl.name, e.inn, e.kpp, e.shortname, e.fullname,

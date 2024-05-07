@@ -1,7 +1,7 @@
 from lib.core import exists_arg
-def permissions(form):
+async def permissions(form):
   if form.id:
-    form.ov=form.db.query(
+    form.ov=await form.db.query(
       query=f'select * from {form.work_table} where {form.work_table_id}={form.id}',
       onerow=1
     )
@@ -11,8 +11,8 @@ def permissions(form):
   #if not exists_arg('blank_document',perm):
   #  form.errors.append('Доступ запрещён!')
 
-def after_save(form):
-  form.db.query(
+async def after_save(form):
+  await form.db.query(
     query=f'UPDATE blank_document set registered=now() where id = {form.id}'
   )
   

@@ -18,7 +18,7 @@ async def autocomplete(config:str,R: dict):
   errors=[]
   field=''
   result_list=[]
-  form=read_config(
+  form = await read_config(
     script='autocomplete', config=config,
     R=R,
     #id=R['id']
@@ -66,7 +66,7 @@ async def autocomplete(config:str,R: dict):
   if not field:
     errors.append(f'field_name: {name} not found')
   else:
-    result_list=get_list(
+    result_list=await get_list(
       errors=errors,
       form=form,
       name=name,
@@ -80,7 +80,7 @@ async def autocomplete(config:str,R: dict):
 
   return  {'success':0 if(len(errors)) else 1,'errors':errors,'list':result_list}
     
-def get_list(**arg):
+async def get_list(**arg):
   form=arg['form']
   element=arg['element']
   like_values=[]
@@ -104,7 +104,7 @@ def get_list(**arg):
   T=element['orig_type'] 
   #print('T:',T)
   if T=='multiconnect':
-    return form.db.query(
+    return await form.db.query(
       query=f'''
         SELECT
             {element['relation_table_id']} as id, { element['relation_table_id'] } as value, { element['relation_table_header'] } as label
@@ -176,7 +176,7 @@ def get_list(**arg):
     
     #print('query:',element['search_query'])
     #print('like_values:',like_values)
-    return form.db.query(
+    return await form.db.query(
 
       query=element['search_query'],
       values=like_values
@@ -185,10 +185,6 @@ def get_list(**arg):
 
 
   # T -- type
-  
-
-
-  #print('DB',form.db)
 def ecran_ind(v):
   v=v.replace('@','\\@')
   #print re.sub(r'([\.])', r'\\\1', "example string.")

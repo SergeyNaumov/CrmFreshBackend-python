@@ -1,5 +1,5 @@
-def get_values(form):
-	return form.db.query(
+async def get_values(form):
+	return await form.db.query(
             query=f'''
                     SELECT
                         wt.*,u.firm, u.id user_id,

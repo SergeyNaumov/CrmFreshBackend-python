@@ -4,6 +4,7 @@ from config import config
 #from db import db,db_read,db_write
 from lib.engine import s
 from lib.session import *
+from lib.send_mes import send_mes
 
 router = APIRouter()
 @router.get('/test')
@@ -96,11 +97,9 @@ async def startpage():
   manager=None
   manager_menu_table=None
   left_menu=[]
-  print(111)
   if hasattr(s,'login'):
 
     if(config['use_project']):
-        print(222)
         manager=await s.db.query(
           query=f'select *,concat("/edit_form/project_manager/",{config["auth"]["manager_table_id"]}) link from project_manager where project_id=%s and login=%s',
           values=[s.project_id,s.login]
@@ -108,7 +107,6 @@ async def startpage():
         manager_menu_table='project_manager_menu'
 
     else:
-        print(333)
         manager=await s.db.query(
           query=f"select *,concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link from {config['auth']['manager_table']} where login=%s",
           values=[s.login],
@@ -181,7 +179,7 @@ async def login(R: dict):
   response={'success':0}
   if R:
     if config['use_project']:
-      response=session_project_create(
+      response=await session_project_create(
         s,
         login=R['login'],
         password=R['password'],
@@ -194,7 +192,7 @@ async def login(R: dict):
 
       )
     else:
-      response=session_create(
+      response=await session_create(
         s,
         login=R['login'],
         password=R['password'],
@@ -208,7 +206,12 @@ async def login(R: dict):
 
   return response
 
+@router.get('/send_mes')
+async def sm_test():
+  send_mes({'a':1,'b':2,'c':3})
+  return {'sended':True}
+
 @router.get('/logout')
 async def logout():
-  session_logout(s)
+  await session_logout(s)
   return {"success":1}

@@ -91,7 +91,7 @@ def parse_str(row):
 #     return result
 
 
-def go_parse(**xarg):
+async def go_parse(**xarg):
     errors=[]
     filename=xarg.get('filename')
     tmp_dir=xarg.get('tmp_dir')
@@ -144,7 +144,7 @@ def go_parse(**xarg):
                 #if before_loopback:
                 #    before_loopback(hash_str)
                 #print('hash_str:',hash_str)
-            loopback(hash_str)
+            await loopback(hash_str)
 
         else:
             _str=clean_empty_tail(_str)

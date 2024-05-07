@@ -1,5 +1,5 @@
 from lib.core import cur_date, exists_arg, join_ids
-def search(form, R):
+async def search(form, R):
     #print('form:',form)
     col1=[]
     col2=[]
@@ -72,7 +72,7 @@ def search(form, R):
 
 
 
-    _list=db.query(
+    _list=await db.query(
         query=query,
         #debug=1,
         values=values

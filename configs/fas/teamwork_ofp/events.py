@@ -2,7 +2,7 @@ from lib.core import exists_arg, join_ids
 from lib.send_mes import send_mes
 from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 
-def get_old_values(form):
+async def get_old_values(form):
   product_hash={
     3:'Банковская Гарантия (Аукцион выигран с нашей помощью)',
     4:'Банковская Гарантия (есть победитель)',
@@ -27,7 +27,7 @@ def get_old_values(form):
 
       LEFT JOIN manager mfin ON (mfin.id=u.manager_fin)
     """
-    ov=form.db.query(
+    ov=await form.db.query(
       query='''
         SELECT
                   wt.teamwork_ofp_id as id, wt.regnumber, wt.user_id, wt.product, '' as link, '' as product_label, wt.manager_from, wt.manager_to, wt.manager_to2,
@@ -75,7 +75,7 @@ def get_old_values(form):
   form.ov=ov
   form.old_values=ov
 
-def permissions(form):
+async def permissions(form):
 
   form.is_admin=False
   form.is_manager_from=False
@@ -90,7 +90,7 @@ def permissions(form):
     form.search_on_load=True
     #return
 
-  get_old_values(form)
+  await get_old_values(form)
   # Админ ОФП
   if form.manager['login'] in ('admin', 'akulov','sed','pzm'):
     form.is_admin=True
@@ -143,9 +143,9 @@ def permissions(form):
 
 
 
-def before_update(form):
+async def before_update(form):
   # Отправка сообщения после назначения юриста
-  def send_lawer_mes(manager_id):
+  async def send_lawer_mes(manager_id):
     if not(manager_id):
       return
 
@@ -158,17 +158,17 @@ def before_update(form):
 
     if manager_from:=form.ov.get('mf__id'):
       to_hash[manager_from]=1
-      manager=get_manager( id=manager_from, db=form.db)
-      if owner:=get_owner(cur_manager=manager,db=form.db):
+      manager=await get_manager( id=manager_from, db=form.db)
+      if owner:=await get_owner(cur_manager=manager,db=form.db):
         to_hash[owner['id']]=1
 
 
-    manager=get_manager( id=manager_id, db=form.db)
+    manager=await get_manager( id=manager_id, db=form.db)
 
-    if owner:=get_owner(cur_manager=manager,db=form.db):
+    if owner:=await get_owner(cur_manager=manager,db=form.db):
       to_hash[owner['id']]=1
 
-    to=get_email_list_from_manager_id(form.db, to_hash)
+    to=await get_email_list_from_manager_id(form.db, to_hash)
     if len(to):
       send_mes(
         from_addr='info@fascrm.ru',
@@ -193,13 +193,13 @@ def before_update(form):
 
     #print(f"new_manager_to: {new_manager_to} ; old_manager_to: {old_manager_to}")
     if new_manager_to and int(new_manager_to)!=old_manager_to:
-      send_lawer_mes(int(new_manager_to))
+      await send_lawer_mes(int(new_manager_to))
 
     if new_manager_to2 and int(new_manager_to2)!=old_manager_to2:
-      send_lawer_mes(int(new_manager_to2))
+      await send_lawer_mes(int(new_manager_to2))
 
     if new_group_id and int(new_group_id)!=old_group_id:
-      lower_group=form.db.query(
+      lower_group=await form.db.query(
         query="select header, owner_id from manager_group where id=%s",
         values=[new_group_id],
         onerow=1,
@@ -219,7 +219,7 @@ def before_update(form):
           # менеджер ОП
           to_hash[manager_op]=1
 
-          if owner_op:=get_owner(manager_id=manager_op,db=form.db):
+          if owner_op:=await get_owner(manager_id=manager_op,db=form.db):
             to_hash[owner_op['id']]=1
 
         #if owner:=get_owner(manager_id=manager,db=form.db):
@@ -228,7 +228,7 @@ def before_update(form):
         if lower_group['owner_id']:
           to_hash[lower_group['owner_id']]=1
 
-        to=get_email_list_from_manager_id(form.db, to_hash)
+        to=await get_email_list_from_manager_id(form.db, to_hash)
         if len(to):
           send_mes(
             from_addr='info@fascrm.ru',
@@ -241,11 +241,11 @@ def before_update(form):
         #form.pre({'lower_group':lower_group})
 
 
-def after_save(form):
+async def after_save(form):
   manager_id=exists_arg('values;manager_id', form.R)
   user_id=exists_arg('user_id', form.ov)
   if manager_id and form.manager['login'] in ('akulov','sed','pzm'):
-    form.db.query(
+    await form.db.query(
       query='UPDATE user set manager_id=%s where id=%s',
       values=[manager_id,user_id],
 
@@ -256,7 +256,7 @@ def after_save(form):
   #form.pre([old_manager_to,form.values['manager_to']])
   #form.errors.append('test')
 
-def before_search(form):
+async def before_search(form):
   manager=form.manager
   user_id=exists_arg('cgi_params;user_id',form.R)
   qs=form.query_search

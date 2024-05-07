@@ -1,32 +1,19 @@
 from .get_values import get_values
 
-def permissions(form):
-    pass
-    # form.ov=None
-    # form.is_admin=True
+async def permissions(form):
+  if form.id:
+    form.ov=await get_values(form)
+    #form.pre(form.ov)
+    #print('ov:',form.ov)
+    #form.title=f"Акт №{form.ov['number']} от {form.ov['registered']}"
 
-    # perm=form.manager['permissions']
-    # #form.pre(perm)
-    # if perm['admin_paids']:
-    #     form.is_admin=True
-    #     form.read_only=False
-    #     form.make_delete=True
-    
-    # if form.id:
-    #     form.ov=get_values(form)
-
-    #     if form.ov:
-    #         form.title=f"Акт №{form.ov['number']} от {form.ov['registered']}"
-
-def after_save(form):
+async def after_save(form):
     pass
     # form.nv=get_values(form)
     # #print('nv:',form.nv)
 
 events={
-  'permissions':[
-      permissions,
-      
+  'permissions':[ permissions
   ],
   'after_save':after_save
   #'before_delete':before_delete,
