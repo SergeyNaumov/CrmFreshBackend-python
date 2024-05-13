@@ -42,7 +42,7 @@ async def autocomplete(config:str,R: dict):
     else:
       #field=form.get_field(name)
       if ajax_autocomplete:=exists_arg('ajax;autocomplete',field):
-        result_list=ajax_autocomplete(form,field,R)
+        result_list = await ajax_autocomplete(form,field,R)
         return {
           'success':True,
           'list': result_list
@@ -151,9 +151,7 @@ async def get_list(**arg):
       if exists_arg('values',arg):
         values_array=[]
         for v in arg['values']:
-          #print('v:',v)
           values_array.append(str(v))
-        #print('values_array:',values_array)
         
         if len(values_array):
           if where: where+=' OR '
