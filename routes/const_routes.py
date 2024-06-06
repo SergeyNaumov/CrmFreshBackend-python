@@ -78,7 +78,7 @@ async def get_list(R:dict): #
 # Сохранение константы
 @router.post('/save_value')
 async def save_value(R:dict):
-    form=read_config(
+    form = await read_config(
         action='save_value',
         config=R['config'],
         #id=exists_arg('id',arg),

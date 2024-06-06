@@ -21,6 +21,12 @@ class FreshDB():
             loop=loop,
             autocommit=settings.get('autocommit',True)
         )
+        # Устанавливаем переменные по умолчанию
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("SET lc_time_names='ru_RU'")
+
+       #self.query(query='set lc_time_names="ru_RU"')
 
     async def close_pool(self):
         if self.pool:
