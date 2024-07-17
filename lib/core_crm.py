@@ -148,16 +148,31 @@ async def get_manager(**arg):
 			m['CHILD_GROUPS'] = await child_groups(db=db,group_id=m['group_id'])
 
 	# получаем права менеджера
-	if True and exists_arg('options_hash',arg):
+	if exists_arg('options_hash',arg):
 	    new_options={}
-	    for o in m['options'].split(';'):
-	      new_options[o]=1
+	    if m['options']:
+		    for o in m['options'].split(';'):
+		      new_options[o]=1
 	    
 	    m['options']=new_options
 
 	return m
 
-	
+async def get_group_options(**arg):
+	# get_group_options(db=db, group_id=ID)
+
+	if arg['group_id']:
+		result={}
+		_list = await arg['db'].query(
+			query="select p.pname from manager_group_permissions mgp join permissions p ON p.id=mgp.permissions_id where mgp.group_id=%s",
+			values=[arg['group_id']],
+			massive=1
+		)
+		for l in _list:
+			result[l]=True
+		return result
+	else:
+		return {}
 
 
 

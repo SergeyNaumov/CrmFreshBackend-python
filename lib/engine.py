@@ -61,28 +61,29 @@ class Engine():
           where=f"login='{config['debug']['login']}'"
         
 
-        self.manager=await db.getrow(
+        self.request.state.manager=self.manager=await db.getrow(
           table=auth['manager_table'],
           where=where,
           values=values,
 
         )
-        
-        if self.manager:
-          self.manager['id']=self.manager[auth['manager_table_id']]
-          self.login=self.manager['login']
+        manager=self.request.state.manager
+
+        if manager:
+          manager['id']=manager[auth['manager_table_id']]
+          #self.login=self.manager['login']
         else:
-          self.login='nonelogin'
+          #self.login='nonelogin'
           self.manager={'id':0,'login':'nonelogin','name':'менеджер не найден'}
       else:
         
         await session_start(self);
 
-            
-            
-      
-          
-      if self.manager['id'] and ('after_create_engine' in config):
+      # для того, чтобы избежать путаницы в сессиях
+      self.request.state.manager=self.manager  
+      #print('RESET self.request.state.manager:',self.request.state.manager)
+      manager=s.request.state.manager
+      if manager['id'] and ('after_create_engine' in config):
         config['after_create_engine'](self)
 
       #print('MANAGER:',self.manager)

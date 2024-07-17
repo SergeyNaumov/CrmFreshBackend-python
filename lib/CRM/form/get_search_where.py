@@ -207,10 +207,12 @@ def get_search_where(form,query):
 
       elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
 
-        db_name=exists_arg('db_name',f)
+        db_name=f.get('db_name')
+#        if f['name']=='ur_lico_id':
+#          print('db_name:', db_name)
         if not(db_name) and f['type']=='filter_extend_select_from_table':
           db_name=f.get('value_field','id')
-        else:
+        elif not(db_name):
           db_name=name
 
         if type(values) is int or type(values)=='str':

@@ -31,7 +31,10 @@ def massive_transform(rez):
 
 def out_error(self,error,arg):
     self.error_str=str(error)
-    err_out=f"ERROR QUERY: {arg['query']}\n{self.error_str}"
+    if q:=arg.get('query'):
+      err_out=f"ERROR QUERY: {arg['query']}\n{self.error_str}"
+    else:
+      err_out=f"{arg}"
 
     if arg.get('values') and len(arg['values']):
         err_out+=f"\nvalues: {arg['values']}"

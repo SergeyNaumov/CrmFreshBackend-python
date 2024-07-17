@@ -70,13 +70,15 @@ async def session_create(s,**arg):
   
 
   auth_id=None
-
+  #print('auth:',auth)
   if auth['encrypt_method']=='mysql_sha2':
       auth_id=await s.db.query(
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=sha2(%s,256)'+add_where,
         values=[arg['login'],arg['password']],
+        #debug=1,
         onevalue=True,
       )
+      #print('auth_id:',auth_id)
   elif auth['encrypt_method']=='mysql_encrypt':
       auth_id=await s.db.query(
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=encrypt(%s,password)'+add_where,
@@ -91,12 +93,15 @@ async def session_create(s,**arg):
       );
   
   if auth_id:
-    s.manager={
+    s.request.state.manager=s.manager={
       'id':auth_id,
       'login':arg['login']
     }
 
     key=gen_pas(200)
+    await db.query(
+      query=f"delete from {auth['session_table']} where auth_id={auth_id}"
+    )
 
     await db.save(
       table=auth['session_table'],
@@ -136,7 +141,7 @@ async def session_start(s,**arg):
   manager={'login':'','id':False, 'password':''}
   
 
-
+  #print('auth:', auth)
   if  exists_arg('type',auth) and auth['type']=='env':
     if 'authorization' in s.env:
       auth=s.env['authorization']
@@ -164,8 +169,10 @@ async def session_start(s,**arg):
         query=f'SELECT count(*) FROM {auth["session_table"]} WHERE auth_id=%s and session_key=%s',
         values=[user_id, key],
         onevalue=1,
+        #debug=1,
         errors=errors
       )
+      #print('ok:',ok)
       if ok:
           manager=await s.db.query(
             query=f'select *,{auth["manager_table_id"]} id from {auth["manager_table"]} where {auth["manager_table_id"]}=%s',
@@ -173,13 +180,13 @@ async def session_start(s,**arg):
             onerow=1,errors=errors
           );
 
-          print('manager:',manager)
+          #print('manager:',manager)
 
   if manager:
   #  manager['id']=str(manager['id'])
     
     del manager['password']
-    s.manager=manager
+    s.request.state.manager=s.manager=manager
       
   s._content={
     'success':1,
@@ -235,7 +242,7 @@ async def project_get_permissions_for(form,login):
   )
   del manager['password']
 
-def child_groups(db,group_id):
+async def child_groups(db,group_id):
   if not len(group_id):
     return []
 
@@ -248,13 +255,13 @@ def child_groups(db,group_id):
   #j=0
   #for g in group_id:
   #  group_id[j]=group_id[j]
-  g_list=db.query(
+  g_list=await db.query(
     query=f"SELECT id from {group_table} where parent_id IN ({join_ids(group_id)})"
   )
   #print('g_list:',g_list)
   for g1 in g_list:
     g1['id']=int(g1['id'])
-    for g2 in child_groups(db,[g1['id']]):
+    for g2 in await child_groups(db,[g1['id']]):
       #print('g2:',[int(g2)])
       group_id.append(int(g2))
   #print('group_id:',group_id)
@@ -319,12 +326,10 @@ async def get_permissions_for(form,login):
     for p in gr_perm_list:
         manager['permissions'][p['pname']]=p['id']
     
-    print('gpf5')
-    manager['CHILD_GROUPS']=child_groups(form.db,[group_id])
+    manager['CHILD_GROUPS'] = await child_groups(form.db,[group_id])
 
     for g_id in manager['CHILD_GROUPS']:
         manager['CHILD_GROUPS_HASH'][int(g_id)]=1
-    print('CHILD_GROUPS_HASH:',manager['CHILD_GROUPS_HASH'])
   manager['files_dir']='./files'
   manager['files_dir_web']='/files'
   return manager

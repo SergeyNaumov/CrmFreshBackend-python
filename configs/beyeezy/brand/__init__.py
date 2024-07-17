@@ -21,6 +21,35 @@ form={
             'name':'header',
             
         },
+        {
+            'description':'Фото',
+            'type':'file',
+            'name':'photo',
+            'filedir':'./files/brand',
+            'preview':'214x293',
+            'resize':[
+                { # вертикальное фото
+                    'file':'<%filename_without_ext%>_mini1.<%ext%>',
+                    'size':'214x293',
+                    'quality':'100'
+                },
+                { # горизонтальное фото
+                    'file':'<%filename_without_ext%>_mini2.<%ext%>',
+                    'size':'295x202',
+                    'quality':'100'
+                },
+                { # лайтбокс
+                    'file':'<%filename_without_ext%>_mini3.<%ext%>',
+                    'size':'0x700',
+                    'quality':'100'
+                },
+                { # вкладка "документы"
+                    'file':'<%filename_without_ext%>_mini4.<%ext%>',
+                    'size':'0x700',
+                    'quality':'100'
+                },
+            ],
+        },
 
 
   ]  

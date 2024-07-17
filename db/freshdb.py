@@ -178,7 +178,6 @@ class FreshDB():
                 out_error(self,"FreshDB::save not set attr where",arg)
                 return False
             query=f"UPDATE {arg['table']} SET {','.join(update_names)} WHERE {arg['where']}"
-
         else:
             if arg.get('replace'):
                 query='REPLACE'
@@ -189,7 +188,7 @@ class FreshDB():
                 query+=' IGNORE'
 
             query+=f" INTO {arg['table']}({','.join(insert_fields)}) VALUES({','.join(insert_vopr)})"
-
+        arg['query']=query
         arg['values']=insert_values
 
         async with self.pool.acquire() as conn:

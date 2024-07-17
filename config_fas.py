@@ -43,7 +43,9 @@ config={
   },
   'main_page_components':[
     {'component':'birth-days','cols':12},
-    {'component':'notifications','cols':12}
+    {'component':'notifications','cols':12},
+    #{'component':'link-telegram','cols':6},
+    {'component':'manager-load','cols':12},
   ],
   'copyright':'copyright 2005 - {{cur_year}}',
    'bottom_menu': [
@@ -135,7 +137,8 @@ config={
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     'manager_id':
 #      12066 # mai
-      1
+      #1
+      11709
       #11691 #Люб
       #4201 # sed
       #585 # Ак ,
