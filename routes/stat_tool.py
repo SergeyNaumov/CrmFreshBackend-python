@@ -4,6 +4,7 @@ from lib.CRM.form.get_values_for_select_from_table import get_values_for_select_
 import traceback
 
 router = APIRouter()
+# Инициализация
 @router.post('/{config}')
 async def get_list(config: str, R:dict): # 
     form=read_config(
@@ -43,7 +44,8 @@ async def get_list(config: str, R:dict): #
     else:
         response['log']=[]
 
-    
+    if(hasattr(form,'javascript')):
+        response['javascript']=form.javascript
     
     return response
 

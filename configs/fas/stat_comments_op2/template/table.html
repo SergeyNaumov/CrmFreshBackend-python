@@ -7,9 +7,10 @@
 			<tr>
 				<td>итого</td>
 				<td>менеджер</td>
+				<td>результат<br>за час</td>
 				<td>время написания</td>
 				<td>комментарий</td>
-				<td>результат<br>за час</td>
+
 				<td>Номер телефона</td>
 				<td>Компания</td>
 
@@ -18,13 +19,11 @@
 		<tr>
 			<td>{{l.j}}</td>
 			<td>{{l.name}}</td>
-			<td>{{l.registered}}</td>
-			<td>{{l.body}}</td>
 			<td>{%for r in l.records%}
 					<div>
-						{{r.registered}} {{r.direction}}
+						<a href="" onclick="return window.toggle('#control{{r.id}}')">{{r.registered}} {{r.direction}}</a>
 						{%if r.src%}
-			            <audio controls>
+			            <audio controls style="display: none;" id="control{{r.id}}">
 			              <source src="{{r.src}}" type="audio/ogg">
 			              <source src="{{r.src}}" type="audio/mpeg">
 			            </audio>
@@ -32,6 +31,9 @@
 					</div>
 				{%endfor%}
 			</td>
+			<td>{{l.registered}}</td>
+			<td style="max-width: 500px;">{{l.body}}</td>
+
 			<td>
 				{{l.phone}}<br>
 				{{l.contact_name}}

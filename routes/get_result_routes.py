@@ -116,7 +116,13 @@ async def get_result(R: dict):
         form.page='1'
 
       log=[]
-      
+      if form.explain:
+        form.explain_query=query
+        form.explain_query=form.explain_query+'<br><br>VALUES: ['+','.join(form.query_search['VALUES'])+']'
+        print('===')
+        print(form.explain_query)
+        print('===')
+      print('get_result_list')
       result_list=form.db.query(
         query=query,
         #debug=1,
@@ -124,10 +130,7 @@ async def get_result(R: dict):
         errors=form.errors,
       )
       
-      
-      if form.explain:
-        form.explain_query=query
-        form.explain_query=form.explain_query+'<br><br>VALUES: ['+','.join(form.query_search['VALUES'])+']'
+
 
       if len(form.errors):
         return {'success':0,'errors':form.errors}

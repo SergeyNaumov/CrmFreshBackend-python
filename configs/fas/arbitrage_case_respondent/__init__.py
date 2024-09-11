@@ -9,12 +9,11 @@ form={
     'title':'Ответчики',
     'sort':False,
     'tree_use':False,
-    'explain':False,
+    'explain':True,
     'make_delete':0,
     'not_edit':1,
     'read_only':1,
     #'QUERY_SEARCH_TABLES':query_search_tables,
     'fields': get_fields(),
     'GROUP_BY':'wt.id',
-    'explain':0
 }
