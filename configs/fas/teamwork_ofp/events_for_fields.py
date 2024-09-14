@@ -3,7 +3,9 @@ from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 from lib.core import cur_date, date_to_rus, exists_arg
 from lib.send_mes import send_mes
 
-
+def manager_from_before_code(form, field):
+  if form.manager['login'] in ('admin','pzm'):
+    field['read_only']=False
   
 def group_id_before_code(form,field):
   #form.pre(form.manager['login'])
@@ -73,11 +75,11 @@ async def manager_before_code(form,field):
       field['where']+=f" or id={v}"
 
 
-def manager_to2_before_code(form,field):
+async def manager_to2_before_code(form,field):
   if form.manager['login'] in ('naumova','sheglova','sed','akulov','zia','strogov','pan'):
     field['read_only']=False
 
-  manager_before_code(form,field)
+  await manager_before_code(form,field)
 
 def born_before_code(form,field):
   if form.script=='admin_table':
@@ -129,6 +131,12 @@ def firm_before_code(form,field):
 
         Карточка ОП: <a href="/edit_form/user/{user_id}" target="_blank">{config["BaseUrl"]}edit_form/user/{user_id}</a>
       '''
+      
+      if logo:=form.ov.get('brand_logo'):
+        html+=f'<div><img src="/files/logo/{logo}"></div>'
+      elif form.ov['brand']:
+        html+=f'<div>Бренд: {form.ov["brand"]}</div>'
+
     else:
       html = "<span style='color: red'>id не было введено на этапе создания карточки СР</span>"
 
@@ -216,7 +224,7 @@ async def comment_after_add(form,field,data):
 
     if len(last_comments)>1:
       # Не первый комментарий в карте
-      #print('subject:',f"Новый комментарий, совместная работа ОФП {form.ov['brand']} / {form.ov['firm']} / {form.ov['product_label']}")
+      #print('TO:',','.join(to_emails.keys()))
       send_mes(
         from_addr='info@fascrm.ru',
         to=','.join(to_emails.keys()),
@@ -244,15 +252,17 @@ async def comment_after_add(form,field,data):
         from_addr='info@fascrm.ru',
         #to='svcomplex@yandex.ru',#
         to=','.join(to_emails.keys()),
-        subject=f"Первый комментарий в карточке совместной работы ОФП / {form.ov['firm']} / {form.ov['product_label']}",
+        subject=f"Первый комментарий в карточке совместной работы ОФП {form.ov['brand']} / {form.ov['firm']} / {form.ov['product_label']}",
         message=f"Наименование компании: {form.ov['link']}<br>"+\
             f"Менеджер: {form.manager['name']}<br>"+\
             f"Комментарий: {data['comment']}<br>"+\
             regnumber_str
       )
     
-
-
+    #print('TO_EMAILS:',to_emails.keys())
+def manager_from_filter_code(form,field,row):
+  form.pre(row['mf__name'])
+  return row['mf__name']
 events={
   'born':{
     'before_code':born_before_code
@@ -268,9 +278,10 @@ events={
   'manager_id':{
     'before_code':manager_id_before_code,
   },
-  #'manager_from':{
-  #  'before_code':manager_before_code
-  #},
+  'manager_from':{
+    'before_code':manager_from_before_code,
+    #'filter_code':manager_from_filter_code
+  },
   'group_id':{
     'before_code':group_id_before_code
   },

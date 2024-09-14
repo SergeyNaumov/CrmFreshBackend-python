@@ -22,8 +22,10 @@ async def permission(form):
     login=form.manager['login']
 
     if login in ('akulov','pzm','sed','anna','admin') or \
-    (entity=='7' and login=='lgf') or \
-    (entity=='10' and login=='sheglova'):
+    (entity in ('7','19') and login=='lgf') or \
+    (entity in '10' and login in ('naumova','ahmetova')) or \
+    (entity in ('16') and login in ('veronika')) or \
+    (entity in ('23') and login in ('anna')):
         form.search_links.append({
           'link':f"/vue/admin_table/assignment?entity={entity}",
           'description':"Менеджеры для распределения",

@@ -41,7 +41,7 @@ async def run_event(form,event_name,arg={}):
             if arg:
               await event(form,arg)
             else:
-              print('event_name:',event_name)
+              #print('event_name:',event_name)
               await event(form)
           except AttributeError as e:
             err=traceback.format_exc()

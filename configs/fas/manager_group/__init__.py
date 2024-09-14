@@ -38,8 +38,12 @@ form={
             'description':'Группа Юристов',
             'type':'checkbox',
             'name':'lawers',
-
         },
+        # {
+        #     'description':'Группа менеджеров фин. услуг',
+        #     'type':'checkbox',
+        #     'name':'managers_fin',
+        # },
         {
           #'before_code': permissions_before_code,
           'description':'Права учётной записи',

@@ -41,7 +41,7 @@ async def get_old_values(form):
                   mg.header mg__header, mg.id m__group_id,
                   m_oso.id m_oso__id, m_oso.email m_oso__email, m_oso.group_id m_oso__group_id,
                   ( wt.product in (9,14,15) and wt.dat_session<>'0000-00-00' and date(wt.dat_session)<=curdate() and wt.win_status=0) block_card,
-                  mfg.owner_id mfg__owner, mgu.owner_id mgu__owner, mgu.id mgu__id, if(b.header is null,'',b.header) brand
+                  mfg.owner_id mfg__owner, mgu.owner_id mgu__owner, mgu.id mgu__id, if(b.header is null,'',b.header) brand, b.logo brand_logo
                 FROM
                   teamwork_ofp wt
                   LEFT JOIN user u ON (u.id=wt.user_id)
@@ -86,12 +86,13 @@ async def permissions(form):
   if form.script=='admin_table':
     user_id=exists_arg('cgi_params;user_id',form.R)
     #field['value']=f'user_id:{user_id}'
-    form.title=f'Совместная работа (поиск по карте ОП: {user_id})'
+    if user_id:
+      form.title=f'Совместная работа (поиск по карте ОП: {user_id})'
     form.search_on_load=True
     #return
 
   await get_old_values(form)
-  # Админ ОФП
+  # Админ юр. услуг
   if form.manager['login'] in ('admin', 'akulov','sed','pzm'):
     form.is_admin=True
 
@@ -103,24 +104,30 @@ async def permissions(form):
       #form.pre(['ow',form.ov['mgu__owner'],form.manager['id']])
       form.is_group_owner=True
 
+    #if form.ov['mfg__owner']==form.manager['id']:
+    #  form.is_manager_to=True
+    #form.pre([form.ov['mfg__owner'], form.manager['id']])
     #form.pre([form.ov['manager_to'],form.manager['id'],form.ov['manager_to']==form.manager['id']])
     #form.pre(form.manager)
     #form.pre([form.ov['manager_to_group'],])
     #print('CHILD_GROUPS_HASH:',form.manager['CHILD_GROUPS_HASH'])
 
-
+    #if form.id==57455:
+    #  if form.manager.id==form.ov[]mfg__owner
+    #  form.pre(form.manager)
+    #  form.pre(form.ov)
 
     # Менеджер
     if form.ov['manager_from']==form.manager['id'] or (form.ov['manager_from_group'] in form.manager['CHILD_GROUPS_HASH'] ) :
       form.is_manager_from=True
 
 
-    # Менеджер ОФП
+    # Менеджер Юр. услуг
     if form.ov['manager_to']==form.manager['id'] or (form.ov['manager_to_group'] in form.manager['CHILD_GROUPS_HASH']):
       form.is_manager_to=True
 
 
-    # менеджер ОФП2
+    # менеджер Юр. услуг2
     if form.ov['manager_to2']==form.manager['id'] or (form.ov['manager_to2_group'] in form.manager['CHILD_GROUPS_HASH']):
       form.is_manager_to2=True
 
@@ -129,7 +136,7 @@ async def permissions(form):
       form.read_only=0
 
 
-    form.title=f"ОФП: {form.ov.get('firm','')}"
+    form.title=f"Юр. Услуги: {form.ov.get('firm','')}"
   form.user_id=None
 
 
@@ -149,7 +156,7 @@ async def before_update(form):
     if not(manager_id):
       return
 
-    subject=f"Создана карточка совместной работы: {form.ov['firm']}, ИНН: {form.ov['inn']}"
+    subject=f"Создана карточка Юр.Услуг: {form.ov['firm']}, ИНН: {form.ov['inn']}"
     message=f"{form.manager['name']} назначил(а) Вас юристом в карточке <a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{form.id}'>{form.ov['firm']}</a>"
     to_hash={
       manager_id: 1,
@@ -178,6 +185,7 @@ async def before_update(form):
       )
 
   values=form.R.get('values')
+  #form.pre({'values':values})
   if values:
     old_manager_to=0
     old_manager_to2=0
@@ -207,7 +215,7 @@ async def before_update(form):
       if lower_group:
         subject=f"Изменена группа юристов: {form.ov['firm']}, ИНН: {form.ov['inn']}"
         message=f"Только что <b>{form.manager['name']}</b> установил(а) группу юристов <b>{lower_group['header']}</b><br>"+\
-        f"В карте ОФП: <a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{form.id}'>{form.ov['firm']}</a>"
+        f"В карте Юр.услуг: <a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{form.id}'>{form.ov['firm']}</a>"
         #print(subject)
         #print(message)
         to_hash={
@@ -242,6 +250,7 @@ async def before_update(form):
 
 
 async def after_save(form):
+  ov=form.ov
   manager_id=exists_arg('values;manager_id', form.R)
   user_id=exists_arg('user_id', form.ov)
   if manager_id and form.manager['login'] in ('akulov','sed','pzm'):
@@ -251,6 +260,16 @@ async def after_save(form):
 
     )
 
+  if form.id and form.ov:
+    # при смене группы юристов, обнуляем юриста
+    new_group_id=exists_arg('values;group_id', form.R)
+    if new_group_id: new_group_id=int(new_group_id)
+    old_group_id=ov['group_id']
+    if new_group_id and new_group_id!=old_group_id:
+      await form.db.query(
+        query="UPDATE teamwork_ofp SET manager_to=0 WHERE teamwork_ofp_id=%s",
+        values=[form.id]
+      )
 
 
   #form.pre([old_manager_to,form.values['manager_to']])

@@ -1,6 +1,8 @@
 from lib.core import exists_arg, join_ids
+from lib.core_crm import get_email_list_from_manager_id
 from .create_ofp_card import *
 from .create_bbg_card import *
+from .create_fin_card import *
 from .filters_for_manager_op import prepare_filters_for_manager_op
 from .find_inn_doubles import prepare_filters_for_find_inn_doubles
 from .components_actions import components_actions
@@ -35,10 +37,10 @@ async def permissions(form):
 
   perm=form.manager['permissions']
 
-
+  #form.pre({'show_brand_in_card_op':perm.get('show_brand_in_card_op')})
   # Убираем поле "бренд" всем, у кого нет прав доступ
-  if not(perm.get('show_brand_in_card_op')):
-    form.remove_field('brand_id')
+  #if not(perm.get('show_brand_in_card_op')):
+  #  form.remove_field('brand_id')
 
 
   # Список фильтров
@@ -52,6 +54,9 @@ async def permissions(form):
     inn=exists_arg('cgi_params;find_inn_doubles',R)
     if inn or inn=='':
       prepare_filters_for_find_inn_doubles(form,inn)
+
+  #if form.manager['login']=='admin':
+  #form.explain=1
 
   if perm['user_delete']:
     form.make_delete=1
@@ -89,28 +94,33 @@ async def permissions(form):
           WHERE u.id={form.id}""",
         onerow=1
       )
-      print('ov:',form.ov)
+      #print('ov:',form.ov)
       # Для работы компонентов (статистика и т.п.)
-      components_actions(form)
+      await components_actions(form)
 
       if form.ov:
-
+        if form.ov['supplier']:
+          form.errors.append('Это карточка поставщика, доступ запрещён')
         form.title=form.ov['firm']
 
       # Создание карты ОФП
       if exists_arg('cgi_params;action',R) == 'create_ofp_card':
-          create_ofp_card(form)
+         await  create_ofp_card(form)
+
+      if exists_arg('cgi_params;action',R) == 'create_fin_card':
+         await  create_fin_card(form)
 
       # Создание карты ББГ
       if exists_arg('cgi_params;action',R) == 'create_bbg_card':
-          create_bbg_card(form)
+          await create_bbg_card(form)
 
 
 
       # В карте выбран брэнд
       if not perm['user_show_all_brand']:
         brand_id=form.ov.get('brand_id')
-
+        #form.pre(brand_id)
+        #form.pre(manager_brand)
         if brand_id and not(brand_id in manager_brand):
           #if form.id==10051697:
           #  form.pre({'brand_id':brand_id, 'manager_brand':manager_brand, 'in': (brand_id in manager_brand) })
@@ -147,7 +157,7 @@ async def after_insert(form):
   # Если не может менять бренд
   if not(perm['user_change_brand']) and form.manager_brand:
     set_str.append(f"brand_id={form.manager_brand}")
-
+  
   # если не может менять менеджера, то менеджер назначается текущим
   if not perm['card_op_make_change_manager']:
     set_str.append(f"manager_id={form.manager['id']}")
@@ -157,15 +167,43 @@ async def after_insert(form):
     await form.db.query(
       query=f"UPDATE user set {', '.join(set_str)} where id=%s",
       values=[form.id],
-      #errors=form.errors,
-      #debug=form.explain,
-      #debug=1
     )
+async def after_update(form):
+  manager=form.manager
+  if True:
+    # Если произошла ручная смена менеджера
+    new_manager_id=exists_arg('values;manager_id',form.R)
+    #form.pre({'nm':new_manager_id})
+
+    old_manager_id=form.ov.get('manager_id')
+    if new_manager_id and old_manager_id:
+      new_manager_id=int(new_manager_id)
+      old_manager_id=int(old_manager_id)
+      if new_manager_id != old_manager_id:
+        #form.pre({new_manager_id: True})
+
+        to_emails = await get_email_list_from_manager_id(form.db, {new_manager_id: True})
+        if to_emails and len(to_emails):
+          #form.pre({'emails': ','.join(to_emails.keys())+', svcomplex@yandex.ru'})
+          send_mes(
+              from_addr='no-reply@fascrm.ru',
+              to=','.join(to_emails.keys())+', svcomplex@yandex.ru',
+              subject=f"Вы назначены менеджером в карте {form.ov['firm']}",
+              message=f"""
+                Вы были назначены менежером в карте ОП
+                <a href='{form.s.config['system_url']}edit_form/user/{form.id}'>{form.ov['firm']}</a>
+              """
+            )
+
+        #if len(to_emails):
+        #  form.pre({ 'to_list':to_emails.keys() })
+          
+
 
 async def before_search(form):
   qs=form.query_search
   #form.pre(qs)
-
+  qs['WHERE'].append('wt.supplier=0')
   if not('archive' in qs['on_filters_hash']):
     #form.add_where.append('wt.archive=0')
     qs['WHERE'].append('wt.archive=0')
@@ -177,5 +215,6 @@ async def before_search(form):
 events={
   'permissions':permissions,
   'after_insert':after_insert,
+  'after_update':after_update,
   'before_search':before_search
 }

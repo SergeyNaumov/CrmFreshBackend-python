@@ -102,7 +102,7 @@ fields=[
             'description':'Вид продукта',
             'name': 'product',
             'regexp_rules': [
-                '/^\d+$/','выберите корректное значение'
+                '/[1-9]/','обязательное поле'
             ],
             'multiple':5,
             'values':[
@@ -118,8 +118,6 @@ fields=[
               {'v':11,'d':'Оформление сро, Лицензий, Допусков'},
               {'v':12,'d':'Лизинг'},
               {'v':13,'d':'Факторинг'},
-
-
             ],
             'type':'select_values', 
             'frontend':{'ajax':{'name':'product','timeout':600}},
@@ -153,6 +151,9 @@ fields=[
           'table':'city',
           'tablename':'city',
           'header_field':'name',
+          'regexp_rules': [
+                '/[1-9]/','обязательное поле'
+          ],
           'search_query':"""
               SELECT
                 c.city_id v, concat(r.header,' -> ', c.name ) d

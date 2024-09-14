@@ -7,7 +7,7 @@ form={
     'work_table':'manager',
     'ajax':ajax,
     'is_admin':False,
-    'explain_exit':1,
+    #'explain':1,
     'QUERY_SEARCH_TABLES':[
             {'table':'manager','alias':'wt'},
             {'t':'manager_email','a':'me','l':'me.manager_id=wt.id','lj':1},

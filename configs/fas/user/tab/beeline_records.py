@@ -1,4 +1,4 @@
-from lib.core import join_ids
+from lib.core import join_ids, date_to_rus
 async def beeline_records_before_code(form,field):
     if form.id:
 
@@ -38,6 +38,8 @@ async def beeline_records_before_code(form,field):
                 for r in records:
                     #if r['downloaded'] and r['date']:
                     full_name=f"/files/beeline/{r['date'].strftime('%Y/%m/%d')}/{r['id']}.mp3"
+                    #if form.manager['login']=='admin':
+                        #form.pre(r)
                     # result=f"""{result}
                     # <div style='padding-top: 5px'>
                     #     <audio controls>
@@ -48,6 +50,7 @@ async def beeline_records_before_code(form,field):
                     #     """
                     records_html+=\
                     "<div style='padding-top: 5px'>"+\
+                        f"{date_to_rus(r['date'])}"+\
                         "<audio controls>"+\
                           f"<source src='{full_name}' type='audio/ogg'>"+\
                           f"<source src='{full_name}'' type='audio/mpeg'>"+\

@@ -23,7 +23,11 @@ async def permission(form):
         '17':'Уклонения ФАС-сервис (список менеджеров)',
         '18':'Расторжения ФАС-сервис (список менеджеров)',
         '19':'РНП ФАС-сервис (список менеджеров)',
-        '20':'Ответчики ФАС-сервис (список менеджеров)'
+        '20':'Ответчики ФАС-сервис (список менеджеров)',
+        '21':'Уклонения AUZ (список менеджеров)',
+        '22':'Расторжения AUZ (список менеджеров)',
+        '23':'Реестр РНП AUZ (список менеджеров)',
+        '24':'Ответчики AUZ (список менеджеров)',
     }
     if form.id:
         form.ov=await form.db.query(
@@ -31,14 +35,32 @@ async def permission(form):
             values=[form.id],
             onerow=1
         )
+        
         if t:=form.ov.get('type'):
-            entity=t
+            entity=str(t)
             form.foreign_key_value=t
         else:
             form.errors.append('Ошибка, не указан type, обратитесь к программисту')
 
     if entity in entity_dict:
         title=entity_dict.get(entity)
+    
+    is_regrf=False
+    is_fas_servis=False
+    is_revisor=False
+    is_bz_info=False
+    is_auz=False
+    #is_auz=
+    if entity in ('5','6','7','11'):
+        is_regrf=True
+    if entity in ('17','18','19','20'):
+        is_fas_servis=True
+    if entity in ('8','9','10','12'):
+        is_revisor=True
+    if entity in ('13','14','15','16'):
+        is_bz_info=True
+    if entity in ('21','22','23','24'):
+        is_auz=True
 
     if entity:
         form.add_where=f"wt.type={entity}"
@@ -49,10 +71,13 @@ async def permission(form):
     #form.explain=1
 
 
-    if login in ('akulov','pzm','sed','anna','admin') or login=='lgf' and entity in ('6','5','7') or login=='sheglova' and entity in ('9','8','10'):
+    if login in ('akulov','pzm','sed','admin') or  (is_auz and login in ('anna')) or \
+    (is_regrf and login in ('lgf')) or (is_fas_servis and login in ('lgf')) or (is_revisor and login in ('ahmetova','naumova')) or (is_bz_info and login in ('veronika')):
         form.read_only=0
         form.not_create=0
         form.make_delete=1
+    
+
     else:
         form.errors.append('доступ запрещён')
         form.read_only=1

@@ -1,7 +1,7 @@
 #from .get_values import get_values
 
 async def permissions(form):
-    pass
+  ...
 
 async def after_save(form):
     pass

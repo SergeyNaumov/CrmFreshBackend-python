@@ -1,6 +1,6 @@
 from lib.send_mes import send_mes
 
-def create_bbg_card(form):
+async def create_bbg_card(form):
         db=form.db
         ov=form.ov
     # Пример ссылки на создание: /edit_form/user/106998?action=create_ofp_card
@@ -14,7 +14,7 @@ def create_bbg_card(form):
         }
 
 
-        bbg_card_id=db.save(
+        bbg_card_id = await db.save(
           table='user_bbg',
           data=data
         )

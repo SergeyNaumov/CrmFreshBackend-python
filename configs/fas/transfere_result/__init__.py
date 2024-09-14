@@ -45,10 +45,11 @@ async def get_table_for_manager(form, _type, manager_id, ts):
         query=f"""
             SELECT
                 u.id, u.firm, u.inn, c.name city, u.contact_date,
-                '' comment
+                '' comment, r.header region
             FROM
                 transfere_result tr
                 JOIN user u ON tr.user_id = u.id
+                LEFT JOIN region r ON r.region_id=u.region_id
                 LEFT JOIN city c ON c.city_id = u.city_id
             WHERE
                 tr.type=%s and tr.ts>=%s and tr.ts<=%s and tr.manager_id=%s
@@ -67,7 +68,7 @@ async def search(form, R):
         _type=int(exists_arg('cgi_params;type',R))
     except Exception as e:
         return {'success':False,'errors':[str(e)]}
-    if _type>=5 and _type<=20:
+    if _type>=5 and _type<=24:
         where=[f""]
         ts=exists_arg('filters;ts',R)
 
@@ -88,7 +89,9 @@ async def search(form, R):
         )
         #print(query)
         accordion_data=[]
+        total_leads=0
         for m in lst:
+            total_leads+=m['doubles']+m['new']
             accordion_data.append({
                 "header":form.template(
                     filename='./conf/transfere_result/template/accordion_header.html', **m
@@ -107,6 +110,11 @@ async def search(form, R):
 
         result_list=[]
         if len(accordion_data):
+            if total_leads:
+                result_list.append({
+                    'type':'html',
+                    'body':f"<p><b>Всего лидов:</b> {total_leads}</p>"}
+                )
             result_list.append(
                 { # раскрывающийся блок
                     'type':'accordion',
@@ -189,8 +197,14 @@ async def permissions(form):
             form.title='Статистика РНП (ФАС-сервис)'
         elif(_type==20):
             form.title='Статистика по ответчикам (ФАС-сервис)'
+        elif(_type==21):
+            form.title='Статистика по уклонениям (AUZ)'
+        elif(_type==22):
+            form.title='Статистика по расторжениям (AUZ)'
         elif(_type==23):
             form.title='Статистика РНП (АУЗ)'
+        elif(_type==24):
+            form.title='Статистика ответчикам (АУЗ)'
         for f in form.filters:
             if f['name']=='ts':
                 f['value']=cur_date()

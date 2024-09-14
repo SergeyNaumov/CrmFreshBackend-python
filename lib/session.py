@@ -200,7 +200,7 @@ async def session_start(s,**arg):
   else:
     #s._content['redirect']=''
     s._content['redirect']=config['BaseUrl']+'/login'
-    
+    s._content['errors'].append('Вы не авторизованы')
     #s._content['referer']=s.request
     s._content['success']=0
     s.end()

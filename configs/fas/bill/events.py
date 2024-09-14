@@ -26,7 +26,7 @@ async def before_search(form):
     # BEFORE SEARCH
     qs=form.query_search
     manager=form.manager ; perm=manager['permissions']
-
+    
     #form.pre(perm)
     on_filters_hash=qs.get('on_filters_hash')
 
@@ -45,18 +45,46 @@ async def before_search(form):
 
     #form.pre(qs)
     if on_filters_hash and 'paid_summ' in on_filters_hash:
+        # 1. считаем без разделений
         tables="\n".join(qs['TABLES'])
+        tables+=f"\nLEFT JOIN bill_division ON bill_division.bill_id=wt.id"
+        qs_where=[]
+        for w in qs['WHERE']:
+            qs_where.append(w)
+        qs_where.append("bill_division.id is null")
+
         where=''
         if len(qs['WHERE']):
-            where='WHERE ' + ' AND '.join(qs['WHERE'])
-        query=f"SELECT sum(wt.paid_summ) from {tables} {where}"
+            where='WHERE ' + ' AND '.join(qs_where)
+        query1=f"SELECT sum(wt.paid_summ) from {tables} {where}"
         #form.pre(qs)
         #form.pre(query)
-        bank=await form.db.query(
-            query=query,
+        #bank1=0
+        
+        bank1=await form.db.query(
+            query=query1,
             values=qs['VALUES'],
             onevalue=1
-        )
+        ) or 0
+        #form.pre(query1)
+        # 2. считаем с разделениями
+        qs_where=[]
+        for w in qs['WHERE']:
+            qs_where.append(w)
+        qs_where.append("bill_division.id is not null")
+        where=''
+        if len(qs['WHERE']):
+            where='WHERE ' + ' AND '.join(qs_where)
+        query2=f"SELECT sum(bill_division.summ) from {tables} {where}"
+        #form.pre(query)
+
+        bank2=await form.db.query(
+            query=query2,
+            values=qs['VALUES'],
+            onevalue=1
+        ) or 0
+        #form.pre({'bank1':bank1,'bank2':bank2})
+        bank=bank1+bank2
         if bank or bank==0:
             form.out_before_search.append(f"Итого: {get_triade(bank)} рублей")
         #form.pre({'bank':bank})

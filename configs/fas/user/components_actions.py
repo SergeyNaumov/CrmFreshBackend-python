@@ -1,15 +1,15 @@
 from lib.core import exists_arg, date_to_rus
 
-def components_actions(form):
+async def components_actions(form):
     db=form.db ; R=form.R
 
     # загрузка статистики в блок "статистика" (выполняется при раскрытии блока)
     if form.id and exists_arg('cgi_params;action',R) == 'load_stat':
         inn=form.ov.get('inn')
-        print('inn:',inn)
+        #print('inn:',inn)
         if inn:
             # уклонений
-            rejection_list=db.query(
+            rejection_list = await db.query(
                 query="""
                     select
                         id, reg_number, org_name firm, ts registered
@@ -22,7 +22,7 @@ def components_actions(form):
 
 
             # расторжений
-            contract_termination_list=db.query(
+            contract_termination_list = await db.query(
                 query="""
                     select
                         id, reestr_number reg_number, name_org firm, ts registered
@@ -33,7 +33,7 @@ def components_actions(form):
             )
 
             # Реестр РПН
-            rnp_reestr_from_ftp_list=db.query(
+            rnp_reestr_from_ftp_list = await db.query(
                 query="""
                 select
                     id, reestr_number reg_number, registered, client_name firm

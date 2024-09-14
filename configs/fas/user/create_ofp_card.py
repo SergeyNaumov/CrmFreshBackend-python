@@ -1,6 +1,6 @@
 from lib.send_mes import send_mes
 
-def create_ofp_card(form):
+async def create_ofp_card(form):
         db=form.db
         ov=form.ov
     # Пример ссылки на создание: /edit_form/user/106998?action=create_ofp_card
@@ -18,21 +18,21 @@ def create_ofp_card(form):
         }
 
         if ov['city']:
-          city_id=db.query(
+          city_id = await db.query(
             query='select city_id from city where name=%s',
             values=[ov['city']],
             onevalue=1
           )
           if city_id: data['city_id']=city_id
 
-        ofp_card_id=db.save(
+        ofp_card_id = await db.save(
           table='teamwork_ofp',
           data=data
         )
 
 
 
-        message=f"<p>Только что {form.manager['name']} создал(а) карту ОФП для компании {ov['firm']}( ИНН: {ov['inn']})</p>"+\
+        message=f"<p>Только что {form.manager['name']} создал(а) карту Юр. услуг для компании {ov['firm']}( ИНН: {ov['inn']})</p>"+\
           f"<p><a href='{form.s.config['system_url']}edit_form/teamwork_ofp/{ofp_card_id}'>Перейти в карту</a></p>"
 
         # send_mes(

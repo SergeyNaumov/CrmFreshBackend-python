@@ -1,4 +1,4 @@
-async def paids_forere_code(form,field):
+async def paids_before_code(form,field):
     if not(form.id):
         return ''
 
@@ -53,10 +53,28 @@ async def paids_forere_code(form,field):
         )
     #form.pre(_list)
 
+def old_paids_forere_code(form,field):
+    if form.id:
+        if not form.ov['paid_info']:
+            #form.ov['paid_info']='-'
+            form.remove_field(field['name'])
+        field['after_html']=f"<pre>{form.ov['paid_info']}</pre>"
 
-fields=[{
+fields=[
+{
+    'description':'Информация о старых оплатах',
+    'full_str':1,
+    'type':'code',
+    'name':'old_paids',
+    'tab':'paids',
+    #'after_html':'ыыыы',
+    'before_code':old_paids_forere_code
+
+},
+{
   'type':'code',
   'name':'paids',
   'tab':'paids',
-  'before_code':paids_forere_code
-}]
+  'before_code':paids_before_code
+}
+]

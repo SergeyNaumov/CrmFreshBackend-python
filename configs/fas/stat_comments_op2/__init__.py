@@ -53,9 +53,20 @@ async def search(form, R):
 
     result_list=[]
     accordion_data=[]
-
-
-
+    CHILD_GROUPS=form.manager['CHILD_GROUPS']
+    if form.manager['login'] in ('admin','pzm','akulov','sed'):
+        ...
+    elif form.manager['is_owner'] and len(CHILD_GROUPS):
+        # Руководителя ограничиваем его группами
+        where.append(f"(m.group_id in ({join_ids(CHILD_GROUPS)}) )")
+        where_records.append(f"(m.group_id in ({join_ids(CHILD_GROUPS)}) )")
+    else:
+        where.append(f"m.id={form.manager['id']}")
+        where_records.append(f"m.id={form.manager['id']}")
+    #log.append(form.manager['is_owner'])
+    #log.append(CHILD_GROUPS)
+    #log.append(where)
+    #log.append(where_records)
     if registered:
         # Комментарии с записями
 
@@ -220,7 +231,5 @@ form={
             'search':search
         },
         #'javascript':"""window.toggle=(sel)=>{el=document.querySelector(sel);if(el){el.style.display=(el.style.display=='none')?'':'none'};return false}"""
-
-
 }
 

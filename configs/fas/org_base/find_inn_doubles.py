@@ -12,7 +12,7 @@ def prepare_filters_for_find_inn_doubles(form,inn):
         f=fields_hash['inn']['value']=inn
 
     # включаем фильтры для поиска по ИНН:
-    for name in ('name', 'inn','phone'):
+    for name in ('name', 'email', 'inn','phone'):
        f=fields_hash[name]
        f['filter_on']=1
 

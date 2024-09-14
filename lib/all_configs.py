@@ -1,6 +1,6 @@
 import importlib,os
 
-from lib.session import project_get_permissions_for, get_permissions_for
+from lib.session import project_get_permissions_for, get_permissions_for, session_start
 
 from lib.engine import s
 from lib.core import exists_arg
@@ -185,26 +185,31 @@ async def read_config(**arg):
 
   # Получаем manager-а 
   auth=sysconfig['auth']
-  login=s.login
-
+  if not(hasattr(s.request.state,'manager')):
+    await session_start(s)
+    s.request.state.manager=s.manager  
+    
+  login=s.request.state.manager.get('login')#s.login
+  
   # form.manager содержит login
   if auth['use_roles']:
+
     #print('use_roles:',auth)
-    form.manager=await get_cur_role(
-     login=s.login,
+    login=await get_cur_role(
+     login=login,
      form=form
     )
-    
+    #form.manager=
+    #print('USE ROLES: ',form.manager)
     # if m2:
     #   form.manager=m2
     #print('use_roles:',form.manager)
 
+  #print('login:',login)
   if auth['use_permissions']:
-    if s.use_project:
-      form.manager=project_get_permissions_for(form,login)
-    else:
-      form.manager=await get_permissions_for(form,login)
+      s.request.state.manager=await get_permissions_for(form,login)
 
+  form.manager=s.request.state.manager
   # Атрибуты по умолчанию
   if exists_arg('id',arg): form.id=arg['id']
   if exists_arg('action',arg): form.action=arg['action']

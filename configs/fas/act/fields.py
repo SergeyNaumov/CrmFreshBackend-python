@@ -1,5 +1,5 @@
 def information_before_code(form,field):
-  backend_base=form.s.config.get('BakendBase')
+  backend_base=form.s.config.get('BackendBase')
   #form.pre(backend_base)
   if not(form.id) or not(form.ov):
     return

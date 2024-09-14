@@ -2,7 +2,8 @@
 	<tr>
 		<td>Наименование</td>
 		<td>ИНН</td>
-		<td>Город</td>
+		{%if 0%}<td>Город</td>{%endif%}
+		<td>Регион</td>
 		<td>Следующий контакт</td>
 		<td>Комментарий</td>
 	</tr>
@@ -10,7 +11,8 @@
 	<tr>
 		<td><a href="/edit_form/user/{{u.id}}" target="_blank">{{u.firm}}</a></td>
 		<td>{{u.inn}}</td>
-		<td>{{u.city or ''}}</td>
+		{%if 0%}<td>{{u.city or ''}}</td>{%endif%}
+		<td>{{u.region or ''}}</td>
 		<td>{{u.contact_date}}</td>
 		<td>{{u.comment}}</td>
 	</tr>

@@ -54,13 +54,13 @@ async def search(form, R):
 
     query=f"""
         SELECT
-            wt.teamwork_ofp_id id, wt.win_status, wt.firm, wt.inn, wt.regnumber,wt.pred_comm,
+            wt.teamwork_ofp_id id, wt.win_status, u.firm, if(u.inn is null,'',u.inn) inn, wt.regnumber,wt.pred_comm,
             if(me.id,me.name,'-') exhibitor,
             if(mf.id,mf.name,'-') manager,
             if(mt.id,mt.name,'-') manager_to,
             if(mt2.id,mt2.name,'-') manager_to2,
             if(m_oso.id,m_oso.name,'-') manager_oso,
-            c.name city, c.name city2, wt.product,
+            if(c.name is null, '',c.name) city, c.name city2, wt.product,
             born
         FROM
             teamwork_ofp wt
@@ -255,7 +255,7 @@ form={
         'autocomplete':1,
         'name':'city',
         'ajax':{
-            'autocomplete':city_autocomplete
+            'autocomplete': city_autocomplete
         },
         'not_multiple':1,
         'value':''

@@ -9,12 +9,17 @@ async def emails_after_save_code(form,field):
       query=f"UPDATE manager_email set main=0 where manager_id={form.id} and id<>{v['id']}",
     )
   
+async def email_filter_code(form,field,row):
+  return row['email']
 
 events={
   #'email':{
   #  'filter_code':email_filter_code
   #},
   'emails':{
-    'after_save_code': emails_after_save_code
+    'after_save_code': emails_after_save_code,
+  },
+  'email':{
+    'filter_code':email_filter_code
   }
 }

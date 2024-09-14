@@ -25,6 +25,9 @@ def get_fields():
       'frontend':{'ajax':{'name':'login','timeout':600}},
       'tab':'main'
     },
+    # {
+    #   'descr'
+    # }
     {
       'description':'Пароль',
       'name':'password',
@@ -93,7 +96,7 @@ def get_fields():
       'name':'email',
       'type':'filter_extend_text',
       'tablename':'me',
-      'db_name':'group_concat(me.email) SEPARATOR ", "'
+      'db_name':'group_concat( distinct me.email) SEPARATOR ", "'
     },
 
     {

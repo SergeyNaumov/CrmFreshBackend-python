@@ -156,7 +156,18 @@ fields=[
         'values':[
           {'v':1,'d':'Безналичные'},
           {'v':2,'d':'Наличные'},
-        ]
+        ],
+        'tab':'paid',
+    },
+    {
+      'description':'Тип счёта',
+      'name':'type',
+      'type':'select_values',
+      'values':[
+         {'v':1,'d':'Предоплата'},
+         {'v':2,'d':'Постоплата'},
+      ],
+      'tab':'paid',
     },
     {
         'description':'Дата оплаты',
@@ -177,4 +188,34 @@ fields=[
         'tab':'paid',
         'filter_on':1,
     },
+    {
+      'description':'Разделения',
+      'type':'1_to_m',
+      'table_id':'id',
+      'name':'bill_division',
+      'table':'bill_division',
+      'read_only':1,
+      'foreign_key':'bill_id',
+      'fields':[
+        {
+          'description':'Менеджер',
+          'name':'manager_id',
+          'type':'select_from_table',
+          'table':'manager',
+          'header_field':'name',
+          'value_field':'id',
+        },
+        {
+          'description':'Сумма',
+          'type':'text',
+          'name':'summ'
+        },
+        {
+          'description':'Комментарий',
+          'type':'text',
+          'name':'comment'
+        }
+      ],
+      'tab':'paid'
+    }
 ]

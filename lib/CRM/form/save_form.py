@@ -94,7 +94,7 @@ async def save_form(form,arg):
         if f['type'] in ['date','datetime'] :
           
           date_value=from_datetime_get_date(v)
-          print(f"v: {v} ; date_value: {date_value}")
+          #print(f"v: {v} ; date_value: {date_value}")
 
           if date_value:
             v=date_value

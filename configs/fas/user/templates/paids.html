@@ -14,7 +14,7 @@
 		</thead>
 		{%for b in list%}
 		<tr>
-			<td>{{b.number}}</td>
+			<td><a href="/edit_form/bill/{{b.id}}" target="_blank">{{b.number}}</td>
 			<td>{{b.paid_date}}</td>
 			<td>{{b.summ}}</td>
 			<td>{{b.manager}}</td>

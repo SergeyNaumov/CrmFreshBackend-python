@@ -119,7 +119,10 @@ def paid_before_code(form,field):
 # Дата оплаты
 def date_before_code(form,field):
   if form.script=='admin_table':
-    field['value']=['2023-12-01']
+    # в фильтр ставим 1-е число месяца
+    ct=cur_date().split('-')
+    ct[2]='01'
+    field['value']=['-'.join(ct),'']
   if form.id:
     if form.ov['paid']:
       field['hide']=False
@@ -169,6 +172,10 @@ def firm_filter_code(form,field,row):
   return '-'
 
 #def summ_before_code(form,field,row):
+def bill_division_before_code(form,field):
+  if form.is_admin:
+    field['read_only']=0
+    field['make_delete']=1
 
 events={
   'c_ur_lico_id': {
@@ -216,5 +223,8 @@ events={
   },
   'firm':{
     'filter_code':firm_filter_code
+  },
+  'bill_division':{
+    'before_code':bill_division_before_code
   }
 }

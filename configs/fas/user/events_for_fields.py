@@ -67,8 +67,10 @@ async def brand_id_before_code(form,field):
         # может менять бренд в картах ОП
         field['read_only']=0
 
-    if form.action=='new' and form.script=='edit_form' and len(form.manager_brand)>1:
+    if form.action in ('new','insert') and form.script=='edit_form' and len(form.manager_brand)>1:
         field['value']=form.manager_brand[1]
+    if form.action=='insert' and form.script=='edit_form':
+        field['read_only']=0
 
 async def manager_id_before_code(form,field):
 
@@ -92,7 +94,8 @@ async def manager_id_before_code(form,field):
     #form.pre(form.manager)
     if form.action=='new':
         field['value']=form.manager['id']
-    
+    if form.action=='insert':
+        field['read_only']=0
     # if form.script in ('find_result', 'admin_table'):
     #     field['make_change_in_search']=1
     #     field['read_only']=0

@@ -7,7 +7,7 @@ from .fields import fields
 
 form={
     'wide_form':True,
-    'title':'Совместная работа Юр. услуг',
+    'title':'Совместная работа Юр. услуг', # в карте ОП, увдомления
     'work_table':'teamwork_ofp',
     'work_table_id':'teamwork_ofp_id',
     'make_delete':0,
