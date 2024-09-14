@@ -1,0 +1,22 @@
+<table class="tbl1" style="width: 100%;">
+  <tr class="h">
+    <td><b>Менеджер</b></td>
+    <td><b>Входящие</b></td>
+    <td><b>Исходящие</b></td>
+    <td><b>Всего</b></td>
+  </tr>
+  {%for l in list%}
+  <tr>
+    <td>{{l.name}}</td>
+    <td>{{l.inbound}}</td>
+    <td>{{l.outbound}}</td>
+    <td>{{l.total}}</td>
+  </tr>
+  {%endfor%}
+  <tr>
+    <td><b>Итого:</b></td>
+    <td>{{total_inbound}}</td>
+    <td>{{total_outbound}}</td>
+    <td>{{total}}</td>
+  </tr>
+</table>

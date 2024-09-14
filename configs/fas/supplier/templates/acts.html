@@ -1,0 +1,35 @@
+<div>
+	<div style="font-weight: bold; margin-top: 10px;">акты:</div>
+	<table class="tbl1">
+		<thead>
+			<tr>
+				<td>№ счёта</td>
+				<td>дата</td>
+				<td>сумма платежа</td>
+				<td>юр. лицо</td>
+			</tr>
+		</thead>
+		{%for a in list%}
+		<tr>
+			<td>{{a.number}}</td>
+			<td>{{a.dat}}</td>
+			<td>{{a.summa}}</td>
+			<td>{{a.ur_lico}}</td>
+		</tr>
+		<tr>
+			<td colspan="6" style="padding-bottom: 20px; border-bottom: 2px solid gray;">
+
+	            с печатями:
+	                <a href='{{backend_base}}/fas/download-act/{{a.ur_lico_id}}/{{a.id}}/doc/1'>doc</a> |
+	                <a href='{{backend_base}}/fas/download-act/{{a.ur_lico_id}}/{{a.id}}/pdf/1'>pdf</a>
+	            <br>
+	            без печатей:
+	                <a href='{{backend_base}}/fas/download-act/{{a.ur_lico_id}}/{{a.id}}/doc/0'>doc</a> |
+	                <a href='{{backend_base}}/fas/download-act/{{a.ur_lico_id}}/{{a.id}}/pdf/0'>pdf</a>
+
+			</td>
+
+		</tr>
+		{%endfor%}
+	</table>
+</div>

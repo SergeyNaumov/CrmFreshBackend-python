@@ -1,0 +1,25 @@
+{%for m in total_bank%}
+<div>{{m}}: {{total_bank[m]}}</div>
+{%endfor%}
+<table class="tbl1 sm" style="width: 100%;">
+    <tr>
+        <td>дата</td>
+        <td>группа</td>
+        <td>менеджер</td>
+        <td>счёт</td>
+        <td>тип</td>
+        <td>сумма счёта</td>
+        <td>сумма менеджера</td
+    </tr>
+    {%for b in list%}
+    <tr>
+        <td>{{b.paid_date}}</td>
+        <td>{{b.group_name}}</td>
+        <td>{{b.manager_name}}</td>
+        <td>{{b.number}}</td>
+        <td>{%if b.type=='bill'%}оплата по счёту{%else%}разделение счёта{%endif%}</td>
+        <td>{{b.paid_summ}}</td>
+        <td>{{b.manager_summ}}</td>
+    </tr>
+    {%endfor%}
+</table>
