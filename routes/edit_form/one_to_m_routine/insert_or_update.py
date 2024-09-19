@@ -4,6 +4,7 @@ from .get_data import get_data
 
 async def insert_or_update(form,field,arg):
     R=form.R
+    #print('ARG:',arg)
     field['values']=[]
     if not exists_arg('values',R) or not len(R['values']):
       form.errors.append('обратитесь к разработчику: в запросе отсутствуют значения (values)')
@@ -43,7 +44,7 @@ async def insert_or_update(form,field,arg):
         await form.run_event('before_save_code',{'field':field,'data':data})
         
         if form.success():
-
+          print(f"WHERE: ",f'{field["foreign_key"]}={foreign_key_value} and {field["table_id"]}={arg["one_to_m_id"]}',)
           await form.db.save(
             table=field['table'],
             where=f'{field["foreign_key"]}={foreign_key_value} and {field["table_id"]}={arg["one_to_m_id"]}',
@@ -60,7 +61,7 @@ async def insert_or_update(form,field,arg):
           if not data:
             form.errors.append('данной записи уже не существует, возможно, кто-то удалил её')
           
-          normalize_value_row(form,field,data)
+          await normalize_value_row(form,field,data)
           #print('data1:',data)
           field['values']=data
 

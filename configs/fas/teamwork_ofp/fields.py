@@ -1,6 +1,6 @@
 from .contact_field import contact_field
 from .paids_field import paids_field
-
+from .tech_field import tech_field
 fields=[
 
         # {
@@ -94,8 +94,10 @@ fields=[
           'tab':'main',
         },
         # Контакты
-        contact_field
-        ,
+        contact_field,
+
+        # Приложения
+        tech_field,
         # Платежи
         paids_field,
         {

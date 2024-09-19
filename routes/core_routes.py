@@ -1,5 +1,5 @@
 from lib.core import cur_year,cur_date
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from config import config
 #from db import db,db_read,db_write
 from lib.engine import s
@@ -91,13 +91,13 @@ async def leftmenu():
 
 # Стартовая страница
 @router.get('/startpage')
-async def startpage():
+async def startpage(request: Request):
 
   errors=s.errors
   manager=None
   manager_menu_table=None
   left_menu=[]
-  if hasattr(s.request.state,'manager'):
+  if hasattr(request.state,'manager'):
 
     if(config['use_project']):
         print('Q1')
@@ -108,19 +108,18 @@ async def startpage():
         manager_menu_table='project_manager_menu'
 
     else:
-        print('Q2')
         manager=await s.db.query(
           query=f"select *,concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link from {config['auth']['manager_table']} where login=%s",
-          values=[s.request.state.manager['login']],
-          debug=1,
+          values=[request.state.manager['login']],
+          #debug=1,
           onerow=1,
         )
   else:
     errors.append('Ошибка авторизации')
   
   
-  print('state.manager:',s.request.state.manager)
-  print('manager:',manager)
+  #print('state.manager:',request.state.manager)
+  #print('manager:',manager)
 
 
   CY=cur_year()

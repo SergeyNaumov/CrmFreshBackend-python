@@ -1,5 +1,5 @@
 from lib.core import cur_year,cur_date, exists_arg
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from lib.engine import s
 
 #import re
@@ -13,12 +13,13 @@ router = APIRouter()
 
 # изменение пароля
 @router.post('/password/{config}/{field_name}/{id}')
-async def password(config:str,field_name:str,id:int,R: dict):
+async def password(config:str,field_name:str,id:int,R: dict, request: Request):
   errors=[]
   response={'success':1,'errors':errors}
 
   if R['action'] == 'change':
       form = await read_config(
+        request=request,
         script='password', config=config,
         action=R['action'], R=R, id=id
       )

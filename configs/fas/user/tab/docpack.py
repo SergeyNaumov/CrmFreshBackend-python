@@ -1,6 +1,7 @@
 from .dp.get_bills import get_bills
 from .dp.get_acts import get_acts
 from .dp.ur_lico_list import ur_lico_list
+from .dp.create_bill import create_bill
 from .dp.number_rules import *
 
 
@@ -14,6 +15,8 @@ from .dp.number_rules import *
 #     ]
 
 
+
+
 fields=[{
   'type':'docpack',
   'name':'docpack',
@@ -25,6 +28,9 @@ fields=[{
   'act_number_rule':act_number_rule,
   'ur_lico_list': ur_lico_list,
   'get_bills':get_bills,
-  'get_acts': get_acts
-
+  'get_acts': get_acts,
+  'need_services_on_bill':True,
+  'service_table':'service',
+  'service_field_table':'service_field',
+  'create_bill':create_bill
 }]

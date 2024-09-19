@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, Request
 from lib.all_configs import read_config
 from .edit_form.one_to_m import process_one_to_m
 
@@ -6,9 +6,10 @@ router = APIRouter()
 
 
 @router.get('/1_to_m/{config}/{field_name}/{id}')
-async def get_value_for_slide(config: str, field_name: str, id: int):
+async def get_value_for_slide(config: str, field_name: str, id: int, request: Request):
 
   return await process_one_to_m(
+      request=request,
       config=config,
       action='get_slide_data',
       field_name=field_name,
@@ -16,8 +17,9 @@ async def get_value_for_slide(config: str, field_name: str, id: int):
     )
 
 @router.post('/1_to_m/insert/{config}/{field_name}/{id}')
-async def insert(config:str,field_name:str,id:int,R:dict):
+async def insert(config:str,field_name:str,id:int,R:dict,request:Request):
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     id=id,
@@ -27,8 +29,9 @@ async def insert(config:str,field_name:str,id:int,R:dict):
 
 # INSERT to 1_to_m
 @router.post('/1_to_m/update/{config}/{field_name}/{id}/{one_to_m_id}')
-async def insert(config:str,field_name:str,id:int,one_to_m_id:int,R:dict):
+async def insert(config:str,field_name:str,id:int,one_to_m_id:int,R:dict,request:Request):
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     id=id,
@@ -39,10 +42,11 @@ async def insert(config:str,field_name:str,id:int,one_to_m_id:int,R:dict):
 
 # UPDATE field
 @router.post('/1_to_m/update_field/{config}/{field_name}/{child_field_name}/{id}')
-async def update_field(config:str,field_name:str,child_field_name:str,id:int,R:dict):
+async def update_field(config:str,field_name:str,child_field_name:str,id:int,R:dict,request:Request):
   #print('UPDATE_FIELD')
   one_to_m_id=R['cur_id']
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     child_field_name=child_field_name,
@@ -54,8 +58,9 @@ async def update_field(config:str,field_name:str,child_field_name:str,id:int,R:d
 
 # sort in slide 1_to_m
 @router.post('/1_to_m/sort/{config}/{field_name}/{id}')
-async def sort_slide(config:str,field_name:str,id:int,R:dict):
+async def sort_slide(config:str,field_name:str,id:int,R:dict,request:Request):
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     id=id,
@@ -65,9 +70,10 @@ async def sort_slide(config:str,field_name:str,id:int,R:dict):
 
 # delete record
 @router.get('/1_to_m/delete/{config}/{field_name}/{id}/{one_to_m_id}')
-async def delete_record(config:str,field_name:str,id:int,one_to_m_id:int):
+async def delete_record(config:str,field_name:str,id:int,one_to_m_id:int,request:Request):
   #print('DELETE!')
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     id=id,
@@ -79,15 +85,17 @@ async def delete_record(config:str,field_name:str,id:int,one_to_m_id:int):
 # Upload file
 @router.post('/1_to_m/upload_file/{config}/{field_name}/{child_field_name}/{id}/{one_to_m_id}')
 async def route_upload_file(
+    request:Request,
     config:str,
     field_name:str,
     child_field_name:str,
     id:int,
     one_to_m_id:int,
-    attach: UploadFile = File(...)
+    attach: UploadFile = File(...),
 ):
   
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     child_field_name=child_field_name,
@@ -100,15 +108,17 @@ async def route_upload_file(
 # Upload file (multiload)
 @router.post('/1_to_m/upload_file/{config}/{field_name}/{child_field_name}/{id}')
 async def route_upload_file(
+    request:Request,
     config:str,
     field_name:str,
     child_field_name:str,
     id:int,
-    
-    attach: UploadFile = File(...)
+    attach: UploadFile = File(...),
+
 ):
   
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     child_field_name=child_field_name,
@@ -122,13 +132,14 @@ async def route_upload_file(
 
 @router.get('/1_to_m/download/{config}/{field_name}/{child_field_name}/{id}/{one_to_m_id}/{filename}')
 async def download(
-      config:str,
+    config:str,
     field_name:str,
     child_field_name:str,
     id:int,
     one_to_m_id:int,
     filename:str,
-    view:int
+    view:int,
+    request:Request
 ):
   # вывести картинку на stdout!
   return {
@@ -136,8 +147,9 @@ async def download(
     'view':view
   }
 @router.get('/1_to_m/delete_file/{config}/{field_name}/{child_field_name}/{id}/{one_to_m_id}')
-async def delete_file(config: str, field_name:str, child_field_name:str, id:int, one_to_m_id:int):
+async def delete_file(config: str, field_name:str, child_field_name:str, id:int, one_to_m_id:int,request:Request):
   return await process_one_to_m(
+    request=request,
     config=config,
     field_name=field_name,
     child_field_name=child_field_name,

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 #from lib.core import cur_year,cur_date,  exists_arg
 from lib.all_configs import read_config
 from .edit_form.process_edit_form import process_edit_form
@@ -10,12 +10,13 @@ router = APIRouter()
 
 # форма добавления элемента
 @router.post('/edit-form/{config}')
-async def new_or_insert_form(config: str,R: dict):
+async def new_or_insert_form(config: str,R: dict,request:Request):
   action='new'
   if 'action' in R:
     if R['action'] in ('insert'):
       action=R['action']
   return await process_edit_form(
+    request=request,
     action=action,
     config=config,
     R=R
@@ -26,8 +27,9 @@ async def new_or_insert_form(config: str,R: dict):
 
 # update изменений в карте
 @router.put('/edit-form/{config}/{id}')
-async def update_form(config: str,id: int,R: dict):
+async def update_form(config: str,id: int,R: dict,request:Request):
   return await process_edit_form(
+    request=request,
     action='update',
     config=config,
     id=id,
@@ -35,7 +37,7 @@ async def update_form(config: str,id: int,R: dict):
   )
 
 @router.post('/edit-form/{config}/{id}')
-async def work_form(config:str,id:int,R:dict):
+async def work_form(config:str,id:int,R:dict,request:Request):
   action=''
   #values=None
 
@@ -44,6 +46,7 @@ async def work_form(config:str,id:int,R:dict):
     action='edit'
   #print('action:',action)
   return await process_edit_form(
+    request=request,
     action=action,
     config=config,
     id=id,
@@ -53,8 +56,9 @@ async def work_form(config:str,id:int,R:dict):
 
 
 @router.get('/delete-element/{config}/{id}')
-async def delete_element(config: str,id:int):
+async def delete_element(config: str,id:int,request:Request):
   form = await read_config(
+    request=request,
     config=config,
     id=id,
     script='delete_element',
@@ -90,8 +94,9 @@ async def delete_element(config: str,id:int):
   return {'success':form.success(),'errors':form.errors,'log':form.log}
 
 @router.post('/multiconnect/{config}/{field_name}')
-async def multiconnect(config:str,field_name:str,R:dict):
+async def multiconnect(config:str,field_name:str,R:dict, request:Request):
   return await multiconnect_process(
+    request=request,
     config=config,
     field_name=field_name,
     R=R

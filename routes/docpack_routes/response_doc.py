@@ -23,7 +23,8 @@ def response_doc(template_file, output_filename, format, data, replace_images=[]
             try:
                 doc.replace_pic(i[0],i[1])
             except Exception as e:
-                return f"Произошла ошибка при подстановки изображения: {i[0]} при формировании документа"
+                ...
+                #return f"Произошла ошибка при подстановки изображения: {i[0]} при формировании документа"
    
 
     doc.render(data)

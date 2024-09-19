@@ -2,6 +2,38 @@ from lib.core import exists_arg, join_ids
 from lib.send_mes import send_mes
 from lib.core_crm import get_manager, get_owner, get_email_list_from_manager_id
 
+async def bill_number_rule(form,ur_lico_id):
+    #my $company_role=($form->{old_values}->{company_role}==2)?'З':'П';
+    prefix = await form.db.query(
+        query="select prefix from ur_lico where id=%s",
+        values=[ur_lico_id],
+        onevalue=1
+    )
+
+    item = await form.db.query(
+      query='''
+        SELECT
+            if(max(b.number_today),max(b.number_today)+1,1) number_today,
+            DATE_FORMAT(now(), %s) dat_bill
+        from
+            docpack dp
+            JOIN bill b ON b.docpack_id=dp.id
+        WHERE
+            dp.ur_lico_id=%s and b.registered=curdate()
+      ''',
+      values=['%d%m%y',ur_lico_id],
+      onerow=1,
+    )
+    number_today=item['number_today']
+    dat_bill=item['dat_bill']
+
+    if prefix:
+        bill_number=f"{prefix}-{number_today}/{dat_bill}"
+    else:
+        bill_number=f"{number_today}/{dat_bill}"
+
+    return number_today, bill_number
+
 async def get_old_values(form):
   product_hash={
     3:'Банковская Гарантия (Аукцион выигран с нашей помощью)',
@@ -31,7 +63,7 @@ async def get_old_values(form):
       query='''
         SELECT
                   wt.teamwork_ofp_id as id, wt.regnumber, wt.user_id, wt.product, '' as link, '' as product_label, wt.manager_from, wt.manager_to, wt.manager_to2,
-                  wt.group_id, u.firm, u.inn, mf.id mf__id, mf.group_id manager_from_group, mf.email manager_from_email,
+                  wt.group_id, u.firm, u.inn, mf.id mf__id, mf.group_id manager_from_group, mf.email manager_from_email, wt.win_status,
                   mf.phone manager_from_phone,
                   mt.group_id manager_to_group, mt2.group_id manager_to2_group,
                   mt.email manager_to_email, mt.phone manager_to_phone,
@@ -92,6 +124,7 @@ async def permissions(form):
     #return
 
   await get_old_values(form)
+  #form.pre(form.ov)
   # Админ юр. услуг
   if form.manager['login'] in ('admin', 'akulov','sed','pzm'):
     form.is_admin=True
@@ -250,11 +283,11 @@ async def before_update(form):
 
 
 async def after_save(form):
-  ov=form.ov
+  ov=form.ov ; db=form.db
   manager_id=exists_arg('values;manager_id', form.R)
   user_id=exists_arg('user_id', form.ov)
   if manager_id and form.manager['login'] in ('akulov','sed','pzm'):
-    await form.db.query(
+    await db.query(
       query='UPDATE user set manager_id=%s where id=%s',
       values=[manager_id,user_id],
 
@@ -266,11 +299,69 @@ async def after_save(form):
     if new_group_id: new_group_id=int(new_group_id)
     old_group_id=ov['group_id']
     if new_group_id and new_group_id!=old_group_id:
-      await form.db.query(
+      await db.query(
         query="UPDATE teamwork_ofp SET manager_to=0 WHERE teamwork_ofp_id=%s",
         values=[form.id]
       )
 
+
+    # Если изменяется поле "Статус победы" устанавливается в "Выполнено победа"
+    new_win_status=int(exists_arg('values;win_status',form.R) or "0")
+    old_win_status=int(form.ov.get('win_status') or "0")
+    #print(f'new_win_status: {new_win_status} ; old_win_status: {old_win_status}')
+
+    if new_win_status==1 and new_win_status!=old_win_status:
+      tech = await db.query(
+        query="""
+          SELECT
+            d.docpack_id dogovor_id, d.number dogovor_number,
+            s.header service, t.bill_id bill1_id, t.postpaid_bill_id bill2_id,
+            t.id, b1.number bill1_number, b2.number bill2_number,
+             t.registered, t.summ, t.summ_post, t.num_of_dogovor number,dp.ur_lico_id
+          FROM
+            tech t
+            JOIN service s ON s.id=t.service_id
+            JOIN bill b1 ON b1.id=t.bill_id
+            JOIN dogovor d ON d.docpack_id=b1.docpack_id
+            JOIN docpack dp ON dp.id=d.docpack_id
+            LEFT JOIN bill b2 ON b2.id=t.postpaid_bill_id
+
+          WHERE
+            t.card_id=%s AND s.type=1
+          LIMIT 1
+        """,
+        values=[form.id],
+        onerow=1
+      )
+
+      # Если есть ТЗ и счёт на постоплату ещё не создавался
+      if tech and not(tech['bill2_id']):
+        # счёт на постоплату ранее не создавался
+        number_today, bill_number = await bill_number_rule(form,tech['ur_lico_id'])
+
+        # создаётся ещё один счёт на постоплату
+        bill2_id = await db.save(
+            table='bill',
+            data={
+              'docpack_id':tech['dogovor_id'],
+              'number_today':number_today,
+              'registered':'func:curdate()',
+              'number':bill_number,
+              'summ':tech['summ_post'],
+              'manager_id':form.manager['id'],
+              'group_id':form.manager['group_id'],
+              'comment':f"счёт на постоплату создан автоматически из карты ОФП {form.id} (статус победа)",
+              'type':2
+            },
+            #debug=1
+        )
+
+        await db.query(
+          query="UPDATE tech SET postpaid_bill_id=%s where id=%s",
+          values=[bill2_id,tech['id']],
+          #debug=1
+        )
+        #print('bingo!')
 
   #form.pre([old_manager_to,form.values['manager_to']])
   #form.errors.append('test')

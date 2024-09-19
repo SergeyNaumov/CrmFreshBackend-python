@@ -24,7 +24,7 @@ async def get_birthdays():
   config=s.config
   manager_table=config["auth"]["manager_table"]
   _list=await s.db.query(
-      query=f"select id,name, born_date date from {manager_table} where born_date<>''"
+      query=f"select id,name, born_date date from {manager_table} where gone=0 and born_date<>''"
   )
   return {'success':True, 'list':_list}
 
@@ -39,7 +39,7 @@ async def get_notifications():
     #return email_list
     _list=await s.db.query(
       query="SELECT id, registered,subject,message, to_addr, readed FROM mail_send WHERE to_addr in ('"+"','".join(email_list)+"') and registered>=now() - interval 2 day order by registered desc limit 100",
-      debug=1
+      #debug=1
     )
   return {'success':True,'list':_list}
 
@@ -119,7 +119,7 @@ async def init_manager_load():
     query="SELECT * FROM manager_load where manager_id=%s and date=%s",
     values=[manager_id,d],
     onerow=1,
-    debug=1
+    #debug=1
   )
   return {
     'success':True,

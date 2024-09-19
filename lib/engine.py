@@ -15,26 +15,28 @@ class Engine():
     self.manager={}
     self.errors=[]
     
-  async def reset(self,**arg):
-    self.db=db
-    self.db_read=db_read
-    self.db_write=db_write
-    self.request=arg['request']
-    self.headers=[]
-    self.cookies={}
-    self.cookies_for_delete=[]
-    self._end=False
-    self._content_type='application/json'
-    self._content=''
-    self.project=None
-    self.errors=[]
-    self.env={}
+  async def reset(s,**arg):
+
+
+    s.db=db
+    s.db_read=db_read
+    s.db_write=db_write
+    s.request=request=arg['request']
+    s.headers=[]
+    s.request.state.cookies={}
+    s.request.state.cookies_for_delete=[]
+    s._end=False
+    s._content_type='application/json'
+    s._content=''
+    s.project=None
+    s.errors=[]
+    s.env={}
 
     #print('request_url:',self.request.url.path)
     # x-real-ip
 
-    for k in self.request['headers']:
-      self.env[str(k[0].decode("utf-8"))]=str(k[1].decode("utf-8"))
+    for k in s.request['headers']:
+      s.env[str(k[0].decode("utf-8"))]=str(k[1].decode("utf-8"))
       #print(str( k[0].decode("utf-8") ),'=>',str(k[1].decode("utf-8")) )
     
     #self.cookies['User-Agent']=''
@@ -45,7 +47,8 @@ class Engine():
     s.config=config
     auth=config['auth']
     s.use_project=config['use_project']
-    if not(self.request.url.path in config['login']['not_login_access']):
+    #print('url:',request.url.path)
+    if not(request.url.path in config['login']['not_login_access']):
       host_ok=not('hosts' in config['debug']) or (('hosts' in config['debug']) and  ( hostname in config['debug']['hosts'] ))
       
       pwd_ok=not('pwd' in config['debug']) or (('pwd' in config['debug']) and  ( pwd in config['debug']['pwd'] ))
@@ -61,30 +64,30 @@ class Engine():
           where=f"login='{config['debug']['login']}'"
         
 
-        self.request.state.manager=self.manager=await db.getrow(
+        manager=request.state.manager=await db.getrow(
           table=auth['manager_table'],
           where=where,
           values=values,
 
         )
-        manager=self.request.state.manager
+
 
         if manager:
           manager['id']=manager[auth['manager_table_id']]
           #self.login=self.manager['login']
         else:
           #self.login='nonelogin'
-          self.manager={'id':0,'login':'nonelogin','name':'менеджер не найден'}
+          manager={'id':0,'login':'nonelogin','name':'менеджер не найден'}
       else:
         
-        await session_start(self);
+        await session_start(s,request=request);
 
       # для того, чтобы избежать путаницы в сессиях
-      self.request.state.manager=self.manager  
+      #s.request.state.manager=s.manager
       #print('RESET self.request.state.manager:',self.request.state.manager)
-      manager=s.request.state.manager
+      manager=request.state.manager
       if manager['id'] and ('after_create_engine' in config):
-        config['after_create_engine'](self)
+        config['after_create_engine'](s)
 
       #print('MANAGER:',self.manager)
 
@@ -96,10 +99,10 @@ class Engine():
       arg['value']=par[1]
     
     #print('arg',arg)
-    if arg['value'] or str(arg['value'])=='0' or arg['value']=='':
-      self.cookies[arg['name']]=arg['value']
+    if arg['value'] or str(arg['value'])=='0' or not(arg['value']):
+      self.request.state.cookies[arg['name']]=arg['value']
     else:
-      self.cookies_for_delete.append(arg['name'])
+      self.request.state.cookies_for_delete.append(arg['name'])
     
 
   def get_cookie(self,cookie_name):

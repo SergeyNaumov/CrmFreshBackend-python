@@ -123,7 +123,7 @@ async def session_create(s,**arg):
   }
 
 async def session_start(s,**arg):
-  
+  request=arg.get('request')
   user_id=s.get_cookie('auth_user_id')
   key=s.get_cookie('auth_key')
   session_table='session'
@@ -186,7 +186,7 @@ async def session_start(s,**arg):
   #  manager['id']=str(manager['id'])
     
     del manager['password']
-    s.request.state.manager=s.manager=manager
+    request.state.manager=s.manager=manager
       
   s._content={
     'success':1,
@@ -271,6 +271,7 @@ async def child_groups(db,group_id):
 
 
 async def get_permissions_for(form,login):
+
   manager=await form.db.query(
     query="""
         SELECT 
@@ -284,9 +285,10 @@ async def get_permissions_for(form,login):
           LEFT JOIN manager ow ON (mg.owner_id = ow.id) 
         WHERE m.login = %s
     """,
+    #debug=1,
     values=[login],onerow=1,log=form.log
   )
-
+  #print('manager:',manager)
   #manager['id']=str(manager['id'])
   if manager and manager['password']:
     del manager['password']

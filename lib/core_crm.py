@@ -47,7 +47,8 @@ async def get_email_list_from_manager_id(db, to: dict):
 			massive=1
 		):
 			#print('email:',email)
-			to_emails[email]=True
+			if '@' in email:
+				to_emails[email]=True
 		#возвращает словарь email-ов их email-ов
 
 		return to_emails

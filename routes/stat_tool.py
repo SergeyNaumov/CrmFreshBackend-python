@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 from lib.CRM.form.get_values_for_select_from_table import get_values_for_select_from_table
 import traceback
@@ -6,7 +6,7 @@ import traceback
 router = APIRouter()
 # Инициализация
 @router.post('/{config}')
-async def get_list(config: str, R:dict): # 
+async def get_list(config: str, R:dict,request:Request): #
     print('stat_tool -1')
     form=await read_config(
         action='init',
@@ -55,8 +55,9 @@ async def get_list(config: str, R:dict): #
 
 # Поиск
 @router.post('/{config}/search')
-async def search(config: str, R: dict):
+async def search(config: str, R: dict, request: Request):
     form=await read_config(
+        request=request,
         action='search',
         config=config,    
         script='stat_tool',

@@ -14,6 +14,7 @@ async def process_one_to_m(**arg):
   R={}
   if exists_arg('R',arg): R=arg['R']
   form = await read_config(
+    request=exists_arg('request',arg),
     action=exists_arg('action',arg),
     config=exists_arg('config',arg),
     id=exists_arg('id',arg),

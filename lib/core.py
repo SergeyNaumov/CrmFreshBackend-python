@@ -37,7 +37,6 @@ def tree_to_list(tree_list,lst,level):
       tree_to_list(t['children'],lst,level+1)
 
 
-
 def exists_arg(key,dict):
   #print('dict:',key,dict)
   # Сложная структура
@@ -60,21 +59,22 @@ def exists_arg(key,dict):
 
 def gen_pas(length=8,letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678'):
   return ''.join(random.choice(letters) for i in range(length))
-  
+
 def cur_year():
   dat = datetime.date.today()
   dat = dat + datetime.timedelta(days=0)
   return dat.strftime("%Y")
 
+def cur_hour():
+  now=datetime.datetime.now()
+  return now.hour
+ 
 def cur_date(delta=0,format="%Y-%m-%d"):
   dat = datetime.date.today()
   dat = dat + datetime.timedelta(days=delta)
   return dat.strftime(format)
 
-def cur_hour():
-  now=datetime.datetime.now()
-  return now.hour
-  
+
 def is_errors(form):
 
   if isinstance(form,dict):

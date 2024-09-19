@@ -35,6 +35,7 @@ async def process_edit_form(**arg):
   if 'id' not in arg: arg['id']=''
   
   form = await read_config(
+    request=arg['request'],
     action=action,
     config=config,
     id=arg['id'],
@@ -42,7 +43,6 @@ async def process_edit_form(**arg):
     values=values,
     script='edit_form'
   )
-  print('ef 1')
   if hasattr(form, 'response') and form.response:
     return form.response
   

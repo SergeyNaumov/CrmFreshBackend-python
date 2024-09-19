@@ -14,14 +14,15 @@ async def startup():
 
 
 @app.middleware("http") # ""
-async def for_all_requests(request: Request,call_next, response=Response):
-  
-  response_obj=response()
+async def for_all_requests(request: Request,call_next): # , response=Response
+  #response_obj=response()
+  #response = await call_next(request)
   await s.reset(
     request=request,
-    status_code=200
+    status_code=200,
     #response=response_obj
   )
+
   #print('RESET END',s.manager)
   # Пишем информацию о посещениях пользователей
   #stat_log_record(s,request)
@@ -29,13 +30,14 @@ async def for_all_requests(request: Request,call_next, response=Response):
   if( s._end):
     return Response(s.to_json(s._content))
   else:
+    #print('request.state.manager: ',request.state.manager['login'])
     response = await call_next(request)
 
     # set cookies
-    for k in s.cookies.keys():
-      response.set_cookie(key=k,value=s.cookies[k])
+    for k in s.request.state.cookies.keys():
+      response.set_cookie(key=k,value=s.request.state.cookies[k])
     # delete_cookies
-    for k in s.cookies_for_delete:
+    for k in s.request.state.cookies_for_delete:
       response.delete_cookie(k)
     
     # print_headers

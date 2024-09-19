@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 #import datetime as dt
 from lib.save_base64_file import save_base64_file
@@ -39,8 +39,9 @@ async def load_at(docpack_id: int, act_id: int, ext: str, need_print: int, debug
     return await load_act(act_id, ext, need_print, debug)
 
 @router.post('/{config}/{field_name}')
-async def get_list(config:str, field_name:str, R:dict): # 
+async def get_list(config:str, field_name:str, R:dict,request:Request): #
     form = await read_config(
+        request=request,
         action='get',
         config=config,
         id=R['id'],

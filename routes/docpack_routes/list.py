@@ -19,6 +19,26 @@ async def action_list(form,field):
             """,
             errors=form.errors
         )
+
+        # Список услуг
+        services=[]
+        if service_table:=field.get('service_table'):
+            serv_fields=[]
+            services = await form.db.query(query=f"select id,header from {service_table} order by header")
+
+            # доп. поля для услуг
+            if field_table:=field.get('service_field_table'):
+                serv_fields=await form.db.query(query=f"select * from {field_table} order by sort")
+
+            for s in services:
+                s['fields']=[]
+                for f in serv_fields:
+                    if s['id']==f['service_id']:
+                        f['value']=''
+                        s['fields'].append(f)
+
+
+
         #print(lst)
         id_list=[]
         for l in lst:
@@ -58,5 +78,6 @@ async def action_list(form,field):
             'success':form.success(),
             'errors':form.errors,
             'permissions':form.manager['permissions'],
-            'list':lst
+            'list':lst,
+            'services':services
         };

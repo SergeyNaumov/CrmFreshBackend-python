@@ -1,0 +1,68 @@
+
+<div style="margin-top: 10px;">
+
+	<div>
+		<b>Договор №{{a.dogovor_number}}</b><br>
+		с печатями: <a href="{{backend_base}}/docpack/load-dogovor/{{a.dogovor_id}}/doc/1">doc</a> |
+					<a href="{{backend_base}}/docpack/load-dogovor/{{a.dogovor_id}}/pdf/1">pdf</a><br>
+		без печатей: <a href="{{backend_base}}/docpack/load-dogovor/{{a.dogovor_id}}/doc/0">doc</a> |
+					<a href="{{backend_base}}/docpack/load-dogovor/{{a.dogovor_id}}/pdf/0">pdf</a><br><br>
+		<hr>
+
+		<div style="margin-top: 10px; font-weight: bold;">Приложение №{{a.number}} от {{a.registered}}</div>
+		<table class="tbl1" style="max-width: 500px;">
+			{%for a in av%}
+				<tr>
+					<td>{{a.header}}: {{a.value}}</td>
+				</tr>
+			{%endfor%}
+		</table>
+		с печатями: <a href="">doc</a> | <a href="">pdf</a><br>
+		без печатей: <a href="">doc</a> | <a href="">pdf</a><br>
+
+	</div>
+	<div style="margin-top: 10px;">
+		<b>Счёт №{{a.bill1_number}}</b> (предоплата {{a.summ}} р.)<br>
+		на сумму: {{a.summ}}
+
+		с печатями: <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill1_id}}/doc/1">doc</a> | <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill1_id}}/pdf/1">pdf</a><br>
+		без печатей: <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill1_id}}/doc/0">doc</a> | <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill1_id}}/pdf/0">pdf</a><br>
+
+	</div>
+	{%if a.bill2_id%}
+	<div style=" margin-top: 10px;">
+		<b>Счёт №{{a.bill2_number}}</b> (постоплата на {{a.summ_post}} р.)<br>
+		на сумму {{a.summ_post}}
+		с печатями: <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill2_id}}/doc/1">doc</a> | <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill2_id}}/pdf/1">pdf</a><br>
+		без печатей: <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill2_id}}/doc/0">doc</a> | <a href="{{backend_base}}/docpack/load-bill/{{a.dogovor_id}}/{{a.bill2_id}}/pdf/0">pdf</a><br>
+	</div>
+	{%endif%}
+</div>
+<!-- <table class="tbl1" style="margin-top: 10px;">
+	<thead>
+		<tr>
+			<td>№</td>
+			<td>создано</td>
+			<td>услуга</td>
+			<td>счёт</td>
+			<td>предоплата</td>
+			<td>постоплата</td>
+		</tr>
+	</thead>
+	{%for t in list%}
+		<tr>
+			<td>{{t.id}}</td>
+			<td>{{t.registered}}</td>
+			<td>{{t.service}}</td>
+			<td>{{t.bill_number}}</td>
+			<td>{{t.summ}} руб.</td>
+			<td>{{t.summ_post}} руб.</td>
+		</tr>
+		<tr>
+			<td colspan="6">
+				с печатями: <a href="http://localhost:8081/backend/docpack/load-bill/151/1592/doc/1">doc</a> | <a href="">pdf</a><br>
+				без печатей: <a href="">doc</a> | <a href="">pdf</a>
+			</td>
+		</tr>
+	{%endfor%}
+</table> -->

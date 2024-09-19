@@ -137,8 +137,8 @@ config={
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
     'manager_id':
 #      12066 # mai
-      #1
-      11709
+      1
+      #11709
       #11691 #Люб
       #4201 # sed
       #585 # Ак ,

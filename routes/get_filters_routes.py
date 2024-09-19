@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from lib.core import is_errors, create_fields_hash, exists_arg
 from lib.all_configs import read_config
 
@@ -12,10 +12,11 @@ async def get_values_for_select_from_table(f,form):
 
 @router.get('/get-filters/{config}')
 @router.post('/get-filters/{config}')
-async def get_filters_controller(config: str, R:dict):
+async def get_filters_controller(config: str, R:dict, request: Request):
   response={}
 
   form=await read_config(
+    request=request,
     config=config,
     R=R,
     script='admin_table'

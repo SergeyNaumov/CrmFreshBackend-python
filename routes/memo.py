@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request
 from lib.all_configs import read_config
 import datetime as dt
 from lib.core import date_to_rus
@@ -7,8 +7,9 @@ router = APIRouter()
 
 
 @router.get('/get/{config}/{field_name}/{id}')
-async def get_memo(config:str, field_name:str,id:int): # 
+async def get_memo(config:str, field_name:str,id:int,request: Request): #
   form = await read_config(
+    request=request,
     action='get',
     config=config,
     id=id,
@@ -66,8 +67,9 @@ async def get_memo(config:str, field_name:str,id:int): #
 
 
 @router.post('/add/{config}/{field_name}/{id}')
-async def get_memo(config:str, field_name:str,id:int, R:dict): 
+async def get_memo(config:str, field_name:str,id:int, R:dict,request: Request):
   form = await read_config(
+    request=request,
     action='add',
     config=config,
     id=id,
@@ -130,8 +132,9 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
   }
 # Обновление записи
 @router.post('/update/{config}/{field_name}/{id}/{memo_id}')
-async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
+async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict,request: Request):
   form = await read_config(
+    request=request,
     config=config,
     id=id,
     #R=R,
@@ -176,8 +179,9 @@ async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
   }
 
 @router.get('/delete/{config}/{field_name}/{id}/{memo_id}')
-async def delete_from_memo(config:str, field_name:str,id:int, memo_id:int):
+async def delete_from_memo(config:str, field_name:str,id:int, memo_id:int,request:Request):
   form = await read_config(
+    request=request,
     action='delete',
     config=config,
     id=id,

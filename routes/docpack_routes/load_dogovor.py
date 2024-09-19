@@ -12,8 +12,10 @@ from .response_doc import response_doc
 
 
 async def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
+	await db.query(query='set lc_time_names="ru_RU"')
 	dp = await db.query(
 		query=f'''
+
 			SELECT
 				bcr.*,
 				m.name manager_name,
@@ -43,7 +45,7 @@ async def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 				LEFT JOIN tarif t ON (t.id = dp.tarif_id)
 				LEFT JOIN blank_document b_dog ON (b_dog.id = t.blank_dogovor_id)
 				LEFT JOIN ur_lico ON (ur_lico.id=dp.ur_lico_id)
-			WHERE dp.id = %s GROUP BY u.id ORDER BY bcr.main LIMIT 1
+			WHERE dp.id = %s ORDER BY bcr.main desc LIMIT 1
 		''', 
 		values=['%e %M %Y', docpack_id],onerow=1
 	)

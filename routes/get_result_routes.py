@@ -1,5 +1,5 @@
 from lib.core import cur_year,cur_date, exists_arg
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from config import config
 
 from lib.engine import s
@@ -14,9 +14,10 @@ router = APIRouter()
 #def get_search_tables(form):
 
 @router.post('/get-result')
-async def get_result(R: dict):
+async def get_result(R: dict, request: Request):
   try:
       form=await read_config(
+        request=request,
         R=R,
         config=R['config'],
         script='find_objects'
@@ -145,9 +146,6 @@ async def get_result(R: dict):
                   'out_after_search':form.out_after_search,
                   'explain_query':form.explain_query
           }
-          
-
-
 
       if len(form.errors):
         return {'success':0,'errors':form.errors}

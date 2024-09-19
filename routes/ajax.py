@@ -1,5 +1,5 @@
 from lib.core import cur_year,cur_date, exists_arg
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 #from lib.engine import s
 
 #import re
@@ -30,10 +30,11 @@ async def ajax_get(config:str,ajax_name:str):
 # изменение пароля
 @router.post('/ajax/{config}/{ajax_name}')
 @router.get('/ajax/{config}/{ajax_name}')
-async def ajax(config:str,ajax_name:str,R: dict):
+async def ajax(config:str,ajax_name:str,R: dict, request: Request):
   success=1
   errors=[]
   form=await read_config(
+    request=request,
     script='ajax', config=config,
     R=R,
     id=R['id']

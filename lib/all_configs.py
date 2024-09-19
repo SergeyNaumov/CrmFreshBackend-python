@@ -147,6 +147,9 @@ def load_form_from_dir(confdir,conflib_dir, arg):
 
 async def read_config(**arg):
 
+  if not(request:=exists_arg('request',arg)):
+    request=s.request
+
   response={}
   
   # это нужно для того, чтобы в конфиг не попали аргументы:
@@ -185,16 +188,20 @@ async def read_config(**arg):
 
   # Получаем manager-а 
   auth=sysconfig['auth']
-  if not(hasattr(s.request.state,'manager')):
-    await session_start(s)
-    s.request.state.manager=s.manager  
+
+  if not(hasattr(request.state,'manager')) or not(request.state.manager.get('login')):
+    print('NO manager')
+    #await session_start(s)
+
+    print('REPEAT SESSION START: ',request.state.manager)
+    #s.request.state.manager=s.manager
     
-  login=s.request.state.manager.get('login')#s.login
+  login=request.state.manager.get('login')#s.login
   
   # form.manager содержит login
   if auth['use_roles']:
 
-    #print('use_roles:',auth)
+    #print('use_roles:',login)
     login=await get_cur_role(
      login=login,
      form=form
@@ -207,9 +214,14 @@ async def read_config(**arg):
 
   #print('login:',login)
   if auth['use_permissions']:
-      s.request.state.manager=await get_permissions_for(form,login)
+      # print('USE PERMISSIONS:')
+      # print('LOGIN:',login)
+      # print('MANAGER:',s.request.state.manager)
 
-  form.manager=s.request.state.manager
+      # print("\n\n\n")
+      request.state.manager=await get_permissions_for(form,login)
+
+  form.manager=request.state.manager
   # Атрибуты по умолчанию
   if exists_arg('id',arg): form.id=arg['id']
   if exists_arg('action',arg): form.action=arg['action']

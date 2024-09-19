@@ -10,10 +10,11 @@ async def action_init_new_docpack_form(form,field):
     manager_list=[]
         
     if field.get('ur_lico_list'):
-        #print('locale ur_lico_list')
-        ur_lico_list=field['ur_lico_list'](form,field)
+        print('locale ur_lico_list')
+        ur_lico_list = await field['ur_lico_list'](form,field)
 
     else:
+        #print('not locale ur_lico_list')
         ur_lico_list=await form.db.query(query='select id v,firm d from ur_lico order by firm')
     
     tarif_list=await form.db.query(

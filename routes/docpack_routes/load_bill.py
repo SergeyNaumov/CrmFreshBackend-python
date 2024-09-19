@@ -39,7 +39,7 @@ async def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
 				LEFT JOIN tarif t ON (t.id = dp.tarif_id)
 				LEFT JOIN blank_document b_bill ON (b_bill.id = t.blank_bill_id)
 				LEFT JOIN ur_lico ON (ur_lico.id=dp.ur_lico_id)
-			WHERE dp.id = %s and b.id=%s GROUP BY u.id ORDER BY bcr.main LIMIT 1
+			WHERE dp.id = %s and b.id=%s ORDER BY bcr.main desc LIMIT 1
 		''', 
 		#debug=1,
 		values=['%e %M %Y', '%e %M %Y', docpack_id, bill_id],onerow=1

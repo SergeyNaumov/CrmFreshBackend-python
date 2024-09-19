@@ -13,7 +13,7 @@ async def action_create_docpack(form, field, R):
     docpack_foreign_key=field['docpack_foreign_key']
 
     if form.success():
-        number,number_today = field['dogovor_number_rule'](form, field, R['ur_lico_id'])
+        number,number_today = await field['dogovor_number_rule'](form, field, R['ur_lico_id'])
 
         
         data={
