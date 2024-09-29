@@ -311,23 +311,23 @@ async def after_save(form):
     #print(f'new_win_status: {new_win_status} ; old_win_status: {old_win_status}')
 
     if new_win_status==1 and new_win_status!=old_win_status:
-      tech = await db.query(
+      app = await db.query(
         query="""
           SELECT
             d.docpack_id dogovor_id, d.number dogovor_number,
-            s.header service, t.bill_id bill1_id, t.postpaid_bill_id bill2_id,
-            t.id, b1.number bill1_number, b2.number bill2_number,
-             t.registered, t.summ, t.summ_post, t.num_of_dogovor number,dp.ur_lico_id
+            s.header service, b1.id bill1_id, a.postpaid_bill_id bill2_id,
+            a.id, b1.number bill1_number, b2.number bill2_number,
+             a.registered, a.summ, a.summ_post, a.num_of_dogovor number,dp.ur_lico_id
           FROM
-            tech t
-            JOIN service s ON s.id=t.service_id
-            JOIN bill b1 ON b1.id=t.bill_id
+            dogovor_app a
+            JOIN service s ON s.id=a.service_id
+            JOIN bill b1 ON b1.dogovor_app_id=a.id
             JOIN dogovor d ON d.docpack_id=b1.docpack_id
             JOIN docpack dp ON dp.id=d.docpack_id
-            LEFT JOIN bill b2 ON b2.id=t.postpaid_bill_id
+            LEFT JOIN bill b2 ON b2.id=a.postpaid_bill_id
 
           WHERE
-            t.card_id=%s AND s.type=1
+            a.card_id=%s AND s.type=1
           LIMIT 1
         """,
         values=[form.id],
@@ -335,31 +335,32 @@ async def after_save(form):
       )
 
       # Если есть ТЗ и счёт на постоплату ещё не создавался
-      if tech and not(tech['bill2_id']):
+      if app and not(app['bill2_id']):
         # счёт на постоплату ранее не создавался
-        number_today, bill_number = await bill_number_rule(form,tech['ur_lico_id'])
+        number_today, bill_number = await bill_number_rule(form,app['ur_lico_id'])
 
         # создаётся ещё один счёт на постоплату
         bill2_id = await db.save(
             table='bill',
             data={
-              'docpack_id':tech['dogovor_id'],
+              'docpack_id':app['dogovor_id'],
               'number_today':number_today,
               'registered':'func:curdate()',
               'number':bill_number,
-              'summ':tech['summ_post'],
+              'summ':app['summ_post'],
               'manager_id':form.manager['id'],
               'group_id':form.manager['group_id'],
               'comment':f"счёт на постоплату создан автоматически из карты ОФП {form.id} (статус победа)",
-              'type':2
+              'type':2,
+              'dogovor_app_id':app['id']
             },
-            #debug=1
+            debug=1
         )
 
         await db.query(
-          query="UPDATE tech SET postpaid_bill_id=%s where id=%s",
-          values=[bill2_id,tech['id']],
-          #debug=1
+          query="UPDATE dogovor_app SET postpaid_bill_id=%s where id=%s",
+          values=[bill2_id,app['id']],
+          debug=1
         )
         #print('bingo!')
 

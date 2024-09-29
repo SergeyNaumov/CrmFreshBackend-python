@@ -1,7 +1,15 @@
-from lib.core import join_ids
+from lib.core import join_ids, exists_arg
 async def action_list(form,field):
         #field=form.fields_hash[field_name]
-        
+        form_id=form.R.get('form_id_alternative',form.id)
+
+        lst_where=f"dp.{field['docpack_foreign_key']}=%s"
+        lst_values=[form_id]
+
+        if only_dogovor:=form.R.get('only_dogovor'):
+            lst_where+=f" and dp.id=%s"
+            lst_values.append(only_dogovor)
+
         lst=await form.db.query(
             query=f"""
                 select
@@ -14,9 +22,10 @@ async def action_list(form,field):
                     LEFT JOIN ur_lico_access_only a ON (a.ur_lico_id=ul.id and a.manager_id={form.manager['id']}) 
                     LEFT JOIN manager m ON (m.id=dp.manager_id)
                 WHERE
-                    dp.{field['docpack_foreign_key']}={form.id}
+                    {lst_where}
                 ORDER BY dp.id desc
             """,
+            values=lst_values,
             errors=form.errors
         )
 

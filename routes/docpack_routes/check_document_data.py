@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 def out_debug(dp):
 	tabs=[
 		{'description':'Договор','name':'dog'},
+		{'description':'Приложение к договору','name':'app'},
 		{'description':'Счёт','name':'bill'},
 		{'description':'Клиент','name':'client'},
 		{'description':'Наше юр. лицо','name':'ur_lico'},
@@ -17,6 +18,44 @@ def out_debug(dp):
 			'tab':'dog'
 		},
 		{'description':'дата договора','name':'dogovor_from','tab':'dog'},
+
+		# Приложение к договору
+		{
+			'description':'номер приложения в рамках договора',
+			'name':'app_num_of_dogovor',
+			'tab':'app'
+		},
+		{
+			'description':'сумма предоплаты',
+			'name':'app_summ',
+			'tab':'app'
+		},
+		{
+			'description':'сумма предоплаты прописью',
+			'name':'app_summ_prop',
+			'tab':'app'
+		},
+		{
+			'description':'сумма постоплаты','name':'app_summ_post',
+			'tab':'app'
+		},
+		{
+			'description':'сумма постоплаты прописью','name':'app_summ_post_prop',
+			'tab':'app'
+		},
+		{
+			'description':'дата создания приложения','name':'app_from',
+			'tab':'app'
+		},
+		{
+			'description':'доп. поля','name':'app_fields',
+			'tab':'app'
+		},
+		{
+			'description':'бланк для приложения','name':'app_blank',
+			'tab':'app'
+		},
+
 		{'description':'должность ответственного лица в родительном падеже','name':'position_otv_rod','tab':'client'},
 		{'description':'ген. дир в именительном падеже (кратко)','name':'gen_dir_f_im','tab':'client'},
 		{'description':'ген. дир в именительном падеже','name':'fio_dir','tab':'client'},

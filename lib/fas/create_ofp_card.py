@@ -1,6 +1,6 @@
 from lib.send_mes import send_mes
 
-async def create_ofp_card(form):
+async def create_ofp_card(form,card_id=None):
         db=form.db
         ov=form.ov
     # Пример ссылки на создание: /edit_form/user/106998?action=create_ofp_card
@@ -8,11 +8,13 @@ async def create_ofp_card(form):
 
         #form.pre(ov)
         city_id=0
+        if not card_id:
+          card_id=form.id
         data={
             #'firm':ov['firm'],
             'city':ov['city'],
             #'inn':ov['inn'],
-            'user_id':form.id,
+            'user_id':card_id,
             # По умолчанию проставлялся Бородин, но решили проставлять того, кто создал
             'manager_from':form.manager['id'], 
         }

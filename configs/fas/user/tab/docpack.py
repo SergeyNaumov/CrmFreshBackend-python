@@ -1,9 +1,9 @@
-from .dp.get_bills import get_bills
+#from .dp.get_bills import get_bills
 from .dp.get_acts import get_acts
 from .dp.ur_lico_list import ur_lico_list
 from .dp.create_bill import create_bill
 from .dp.number_rules import *
-
+#from .db.create_sr import *
 
 # def get_acts(form,field,R):
 #     return [
@@ -27,7 +27,7 @@ fields=[{
   'bill_number_rule':bill_number_rule,
   'act_number_rule':act_number_rule,
   'ur_lico_list': ur_lico_list,
-  'get_bills':get_bills,
+  #'get_bills':get_bills,
   'get_acts': get_acts,
   'need_services_on_bill':True,
   'service_table':'service',

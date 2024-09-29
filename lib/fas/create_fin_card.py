@@ -1,10 +1,12 @@
 from lib.send_mes import send_mes
 from lib.core_crm import get_owner, get_email_list_from_manager_id
-async def create_fin_card(form):
+async def create_fin_card(form,card_id=None):
         db=form.db ; ov=form.ov ; manager_id=form.manager['id']
+        if not card_id:
+          card_id=form.id
         city_id=0
         data={
-          'user_id':form.id,
+          'user_id':card_id,
           'manager_id':manager_id,
           'group_id':443,
           'manager_fin':12057
@@ -36,3 +38,4 @@ async def create_fin_card(form):
         redirect_link=f"/edit_form/user_fin/{fin_card_id}"
         #form.pre(f"<a href='{redirect_link}'>{redirect_link}</a>")
         form.redirect=redirect_link
+        return fin_card_id

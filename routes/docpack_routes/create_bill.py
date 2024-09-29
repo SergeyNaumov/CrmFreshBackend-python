@@ -1,9 +1,9 @@
 from lib.core import exists_arg
 from .get_bills import get_bills
 async def action_create_bill(form,field,R):
-  if 'create_bill' in field:
-    print("CREATE BILL",form,field,R)
-    return await field['create_bill'](form,field,R)
+  #if 'create_bill' in field:
+  #  print("CREATE BILL",form,field,R)
+  #  return await field['create_bill'](form,field,R)
 
   lst=[]
   summ=exists_arg('summ',R)
@@ -46,7 +46,8 @@ async def action_create_bill(form,field,R):
           'manager_id':form.manager['id'],
           'group_id':form.manager['group_id'],
           'summ':summ,
-          'comment':comment
+          'comment':comment,
+          'type':0
       };
 
 

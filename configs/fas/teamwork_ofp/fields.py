@@ -97,7 +97,7 @@ fields=[
         contact_field,
 
         # Приложения
-        tech_field,
+        #tech_field,
         # Платежи
         paids_field,
         {

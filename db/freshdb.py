@@ -69,6 +69,7 @@ class FreshDB():
         async with self.pool.acquire() as conn:
             async with get_cursor(conn) as cur:
                 # out debug
+                await cur.execute("SET lc_time_names='ru_RU'")
                 if(arg.get('debug')):
                     print(arg['query'])
                     if arg.get('values'):
