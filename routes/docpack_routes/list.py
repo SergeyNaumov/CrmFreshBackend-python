@@ -1,7 +1,7 @@
 from lib.core import join_ids, exists_arg
 async def action_list(form,field):
         #field=form.fields_hash[field_name]
-        form_id=form.R.get('form_id_alternative',form.id)
+        form_id=form.R.get('form_id_alternative') or form.id
 
         lst_where=f"dp.{field['docpack_foreign_key']}=%s"
         lst_values=[form_id]
@@ -25,6 +25,7 @@ async def action_list(form,field):
                     {lst_where}
                 ORDER BY dp.id desc
             """,
+            #debug=1,
             values=lst_values,
             errors=form.errors
         )
@@ -82,7 +83,7 @@ async def action_list(form,field):
                     if dp['id']==d['docpack_id']:
                         dp['dogovor_list'].append(d)
 
-        #return {'ok':3}
+        #print('lst:',lst)
         return {
             'success':form.success(),
             'errors':form.errors,

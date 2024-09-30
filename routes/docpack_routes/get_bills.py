@@ -34,7 +34,7 @@ async def get_bills(form,field, R):
     Возвращает все счета и приложения к договору (с привязанными счетами)
   """
   R=form.R
-  form_id=R.get('form_id_alternative',form.id)
+  form_id=R.get('form_id_alternative') or form.id
   only_dogovor=R.get('only_dogovor')
   only_app=R.get('only_app')
   docpack_foreign_key=field['docpack_foreign_key'] ; lst=[] ; db=form.db
@@ -62,7 +62,7 @@ async def get_bills(form,field, R):
               {lst_where}
           order by b.id desc
         """,
-        debug=1,
+        #debug=1,
         values=lst_values
       )
       process_bill_list(form, lst)

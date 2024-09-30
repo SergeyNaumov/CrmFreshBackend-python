@@ -11,7 +11,7 @@ async def get_list(config: str, R:dict,request:Request): #
     form=await read_config(
         action='init',
         config=config,
-        #id=exists_arg('id',arg),
+        request=request,
         R=R,
         script='stat_tool'
     )
