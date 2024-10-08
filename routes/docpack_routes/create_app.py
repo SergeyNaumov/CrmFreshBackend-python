@@ -33,7 +33,7 @@ async def action_create_app(form,field,R):
   bills_data={}
   summ=exists_arg('summ',R)
   summ_post=exists_arg('summ_post',R)
-  tech_fields=exists_arg('tech_fields',R)
+  tech_fields=R.get('tech_fields')
   service_id=exists_arg('service_id',R)
   comment=exists_arg('comment',R)
   docpack_id=exists_arg('dogovor_id',R)
@@ -44,8 +44,8 @@ async def action_create_app(form,field,R):
 
   if not(summ_post):
     form.errors.append('сумма постоплаты не указана или указана не верно')
-
-  if not(tech_fields):
+  #print('tech_fields:',tech_fields)
+  if not('tech_fields' in R):
     form.errors.append('не получены дополнительные поля')
 
   if not(service_id):

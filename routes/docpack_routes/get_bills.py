@@ -35,10 +35,12 @@ async def get_bills(form,field, R):
   """
   R=form.R
   form_id=R.get('form_id_alternative') or form.id
+  perm=form.manager['permissions']
+
   only_dogovor=R.get('only_dogovor')
   only_app=R.get('only_app')
   docpack_foreign_key=field['docpack_foreign_key'] ; lst=[] ; db=form.db
-  if R.get('dogovor_id'):
+  if dogovor_id:=R.get('dogovor_id'):
       bill_list=[]
       bill_for_apps_dict={}
 
@@ -51,6 +53,14 @@ async def get_bills(form,field, R):
       if only_app:
         lst_where+=' and dogovor_app_id=%s'
         lst_values.append(only_app)
+
+      dp = await form.db.query(
+        query="select (registered<'2024-10-04') old  from docpack where id=%s",
+        values=[dogovor_id],
+        debug=1,
+        onerow=1
+      )
+
       lst = await form.db.query(
         query=f"""
           SELECT
@@ -118,8 +128,16 @@ async def get_bills(form,field, R):
 
   else:
     form.errors.append('отсутствует параметр dogovor_id')
-  return bill_list, apps_list
+
+  make_add_bill_without_app=False
+
+  if dp:
+    # Старый пакет документов или есть приложение или админ
+    if dp['old'] or len(apps_list) or perm.get('admin_paids'):
+      make_add_bill_without_app=True
+
+  return bill_list, apps_list, make_add_bill_without_app
 
 async def action_get_bills(form,field, R):
-  bills,apps = await get_bills(form,field, R)
-  return {'success':form.success(),'errors':form.errors, 'bills':bills,'apps':apps}
+  bills,apps, make_add_bill_without_app = await get_bills(form,field, R)
+  return {'success':form.success(),'errors':form.errors, 'bills':bills,'apps':apps, 'make_add_bill_without_app':make_add_bill_without_app}

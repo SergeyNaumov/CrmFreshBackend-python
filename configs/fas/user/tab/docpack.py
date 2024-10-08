@@ -32,5 +32,6 @@ fields=[{
   'need_services_on_bill':True,
   'service_table':'service',
   'service_field_table':'service_field',
-  'create_bill':create_bill
+  'create_bill':create_bill,
+  'after_html':'this is after_html'
 }]
