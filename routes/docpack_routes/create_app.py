@@ -42,7 +42,7 @@ async def action_create_app(form,field,R):
   if not(summ):
     form.errors.append('сумма предоплаты не указана или указана не верно')
 
-  if not(summ_post):
+  if not(summ_post) and summ_post!=0:
     form.errors.append('сумма постоплаты не указана или указана не верно')
   #print('tech_fields:',tech_fields)
   if not('tech_fields' in R):

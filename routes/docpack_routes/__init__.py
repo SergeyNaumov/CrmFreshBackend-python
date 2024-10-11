@@ -10,9 +10,11 @@ from .create_docpack import action_create_docpack
 from .get_bills import action_get_bills
 from .get_acts import action_get_acts
 from .create_app import action_create_app
+from .load_sr_list import action_load_sr_list
 from .create_bill import action_create_bill
 from .create_act import action_create_act
 from .create_sr import action_create_sr
+from .link_sr import action_link_sr
 from .delete_act import action_delete_act
 from .save_summ_bill import save_summ_bill
 from .save_app_field import save_app_field
@@ -46,6 +48,8 @@ async def load_at(docpack_id: int, act_id: int, ext: str, need_print: int, debug
 async def load_app_endpoint(app_id:int,ext:str,need_print: int, debug=0):
     print('load app endpoint')
     return await load_app(app_id,ext, need_print, debug)
+
+
 
 @router.post('/{config}/{field_name}')
 async def get_list(config:str, field_name:str, R:dict,request:Request): #
@@ -82,6 +86,10 @@ async def get_list(config:str, field_name:str, R:dict,request:Request): #
         # создание счёта
         return await action_create_bill(form,field, R)
 
+    if action == 'load_sr_list':
+        # загрузка списка СР-ок
+        return await action_load_sr_list(form,field, R)
+
     if action == 'create_app':
         # создание приложения к договору
         return await action_create_app(form,field, R)
@@ -89,6 +97,9 @@ async def get_list(config:str, field_name:str, R:dict,request:Request): #
     if action == 'create_sr':
         # Создание совместной работы
         return await action_create_sr(form,field, R)
+
+    if action == 'link_sr':
+        return await action_link_sr(form,field, R)
 
     if action == 'save_app_field':
         # сохранение доп. поля в приложении к договору

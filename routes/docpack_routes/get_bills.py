@@ -92,7 +92,7 @@ async def get_bills(form,field, R):
           select
             a.id, a.num_of_dogovor, date(a.registered) registered,
             a.card_id, s.type, s.header service,a.summ, a.summ_post,
-            u.firm sr_name, u.id user_id, '' error
+            concat( if(uc.regnumber,uc.regnumber,'-'),' от ', DATE_FORMAT(uc.born,%s) ) sr_name, u.id user_id, '' error
           from
             dogovor_app a
             LEFT JOIN service s ON s.id=a.service_id
@@ -101,7 +101,7 @@ async def get_bills(form,field, R):
             LEFT JOIN user u ON u.id in (uf.user_id,uc.user_id)
           where a.dogovor_id=%s
         """,
-        values=[R['dogovor_id']]
+        values=['%e.%m.%Y', R['dogovor_id']]
       )
 
       for a in apps_list:
