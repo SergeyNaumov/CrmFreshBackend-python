@@ -2,7 +2,7 @@ from lib.core import exists_arg
 from fastapi import Response
 import socket # только для определения hostname
 import json
-from db import db,db_read,db_write
+from db import get_db #db,db_read,db_write
 from .session import *
 from config import config
 import os
@@ -17,10 +17,11 @@ class Engine():
     
   async def reset(s,**arg):
 
+    db=get_db()
 
     s.db=db
-    s.db_read=db_read
-    s.db_write=db_write
+    s.db_read=db
+    s.db_write=db
     s.request=request=arg['request']
     s.headers=[]
     s.request.state.cookies={}

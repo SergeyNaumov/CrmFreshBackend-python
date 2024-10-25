@@ -1,5 +1,5 @@
 from lib.core import exists_arg, gen_pas, join_ids
-from db import db,db_read,db_write
+from db import db
 from config import config
 from base64 import b64decode
 

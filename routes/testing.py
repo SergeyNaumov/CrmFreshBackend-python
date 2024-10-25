@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from config import config
-from db import db,db_read,db_write
+from db import db
 #from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
 from lib.send_mes import send_mes
 

@@ -1,10 +1,23 @@
 from config import config
 from .freshdb import FreshDB
+from .freshdbs import FreshDB as FreshDBSync
+
 crm_write=config['connects']['crm_write']
 #crm_read=config['connects']['crm_read']
 
+db=None
 
-db_read=db_write=db=FreshDB(crm_write)
+def get_db(**arg):
+    global db
+    if db:
+        return db
+
+    if arg.get('sync'):
+        db=FreshDBSync(crm_write)
+    else:
+        db=FreshDB(crm_write)
+    return db
+
 
 # {'host':'localhost', 'port':3306, 'user':'fas', 'password':'', 'db':'fas'}
 

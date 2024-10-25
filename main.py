@@ -3,12 +3,14 @@ from fastapi import Depends, FastAPI, Request, Response
 from starlette.responses import JSONResponse, Response
 from routes import router
 from lib.engine import s
-from db import db
+from db import get_db
 # uvicorn main:app --reload --port=5000
 app = FastAPI(Debug=True)
 
 @app.on_event("startup")
 async def startup():
+    db=get_db()
+
     await db.create_pool()
     print('create_pool end')
 
