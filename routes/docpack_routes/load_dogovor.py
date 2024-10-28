@@ -1,7 +1,7 @@
 
 from subprocess import PIPE, run
 import random, time
-from db import db
+from db import get_db
 
 import os.path 
 from fastapi.responses import HTMLResponse
@@ -12,6 +12,7 @@ from .response_doc import response_doc
 
 
 async def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
+	db=get_db()
 	await db.query(query='set lc_time_names="ru_RU"')
 	dp = await db.query(
 		query=f'''

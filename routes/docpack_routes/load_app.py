@@ -1,4 +1,4 @@
-from db import db
+from db import get_db, db
 import os.path 
 from fastapi.responses import HTMLResponse
 from .check_document_data import check_dogovor, out_debug
@@ -7,6 +7,7 @@ from .response_doc import response_doc
 
 async def load_app(app_id,ext:str,need_print: int, debug=0):
     print('load app begin')
+    db=get_db()
     dp = await db.query(
         query=f'''
             SELECT

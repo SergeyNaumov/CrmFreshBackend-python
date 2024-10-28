@@ -1,4 +1,4 @@
-from db import db
+from db import get_db
 import os.path 
 from fastapi.responses import HTMLResponse
 from .check_document_data import check_dogovor, out_debug
@@ -6,6 +6,7 @@ from .num_to_text import num_to_text
 from .response_doc import response_doc
 
 async def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
+	db=get_db()
 	dp = await db.query(
 		query=f'''
 			SELECT

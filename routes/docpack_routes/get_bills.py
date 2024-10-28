@@ -55,7 +55,7 @@ async def get_bills(form,field, R):
         lst_values.append(only_app)
 
       dp = await form.db.query(
-        query="select (registered<'2024-10-04') old  from docpack where id=%s",
+        query="select (registered<'2024-10-04 00:00:00') old  from docpack where id=%s",
         values=[dogovor_id],
         debug=1,
         onerow=1
@@ -133,7 +133,7 @@ async def get_bills(form,field, R):
 
   if dp:
     # Старый пакет документов или есть приложение или админ
-    if dp['old'] or len(apps_list) or perm.get('admin_paids'):
+    if dp['old'] or perm.get('admin_paids'): # or len(apps_list)
       make_add_bill_without_app=True
 
   return bill_list, apps_list, make_add_bill_without_app
