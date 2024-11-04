@@ -26,8 +26,9 @@ from .parser_excel import router as router_parser_excel
 # messenger
 from .messenger import router as router_messenger
 from .gptassist import router as router_gptassist
-
-
+from .fas import router as router_fas
+from .beeline import router as router_beeline
+from .transfere_cards import router as router_transfere_cards
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
 from .svcms import router as router_svcms
@@ -36,18 +37,6 @@ from .svcms import router as router_svcms
 from .extend_routes import router as router_extend
 
 router = APIRouter()
-# @router.get('/testtest')
-# async def testtest():
-#   return await s.db.save(
-#     table='teamwork_ofp_memo',
-#     data={
-#       'teamwork_ofp_id': 56787,
-#       'registered': 'func:now()',
-#       'manager_id': 1,
-#       'comment': """Дмитрий Викторович Генеральный директор тел. 79180758941 - 2 уклонения в разном УФАС. Первая закупка № 0121200002724000041 .Начальная цена контракта 142 837,26 ₽ . УФАС СТАВРОПОЛЬСКОГО КРАЯ . До этого не было уклонений. Позиция- тех. поломка комп. ( не успел подписать) Все документы прислал на закупки . оплатил аванс 10к'}, 'values': [57637, 1, 'Дмитрий Викторович Генеральный директор тел. 79180758941 - 2 уклонения в разном УФАС. Первая закупка № 0121200002724000041 .Начальная цена контракта 142 837,26 ₽ . УФАС СТАВРОПОЛЬСКОГО КРАЯ . До этого не было уклонений. Позиция- тех. поломка комп. ( не успел подписать) Все документы прислал на закупки . оплатил аванс 10к"""
-#     }
-#   )
-  
 
 router.include_router(router_mainpage,prefix='/mainpage')
 
@@ -57,8 +46,9 @@ router.include_router(router_password)
 
 # /login, /logout, /mainpage, /startpage 
 router.include_router(router_core)
-
-
+router.include_router(router_fas,prefix='/fas')
+router.include_router(router_beeline,prefix='/beeline')
+router.include_router(router_transfere_cards,prefix='/transfere-cards')
 
 
 router.include_router(router_testing)

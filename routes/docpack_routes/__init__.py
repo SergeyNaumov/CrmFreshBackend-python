@@ -15,6 +15,7 @@ from .create_bill import action_create_bill
 from .create_act import action_create_act
 from .create_sr import action_create_sr
 from .link_sr import action_link_sr
+from .unlink_sr import action_unlink_sr
 from .delete_act import action_delete_act
 from .save_summ_bill import save_summ_bill
 from .save_app_field import save_app_field
@@ -100,6 +101,9 @@ async def get_list(config:str, field_name:str, R:dict,request:Request): #
 
     if action == 'link_sr':
         return await action_link_sr(form,field, R)
+
+    if action == 'unlink_sr':
+        return await action_unlink_sr(form,field, R)
 
     if action == 'save_app_field':
         # сохранение доп. поля в приложении к договору

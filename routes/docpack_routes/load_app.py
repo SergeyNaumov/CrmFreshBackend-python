@@ -11,6 +11,7 @@ async def load_app(app_id,ext:str,need_print: int, debug=0):
     dp = await db.query(
         query=f'''
             SELECT
+                bcr.*,
                 app.id, app.service_id, app.num_of_dogovor app_num_of_dogovor,
                 app.summ app_summ, app.summ_post app_summ_post, DATE_FORMAT(app.registered,%s) app_from,
                 m.name manager_name,
