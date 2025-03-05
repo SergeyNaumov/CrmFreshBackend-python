@@ -7,6 +7,7 @@ config={
    ],
   'encrypt_method':'mysql_sha2',
   'use_project':False,
+  'config_folder':'configs/anna',
   'auth':{
     # Таблица авторизации:
     'manager_table':'manager',
