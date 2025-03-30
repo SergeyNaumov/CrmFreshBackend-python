@@ -26,8 +26,6 @@ from .parser_excel import router as router_parser_excel
 # messenger
 from .messenger import router as router_messenger
 from .gptassist import router as router_gptassist
-from .fas import router as router_fas
-from .beeline import router as router_beeline
 from .transfere_cards import router as router_transfere_cards
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
@@ -46,8 +44,6 @@ router.include_router(router_password)
 
 # /login, /logout, /mainpage, /startpage 
 router.include_router(router_core)
-router.include_router(router_fas,prefix='/fas')
-router.include_router(router_beeline,prefix='/beeline')
 router.include_router(router_transfere_cards,prefix='/transfere-cards')
 
 

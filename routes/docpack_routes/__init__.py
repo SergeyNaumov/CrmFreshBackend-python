@@ -10,10 +10,10 @@ from .create_docpack import action_create_docpack
 from .get_bills import action_get_bills
 from .get_acts import action_get_acts
 from .create_app import action_create_app
-from .load_sr_list import action_load_sr_list
+#from .load_sr_list import action_load_sr_list
 from .create_bill import action_create_bill
 from .create_act import action_create_act
-from .create_sr import action_create_sr
+#from .create_sr import action_create_sr
 from .link_sr import action_link_sr
 from .unlink_sr import action_unlink_sr
 from .delete_act import action_delete_act
@@ -87,17 +87,17 @@ async def get_list(config:str, field_name:str, R:dict,request:Request): #
         # создание счёта
         return await action_create_bill(form,field, R)
 
-    if action == 'load_sr_list':
-        # загрузка списка СР-ок
-        return await action_load_sr_list(form,field, R)
+    # if action == 'load_sr_list':
+    #     # загрузка списка СР-ок
+    #     return await action_load_sr_list(form,field, R)
 
     if action == 'create_app':
         # создание приложения к договору
         return await action_create_app(form,field, R)
 
-    if action == 'create_sr':
-        # Создание совместной работы
-        return await action_create_sr(form,field, R)
+    # if action == 'create_sr':
+    #     # Создание совместной работы
+    #     return await action_create_sr(form,field, R)
 
     if action == 'link_sr':
         return await action_link_sr(form,field, R)

@@ -102,14 +102,27 @@ async def startpage(request: Request):
     if(config['use_project']):
         print('Q1')
         manager=await s.db.query(
-          query=f'select *,concat("/edit_form/project_manager/",{config["auth"]["manager_table_id"]}) link from project_manager where project_id=%s and login=%s',
-          values=[s.project_id,s.login]
+          query=f'''
+            select
+              *,
+              concat("/edit_form/project_manager/",{config["auth"]["manager_table_id"]}) link
+            from
+              project_manager where project_id=%s and login=%s
+          ''',
+          values=[s.project_id,request.state.manager['login']]
         )
         manager_menu_table='project_manager_menu'
 
     else:
         manager=await s.db.query(
-          query=f"select *,concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link from {config['auth']['manager_table']} where login=%s",
+          query=f'''
+            select
+              *,
+              concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link,
+              concat('https://t.me/{config['telegram']['bot_name']}/?start=linkcrm-',id,'-',md5(password)) tg_link
+            from
+              {config['auth']['manager_table']} where login=%s
+            ''',
           values=[request.state.manager['login']],
           #debug=1,
           onerow=1,
