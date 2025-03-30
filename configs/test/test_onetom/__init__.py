@@ -9,8 +9,11 @@ create table test_onetom(
     f4 date comment 'date',
     f5 datetime comment 'datetime',
     f6 time comment 'time',
+    f7 tinyint unsigned not null default '0' comment 'checkbox',
+    f8 varchar(200) not null default '' comment 'file';
     constraint foreign key(parent_id) references test(id) on update cascade on delete cascade
 ) engine=innodb default charset=utf8;
+
 """
 form={
     'work_table':'test',
@@ -34,7 +37,12 @@ form={
                 '/[^0-9]/g', ''
             ],
         },
-
+        {
+            'description':'Файл',
+            'type':'file',
+            'name':'file',
+            'filedir':'./files/test'
+        },
         {
             'description':'Один ко многим',
             'type':'1_to_m',
@@ -43,10 +51,12 @@ form={
             'table_id':'id',
             'foreign_key':'parent_id',
             'sort':1,
-            'view_type':'list',
+            #'view_type':'list',
             'fields':[
+
                 {
                     'description':'Текстовое поле',
+                    'add_description':'Доп. описание',
                     'name':'f1',
                     'type':'text',
                     'regexp_rules':[
@@ -55,15 +65,27 @@ form={
                     'replace_rules':[
                         '/[^0-9]/g', ''
                     ],
+
+                    'warning_message':'Это warning, он не является ошибкой'
+                },
+                {
+                    'description':'textarea',
+                    'name':'f2',
+                    'warning_message':'Это warning, он не является ошибкой',
+                    'type':'textarea',
+                    'replace_rules':[
+                        '/[^0-9]/g', ''
+                    ],
                 },
                 {
                     'description':'select',
-                    'name':'f2',
+                    'name':'f3',
                     'type':'select_values',
                     'replace_rules':[
                         '4', '2',
                         '5', '3',
                     ],
+                    'warning_message':'Это для select warning, он не является ошибкой',
                     'values':[
                         {'v':1,'d':'первый'},
                         {'v':2,'d':'второй'},
@@ -71,6 +93,17 @@ form={
                         {'v':4,'d':'четвёртый'},
                         {'v':5,'d':'пятый'},
                     ]
+                },
+                {
+                    'description':'checkbox',
+                    'type':'checkbox',
+                    'name':'f7'
+                },
+                {
+                    'description':'file',
+                    'filedir':'./files/test',
+                    'type':'file',
+                    'name':'f8'
                 },
             ]
         }

@@ -76,15 +76,16 @@ async def upload_file(form,field,arg):
         save_data={
           child_field['name']: db_value
         }
-        if field.get('sort'):
-          save_data['sort'] = await form.db.query(
-            query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
-            onevalue=1
-          )
-          if save_data['sort']:
-            save_data['sort']+=10
-          else:
-            save_data['sort']=1
+        # Убрал, потому что при обновлении файла запись улетала в конец
+        # if field.get('sort'):
+        #   save_data['sort'] = await form.db.query(
+        #     query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
+        #     onevalue=1
+        #   )
+          # if save_data['sort']:
+          #   save_data['sort']+=10
+          # else:
+          #   save_data['sort']=1
 
 
 
@@ -92,14 +93,13 @@ async def upload_file(form,field,arg):
           table=field['table'],
           update=1,
           where=f'{field["foreign_key"]}={form.id} and {field["table_id"]}={arg["one_to_m_id"]}',
-          
           data=save_data
         )
         # Сделать ресайз!
         if form.success():
           field['_id']=arg["one_to_m_id"]
-          form.run_event('after_update_code',{'field':field})
-          form.run_event('after_save_code',{'field':field})
+          await form.run_event('after_update_code',{'field':field})
+          await form.run_event('after_save_code',{'field':field})
         await get_1_to_m_data(form,field)
         return {
           'success':form.success(),
@@ -123,7 +123,7 @@ async def upload_file(form,field,arg):
             onevalue=1
           )
           if save_data['sort']:
-            save_data['sort']+=10
+            save_data['sort']+=1
           else:
             save_data['sort']=1
 
