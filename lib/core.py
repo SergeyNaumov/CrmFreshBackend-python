@@ -107,14 +107,26 @@ def date_to_rus(d):
 
 
 def from_datetime_get_date(dt):
-  if not dt: return False
-  rez=re.search('^(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}(:\d{2})?)?$',dt)
-  if rez:
-    return rez[0]
-  else:
-    if rez:=re.search('^(\d{4}-\d{2}-\d{2}).*$',dt):
-      print('res: ',rez)
-      return rez[1]
+    if not dt:
+        return False
+
+    # Проверяем полный формат даты и времени с секундами
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})$', dt)
+    if rez:
+        return rez.group(0)  # Возвращаем полную строку без изменений
+
+    # Проверяем формат даты и времени без секунд
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})$', dt)
+    if rez:
+        return f"{rez.group(1)} {rez.group(2)}:00"  # Добавляем ":00" к времени
+
+    # Проверяем только дату (без времени)
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2}).*$', dt)
+    if rez:
+        return rez.group(1)  # Возвращаем только дату
+
+    # Если ни одно из условий не выполнено
+    return False
 
 def create_fields_hash(form):
   form.fields_hash={}

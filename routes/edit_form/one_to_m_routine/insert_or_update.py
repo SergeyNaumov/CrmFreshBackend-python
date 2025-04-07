@@ -44,7 +44,6 @@ async def insert_or_update(form,field,arg):
         await form.run_event('before_save_code',{'field':field,'data':data})
         
         if form.success():
-          print(f"WHERE: ",f'{field["foreign_key"]}={foreign_key_value} and {field["table_id"]}={arg["one_to_m_id"]}',)
           await form.db.save(
             table=field['table'],
             where=f'{field["foreign_key"]}={foreign_key_value} and {field["table_id"]}={arg["one_to_m_id"]}',

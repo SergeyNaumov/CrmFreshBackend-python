@@ -37,6 +37,11 @@ form={
                 '/[^0-9]/g', ''
             ],
         },
+        # {
+        #     'description':'date',
+        #     'type':'date',
+        #     'name':'f_date'
+        # },
         {
             'description':'Файл',
             'type':'file',
@@ -68,43 +73,53 @@ form={
 
                     'warning_message':'Это warning, он не является ошибкой'
                 },
-                {
-                    'description':'textarea',
-                    'name':'f2',
-                    'warning_message':'Это warning, он не является ошибкой',
-                    'type':'textarea',
-                    'replace_rules':[
-                        '/[^0-9]/g', ''
-                    ],
-                },
-                {
-                    'description':'select',
-                    'name':'f3',
-                    'type':'select_values',
-                    'replace_rules':[
-                        '4', '2',
-                        '5', '3',
-                    ],
-                    'warning_message':'Это для select warning, он не является ошибкой',
-                    'values':[
-                        {'v':1,'d':'первый'},
-                        {'v':2,'d':'второй'},
-                        {'v':3,'d':'третий'},
-                        {'v':4,'d':'четвёртый'},
-                        {'v':5,'d':'пятый'},
-                    ]
-                },
-                {
-                    'description':'checkbox',
-                    'type':'checkbox',
-                    'name':'f7'
-                },
+                # {
+                #     'description':'textarea',
+                #     'name':'f2',
+                #     'warning_message':'Это warning, он не является ошибкой',
+                #     'type':'textarea',
+                #     'replace_rules':[
+                #         '/[^0-9]/g', ''
+                #     ],
+                # },
+                # {
+                #     'description':'select',
+                #     'name':'f3',
+                #     'type':'select_values',
+                #     'replace_rules':[
+                #         '4', '2',
+                #         '5', '3',
+                #     ],
+                #     'warning_message':'Это для select warning, он не является ошибкой',
+                #     'values':[
+                #         {'v':1,'d':'первый'},
+                #         {'v':2,'d':'второй'},
+                #         {'v':3,'d':'третий'},
+                #         {'v':4,'d':'четвёртый'},
+                #         {'v':5,'d':'пятый'},
+                #     ]
+                # },
+                # {
+                #     'description':'checkbox',
+                #     'type':'checkbox',
+                #     'name':'f7'
+                # },
                 {
                     'description':'file',
                     'filedir':'./files/test',
                     'type':'file',
                     'name':'f8'
                 },
+                # {
+                #     'description':'date',
+                #     'type':'date',
+                #     'name':'f4'
+                # },
+                # {
+                #     'description':'datetime (f5)',
+                #     'type':'datetime',
+                #     'name':'f5'
+                # },
             ]
         }
     ]

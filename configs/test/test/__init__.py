@@ -15,28 +15,32 @@ form={
     'header_field':'url',
     'default_find_filter':'header',
     'QUERY_SEARCH_TABLES':[
-        {'t':'news','a':'wt'},
-        {'t':'snt','a':'snt', 'l':'wt.snt_id=snt.id'},
+        {'t':'test','a':'wt'},
     ],
+    'explain':0,
     'fields': [ 
-            {
-            'description':'СНТ',
-            'type':'select_from_table',
-            'name':'snt_id',
-            'table':'snt',
-            'header_field':'header',
-            'value_field':'id',
-            'tablename':'snt',
-            'regexp_rules':[
-                '/^[1-9][0-9]*$/','Поле, обязательное для заполнения'
-            ],
+
+        {
+            'description':'Заголовок',
+            'type':'text',
+            'name':'header',
+            'make_change_in_search':True,
+            'filter_on':True
+
+        },
+        {
+            'description':'Время',
+            'type':'time',
+            'name':'f_time',
+            'make_change_in_search':True,
             'filter_on':True
         },
         {
-            'description':'Заголовок новости',
-            'type':'text',
-            'name':'header',
-            'filter_on':True
+            'description':'День и месяц',
+            'type':'daymon',
+            'name':'daymon',
+            'make_change_in_search':True,
+            #'filter_on':True
         },
         # {
         #     'description':'Большое фото',
