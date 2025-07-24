@@ -75,7 +75,10 @@ async def get_values_for_select_from_table(form,f,debug=False):
     
     if not len(lst): lst=[]
     if form.script not in ('admin_table','find_objects'):
-      lst.insert(0,{'v':'0','d':'выберите значение'})
+      if default_label:=f.get('default_label'):
+        lst.insert(0,{'v':'0','d':default_label})
+      else:
+        lst.insert(0,{'v':'0','d':'выберите значение'})
 
     # else:
     #   _list.append({'v':'0','d':'выберите значение'})
