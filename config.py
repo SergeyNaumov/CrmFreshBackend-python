@@ -11,9 +11,10 @@ def after_read_form_config(form):
     form.errors=form.s.errors
   
   form.manager=form.s.manager
-  form.manager['files_dir']=f'./files/project_{form.s.shop_id}'
-  form.manager['files_dir_web']=f'/files/project_{form.s.shop_id}'
-
+  #form.manager['files_dir']=f'./files/project_{form.s.shop_id}'
+  #form.manager['files_dir_web']=f'/files/project_{form.s.shop_id}' 
+  form.manager['files_dir']=f'./files/'
+  form.manager['files_dir_web']=f'/files/'
 # def alter_all_change_action(form):
 #   # Это нужно для сброса кэша у клиентских сайтов
 #   host=form.s.manager['host']
@@ -45,7 +46,7 @@ config={
     'max_fails_login_interval':3600,
     'max_fails_ip':20,
     'max_fails_ip_interval':3600,
-    'use_permissions':False,
+    'use_permissions':True,
     'use_roles':True,
   },
   'startpage':{ # указываем, какой компонент будет загружаться на главной странице
