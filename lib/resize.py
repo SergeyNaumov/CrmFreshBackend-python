@@ -5,7 +5,6 @@ from lib.core import exists_arg, get_name_and_ext
 #from lib.save_base64_file import save_base64_file
 
 def resize_field(field,value,debug=0):
-  #print("\n\nV:",value)
   if not(exists_arg('resize',field)) or not(value):
     return False
   
@@ -104,7 +103,6 @@ def crop(img,crop_type,width,height):
     max_y=min_y+height
 
     box = (min_x, min_y, max_x, max_y)
-    #print('size:',img.size, 'width:',width,'height:',height, 'crop_box:',box)
   else:
     box = (0, 0, img.size[0], img.size[1])
   return img.crop(box)
@@ -120,7 +118,6 @@ def resize_one(**arg):
   height=int(arg['height'])
   fr=arg['fr']
   to=arg['to']
-  #print('RESIZE_ONE',arg)
   ny=0
   nx=0
 
@@ -133,83 +130,85 @@ def resize_one(**arg):
   if 'optimize' in arg: optimize=arg['optimize']
   
   
-  #print(f'width: {width}, height: {height}')
   #size=(width,height)
   if not(os.path.isfile(fr)):
-    print(f"not open {fr}")
     return 
-  color_cheme='RGB'
-  
   #print('fr:',fr)
-  #quit()
-  img = Image.open(fr)
-  #print('mode: :',img.mode, 'FR:',fr.split('.')[-1])
-  if fr and (fr.split('.')[-1]=='png'):
-    color_cheme='RGBA'
-    #print(get_name_and_ext(fr))
-
-  #img.convert(color_cheme)
-
-
+  img = Image.open(fr).convert('RGB')
   ox, oy = img.size
   k=nx=ny=0
 
-  if height==0:
-    if width > ox:
-      img.save(to)
-      return
+  if width>0 and height>0:
+      if height==0:
+        if width > ox:
+          img.save(to)
+          return
 
-    k = oy / ox
-    height = int(width * k)
+        k = oy / ox
+        height = int(width * k)
 
-  elif width==0:
-    k = ox / oy
-    width = int(height * k)
+      elif width==0:
+        k = ox / oy
+        width = int(height * k)
 
-  elif width==height:
-    nx=ny=width
-    k=1
+      elif width==height:
+        nx=ny=width
+        k=1
 
-  else:
-    ny= int( (oy / ox) * width)
-    nx= int( (ox / oy) * height)
-  
-  if width == height:
-    if ox != oy:
-      min_len=min(ox,oy)
-      img=crop(img,crop_type,min_len,min_len)
-    
-    img=img.resize((width,height),  Image.ANTIALIAS)
-    
-  elif nx >= width: # горизонтально ориентированная
-    
-    #$image->Resize(geometry=>'geometry', width=>$nx, height=>$opt->{height});
-    
-    img=img.resize( (nx,height), Image.ANTIALIAS)
+      else:
+        ny= int( (oy / ox) * width)
+        nx= int( (ox / oy) * height)
 
-    if ny>height:
-      
-      #$image->Crop(geometry=>$opt->{width}.'x'.$opt->{height}, gravity=>'center')
-      img=crop(img,crop_type,width,height)
-    
-    #img=img.resize( (nx,ny), Image.ANTIALIAS)
-    if nx >width:
-      img=crop(img,crop_type,width,height)
-      
-      #nnx = int( (nx - width) / 2 )
+      if width == height:
+        if ox != oy:
+          min_len=min(ox,oy)
+          img=crop(img,crop_type,min_len,min_len)
+          #img=img.resize((width,height), Image.Resampling.LANCZOS)
+          img=img.resize( (width,height), resample=Image.BICUBIC)
+
+          #img=img.resize((width,height),  Image.ANTIALIAS)
+
+      elif nx >= width: # горизонтально ориентированная
+
+        #$image->Resize(geometry=>'geometry', width=>$nx, height=>$opt->{height});
+
+        #img=img.resize( (nx,height), Image.ANTIALIAS)
+        print('img:',img)
+        #img=img.resize( (nx,height), Image.Resampling.LANCZOS)
+        img=img.resize( (nx,height), resample=Image.BICUBIC)
+
+        if ny>height:
+
+          #$image->Crop(geometry=>$opt->{width}.'x'.$opt->{height}, gravity=>'center')
+          img=crop(img,crop_type,width,height)
 
 
-  else: # вертикально ориентированная
-    
-    if ny < height:
-      ny = height
-    img=img.resize( (width,ny), Image.ANTIALIAS ) 
 
-    if ny > height or nx > width:
-      img=crop(img,crop_type,width,height)
+
+        if nx >width:
+          img=crop(img,crop_type,width,height)
+
+          #nnx = int( (nx - width) / 2 )
+
+
+      else: # вертикально ориентированная
+
+        if ny < height:
+          ny = height
+        #img=img.resize( (width,ny), Image.ANTIALIAS )
+
+        #img=img.resize( (width,ny), Image.Resampling.LANCZOS )
+        img=img.resize( (width,ny), resample=Image.BICUBIC )
+        if ny > height or nx > width:
+          img=crop(img,crop_type,width,height)
 
   if composite_file:
     composite_gravity=exists_arg('composite_gravity',arg)
+
+    if not (width+height):
+      # Можно указать размер 0x0, чтобы был watermark без ресайза
+      # в этом случае, берём реальные размеры фото
+      width,height=img.size[0],img.size[1]
     
     if not composite_gravity:
       composite_gravity='center'
@@ -255,26 +254,14 @@ def resize_one(**arg):
       wm_position_y = int(  height - composite_image.size[1] ) 
     
     img.paste(composite_image, (wm_position_x, wm_position_y) ,composite_image)
-    #print(f"alpha composite ")
-    #img.aplha_composite(composite_image, (wm_position_x, wm_position_y) ,composite_image)
 
-    #print('водяные знаки не реализованы')
 
-  #print('optimize:',optimize)
+
   if grayscale:
     img = ImageOps.grayscale(img)
   
   if exists_arg('debug',arg):
     print("size: ",img.size,"\nsave:",to,"\n")
   
-  #print(f'color_cheme: "{color_cheme}"',)
-  img=img.convert(color_cheme)
-  #if img.mode in ('RGBA', 'LA') and color_cheme=='RGBA':
-  #  background = Image.new(img.mode[:-1], img.size, '')
-  #  background.paste(img, img.split()[-1])
-  #  img = background
-
-  #print('image_mode: ',img.mode)
-
   img.save(to) # ,quality=quality,optimize=optimize
 

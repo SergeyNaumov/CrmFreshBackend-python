@@ -10,7 +10,7 @@ async def post_actions(config:str, R:dict): #
   if 'action' in R:
     action=R['action']
   
-  form=read_config(
+  form = await read_config(
     action=action,
     config=config,
     #id=id,
@@ -19,21 +19,20 @@ async def post_actions(config:str, R:dict): #
   )
 
   if form.action=='open_video' and form.table_stat_open:
-    rec_id=form.db.save(
+    rec_id = await form.db.save(
       table=form.table_stat_open,
       data={
         'manager_id':form.manager['id'],
         'video_id':R['id'],
         'ts':'func:(now())'
       },
-      #debug=1
     )
 
     return {
       'success':1,'id':rec_id
     }
   if form.action=='update_open_video' and ('id' in R) and ('seconds' in R) and form.table_stat_open:
-    form.db.query(
+    await form.db.query(
       query=f"UPDATE {form.table_stat_open} SET sec_opened=%s where manager_id=%s and id=%s",
       values=[R['seconds'], form.manager['id'], R['id']],
       
@@ -48,7 +47,7 @@ async def post_actions(config:str, R:dict): #
 @router.get('/{config}')
 async def news_videos(config:str, limit: int = 0): # 
   
-  form=read_config(
+  form = await read_config(
     action='',
     config=config,
     #id=id,
@@ -60,7 +59,7 @@ async def news_videos(config:str, limit: int = 0): #
   #form.pre(f'select * from {form.work_table} where enabled=1 order by registered desc limit {limit}')
   if not len(errors):
     if limit:
-      data_list=form.db.query(
+      data_list=await form.db.query(
         query=f'''
           select
             id,anons,body,header,registered reg, DATE_FORMAT(registered, %s) registered
@@ -70,12 +69,10 @@ async def news_videos(config:str, limit: int = 0): #
             enabled=1 and registered<=curdate() order by reg desc limit {limit}
         ''',
         values=['%d.%m.%Y'],
-        debug=1
       )
     else:
-      data_list=form.db.query(
+      data_list = await form.db.query(
         query=f'select * from {form.work_table} order by registered desc' ,
-        #debug=1,
         #table=config,
         #order='sort',
         #where='parent_id is null',        

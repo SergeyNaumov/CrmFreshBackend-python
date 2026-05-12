@@ -1,8 +1,9 @@
 from lib.resize import resize_one
 from lib.core import exists_arg, get_ext, random_filename
 from lib.save_base64_file import save_base64_file, b64_split
+from pathlib import Path
 
-def upload_file(form):
+async def upload_file(form):
     R=form.R
     name=exists_arg('name',R)
     field=None
@@ -50,12 +51,11 @@ def upload_file(form):
       if 'crops' in value:
         crops=value['crops']
       
-      #b64=b64_split(src)
-
-
+      # Если каталога нет -- создаём его:
+      Path(field['filedir']).mkdir(parents=True, exist_ok=True)
 
       if src and not len(form.errors):
-        save_base64_file(
+        await save_base64_file(
           form=form,
           src=src,
           field=field,

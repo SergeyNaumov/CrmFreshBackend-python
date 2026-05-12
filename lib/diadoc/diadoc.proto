@@ -1,0 +1,450 @@
+message Box {
+    required string BoxId = 1;
+    required string Title = 2;
+    optional Organization Organization = 3;
+    optional OrganizationInvoiceFormatVersion InvoiceFormatVersion = 4 [default = v5_02];
+    optional bool EncryptedDocumentsAllowed = 5;
+    required string BoxIdGuid = 6;
+}
+enum OrganizationInvoiceFormatVersion {
+    v5_01 = 1;
+    v5_02 = 2;
+}
+message Organization {
+    required string OrgId = 1;
+    required string Inn = 2;
+    optional string Kpp = 3;
+    required string FullName = 4;
+    optional string ShortName = 5;
+    required bool JoinedDiadocTreaty = 6;
+    repeated Box Boxes = 7;
+    optional string Ogrn = 8;
+    optional string FnsParticipantId = 9;
+    optional Address Address = 10;
+    optional string FnsRegistrationDate = 11;
+    repeated Department Departments = 12;
+    optional string IfnsCode = 13;
+    required bool IsPilot = 14;
+    required bool IsActive = 15;
+    required bool IsTest = 16;
+    required bool IsBranch = 17;
+    required bool IsRoaming = 18;
+    optional bool IsEmployee = 19 [default = false];
+    optional int32 InvitationCount = 20;
+    optional int32 SearchCount = 21;
+    required Sociability Sociability = 22;
+    optional string LiquidationDate = 23;
+    optional string CertificateOfRegistryInfo = 24;
+    optional bool IsForeign = 25 [default = false];
+    optional bool HasCertificateToSign = 26 [default = false];
+}
+enum Sociability {
+    AllOrganizations = 0;
+    CounteragentsOnly = 1;
+}
+message Address {
+    optional RussianAddress RussianAddress = 1;
+    optional ForeignAddress ForeignAddress = 2;
+    optional string AddressCode = 3;
+}
+message RussianAddress {
+    optional string ZipCode = 1;
+    required string Region = 2;
+    optional string Territory = 3;
+    optional string City = 4;
+    optional string Locality = 5;
+    optional string Street = 6;
+    optional string Building = 7;
+    optional string Block = 8;
+    optional string Apartment = 9;
+    optional string OtherInformation = 10;
+}
+message ForeignAddress {
+    required string Country = 1;
+    required string Address = 2;
+}
+message Department
+{
+    required string DepartmentId = 1;
+    required string ParentDepartmentId = 2;
+    required string Name = 3;
+    optional string Abbreviation = 4;
+    optional string Kpp = 5;
+    optional Address Address = 6;
+    optional bool IsDisabled = 7 [default = false];
+}
+message LoginPassword {
+   required string login = 1;
+   required string password = 2;
+}
+enum EntityType {
+    UnknownEntityType = 0;
+    Attachment = 1;
+    Signature = 2;
+}
+enum AttachmentType {
+    UnknownAttachmentType = -1;
+    Nonformalized = 0;
+    Invoice = 1;
+    InvoiceReceipt = 2;
+    InvoiceConfirmation = 3;
+    InvoiceCorrectionRequest = 4;
+    AttachmentComment = 5;
+    DeliveryFailureNotification = 6;
+    SignatureRequestRejection = 8;
+    SignatureVerificationReport = 10;
+    TrustConnectionRequest = 11;
+    Torg12 = 12;
+    InvoiceRevision = 13;
+    InvoiceCorrection = 14;
+    InvoiceCorrectionRevision = 15;
+    AcceptanceCertificate = 16;
+    StructuredData = 17;
+    ProformaInvoice = 18;
+    XmlTorg12 = 19;
+    XmlAcceptanceCertificate = 20;
+    XmlTorg12BuyerTitle = 21;
+    XmlAcceptanceCertificateBuyerTitle = 22;
+    Resolution = 23;
+    ResolutionRequest = 24;
+    ResolutionRequestDenial = 25;
+    PriceList = 26;
+    Receipt = 27;
+    XmlSignatureRejection = 28;
+    RevocationRequest = 29;
+    PriceListAgreement = 30;
+    CertificateRegistry = 34;
+    ReconciliationAct = 35;
+    Contract = 36;
+    Torg13 = 37;
+    ServiceDetails = 38;
+    RoamingNotification = 39;
+    SupplementaryAgreement = 40;
+    UniversalTransferDocument = 41;
+    UniversalTransferDocumentBuyerTitle = 42;
+    UniversalTransferDocumentRevision = 45;
+    UniversalCorrectionDocument = 49;
+    UniversalCorrectionDocumentRevision = 50;
+    UniversalCorrectionDocumentBuyerTitle = 51;
+    CustomData = 64;
+    MoveDocument = 65;
+    ResolutionRouteAssignment = 66;
+    ResolutionRouteRemoval = 67;
+    Title = 68;
+    Cancellation = 69;
+    Edition = 71;
+    DeletionRestoration = 72;
+    TemplateTransformation = 73;
+    TemplateRefusal = 74;
+    OuterDocflow = 75;
+    RoamingConfirmation = 76;
+    PowerOfAttorney = 77;
+    PowerOfAttorneyStatus = 78;
+}
+message MoveDocumentInfo {
+    required string MovedFromDepartment = 1;
+    required string MovedToDepartment = 2;
+}
+enum LockMode
+{
+    None = 1;
+    Send = 2;
+    Full = 3;
+}
+message Content
+{
+    required sfixed32 Size = 1;
+    optional bytes Data = 2;
+}
+message Entity {
+    required EntityType EntityType = 1;
+    required string EntityId = 2;
+    optional Content Content = 4;
+    required AttachmentType AttachmentType = 5;
+    optional string FileName = 6;
+    optional string PacketId = 18;
+}
+message PredefinedRecipientTitle {
+    required UnsignedContent UnsignedContent = 1;
+}
+message UnsignedContent {
+    optional bytes Content = 1;
+    optional string NameOnShelf = 2;
+}
+message MetadataItem {
+    required string Key = 1;
+    required string Value = 2;
+}
+message CustomDataItem
+{
+    required string Key = 1;
+    optional string Value = 2;
+}
+message OrganizationList {
+    repeated Organization Organizations = 1;
+}
+message SignedContent {
+    optional bytes Content = 1;
+    optional bytes Signature = 2;
+    optional string NameOnShelf = 4;
+    optional bool SignWithTestSignature = 5 [default = false];
+    optional string SignatureNameOnShelf = 6;
+}
+message DocumentId
+{
+    required string MessageId = 1;
+    required string EntityId = 2;
+}
+message DocumentAttachment {
+    required SignedContent SignedContent = 1;
+    optional string Comment = 3;
+    optional bool NeedRecipientSignature = 4 [default = false];
+    repeated DocumentId InitialDocumentIds = 5;
+    repeated DocumentId SubordinateDocumentIds = 6;
+    optional string CustomDocumentId = 9;
+    optional bool NeedReceipt = 10 [default = false];
+    repeated CustomDataItem CustomData = 11;
+    required string TypeNamedId = 12;
+    optional string Function = 13;
+    optional string Version = 14;
+    repeated MetadataItem Metadata = 15;
+    optional int32 WorkflowId = 16;
+    optional bool IsEncrypted = 17 [default = false];
+    optional string EditingSettingId = 18;
+}
+message MessageToPost {
+    required string FromBoxId = 1;
+    optional string ToBoxId = 2;
+    optional string ToDepartmentId = 12;
+    optional bool IsDraft = 13 [default = false];
+    optional bool LockDraft = 14 [default = false];
+    optional bool StrictDraftValidation = 15 [default = true];
+    optional bool IsInternal = 16 [default = false];
+    optional string FromDepartmentId = 17;
+    optional bool DelaySend = 18 [default = false];
+    optional string ProxyBoxId = 26;
+    optional string ProxyDepartmentId = 27;
+    optional bool LockPacket = 32 [default = false];
+    repeated DocumentAttachment DocumentAttachments = 34;
+    optional LockMode LockMode = 35 [default = None];
+}
+message DocumentsMoveOperation {
+    required string BoxId = 1;
+    optional string ToDepartmentId = 2;
+    repeated DocumentId DocumentIds = 3;
+}
+message AcquireCounteragentRequest {
+    optional string OrgId = 1;
+    optional string Inn = 2;
+    optional string MessageToCounteragent = 3;
+    optional InvitationDocument InvitationDocument = 4;
+    optional string BoxId = 5;
+}
+message InvitationDocument {
+    required SignedContent SignedContent = 1;
+    required string FileName = 2;
+    optional bool SignatureRequested = 3 [default = false];
+}
+enum CounteragentStatus {
+    UnknownCounteragentStatus = 0;
+    IsMyCounteragent = 1;
+    InvitesMe = 2;
+    IsInvitedByMe = 3;
+    RejectsMe = 5;
+    IsRejectedByMe = 6;
+    NotInCounteragentList = 7;
+}
+message Counteragent {
+    optional string IndexKey = 1;
+    required Organization Organization = 2;
+    optional CounteragentStatus CurrentStatus = 3 [default = UnknownCounteragentStatus];
+    required sfixed64 LastEventTimestampTicks = 4;
+    optional string MessageFromCounteragent = 6;
+    optional string MessageToCounteragent = 7;
+    optional DocumentId InvitationDocumentId = 8;
+    optional string CounteragentGroupId = 9;
+}
+message AsyncMethodResult {
+    optional string TaskId = 1;
+}
+message Message {
+    required string MessageId = 1;
+    required sfixed64 TimestampTicks = 2;
+    required sfixed64 LastPatchTimestampTicks = 3;
+    required string FromBoxId = 4;
+    required string FromTitle = 5;
+    optional string ToBoxId = 6;
+    optional string ToTitle = 7;
+    repeated Entity Entities = 8;
+    optional bool IsDraft = 9 [default = false];
+    optional bool DraftIsLocked = 10 [default = false];
+    optional bool DraftIsRecycled = 11 [default = false];
+    optional string CreatedFromDraftId = 12;
+    repeated string DraftIsTransformedToMessageIdList = 13;
+    optional bool IsDeleted = 14 [default = false];
+    optional bool IsTest = 15 [default = false];
+    optional bool IsInternal = 16 [default = false];
+    optional bool IsProxified = 17 [default = false];
+    optional string ProxyBoxId = 18;
+    optional string ProxyTitle = 19;
+    optional bool PacketIsLocked = 20 [default = false];
+    required LockMode LockMode = 21;
+    required MessageType MessageType = 22;
+    optional bool IsReusable = 24 [default = false];
+}
+enum MessageType {
+    Unknown = 0;
+    Letter = 1;
+    Draft = 2;
+    Template = 3;
+}
+message AcquireCounteragentResultV2 {
+    required string BoxId = 1;
+    optional DocumentId InvitationDocumentId = 2;
+}
+message Document {
+    optional string IndexKey = 1;
+    required string MessageId = 2;
+    required string EntityId = 3;
+    required sfixed64 CreationTimestampTicks = 4;
+    optional string CounteragentBoxId = 5;
+    repeated DocumentId InitialDocumentIds = 7;
+    repeated DocumentId SubordinateDocumentIds = 8;
+    optional string FileName = 10;
+    optional bool IsDeleted = 24 [default = false];
+    optional string DepartmentId = 25;
+    optional bool IsTest = 26 [default = false];
+    optional string FromDepartmentId = 27;
+    optional string ToDepartmentId = 28;
+    optional string CustomDocumentId = 30;
+    optional RevocationStatus RevocationStatus = 32 [default = UnknownRevocationStatus];
+    optional sfixed64 SendTimestampTicks = 33;
+    optional sfixed64 DeliveryTimestampTicks = 34;
+    optional RoamingNotificationStatus RoamingNotificationStatus = 42 [default = UnknownRoamingNotificationStatus];
+    repeated CustomDataItem CustomData = 44;
+    optional string PacketId = 45;
+    optional DocumentDirection DocumentDirection = 46 [default = UnknownDocumentDirection];
+    optional sfixed64 LastModificationTimestampTicks = 47;
+    optional bool IsEncryptedContent = 48;
+    optional SenderSignatureStatus SenderSignatureStatus = 49 [default = UnknownSenderSignatureStatus];
+    optional bool IsRead = 51 [default = false];
+    optional string RoamingNotificationStatusDescription = 52;
+    optional bool PacketIsLocked = 53 [default = false];
+    optional string ResolutionRouteId = 60 [default = ""];
+    optional ProxySignatureStatus ProxySignatureStatus = 62 [default = UnknownProxySignatureStatus];
+    required string TypeNamedId = 63;
+    required string Function = 64;
+    required int32 WorkflowId = 65;
+    required string Title = 66;
+    repeated MetadataItem Metadata = 67;
+    required RecipientReceiptMetadata RecipientReceiptMetadata = 68;
+    required ConfirmationMetadata ConfirmationMetadata = 69;
+    required RecipientResponseStatus RecipientResponseStatus = 70 [default = RecipientResponseStatusUnknown];
+    required LockMode LockMode = 74;
+    required SenderReceiptMetadata SenderReceiptMetadata = 75;
+    required string Version = 76;
+    repeated LastOuterDocflow LastOuterDocflows = 77;
+    optional string ProxyBoxId = 78;
+    optional string ProxyDepartmentId = 79;
+    required DocflowStatusV3 DocflowStatus = 80;
+}
+enum RoamingNotificationStatus {
+    UnknownRoamingNotificationStatus = 0;
+    NotificationStatusNone = 1;
+    NotificationStatusSuccess = 2;
+    NotificationStatusError = 3;
+}
+enum RevocationStatus {
+    UnknownRevocationStatus = 0;
+    RevocationStatusNone = 1;
+    RevocationIsRequestedByMe = 2;
+    RequestsMyRevocation = 3;
+    RevocationAccepted = 4;
+    RevocationRejected = 5;
+}
+enum DocumentDirection
+{
+    UnknownDocumentDirection = 0;
+    Inbound = 1;
+    Outbound = 2;
+    Internal = 3;
+}
+enum SenderSignatureStatus {
+    UnknownSenderSignatureStatus = 0;
+    WaitingForSenderSignature = 1;
+    SenderSignatureUnchecked = 2;
+    SenderSignatureCheckedAndValid = 3;
+    SenderSignatureCheckedAndInvalid = 4;
+}
+enum ProxySignatureStatus {
+    UnknownProxySignatureStatus = 0;
+    ProxySignatureStatusNone = 1;
+    WaitingForProxySignature = 2;
+    WithProxySignature = 3;
+    ProxySignatureRejected = 4;
+    InvalidProxySignature = 5;
+}
+message RecipientReceiptMetadata {
+    required GeneralReceiptStatus ReceiptStatus = 1;
+    required ConfirmationMetadata ConfirmationMetadata = 2;
+}
+enum GeneralReceiptStatus {
+    GeneralReceiptStatusUnknown = 0;
+    GeneralReceiptStatusNotAcceptable = 1;
+    HaveToCreateReceipt = 2;
+    WaitingForReceipt = 3;
+    Finished = 4;
+}
+message ConfirmationMetadata {
+    required GeneralReceiptStatus ReceiptStatus = 1;
+    required sfixed64 DateTimeTicks = 2;
+}
+enum RecipientResponseStatus {
+    RecipientResponseStatusUnknown = 0;
+    RecipientResponseStatusNotAcceptable = 1;
+    WaitingForRecipientSignature = 2;
+    WithRecipientSignature = 3;
+    RecipientSignatureRequestRejected = 4;
+    InvalidRecipientSignature = 5;
+    WithRecipientPartiallySignature = 6;
+}
+message SenderReceiptMetadata {
+    required GeneralReceiptStatus ReceiptStatus = 1;
+}
+message LastOuterDocflow {
+    required string ParentEntityId = 1;
+    required OuterDocflowInfo OuterDocflow = 2;
+}
+message OuterDocflowInfo {
+    required string DocflowNamedId = 1;
+    required string DocflowFriendlyName = 2;
+    required Status Status = 3;
+}
+message DocflowStatusV3
+{
+    required DocflowStatusModelV3 PrimaryStatus = 1;
+    optional DocflowStatusModelV3 SecondaryStatus = 2;
+}
+message DocflowStatusModelV3
+{
+    optional string Severity = 1;
+    optional string StatusText = 2;
+}
+message Status {
+    required string NamedId = 1;
+    required string FriendlyName = 2;
+    required OuterStatusType Type = 3;
+    optional string Description = 4;
+    repeated StatusDetail Details = 5;
+}
+enum OuterStatusType {
+    UnknownStatus = 0;
+    Normal = 1;
+    Success = 2;
+    Warning = 3;
+    Error = 4;
+}
+message StatusDetail {
+    optional string Code = 1;
+    optional string Text = 2;
+}

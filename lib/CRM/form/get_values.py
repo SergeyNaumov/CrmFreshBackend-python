@@ -1,73 +1,24 @@
 from lib.core import is_wt_field, exists_arg, tree_to_list
 from lib.get_1_to_m_data import get_1_to_m_data
 from .get_values_for_select_from_table import get_values_for_select_from_table
-# sub get_in_ext_url{
-#     my %arg=@_;
-#     my $s=$arg{'s'}; my $form=$arg{form}; my $f=$arg{field};
-#     return '' unless($form->{id});
-#     my $in_url=get_in_url($f,$form->{id});
-#     return '' unless($in_url);
-#     my @where=('in_url=?'); my @values=($in_url);
-
-#     if($f->{foreign_key} && $f->{foreign_key_value}){
-#         push @where,"$f->{foreign_key}=?";
-#         push @values,$f->{foreign_key_value};
-#     }
-
-#     my $where_str=join(' AND ',@where);
-#     my $exists=$s->{db}->get(
-#         table=>'in_ext_url',
-#         where=>$where_str,
-#         values=>\@values,
-#         onerow=>1
-#     );
-#     if($exists){
-#         $f->{value}=$exists->{ext_url};
-#     }
-#     #print Dumper($f);
-# }
 
 
+async def get_in_ext_url(form,f):
+  print('get_in_ext_url не готова')
 
-def get_in_ext_url(form,f):
-  if not(form.id) or not(exists_arg('in_url',f)):
-    return
-    
-  in_url=f['in_url'].replace('<%id%>',str(form.id))
-  where=[f'in_url="{in_url}"']
-  values=[]
-
-  if exists_arg('foreign_key',f) and exists_arg('foreign_key_value',f):
-    where.append(f'{f["foreign_key"]}={f["foreign_key_value"]}')
-
-  where_str=' AND '.join(where)
-  #print('WHERE:',where_str)
-  exists=form.db.get(
-    table='in_ext_url',
-    where=where_str,
-    #values=values,
-    onerow=1
-  )  
-
-  if exists:
-    f['value']=exists['ext_url']
-      
-
-  #print('get_in_ext_url не готова')
-
-def func_get_values(form):
-
+async def func_get_values(form):
     values={}
+
     if(hasattr(form,'values')):
       values=form.values
-    
 
     if form.id:
-      values=form.db.getrow(
-        table=form.work_table,
+      values=await form.db.getrow(
+        table=f"`{form.work_table}`",
         where=f'{form.work_table_id}=%s',
         values=[form.id],
-        log=form.log
+        log=form.log,
+        errors=form.errors
       )
       if not values:
         form.errors.append(f'Запись {form.id} не найдена')
@@ -89,8 +40,11 @@ def func_get_values(form):
         if f['type']=='password':
           del values[f['name']]
 
-
+    tables_1_to_1={}
     for f in form.fields:
+      if not( 'name' in f ):
+        break
+
       if form.action=='new':
         f['value']=''
       if 'name' in f: name=f['name']
@@ -109,6 +63,7 @@ def func_get_values(form):
           if f['type']=='datetime' and values[name]=='0000-00-00 00:00:00':
             values[name]=''    
       
+
       set_from_nv=True
       if form.script=='edit_form' and (form.action in ('new')) and ('value' in f ):
         #print('f:',f)
@@ -123,14 +78,49 @@ def func_get_values(form):
 
           if set_from_nv:  f['value']=exists_arg(f['name'],values);
           if not exists_arg('values',f) or not len(f['values']):
-            f['values']=get_values_for_select_from_table(form,f)
+            f['values']=await get_values_for_select_from_table(form,f)
             
       if f['type'] == '1_to_m':
+        await get_1_to_m_data(form,f)
 
-        get_1_to_m_data(form,f)
 
-      if f['type']=='in_ext_url':
-        get_in_ext_url(form,f)
+      # Если это 1_to_1
+      if f['type'].startswith('1_to_1_'):
+        T=f['type'].replace('1_to_1_','')
+
+        if not('db_name' in f):
+          f['db_name']=f.get('name')
+
+        # Проверки
+        if not( f.get('save_table') ):
+          form.errors.append(f"в поле {f.get('description')} - {f.get('name')} отсутствует атрибут save_table")
+          break
+
+        if not( f.get('foreign_key') ):
+          form.errors.append(f"в поле {f.get('description')} - {f.get('name')} отсутствует атрибут foreign_key")
+          break
+
+        table=f.get('save_table')
+        if form.id:
+          if not(table in tables_1_to_1):
+            values=await form.db.query(
+                query=f"select * from {f.get('save_table')} WHERE {f.get('foreign_key')}={form.id}",
+                onerow=1
+            )
+            tables_1_to_1[table]={
+              'foreign_key': f['foreign_key'],
+              'values':values
+            }
+
+          cur_values=tables_1_to_1[table]['values']
+          if cur_values and f['db_name'] in cur_values:
+            f['value']=cur_values[f['db_name']]
+        else:
+          f['value']=''
+
+
+      if f['type']=='get_in_ext_url':
+        await get_in_ext_url(form,f)
         #values[name]=f['value']
 
 
@@ -144,17 +134,18 @@ def func_get_values(form):
     form.values=values
 
 
+
 # Получаем значения для select_from_table, 1_to_m
-def func_get_fields_values(form):
+async def func_get_fields_values(form):
   form.set_orig_types()
   for f in form.fields:
+
     if f['type'] == '1_to_m':
-      get_1_to_m_data(form,f)
+      await get_1_to_m_data(form,f)
 
-    elif f['type']=='in_ext_url':
-      
-      get_in_ext_url(form,f)
+    elif f['type']=='get_in_ext_url':
+      await get_in_ext_url(form,f)
     elif exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
-
-      f['values']=get_values_for_select_from_table(form,f)
-      
+      #print(f"name: {f['name']}")
+      f['values'] = await get_values_for_select_from_table(form,f)
+      #print(f)

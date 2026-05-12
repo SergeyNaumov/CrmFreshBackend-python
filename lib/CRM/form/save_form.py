@@ -1,64 +1,79 @@
 from lib.core import exists_arg, is_wt_field, from_datetime_get_date
 #from routes.edit_form.multiconnect import save as multiconnect_save
 from .multiconnect import save as multiconnect_save
-def get_in_url(f,id):
-  in_url=f['in_url'].replace('<%id%>',str(id))
-  return in_url
-  
-def save_in_ext_url(form,f,value):
-  in_url=get_in_url(f,form.id)
-  if not in_url:
+from .wysiwyg_before_save import wysiwyg_before_save
+
+async def update_1_to_1(form):
+  if not(form.id):
+    # выходим, если нет form.id
     return
-  
-  where=[f'in_url="{in_url}"']
-  values=[]
 
-  data={
-    'in_url':in_url,
-    'ext_url':value
-  }
+  tables_1_to_1={}
+  for f in form.fields:
 
-  if exists_arg('foreign_key',f) and  exists_arg('foreign_key_value',f):
-        where.append(f'{f["foreign_key"]}={f["foreign_key_value"]}')
-        
-        data[f['foreign_key']]=f['foreign_key_value']
-  
-  where_str=' AND '.join(where)
-  
-  exists=form.db.get(
-    table='in_ext_url',
-    where=where_str,
-    values=values,
-    onerow=1
-  )
+      if f.get('read_only'):
+        continue
 
-  if exists and exists['ext_url']!=value and value:
-    print('where_str:',where_str)
-    print('values:',values)
-    print('data:',data)
-    form.db.save(
-       table='in_ext_url',
-       update=1,
-       debug=1,
-       where=where_str,
-       #values=values,
-       data=data
+      #print('f:',f)
+      if f['name'] in form.new_values and f['type'].startswith('1_to_1_'):
+        subtype=f['type'].replace('1_to_1_','')
+
+        if subtype in ('wysiwyg','text','textarea', 'checkbox', 'switch'):
+          if not(f.get('db_name')):
+            f['db_name']=f['name']
+
+          if table:=f.get('save_table'):
+
+            if not(table in tables_1_to_1):
+              tables_1_to_1[table]={
+                'foreign_key':f['foreign_key'],
+                'data':None
+              }
+
+            if not(tables_1_to_1[table]['data']):
+
+              tables_1_to_1[table]['data'] = await form.db.query(
+                query=f"select * from {table} WHERE {f['foreign_key']}={form.id}",
+                onerow=1,
+                errors=form.errors
+              )
+              if not(tables_1_to_1[table]['data']):
+                tables_1_to_1[table]['data']={
+                  f['foreign_key']: form.id
+                }
+
+
+
+            value=form.new_values[f['name']]
+            #if f['type'] in ('checkbox', '1_to_1')
+            # новое значение в данные
+            tables_1_to_1[table]['data'][f['db_name']]=value
+            f['value']=form.new_values[f['name']]
+
+
+          else:
+            tables_1_to_1[table]['data'][f['db_name']]=v
+
+  for table in tables_1_to_1:
+    await form.db.save(
+      table=table,
+      data=tables_1_to_1[table]['data'],
+      replace=1,
+      #debug=1
     )
-  elif not(exists) and value:
-    form.db.save(
-        table='in_ext_url',
-        debug=1,
-        data=data,
-    )
+    #print('SET 1_to_1:',tables_1_to_1[table])
 
 
-def save_form(form,arg):
+async def save_form(form,arg):
   
   if len(form.errors): return
   save_hash={}
-  print('NEW_VALUES:',form.new_values)
+  
+  # для сохранения полей 1_to_1
+
+
   for f in form.fields:
-     
+
       if exists_arg('read_only',f) or exists_arg('not_process',f):
         continue
       name=f['name']
@@ -75,13 +90,18 @@ def save_form(form,arg):
       
       if is_wt_field(f):
         
+        if f['type']=='wysiwyg':
+          #print('wysiwyg:',v)
+          v = await wysiwyg_before_save(form,f,v)
+
         if f['type'] in ['switch','checkbox','select_values','select_from_table','select'] and not v:
           v='0'
 
         if f['type'] in ['date','datetime'] :
           
           date_value=from_datetime_get_date(v)
-          #print(f['name'],'(date_value): ',date_value)
+          #print(f"v: {v} ; date_value: {date_value}")
+
           if date_value:
             v=date_value
             
@@ -98,10 +118,12 @@ def save_form(form,arg):
         save_hash[name]=v
       
 
+
+
       # Если мы только создаём карточку -- пароль также разрешено сохранить
       if(f['type']=='password' and form.action=='insert'):
-        if form.s.config['encrypt_method'] == 'mysql_sha2':
-          save_hash[name]=form.db.query(
+        if form.s.config['auth']['encrypt_method'] == 'mysql_sha2':
+          save_hash[name] = await form.db.query(
             query="select sha2(%s,256)",
             values=[v],
             onevalue=1
@@ -119,8 +141,8 @@ def save_form(form,arg):
         if form.work_table_foreign_key and form.work_table_foreign_key_value:
             where=where + f' AND {form.work_table_foreign_key}={form.work_table_foreign_key_value}'
         
-        
-        form.db.save(
+        #print('data:',save_hash)
+        await form.db.save(
           table=form.work_table,
           where=where,
           update=1,
@@ -133,7 +155,7 @@ def save_form(form,arg):
         if form.work_table_foreign_key and form.work_table_foreign_key_value:
             save_hash[form.work_table_foreign_key]=form.work_table_foreign_key_value
         
-        form.id = form.db.save(
+        form.id = await form.db.save(
           table=form.work_table,
           data=save_hash,
           errors=form.errors,
@@ -141,6 +163,8 @@ def save_form(form,arg):
           log=form.log
         )
         #print('errors:',form.errors)
+
+  await update_1_to_1(form)
 
   for f in form.fields:
     name=f['name']
@@ -151,11 +175,37 @@ def save_form(form,arg):
 
     value=form.new_values[name]
     if f['type']=='multiconnect':
-      print('!!NEW_VALUES:',value)
+      #print('!!NEW_VALUES:',value)
       if isinstance(value,list):
-        multiconnect_save(form,f,value)
+        await multiconnect_save(form,f,value)
+    #elif f['type']=='1_to_1_text':
+    #
     elif f['type']=='in_ext_url':
         save_in_ext_url(form,f,value)
+
+  # события после сохранения формы
+  if form.success():
+    if form.action=='insert':
+      await form.run_event('after_insert')
+      await form.run_event('after_save')
+
+    if form.action=='update':
+      await form.run_event('after_update')
+      await form.run_event('after_save')
+
+
+    for f in form.fields:
+
+
+      if form.action=='insert':
+        await form.run_event('after_insert',{'field':f})
+        await form.run_event('after_save',{'field':f})
+
+      if form.action=='update':
+        await form.run_event('after_update',{'field':f})
+        await form.run_event('after_save',{'field':f})
+      
+
 
 
 

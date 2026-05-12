@@ -1,12 +1,31 @@
 import random, re, time, datetime, os
 
+mon_list=('январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь')
+
+def get_mon_name(idx):
+  return mon_list[idx]
+
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+def get_triade(x):
+  return '{0:,}'.format(x).replace(',', '`')
+
+def join_ids(ids):
+  result=''
+  idx=0
+  str_list=[str(_id) for _id in ids]
+  return ','.join(str_list)
+
 def cnt_days_period(d1,d2):
   # Ввычисляет кол-во дней между датами
   
   if not(isinstance(d1,str)): d1=str(d1)
   if not(isinstance(d2,str)): d2=str(d2)
-  #print('type_d1:',type(d1))
-  #print('type_d2:',type(d2))
   d1=d1.split('-')
   d2=d2.split('-')
   res=str(datetime.date(int(d2[0]),int(d2[1]),int(d2[2]))-datetime.date(int(d1[0]),int(d1[1]),int(d1[2])))
@@ -22,21 +41,47 @@ def tree_to_list(tree_list,lst,level):
     if exists_arg('children',t) and len(t['children']):
       tree_to_list(t['children'],lst,level+1)
 
-def cur_year():
-  dat = datetime.date.today()
-  dat = dat + datetime.timedelta(days=0)
-  return dat.strftime("%Y")
 
 def exists_arg(key,dict):
   #print('dict:',key,dict)
+  if not dict:
+    return None
+  # Сложная структура
+  if isinstance(key,str):
+    keys=key.split(';')
+  
+    if len(keys)>1:
+      dict2=dict
+      v=False
+      for k in keys:
+        if not(k in dict2):
+          return False
+        dict2=dict2[k]
+      return dict2
+  # Простая структура
+  
   if (key in dict) and dict[key]:
     return dict[key]
   return False
 
 def gen_pas(length=8,letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678'):
   return ''.join(random.choice(letters) for i in range(length))
-  
+
+def cur_year():
+  dat = datetime.date.today()
+  dat = dat + datetime.timedelta(days=0)
+  return dat.strftime("%Y")
+
+def cur_hour():
+  now=datetime.datetime.now()
+  return now.hour
+ 
 def cur_date(delta=0,format="%Y-%m-%d"):
+  dat = datetime.date.today()
+  dat = dat + datetime.timedelta(days=delta)
+  return dat.strftime(format)
+
+def first_day_in_mon(delta=0,format="%Y-%m-01"):
   dat = datetime.date.today()
   dat = dat + datetime.timedelta(days=delta)
   return dat.strftime(format)
@@ -58,36 +103,65 @@ def get_func(f):
   return ''
 
 
+# def date_to_rus(d):
+#   d=str(d)
+#   rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
+#   if rez and rez[5]:
+#     return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
+#   elif rez:
+#     return f"{rez[4]}.{rez[3]}.{rez[2]}"
+#   return ''
 def date_to_rus(d):
-  d=str(d)
-  rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
-  print(f'res: {rez}')
-  if rez and rez[5]:
-    return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
-  elif rez:
-    return f"{rez[4]}.{rez[3]}.{rez[2]}"
-  return ''
-  # elif d:
-  #   date_list=d.split('-')
-  #   date_list.reverse()
-  #   return '.'.join(date_list)
+    if not d:
+        return ''
+    d = str(d)
+    # Пытаемся распарсить как ISO-формат (с миллисекундами и временной зоной)
+    try:
+        dt = datetime.datetime.fromisoformat(d.replace('Z', '+00:00'))
+        return dt.strftime("%d.%m.%Y %H:%M:%S") if dt.time() else dt.strftime("%d.%m.%Y")
+    except ValueError:
+        pass
+
+    # Регулярка для старых форматов (YYYY-MM-DD и YYYY-MM-DD HH:MM:SS)
+    rez = re.search(r'^(\d{4})-(\d{2})-(\d{2})(?:T|\s)?(\d{2}:\d{2}:\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?$', d)
+    if rez:
+        date_part = f"{rez.group(3)}.{rez.group(2)}.{rez.group(1)}"
+        time_part = f" {rez.group(4)}" if rez.group(4) else ""
+        return date_part + time_part
+
+    return ''
   
 
 
 def from_datetime_get_date(dt):
-  if not dt: return False
-  rez=re.search('^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2}(:\d{2})?)?$',dt)
-  if rez:
-    return rez[0]
-  return False
+    if not dt:
+        return False
+
+    # Проверяем полный формат даты и времени с секундами
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})$', dt)
+    if rez:
+        return rez.group(0)  # Возвращаем полную строку без изменений
+
+    # Проверяем формат даты и времени без секунд
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})$', dt)
+    if rez:
+        return f"{rez.group(1)} {rez.group(2)}:00"  # Добавляем ":00" к времени
+
+    # Проверяем только дату (без времени)
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2}).*$', dt)
+    if rez:
+        return rez.group(1)  # Возвращаем только дату
+
+    # Если ни одно из условий не выполнено
+    return False
 
 def create_fields_hash(form):
   form.fields_hash={}
   for f in form.fields:
     if 'name' in f:
       form.fields_hash[f['name']]=f
-    else:
-      form.errors.append('Отсутствует name в поле: ',f)
+    elif not f.get('type') in ('header'):
+      form.errors.append(f'Отсутствует name в поле: {f["description"]}')
 
 
 # Возвращает расширение файла
@@ -142,11 +216,12 @@ def del_file_and_resizes(**arg):
   field=arg['field']
   value=arg['value']
   name=field['name']  
-  
+  #print('VALUE:',value)
   if not value:
     return
   
   filename_without_ext,ext=get_name_and_ext(value)
+  #print('filename_without_ext:',filename_without_ext, 'ext:',ext)
   if ext:
       # удаляем ресайзы
       if exists_arg('resize',field) and len(field['resize']):
@@ -162,9 +237,10 @@ def del_file_and_resizes(**arg):
             os.remove(file_for_del)
 
       # удаляем основной файл
+
       file_for_del=field['filedir']+'/'+value
       if os.path.isfile(file_for_del):
         os.remove(file_for_del)
-        #print('del main file:',file_for_del)
+        
 
 

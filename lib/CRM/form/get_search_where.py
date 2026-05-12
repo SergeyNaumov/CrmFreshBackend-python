@@ -1,10 +1,19 @@
-from lib.core import exists_arg, get_func, from_datetime_get_date
+from lib.core import exists_arg, get_func, from_datetime_get_date, join_ids
 import re
 import shlex
 def get_search_where(form,query):
   WHERE,headers=[],[]
   VALUES=[]
-  if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value'):
+
+  # add_where
+  if hasattr(form,'add_where') and len(form.add_where):
+    if isinstance(form.add_where, list):
+      for w in form.add_where: WHERE.append(w)  
+    if isinstance(form.add_where, str):
+      WHERE.append(form.add_where)
+
+  
+  if hasattr(form,'foreign_key') and hasattr(form,'foreign_key_value') and form.foreign_key_value:
     WHERE.append(f"wt.{form.foreign_key}={form.foreign_key_value}")
 
   form.SEARCH_RESULT['query_fields']=[]
@@ -58,7 +67,7 @@ def get_search_where(form,query):
 
       if f['type'] not in ['1_to_m','memo'] and not exists_arg('not_order',f):
           o,operable_fld='',''
-          #print('F:',f)
+
           if f['type'] in ['date','datetime','filter_extend_date','filter_extend_datetime']:
               operable_fld=table+'.'+db_name
               o=operable_fld+" desc"
@@ -108,19 +117,32 @@ def get_search_where(form,query):
         if max:
           WHERE.append(f'({table}.{db_name} <= %s)')
           VALUES.append(max)
+      elif f['type'] in ('filter_extend_checkbox', 'filter_extend_switch', 'checkbox','switch'):
+        v=values
+        if v in (0,'0'):
+          WHERE.append(f"({table}.{db_name}=0)")
+        elif v:
+          WHERE.append(f"({table}.{db_name}=1)")
+
+
 
       elif f['type'] in ('text','textarea','email','filter_extend_text'):
 
         v=values
         if v:
           # form.db.connect.escape_string(v)
-          v='%'+str(v)+'%'
+
           #v="'"+v+"'"
           func=get_func(f)
           if func:
             WHERE.append('('+dn_name+' LIKE %s)')
+            v='%'+str(v)+'%'
           else:
-            WHERE.append('('+table+'.'+db_name+' LIKE %s)')
+            if f.get('filter_type') == 'eq':
+              WHERE.append('('+table+'.'+db_name+' = %s)')
+            else:
+              WHERE.append('('+table+'.'+db_name+' LIKE %s)')
+              v='%'+str(v)+'%'
           VALUES.append(v)
           #print('WHERE:',WHERE)
 
@@ -141,19 +163,22 @@ def get_search_where(form,query):
             VALUES.append(max_date)          
 
       elif f['type']=='memo':
-        v=values[0]
-        date_low=from_datetime_get_date(v['registered_low'])
+        #print('VALUES:',values)
+        v=values
+        if 'registered_low' in v:
+          date_low=from_datetime_get_date(v['registered_low'])
 
-        if date_low:
-            date_low=date_low+' 00:00:00'
-            WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' >= %s')
-            VALUES.append(date_low)
+          if date_low:
+              date_low=date_low+' 00:00:00'
+              WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' >= %s')
+              VALUES.append(date_low)
         
-        date_hi=from_datetime_get_date(v['registered_hi'])
-        if date_hi:
-            date_hi=date_hi+' 23:59:59'
-            WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' <= %s')
-            VALUES.append(date_hi)
+        if 'registered_hi' in v:
+          date_hi=from_datetime_get_date(v['registered_hi'])
+          if date_hi:
+              date_hi=date_hi+' 23:59:59'
+              WHERE.append(f['memo_table_alias']+'.'+f['memo_table_registered']+' <= %s')
+              VALUES.append(date_hi)
 
         m=exists_arg('message',v)
         if m:
@@ -164,7 +189,7 @@ def get_search_where(form,query):
         user_id = exists_arg('user_id',v)
         if user_id:
 
-          WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+','.join(user_id)+') )')
+          WHERE.append('('+f['memo_table_alias']+'.'+f['memo_table_auth_id']+' IN ('+join_ids(user_id)+') )')
       elif f['type'] in ['checkbox','filter_extend_checkbox']:
         if type(values) is list:
           map_rezult=[]
@@ -181,6 +206,15 @@ def get_search_where(form,query):
               WHERE.append(' (wt.'+db_name+' IN ('+','.join(map_rezult)+'))')
 
       elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
+
+        db_name=f.get('db_name')
+#        if f['name']=='ur_lico_id':
+#          print('db_name:', db_name)
+        if not(db_name) and f['type']=='filter_extend_select_from_table':
+          db_name=f.get('value_field','id')
+        elif not(db_name):
+          db_name=name
+
         if type(values) is int or type(values)=='str':
           values=[values]
         if type(values) is list:

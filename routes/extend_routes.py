@@ -19,7 +19,7 @@ async def kladr(R: dict):
   name=R['name']
 
   if action == 'onestring':
-    
+    # https://kladr-api.ru/api.php?query=моск&oneString=1&withParent=false&limit=10
     #request_str=f'?query=моск&oneString=1&withParent=false&limit=10'
     url='https://kladr-api.ru/api.php?'
     request={
@@ -38,7 +38,7 @@ async def kladr(R: dict):
       
       if data:
         if config and name:
-            form=read_config(config=config,script='edit_form')
+            form = await read_config(config=config,script='edit_form')
             
             field=form.fields_hash[name]
             

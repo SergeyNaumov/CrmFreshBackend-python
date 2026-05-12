@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from config import config
-from db import db,db_read,db_write
+from db import get_db
 #from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
 from lib.send_mes import send_mes
 
@@ -32,8 +32,10 @@ async def test_cookie_write():
 
 @router.get('/test/quote')
 async def test_quote():
+  db=get_db()
   string=db.connect.escape_string('sv " \' cms')
   return {'result':string}
+
 @router.get('/test-cookie-read')
 async def test_cookie_read():
   print(s.get_cookie('cookie_testing'))
@@ -42,11 +44,13 @@ async def test_cookie_read():
 
 @router.get("/config")
 async def show_config():
+  db=get_db()
   print(db)
   return config
 
 @router.get('/test-query')
 async def test_query():
+  db=get_db()
   errors=[]
   result=db.query(
     query='desc test',

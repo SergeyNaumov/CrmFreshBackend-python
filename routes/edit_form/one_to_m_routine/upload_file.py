@@ -2,20 +2,13 @@ from lib.core import get_child_field, exists_arg, get_ext, random_filename
 from lib.get_1_to_m_data import get_1_to_m_data
 from lib.resize import resize_one
 import shutil,os
-import re
 
-def upload_file(form,field,arg):
+async def upload_file(form,field,arg):
   child_field_name=arg['child_field_name']
   child_field=get_child_field(field,child_field_name)
   if not child_field:
     form.errors.append(f'не найдено поле {child_field_name} в {field["name"]} обратитесь к разработчику')
   
-
-  #if form.success():
-
-  
-  
-
   # сохраняем файл
   if form.success():
     attach=arg['attach']
@@ -57,12 +50,11 @@ def upload_file(form,field,arg):
           composite_resize=exists_arg('composite_resize',r),
           quality=exists_arg('quality',r),
         )
-    
-    
+
     
     if arg['one_to_m_id']:
 
-        oldfile=form.db.query(
+        oldfile = await form.db.query(
           query=f'SELECT {child_field["name"]} from {field["table"]} WHERE {field["foreign_key"]}=%s and {field["table_id"]}=%s',
           values=[form.id,arg["one_to_m_id"] ],
           onevalue=1,
@@ -81,20 +73,35 @@ def upload_file(form,field,arg):
             os.remove(child_field['filedir']+'/'+oldfile)
 
 
+        save_data={
+          child_field['name']: db_value
+        }
+        # Убрал, потому что при обновлении файла запись улетала в конец
+        # if field.get('sort'):
+        #   save_data['sort'] = await form.db.query(
+        #     query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
+        #     onevalue=1
+        #   )
+          # if save_data['sort']:
+          #   save_data['sort']+=10
+          # else:
+          #   save_data['sort']=1
 
 
-        form.db.save(
+
+        await form.db.save(
           table=field['table'],
           update=1,
           where=f'{field["foreign_key"]}={form.id} and {field["table_id"]}={arg["one_to_m_id"]}',
           
-          data={
-            child_field['name']: db_value
-          }
+          data=save_data
         )
         # Сделать ресайз!
-
-        get_1_to_m_data(form,field)
+        if form.success():
+          field['_id']=arg["one_to_m_id"]
+          await form.run_event('after_update_code',{'field':field})
+          await form.run_event('after_save_code',{'field':field})
+        await get_1_to_m_data(form,field)
         return {
           'success':form.success(),
           'errors':form.errors,
@@ -107,47 +114,46 @@ def upload_file(form,field,arg):
         db_value=filename
         if exists_arg('keep_orig_filename',child_field):
           db_value+=";"+orig_filename
-        
-        id = form.db.save(
-          table=field['table'],
-          data={
+        save_data={
             field['foreign_key']:form.id,
             child_field_name:db_value
-          }
-        )
-        
-           
-           
-           
-        value={
-          field['foreign_key']:form.id,
-          field['table_id']:id,
-          child_field['name']:filename,
-          child_field['name']+'_filename':filename,
         }
-
-        
-        if filename and exists_arg('filedir',child_field) and exists_arg('preview',child_field) and exists_arg('resize',child_field) and len(child_field['resize']):
-            resize_for_preview=None
-            for r in child_field['resize']:
-              if r['size'] == child_field['preview']:
-                resize_for_preview=r['file']
-            if not resize_for_preview:
-               resize_for_preview=child_field['resize'][0]['file']
-            
-            fdir=re.sub(r'^\.\/','/',child_field['filedir'])
-
-            name,ext=filename.split('.')
-
-            value['preview_img']=fdir +'/'+resize_for_preview.replace('<%filename_without_ext%>',name).replace('<%ext%>',ext)
-            
+        if field.get('sort'):
+          save_data['sort'] = await form.db.query(
+            query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
+            onevalue=1
+          )
+          if save_data['sort']:
+            save_data['sort']+=10
+          else:
+            save_data['sort']=1
 
 
+
+
+        id = await form.db.save(
+          table=field['table'],
+          data=save_data,
+        )
+
+        # value={
+        #   field['foreign_key']:form.id,
+        #   field['table_id']:id,
+        #   child_field['name']:filename,
+        #   child_field['name']+'_filename':filename,
+        # }
+
+        if form.success():
+          await form.run_event('after_update_code',{'field':field})
+          await form.run_event('after_save_code',{'field':field})
+
+        await get_1_to_m_data(form,field,id)
+        values=field['values']
 
         return {
           'success':form.success(),
           'errors':form.errors,
-          'values':[value]
+          'values': values
           # 'file_info': [{
           #   'name':filename,
           #   'orig_name':orig_filename,

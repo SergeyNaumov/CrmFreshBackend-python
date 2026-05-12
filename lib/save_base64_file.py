@@ -3,12 +3,34 @@ from base64 import b64encode, b64decode
 from lib.core import exists_arg, del_file_and_resizes,get_name_and_ext, random_filename
 #from lib.resize import resize_all
 
-def save_base64_file(**arg):
+async def save_base64_file(**arg):
 
+    # убиваем существующий файл, если он есть:
+    if exists_arg('field',arg) and exists_arg('form',arg) and exists_arg('id',arg):
+      form=arg['form']
+      field=arg['field']
+      exists = await form.db.query(
+        query=f'SELECT {field["name"]} from {form.work_table} where {form.work_table_id}={arg["id"]}',
+        onevalue=1
+
+      )
+      if exists:
+
+        filename=''
+        exists_values=exists.split(';')
+        if len(exists_values)>1:
+          filename=exists_values[0]
+        else:
+          filename=exists
+
+        del_file_and_resizes(
+          field=field,
+          value=filename,
+          name=field['name']
+        )
 
     if exists_arg('filedir',arg) and exists_arg('src',arg) and exists_arg('orig_filename',arg):
           
-          #print('src:',arg['src'])
           # Сохраняем файл
           rez = re.search(r'^data:(.+?);base64,(.+)',arg['src'])
           
@@ -24,7 +46,6 @@ def save_base64_file(**arg):
 
             fullname=arg['filedir']+'/'+filename
             mime=rez[1]
-            #print('res2:',rez[2])
             #base64=str.encode(rez[2])
             #rez[2]=b64decode(arg['src'])
             bytes = b64decode(rez[2], validate=True)
@@ -49,7 +70,7 @@ def save_base64_file(**arg):
           
           if not os.path.isdir(field['filedir']):
             try:
-              print('mkdir: ',field['filedir'])
+              #os.mkdir(field['filedir'])
               os.makedirs(field['filedir'], exist_ok=True)
             except FileExistsError:
               errors.append(f'не удалось создать директорию {field["filedir"]}')
@@ -63,7 +84,6 @@ def save_base64_file(**arg):
             mime=rez[1]
             #base64=str.encode(rez[2])
             bytes = b64decode(rez[2], validate=True)
-            print('save to:',fullname)
             fh = open(fullname, "wb")
             fh.write(bytes)
             fh.close()
@@ -75,25 +95,23 @@ def save_base64_file(**arg):
             return 
 
           # удаляем старый
-          if not exists_arg('table',arg) or not exists_arg('id',arg):
-            return
+          #if not exists_arg('table',arg) or not exists_arg('id',arg):
+          #  return
 
 
 
-          old_photo=form.db.query(
-            query=f'SELECT {field["name"]} from {arg["table"]} WHERE id=%s',
-            values=[arg['id']],
-            onevalue=1,
-            errors=form.errors
-          )
-          #print()
-          #print('OLD_PHOTO: ',old_photo)
+          # old_photo=form.db.query(
+          #   query=f'SELECT {field["name"]} from {arg["table"]} WHERE {form.work_table_id}=%s',
+          #   values=[arg['id']],
+          #   onevalue=1,
+          #   errors=form.errors
+          # )
           # удаляем старое фото и все его ресайзы
 
-          del_file_and_resizes(
-            field=field,
-            value=old_photo
-          )
+          #del_file_and_resizes(
+          #  field=field,
+          #  value=old_photo
+          #)
 
 
           # сохраняем полное имя в базе или нет?
@@ -101,13 +119,13 @@ def save_base64_file(**arg):
             filename+=';'+arg['orig_name']
 
           elif exists_arg('keep_orig_filename_in_field',field):
-            form.db.query(
-              query=f'UPDATE {arg["table"]} SET {field["name"]}=%s, {field["keep_orig_filename_in_field"]}=%s where id=%s',
+            await form.db.query(
+              query=f'UPDATE {arg["table"]} SET {field["name"]}=%s, {field["keep_orig_filename_in_field"]}=%s where {form.work_table_id}=%s',
               values=[filename,arg['orig_name'],arg['id']]
             )
 
-          form.db.query(
-            query=f'UPDATE {arg["table"]} SET {field["name"]}=%s where id=%s',
+          await form.db.query(
+            query=f'UPDATE {arg["table"]} SET {field["name"]}=%s where {form.work_table_id}=%s',
             errors=form.errors,
             values=[filename,arg['id']],
           )
@@ -115,4 +133,4 @@ def save_base64_file(**arg):
 
 
 def b64_split(src):
-  print('SRC:',src)
+    pass

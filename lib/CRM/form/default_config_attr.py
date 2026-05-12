@@ -1,9 +1,8 @@
-from lib.engine import s
 from lib.core import create_fields_hash, exists_arg
 
 from .set_default_attributes import set_default_attributes
 def form_self():
-  return s
+  return ''
 
 
 
@@ -15,7 +14,7 @@ def default_config_attr(form,arg): # Атрибуты формы по умолч
 
 
     # Атрибуты по умолчанию
-    s.form=form
+    #s.form=form
     # read_only
     if not hasattr(form,'read_only'): form.read_only=0
 

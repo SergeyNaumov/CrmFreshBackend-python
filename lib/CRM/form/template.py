@@ -2,9 +2,13 @@ from jinja2 import Template
 
 def template(form,filename,**values):
   html = open(filename).read()
-
-  t=Template(html)
-  return t.render(**values)
+  try:
+    t=Template(html)
+    return t.render(**values)
+  except Exception as e:
+    print(f"exception in template {filename} {e}")
+    form.errors.append(e)
+    return ''
   # try:
   #   return t.render(**values)
   # except TemplateSyntaxErrorr as e:

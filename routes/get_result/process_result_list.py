@@ -1,12 +1,12 @@
+import inspect
 from lib.core import exists_arg, date_to_rus
-def process_result_list(form,R,result_list):
+async def process_result_list(form,R,result_list):
   # Обрабатывает результат, возвращает output
   if not result_list: result_list=[]
   output=[]
   memo_values={}
   multiconnect_values={}
   id_list=[]
-
 
   for r in result_list:
     id_fields=form.work_table_id.split(',')
@@ -25,7 +25,7 @@ def process_result_list(form,R,result_list):
 
         field=form.fields_hash[name]
         if field['type'] == 'multiconnect':
-            multiconnect_arr=form.db.query(
+            multiconnect_arr=await form.db.query(
               query=f'''
                 SELECT
                     rst.{field['relation_save_table_id_worktable']} id,
@@ -50,6 +50,9 @@ def process_result_list(form,R,result_list):
         continue
       field=form.fields_hash[name]
       type='html' #field['type']
+      if exists_arg('make_change_in_search',field):
+        type=field['type']
+
       tbl = exists_arg('tablename',field) or 'wt'
       db_name=exists_arg('db_name',field) or name
       value=exists_arg(tbl+'__'+db_name,r)
@@ -58,21 +61,32 @@ def process_result_list(form,R,result_list):
       
       if field['type_orig'] in ['filter_extend_select_values', 'select_values']:
           values_finded=0
+          field['orig_value']=value
           for v in field['values']:
             if str(v['v'])==str(value):
               value,values_finded=v['d'],1
 
           if not values_finded:
             value='не выбрано'
+      if not field.get('make_change_in_search') and field.get('filter_code'):
+        fnc=field['filter_code']
+        #print(f"run filter_code: {field}")
+        if inspect.iscoroutinefunction(fnc):
+          value = await fnc(form=form,field=field,row=r)
+        else:
+          value = fnc(form=form,field=field,row=r)
 
-      if not exists_arg('make_change_in_search',field) and exists_arg('filter_code',field) and not (isinstance(field['filter_code'],str)):
-        value=field['filter_code'](form=form,field=field,row=r)
-        
       else:
 
         if field['type']=='memo':
           type='memo'
         
+        elif field['type']=='file':
+          if value:
+            value=(field['filedir']+'/'+value).replace('./','/')
+          
+          type='file'
+
         elif field['type']=='multiconnect':
           type='multiconnect'
           if exists_arg(r['wt__'+form.work_table_id],multiconnect_values):
@@ -88,14 +102,18 @@ def process_result_list(form,R,result_list):
           else:
             value='да' if value else 'нет'
 
-        elif field['type_orig'] in ['filter_extend_checbox','filter_extend_switch']:
-          value=('нет','да')[value]
+        elif field['type_orig'] in ['filter_extend_checkbox','filter_extend_switch']:
+          if value:
+            value='да'
+          else:
+            value='нет'
+          #value=('нет','да')[value]
 
         elif field['type_orig'] in ['select_from_table','filter_extend_select_from_table']:
           
           if exists_arg('make_change_in_search',field):
             type='select'
-            value=r[tbk+'__'+field['value_field']]
+            value=r[tbl+'__'+field['value_field']]
             if not exists_arg(name,form.SEARCH_RESULT['selects']):
                 form.SEARCH_RESULT['selects'][name]=field['values']
           else:
@@ -112,12 +130,38 @@ def process_result_list(form,R,result_list):
             type='select'
             value=exists_arg(tbl+'__'+db_name,r)
 
-            if not exists_arg(name,form.SEARCH_RESULT['selects']):
-              form.SEARCH_RESULT['selects'][name]=field.values
 
+
+            if not exists_arg(name,form.SEARCH_RESULT['selects']):
+              form.SEARCH_RESULT['selects'][name]=field['values']
+          else:
+            color_dict=field.get('color_dict')
+            if not color_dict:
+              color_dict={ item['v']: {'c':item.get('c'),'d':item.get('d')} for item in field['values']}
+              field['color_dict']=color_dict
+
+            orig_value=field.get('orig_value')
+            if color_dict and orig_value:
+
+                if not color_dict:
+                    #form.pre('get_color_dict')
+                    color_dict={ item['v']: {'c':item.get('c'),'d':item.get('d')} for item in field['values']}
+                    field['color_dict']=color_dict
+
+                if cur_status:=color_dict.get(orig_value):
+                    c=cur_status.get('c')
+                    d=cur_status.get('d')
+                    if c and d:
+                        value=f"<div style='background: {c}; border: 1px solid gray; width: 10px; height: 10px; display: inline-block;'></div> {d}"
+                    elif d:
+                        value=d
+          #print('value:',value)
         elif field['type_orig'] in ['text','textarea','filter_extend_text']:
           t='text' # или textarea ?
-          type='text'
+          #values=field.get('values')
+          #if values and len(values) and values['0':
+
+
           value=exists_arg(tbl+'__'+db_name,r)
 
         elif field['type_orig'] == 'password':
@@ -125,18 +169,25 @@ def process_result_list(form,R,result_list):
 
         elif field['type_orig']=='in_ext_url':
           value=exists_arg('in_ext_url__ext_url',r)
+        elif field['type_orig'] in ('time','filter_extend_time'):
+          if(value):
+            value=str(value)
+          else:
+            value=''
         elif field['type_orig'] == 'datetime':
           value=date_to_rus(value)
         elif field['type_orig']=='date':
           
           if value:
-            value=date_to_rus(value)
+            if not ('make_change_in_search' in field):
+              value=date_to_rus(value)
           else:
             value=''
           if exists_arg('make_change_in_search',field):
             type='date'
-          
-      if not type in('memo') and not exists_arg('make_change_in_search',field):
+
+
+      if not type in('memo','file') and not exists_arg('make_change_in_search',field):
         type='html'
 
 
@@ -144,7 +195,8 @@ def process_result_list(form,R,result_list):
       data.append({
           'name':name,
           'type':type,
-          'value':value
+          'value':value,
+          'show_type':exists_arg('show_type',field) or ''
       })
 
     # все эти заморочки для структур с составнам work_table_id,

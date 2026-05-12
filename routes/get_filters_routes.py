@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from lib.core import is_errors, create_fields_hash, exists_arg
 from lib.all_configs import read_config
 
@@ -6,18 +6,23 @@ router = APIRouter()
 
 
 
-def get_values_for_select_from_table(f,form):
+async def get_values_for_select_from_table(f,form):
   return []
 
 
 @router.get('/get-filters/{config}')
-async def get_filters_controller(config: str):
+@router.post('/get-filters/{config}')
+async def get_filters_controller(config: str, R:dict, request: Request):
   response={}
-  form=read_config(
+
+  form=await read_config(
+    request=request,
     config=config,
+    R=R,
     script='admin_table'
   )
   
+
   if is_errors(form):
     return {
       'success':0,
@@ -49,10 +54,10 @@ async def get_filters_controller(config: str):
       if not(exists_arg('value_field',f)): f['value_field']='id'
       
       if not exists_arg('values',f):
-        f['values']=get_values_for_select_from_table(f,form)
+        f['values']=await get_values_for_select_from_table(f,form)
 
     elif f['type']=='memo':
-      f['users']=form.db.query(
+      f['users']=await form.db.query(
         query='SELECT '+f['auth_id_field']+' v, '+f['auth_name_field']+' d from '+f['auth_table']+' ORDER BY '+f['auth_name_field'],
         errors=form.log
       )
@@ -64,19 +69,21 @@ async def get_filters_controller(config: str):
     if exists_arg('filter_type',f) and f['filter_type'] == 'range':
       f['range']=1
     
-    for k in ('tablename','db_name','regexp','tab','table','where','table_id','header_field','value_field','empty_value'): # 'filter_type' -- убрал, потому что появился filter_type: checkbox
+    for k in ('tablename','db_name','regexp_rules','regexp','tab','where','table_id','header_field','value_field','empty_value'): # 'filter_type' -- убрал, потому что появился filter_type: checkbox
       if exists_arg(k,f): del f[k]
     
-
+    # order исправил на _order (конфиликтовал с беком в запросах)
     if exists_arg('filter_on',f):
-      f['order']=order
+      f['filter_order']=order
       order+=1
 
     filters.append(f)
 
   make_create=1
   if form.not_create: make_create=0
-  
+  search_multi_action=[]
+  if hasattr(form,'search_multi_action'):
+    search_multi_action=form.search_multi_action
   return {
     'success':1,
     'title':form.title,
@@ -88,6 +95,7 @@ async def get_filters_controller(config: str):
     'filters_groups':form.filters_groups,
     'log':form.log,
     'search_plugin':form.search_plugin,
+    'search_multi_action':search_multi_action,
     'permissions':{
       'make_create':make_create,
       'make_delete':form.make_delete,

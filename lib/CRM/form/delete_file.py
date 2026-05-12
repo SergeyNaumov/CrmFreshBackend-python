@@ -1,6 +1,6 @@
 import re
 from lib.core import del_file_and_resizes, exists_arg
-def delete_file(form,arg={}):
+async def delete_file(form,arg={}):
   # удаляет файл со всеми миниатюрами
 
   R=form.R
@@ -26,7 +26,7 @@ def delete_file(form,arg={}):
       if exists_arg('keep_orig_filename_in_field',field):
         keep_str=f', {field["keep_orig_filename_in_field"]}=""'
 
-      form.db.query(
+      await form.db.query(
         query=f'UPDATE {form.work_table} SET {name}="" {keep_str} WHERE {form.work_table_id}=%s',
         errors=form.errors,
         values=[form.id],

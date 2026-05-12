@@ -1,13 +1,14 @@
 import importlib,os
 
-from lib.session import project_get_permissions_for, get_permissions_for
+from lib.session import project_get_permissions_for, get_permissions_for, session_start
 
-from lib.engine import s
+#from lib.engine import s
 from lib.core import exists_arg
 
 from config import config as sysconfig
 from lib.CRM.form import Form
 import copy
+
 
 def need_only_read(form):
   w1=True #(form.script=='admin_table' and form.action=='edit')
@@ -18,8 +19,9 @@ def need_only_read(form):
 
   return False
 
-def get_cur_role(**arg):
+async def get_cur_role(**arg):
   form=arg['form']
+  s=form.s
   if(form.config == 'manager'):
     return arg['login']
   
@@ -29,7 +31,7 @@ def get_cur_role(**arg):
       manager_role_table='project_manager_role'
       manager_table='project_manager'
   
-  r=s.db.query(
+  r = await s.db.query(
     query="""
       SELECT
         m2.login
@@ -44,6 +46,7 @@ def get_cur_role(**arg):
   )
 
   if r:
+    #del r['password']
     return r
   else:
     return arg['login']
@@ -74,82 +77,112 @@ class error():
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
   errors=[]
+  module_dir=conflib_dir.replace('/','.')
+
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
-      module=importlib.import_module(conflib_dir+'.'+arg['config'])
-      
+      #print(f"import_module: {module_dir}.{arg['config']}")
+      module=importlib.import_module(f"{module_dir}.{arg['config']}")
+
       form_data=copy.deepcopy(module.form)
+
     except SyntaxError as e:
-      errors.append(f"1Ошибка при загрузке конфига {arg['config']}: {e}")
+      errors.append(f"Ошибка при загрузке конфига - 1 {arg['config']}: {e}")
     except ModuleNotFoundError as e:
-      errors.append(f"2Ошибка при загрузке конфига {arg['config']}: {e}\n{conflib_dir+'.'+arg['config']}")
-    
+      errors.append(f"Ошибка при загрузке конфига - 2 {arg['config']}: {e}")
+    except Exception as e:
+      errors.append(f"ошибка при обработке конфига - 3 {arg['config']}: {e}")
+
     if not len(errors) and os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
       try:
-        module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events')
+        module=importlib.import_module(module_dir+'.'+arg['config']+'.events')
         form_data['events']=module.events
       except SyntaxError as e:
-        errors.append(f"1Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
+        errors.append(f"Ошибка при загрузке конфига - 4 {arg['config']}/events.py: {e}")
       except ModuleNotFoundError as e:
-        errors.append(f"2Ошибка при загрузке конфига {arg['config']}/events.py: {e}")
-    
+        errors.append(f"Ошибка при загрузке конфига - 5 {arg['config']}/events.py: {e}")
+      except Exception as e:
+        errors.append(f"ошибка при обработке конфига -6 {arg['config']}: {e}")
+
     if not len(errors):
       form=Form(arg)  
       form.load_data(form_data)
     
     if not len(errors) and  os.path.isfile(f"{confdir}/{arg['config']}/events_for_fields.py"):
       try:
-        module=importlib.import_module(conflib_dir+'.'+arg['config']+'.events_for_fields')
+        module=importlib.import_module(module_dir+'.'+arg['config']+'.events_for_fields')
         events=module.events
         for f in form.fields:
           if 'name' not in f:
             form.errors.append(f'{f["description"]}: не указано имя!')
             break
-          
+
           if f['name'] in events:
-            for postfix in ['before_code','permissions','filter_code','code']:
-              if postfix in events[f['name']]:
-                f[postfix]=events[f['name']][postfix]
+            # все возможные события
+            for event_name in (
+              'permissions','before_code',
+
+              'before_insert', 'before_update', 'before_save',
+              'before_insert_code', 'before_update_code', 'before_save_code','before_delete_code',
+
+              'after_add', # для memo
+              'after_insert', 'after_update', 'after_save',
+              'after_insert_code''after_update_code','after_save_code','after_delete_code',
+              
+              'code','slide_code',
+              
+              'filter_code',
+            ):
+              if event_name in events[f['name']]:
+                f[event_name]=events[f['name']][event_name]
 
       except SyntaxError as e:
-          errors.append(f"1Ошибка при загрузке конфига {arg['config']}/events_for_fields.py: {e}")
+          errors.append(f"Ошибка при загрузке конфига -7 {arg['config']}/events_for_fields.py: {e}")
       except ModuleNotFoundError as e:
-          errors.append(f"2Ошибка при загрузке конфига {arg['config']}/events_for_fields: {e}")
+          errors.append(f"Ошибка при загрузке конфига -8 {arg['config']}/events_for_fields: {e}")
           
       #print('FIELDS:',form.fields)
         
 
   return [form,errors]
 
-def read_config(**arg):
-  #response={}
+async def read_config(**arg):
+
+  request=exists_arg('request',arg)
+  s = request.state.engine
+  #if not(request):
+  #  request=s.request
+
+  response={}
+  
+  # это нужно для того, чтобы в конфиг не попали аргументы:
+  arg["config"]=arg["config"].split('?')[0]
+  
   
   # попытка загрузки локального конфига
-  #print('STEP1')
-  if len(s.errors): return error(s.errors)
-  [form,errors]=load_form_from_dir(f'./conf', f'conf',arg)
+  config_folder=exists_arg('config_folder',sysconfig)
+  
+  if not(config_folder): config_folder='conf'
+
+  [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
   if len(errors): return error(errors)
-  #print('STEP2')
+  
   # Если локальной папки нет -- загружаем глобальный конфиг
-  if not(form) and hasattr(s,'shop_id'):
-    [form,errors]=load_form_from_dir(f'./conf_projects/project_{s.shop_id}', f'conf_projects.project_{s.shop_id}',arg)
+  if not(form):
+    [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
     if len(errors): return error(errors)
-  #print('STEP3')
-  if not(form):    
-    print(f'конфиг {arg["config"]} не найден')
+
+  if not(form):
     return error([f'конфиг {arg["config"]} не найден'])
   
-  
-  form.s=s
-  s.form=form
-  
+  form.s=request.state.engine
+
+  request.state.engine.form=form
   if 'after_read_form_config' in sysconfig:
       sysconfig['after_read_form_config'](form)
 
   form.config=arg['config']
   form.script=arg['script']
-
-
 
   if need_only_read(form): form.db=s.db_read
   else: form.db=s.db_write
@@ -159,30 +192,63 @@ def read_config(**arg):
   # Получаем manager-а 
   auth=sysconfig['auth']
 
+  if not(hasattr(request.state,'manager')) or not(request.state.manager.get('login')):
+    print('NO manager')
+    #await session_start(s)
+
+    print('REPEAT SESSION START: ',request.state.manager)
+    #s.request.state.manager=s.manager
+    
+  login=request.state.manager.get('login')#s.login
   
+  # form.manager содержит login
+  if auth['use_roles']:
+
+    #print('use_roles:',login)
+    login=await get_cur_role(
+     login=login,
+     form=form
+    )
+    #form.manager=
+    #print('USE ROLES: ',form.manager)
+    # if m2:
+    #   form.manager=m2
+    #print('use_roles:',form.manager)
+
+  #print('login:',login)
   if auth['use_permissions']:
-    if s.use_project:
-      form.manager=project_get_permissions_for(form,login)
-    else:
-      form.manager=get_permissions_for(form,login)
-  
+      # print('USE PERMISSIONS:')
+      # print('LOGIN:',login)
+      # print('MANAGER:',s.request.state.manager)
+
+      # print("\n\n\n")
+      request.state.manager=await get_permissions_for(form,login)
+
+  form.manager=request.state.manager
   # Атрибуты по умолчанию
   if exists_arg('id',arg): form.id=arg['id']
   if exists_arg('action',arg): form.action=arg['action']
   if not form.work_table: form.work_table=arg['config']
   
-  form.run_event('permissions')
+  await form.run_event('permissions')
+
+  # вызываем permissions для полей (если есть)
+  for field in form.fields:
+    if 'permissions' in field:
+      await field['permissions'](form,field)
 
   form.default_config_attr(arg)
   form.set_orig_types()
   
   # Перенёс из routes.edit_form.process_edit_form.py
-  #form.get_values()
-  
-  form.get_values()
-  form.run_all_before_code()
-  form.get_fields_values()
+  if form.script !='history':
+    await form.get_values()
 
+  await form.run_all_before_code()
+  
+  #if form.script!='history':
+  gfv = await form.get_fields_values()
+  await form.run_event('after_get_values')
   return form
 
 

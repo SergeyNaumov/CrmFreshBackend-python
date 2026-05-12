@@ -1,5 +1,5 @@
 
-from lib.engine import s
+#from lib.engine import s
 import re
 import pandas as pd
 from UliPlot.XLSX import auto_adjust_xlsx_column_width
@@ -12,11 +12,11 @@ config={
 }
 
 
-def before_search(form):
+async def before_search(form):
     if form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
         
         form.not_perpage=1
-def after_search(form):
+async def after_search(form):
     if form.script=='find_objects' and 'plugin' in form.R and form.R['plugin']=='search_xls':
         filename=form.config+'_'+form.manager['login']+'.xlsx'
         full_path='files/tmp/'+filename
@@ -39,7 +39,7 @@ def after_search(form):
             pandas_dataframe['№'].append(j)
             j+=1
 
-            id=tr['key']
+            #_id=tr['key']
             i=0
             cols=[]
             for d in tr['data']:

@@ -1,5 +1,5 @@
 from lib.core import exists_arg
-def slide_sort(form,field):
+async def slide_sort(form,field):
     sort_hash=exists_arg('sort_hash',form.R)
 
     if not exists_arg('sort',field):
@@ -27,10 +27,10 @@ def slide_sort(form,field):
         WHERE {field['foreign_key']}={form.id}
       """
 
-      form.db.query(
+      await form.db.query(
         query=query,
         errors=form.errors
       )
-      form.run_event('after_slide_sort')
+      await form.run_event('after_slide_sort')
 
     return {'success':form.success(),'errors':form.errors}

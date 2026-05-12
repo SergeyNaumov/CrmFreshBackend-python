@@ -1,12 +1,12 @@
 from lib.core import get_child_field,exists_arg
 from lib.get_1_to_m_data import get_1_to_m_data
-def update_field(form,field,arg):
+async def update_field(form,field,arg):
   R=form.R
   child_field_name=exists_arg('child_field_name',arg)
 
   if child_field_name:
     child_field=get_child_field(field,exists_arg('child_field_name',arg))
-    print('child_field:',child_field)
+    #print('child_field:',child_field)
 
     if not child_field:
       form.errors.append(f'Не найден элемент {arg["child_field_name"]} в элементе {arg["field_name"]}')
@@ -26,18 +26,17 @@ def update_field(form,field,arg):
       
 
   if form.success():
-    form.db.query(
+    await form.db.query(
       query=f"""
         UPDATE
           {field["table"]}
         SET
           {child_field["name"]}=%s
         WHERE {field["table_id"]}=%s""",
-      debug=1,
       values=[value,id]
 
     )
-    get_1_to_m_data(form,field)
+    await get_1_to_m_data(form,field)
 
   return {
     'success':1,

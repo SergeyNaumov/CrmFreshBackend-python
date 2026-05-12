@@ -20,7 +20,6 @@ def get_file_list(**arg):
 
     # если нет директории -- создаём её
     if not os.path.isdir(form.manager['files_dir']+path):
-      
       dirname=form.manager['files_dir']
       if path != '/':
         dirname+=path
@@ -29,13 +28,11 @@ def get_file_list(**arg):
         error=f'Ошибка wysiwyg: {dirname} -- это файл (а должна быть директория), обратитесь к разработчику'
         return res,error
       else:
-        os.mkdir(form.manager['files_dir']+path)
+        os.makedirs(f"{form.manager['files_dir']}{path}", exist_ok=True)
 
+    _list=sorted(os.listdir(path_directory))
 
-
-    list=sorted(os.listdir(path_directory))
-
-    for l in list:
+    for l in _list:
         
         if(os.path.isdir(path_directory+'/'+l)):
             res_dirs.append({'name':l,'type':'dir'})
@@ -47,10 +44,11 @@ def get_file_list(**arg):
     #['file1.png','file2.png','file3.png']
     return res,error
 
-def wysiwyg_process(**arg):
+async def wysiwyg_process(**arg):
   #print('wysiwyg_process - реализовать')
   config=arg['config']
   field_name=arg['field_name']
+  request=arg['request']
   errors=[]
   R={}
 
@@ -73,11 +71,15 @@ def wysiwyg_process(**arg):
   id=''
   if 'id' in arg:
     id=arg['id']
-
-  form=read_config(
+  if 'id' in R:
+    id=R['id']
+  if 'config' in R:
+    config=R['config']
+  form = await read_config(
     action=action,
     config=config,
     id=id,
+    request=request,
     #values=values,
     script='wysiwyg'
   )
@@ -86,8 +88,10 @@ def wysiwyg_process(**arg):
   if not len(errors):
     if action == 'file_list':
         file_list,error=get_file_list(path=path,errors=errors,form=form)
+        #print('file_list:',file_list)
         if error:
           errors.append(error)
+        
         return {
             'success':form.success(),
             'errors':errors,
@@ -99,6 +103,10 @@ def wysiwyg_process(**arg):
         new_folder_name=R['new_folder_name']
         if re.match(r'^[a-zA-Z0-9\.\-_]+$',new_folder_name):
             try:
+                print('files_dir:',form.manager['files_dir'])
+                print('path:',path)
+                print('new_folder_name:',new_folder_name)
+
                 os.mkdir(form.manager['files_dir']+path+'/'+new_folder_name)
             except FileExistsError:
                 errors.append('уже существует файл или папка с таким именем')
@@ -145,7 +153,7 @@ def wysiwyg_process(**arg):
         if arg['path']:
             P= path[:0] + path[(0+1):] # удаляем начальный слэш
             full_path=f"{form.manager['files_dir']}/{P}{file.filename}"
-
+        #print('upload_to:',full_path)
         with open(full_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
