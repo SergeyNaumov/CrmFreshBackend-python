@@ -1,20 +1,20 @@
+from lib.core_crm import get_manager_email
 from lib.send_mes import send_mes
 
 
 async def send_new_password(form,field,newpass):
   # print('ov:',form.id)
   #print('send: ',field,newpass)
-  if form.ov:
-    if email:=form.ov.get('email'):
-      send_mes(
-        subject='Вам сгенерирован пароль для входа в систему Fas',
-        to=email,
-        message=f"""
-          Ссылка для входа в ЛК: <a href="https://fas.crm-dev.ru/">https://fas.crm-dev.ru/</a>
-          Логин: {form.ov['login']}<br>
-          Пароль: {newpass}<br>
-        """
-      )
+  if email:=await get_manager_email(form.db, form.id):
+    send_mes(
+      subject='Вам сгенерирован пароль для входа в систему Fas',
+      to=email,
+      message=f"""
+        Ссылка для входа в ЛК: <a href="https://fas.crm-dev.ru/">https://fas.crm-dev.ru/</a>
+        Логин: {form.ov['login']}<br>
+        Пароль: {newpass}<br>
+      """
+    )
 
 async def without_send(form,field,newpass):
     return
@@ -26,6 +26,14 @@ fields=[
 
       'type':'text',
       'filter_on':1,
+      #regexp':'^[a-zA-Z\-_0-9\.\@]+$',
+      # filter_code=>sub{
+      #   my $e=shift;
+      #   my $login=$e->{str}->{wt__login};
+      #   $login=~s{([^a-zA-Z\-_0-9\.\@]+)}{<span style="color: red;">$1</span>}gs;
+      #   return $login;
+      # },
+      #'read_only':1,
       'unique':1,
       'regexp_rules':[
         '/.{3}/','длина логина должна быть не менее 3 символов',
@@ -63,18 +71,50 @@ fields=[
         'value_field': 'id',
         'filter_on':1,
         'regexp_rules':[
-              #'/^.+$/','Укажите группу',
+              '/^.+$/','Укажите группу',
         ],
         'tab': 'main',
     },
+    {
+      'description':'Email - адреса',
+      'name':'emails',
+      'type':'1_to_m',
+      'table':'manager_email',
+      'table_id':'id',
+      'view_type':'list',
+      'foreign_key':'manager_id',
+      'order':'main desc',
+      'fields':[
+        {
+          'description':'Основной',
+          'type':'checkbox',
+          'name':'main',
+          #'make_change_in_slide':1,
+          #'change_in_slide':1,
+        },
+        {
+          'description':'Бренд',
+          'type':'select_from_table',
+          'name':'brand_id',
+          'table':'brand',
+          'header_field':'header',
+          'value_field':'id'
+        },
+        {
+          'description':'Email',
+          'type':'text',
+          'name':'email',
+        },
+      ],
+      'tab':'main'
 
+    },
     {
       'description':'Email',
       'name':'email',
-      'type':'text',
-      'regexp_rules':[
-          r'/^.+@.+[a-zA-Z0-9\-\_]+$/','Укажите корректный email',
-      ],
+      'type':'filter_extend_text',
+      'tablename':'me',
+      'db_name':'group_concat( distinct me.email) SEPARATOR ", "'
     },
 
     {
@@ -88,17 +128,38 @@ fields=[
       #     '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
       # ],
       'replace_rules':[
-          r'/[^\d]/g','',
-          r'/^(\d{11}).*$/','$1',
-          r'/^[87]/','+7',
-          r'/^\+7(\d{3})(\d)/','+7 ($1) $2',
-          r'/^(\+7 \(\d{3}\))(\d{3})/','$1 $2',
-          r'/(\d{3})(\d{2})/',"$1-$2",
-          r'/-(\d{2})(\d{2}\d*)$/',"-$1-$2"
+          '/[^\d]/g','',
+          '/^(\d{11}).*$/','$1',
+          '/^[87]/','+7',
+          '/^\+7(\d{3})(\d)/','+7 ($1) $2',
+          '/^(\+7 \(\d{3}\))(\d{3})/','$1 $2',
+          '/(\d{3})(\d{2})/',"$1-$2",
+          '/-(\d{2})(\d{2}\d*)$/',"-$1-$2"
 
       ]
     },
 
+    {
+      'description':'Телефон2',
+      'type':'text',
+      'name':'phone2',
+      'tab':'main',
+      'frontend':{'ajax':{'name':'phone','timeout':600}},
+      #'read_only':1,
+      # 'regexp_rules':[
+      #     '/^(\+7 \(\d{3}\) \d{3}-\d{2}-\d{2})?$/','Если указывается телефон, он должен быть в формате +7 (XXX) XXX-XX-XX',
+      # ],
+      'replace_rules':[
+          '/[^\d]/g','',
+          '/^(\d{11}).*$/','$1',
+          '/^[87]/','+7',
+          '/^\+7(\d{3})(\d)/','+7 ($1) $2',
+          '/^(\+7 \(\d{3}\))(\d{3})/','$1 $2',
+          '/(\d{3})(\d{2})/',"$1-$2",
+          '/-(\d{2})(\d{2}\d*)$/',"-$1-$2"
+
+      ]
+    },
     {
       'description':'СИП',
       'type':'text',

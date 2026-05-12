@@ -13,15 +13,15 @@ async def new_form_permissions(form):
       if not(f['name'] in ('login','group_id','name')):
         form.remove_field(f['name'])
 
-      elif f['name']=='name':
-        form.fields.append({
-          'description':'Email',
-          'name':'email',
-          'type':'text',
-          'regexp_rules':[
-              '/^.+@.+[a-zA-Z0-9\-\_]+$/','Укажите корректный email',
-          ],
-        })
+      # elif f['name']=='name':
+      #   form.fields.append({
+      #     'description':'Email',
+      #     'name':'email',
+      #     'type':'text',
+      #     'regexp_rules':[
+      #         r'/^.+@.+[a-zA-Z0-9\-\_]+$/','Укажите корректный email',
+      #     ],
+      #   })
 
 async def before_save(form):
   ...
@@ -39,14 +39,14 @@ async def new_form_after_insert(form):
 async def events_permissions(form):
     manager = form.manager
     if form.id:
-      form.ov = form.db.query(
+      form.ov = await form.db.query(
         query="select * from manager where id=%s",
         values=[form.id],
         onerow=1
       )
     else:
       form.ov=None
-      
+
     if ('superadmin' in form.manager['permissions']) or (form.manager['login']=='admin'):
       form.is_admin=1
       form.not_create=0
