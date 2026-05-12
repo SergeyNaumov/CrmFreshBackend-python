@@ -12,6 +12,10 @@ def normalize_value_row(form,field,d):
         fdir=re.sub(r'^\.\/','/',cf['filedir'])
       d_cname=exists_arg(c_name,d) or ''
       
+      if d_cname:
+        d_cname=str(d_cname)
+        d[c_name]=d_cname
+
       if cf['type'] == 'file' and exists_arg(c_name,d):
           
         if d_cname:
