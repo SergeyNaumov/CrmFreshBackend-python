@@ -1,6 +1,6 @@
 from lib.core import cur_year,cur_date, exists_arg
-from fastapi import FastAPI, APIRouter
-from lib.engine import s
+from fastapi import FastAPI, APIRouter, Request
+#from lib.engine import s
 
 #import re
 from lib.send_mes import send_mes
@@ -13,12 +13,13 @@ router = APIRouter()
 
 # изменение пароля
 @router.post('/password/{config}/{field_name}/{id}')
-async def password(config:str,field_name:str,id:int,R: dict):
+async def password(config:str,field_name:str,id:int,R: dict, request: Request):
   errors=[]
   response={'success':1,'errors':errors}
 
   if R['action'] == 'change':
-      form=read_config(
+      form = await read_config(
+        request=request,
         script='password', config=config,
         action=R['action'], R=R, id=id
       )
@@ -35,7 +36,7 @@ async def password(config:str,field_name:str,id:int,R: dict):
 
       if not len(errors):
         if form.s.config['encrypt_method'] == 'mysql_sha2':
-          form.db.query(
+          await form.db.query(
             query=f'UPDATE {form.work_table} SET {field_name}=sha2(%s,256) where id=%s',
             values=[R['new_password'],form.id]
           )
@@ -45,8 +46,8 @@ async def password(config:str,field_name:str,id:int,R: dict):
       if len(errors):
         response['success']=0
         response['errors']=errors
-      
-      field['methods_send'][R['method_send']]['method_send'](form,field,R['new_password'])
+
+      await field['methods_send'][R['method_send']]['method_send'](form,field,R['new_password'])
       
 
 

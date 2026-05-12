@@ -1,24 +1,67 @@
-from lib.core import join_ids
-def action_list(form,field):
+from lib.core import join_ids, exists_arg
+async def action_list(form,field):
         #field=form.fields_hash[field_name]
-        
-        lst=form.db.query(
+        form_id=form.R.get('form_id_alternative') or form.id
+
+        lst_where=f"dp.{field['docpack_foreign_key']}=%s"
+        lst_values=[form_id]
+
+        if only_dogovor:=form.R.get('only_dogovor'):
+            lst_where+=f" and dp.id=%s"
+            lst_values.append(only_dogovor)
+
+        lst=await form.db.query(
             query=f"""
                 select
                     dp.id, dp.ur_lico_id, dp.tarif_id, t.header tarif, ul.firm ur_lico, dp.registered, m.name manager,
-                    if(ul.for_all or a.id is not null,1,0) make_new_bill
+                    if(ul.for_all or a.id is not null,1,0) make_new_bill,
+                    if(bcr.id, concat(bcr.firm, '; ИНН: ', bcr.inn), '') requisits,
+                    bcr.id requisits_id
+
                 from
                     docpack dp
+                    LEFT JOIN buhgalter_card_requisits bcr ON bcr.id=dp.buhgalter_card_requisits_id
                     LEFT join tarif t ON dp.tarif_id=t.id
                     LEFT join ur_lico ul ON (dp.ur_lico_id=ul.id)
                     LEFT JOIN ur_lico_access_only a ON (a.ur_lico_id=ul.id and a.manager_id={form.manager['id']}) 
                     LEFT JOIN manager m ON (m.id=dp.manager_id)
                 WHERE
-                    dp.{field['docpack_foreign_key']}={form.id}
+                    {lst_where}
                 ORDER BY dp.id desc
             """,
+            #debug=1,
+            values=lst_values,
             errors=form.errors
         )
+
+        # Список услуг
+        services=[]
+        if service_table:=field.get('service_table'):
+            serv_fields=[]
+            services = await form.db.query(query=f"select id,header from {service_table} order by header")
+
+            # доп. поля для услуг
+            if field_table:=field.get('service_field_table'):
+
+                serv_fields = await form.db.query(
+                    query=f"""
+                        select
+                            sf.id, sf.service_id, sv.label header, sf.sort, sv.header name
+                        from
+                            {field_table} sf
+                            join service_var sv ON sv.id=sf.service_var_id order by sort
+                    """,
+                )
+
+
+            for s in services:
+                s['fields']=[]
+                for f in serv_fields:
+                    if s['id']==f['service_id']:
+                        f['value']=''
+                        s['fields'].append(f)
+
+
         #print(lst)
         id_list=[]
         for l in lst:
@@ -30,14 +73,18 @@ def action_list(form,field):
             
             query=f"select * from dogovor where docpack_id in ({join_ids(id_list)}) ORDER BY registered desc"
             
-            dogovor_list=form.db.query(
+            dogovor_list = await form.db.query(
                 query=f"select * from dogovor where docpack_id in ({join_ids(id_list)}) ORDER BY registered desc",
                 #debug=1
             )
-            #print('dogovor_list:',dogovor_list)
+            for d in dogovor_list:
+                if d['attach']:
+                    registered=str(d['registered'])
+                    filedir=f"/files/dogovor-scan/{'/'.join(registered.split('-'))}"
+                    d['attach']=f"{filedir}/{d['attach']}"
             
             for dp in lst:
-                dp['cnt_bill']=form.db.query(
+                dp['cnt_bill'] = await form.db.query(
                     query='select count(*) from bill where docpack_id=%s',
                     values=[dp['id']],
                     errors=form.errors,
@@ -53,10 +100,11 @@ def action_list(form,field):
                     if dp['id']==d['docpack_id']:
                         dp['dogovor_list'].append(d)
 
-        #return {'ok':3}
+        #print('lst:',lst)
         return {
             'success':form.success(),
             'errors':form.errors,
             'permissions':form.manager['permissions'],
-            'list':lst
+            'list':lst,
+            'services':services
         };

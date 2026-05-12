@@ -1,7 +1,8 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
 from fastapi import WebSocket, WebSocketDisconnect
 from config import config as sysconfig
-from lib.engine import s
+#from lib.engine import s
+from db import get_db
 
 from .sockets_connector import sockets_connector
 from .models import *
@@ -42,7 +43,8 @@ async def init():
 async def send_request_to_gpt(r:RequestTask):
     gpt_assist_rules=sysconfig.get('gptassist_rules')
     task_id=gen_pas(50)
-    s.db.save(
+    db=get_db()
+    db.save(
         table='crm_gptassist',
         data={
             'task_id':task_id,

@@ -1,4 +1,5 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
+from fastapi.responses import StreamingResponse
 from lib.all_configs import read_config
 from lib.CRM.form.get_values_for_select_from_table import get_values_for_select_from_table
 import traceback
@@ -6,14 +7,17 @@ import traceback
 router = APIRouter()
 # Инициализация
 @router.post('/{config}')
-async def get_list(config: str, R:dict): # 
-    form=read_config(
+async def get_list(config: str, R:dict,request:Request): #
+    form=await read_config(
         action='init',
         config=config,
-        #id=exists_arg('id',arg),
+        request=request,
         R=R,
         script='stat_tool'
     )
+    if hasattr(form, 'response') and form.response:
+        return form.response
+
     response={}
     success=True
     if not len(form.errors):
@@ -29,7 +33,7 @@ async def get_list(config: str, R:dict): #
             _type=f.get('type')
 
             if f.get('type')=='select_from_table':
-                f['values']=get_values_for_select_from_table(form, f)
+                f['values']=await get_values_for_select_from_table(form, f)
                 f['type']='select'
 
         response['title']=form.title
@@ -53,8 +57,9 @@ async def get_list(config: str, R:dict): #
 
 # Поиск
 @router.post('/{config}/search')
-async def search(config: str, R: dict):
-    form=read_config(
+async def search(config: str, R: dict, request: Request):
+    form=await read_config(
+        request=request,
         action='search',
         config=config,    
         script='stat_tool',
@@ -69,50 +74,30 @@ async def search(config: str, R: dict):
 
     if func:
         try:
-            """
-                form.events.search возвращает блоки для вывода, которые выводятся на frontend-е
-                success: True,
-                list: [
-                    { # раскрывающийся блок
-                        'type':'accordion',
-                        'data':[
-                            {
-                                'header':"
-                                    Волков Павел Юрьевич
-                                    <span style="color: green;">новых: 19</span> | <span style="color: red;">дублей: 6</span>
-                                ",
-                                'header_links':[
-                                    # {'url':'sasa','style':'','header':'link1'},
-                                    # {'url':'sasa','style':'','header':'link2'},
-                                    # {'url':'sasa','style':'','header':'link3'},
-                                ],
-                                'content':[
-                                    {
-                                        'type':'html',
-                                        'body':form.template('./confFas/transfere_result/template/table.html')
-                                    },
-                                    {
-                                        'type':'html',
-                                        'body':'hello2'
-                                    },
-                                ]
-                            }
-                        ]
+            #return await func(form, R)
+            result = await func(form, R)
 
-
-                    },
-                    {
-                        'type':'html',
-                        'body':'html-код для вывода'
-                    },
-                    {   # вложенный список (но это задел на будущее)
-                        'type':'list',
-                    }
-                ]
-            """
-            return func(form, R)
+            # Проверяем, является ли результат StreamingResponse
+            if isinstance(result, StreamingResponse):
+                return result
+            else:
+                return result
         except Exception as e:
             error_info = traceback.format_exc()
             return {'success':False, 'errors':[f'ошибка приложения при выполнении события {search} ({e}) {error_info}']}
     else:
         return {'success':False, 'errors':[f'ошибка приложения при выполнении события {search} ({e})']}
+
+
+# from conf.manager_employee.get_stat_dates_excel import save_excel
+# @router.get('/test-xlsx')
+# async def test_excel():
+
+#     # form=await read_config(
+#     #     request=request,
+#     #     action='search',
+#     #     config=config,
+#     #     script='stat_tool',
+#     #     R=R
+#     # )
+#     return await save_excel()

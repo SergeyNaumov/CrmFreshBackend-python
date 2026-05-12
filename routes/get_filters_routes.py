@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from lib.core import is_errors, create_fields_hash, exists_arg
 from lib.all_configs import read_config
 
@@ -6,16 +6,17 @@ router = APIRouter()
 
 
 
-def get_values_for_select_from_table(f,form):
+async def get_values_for_select_from_table(f,form):
   return []
 
 
 @router.get('/get-filters/{config}')
 @router.post('/get-filters/{config}')
-async def get_filters_controller(config: str, R:dict):
+async def get_filters_controller(config: str, R:dict, request: Request):
   response={}
-  #print('R0:',R)
-  form=read_config(
+
+  form=await read_config(
+    request=request,
     config=config,
     R=R,
     script='admin_table'
@@ -32,8 +33,6 @@ async def get_filters_controller(config: str, R:dict):
   order=1
   
   for f in form.fields:
-    if f.get('name')=='brand_id':
-      print(f"{f['name']} {f.get('value')}")
     # if(ref($f->{before_code}) eq 'CODE'){
     #   run_event(event=>$f->{before_code},description=>'before_code for '.$f->{name},form=>$form,arg=>$f);
     # }
@@ -55,10 +54,10 @@ async def get_filters_controller(config: str, R:dict):
       if not(exists_arg('value_field',f)): f['value_field']='id'
       
       if not exists_arg('values',f):
-        f['values']=get_values_for_select_from_table(f,form)
+        f['values']=await get_values_for_select_from_table(f,form)
 
     elif f['type']=='memo':
-      f['users']=form.db.query(
+      f['users']=await form.db.query(
         query='SELECT '+f['auth_id_field']+' v, '+f['auth_name_field']+' d from '+f['auth_table']+' ORDER BY '+f['auth_name_field'],
         errors=form.log
       )

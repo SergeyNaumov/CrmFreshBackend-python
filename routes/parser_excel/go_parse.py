@@ -1,6 +1,13 @@
 import xlrd,re
 from pprint import pprint
 
+
+import os
+#import xlrd
+from openpyxl import load_workbook
+import csv
+import asyncio
+
 def print_error(error):
     return {
         'success':False,
@@ -24,8 +31,8 @@ def is_empty_xls_str(hash_fields):
     for k in hash_fields:
         #s=
         if is_empty(hash_fields[k]):
-            return False
-    return True
+            return True
+    return False
             
 
 def clean_empty_tail(_list):
@@ -49,130 +56,233 @@ def parse_str(row):
     _str=[] ; hash_str={} ; col=0
     is_empty_cnt=0
 
-# def get_row_values(row):
-#     result=[]
-#     for r in row: result.ar.value
-        
-# def get_hash_fields():
-#     result={}
-#     fields=[
-
-#         {'name':'doc_number','description':'Номер документа'},
-#         {'name':'date','description':'Дата'},
-
-#         {'name':'time','description':'Время'},
-#         {'name':'comment','description':'Комментарий'},
-#         {'name':'contragent','description':'Контрагент'},
-#         {'name':'inn','description':'ИНН'},
-#         {'name':'dogovor','description':'Договор'},
-#         {'name':'calc_np','description':'УчитыватьНП'},
-#         {'name':'calc_avance','description':'Зачитывать аванс'},
-#         {'name':'kurs','description':'Курс'},
-#         {'name':'var_nalog','description':'ВариантРасчетаНалогов'},
-#         {'name':'service_type','description':'Тип услуги'},
-#         {'name':'treb','description':'Зачет взаимных требований'},
-#         {'name':'version_object','description':'Версия объекта'},
-#         {'name':'num_page','description':'№ стр.'},
-#         {'name':'type_price','description':'Тип цен'},
-#         {'name':'other_income','description':'Статья прочих доходов'},
-#         {'name':'nds','description':'НДС'},
-#         {'name':'total','description':'Всего'},
-#         {'name':'service','description':'Услуга'},
-#         {'name':'cnt','description':'Количество'},
-#         {'name':'price','description':'Цена'},
-#         {'name':'summa','description':'Сумма'},
-#         {'name':'np','description':'НП'},
-#     ]
-#     idx=0
-#     for f in fields:
-#         result[idx]=f['name']
-#         idx+=1
-
-#     return result
 
 
-def go_parse(**xarg):
-    errors=[]
-    filename=xarg.get('filename')
-    tmp_dir=xarg.get('tmp_dir')
-    full_path=f"{tmp_dir}/{filename}"
+async def go_parse(**xarg):
+    errors = []
+    filename = xarg.get('filename')
+    tmp_dir = xarg.get('tmp_dir')
+    full_path = f"{tmp_dir}/{filename}"
 
-    #file_path=xarg.get('file')
-    hash_fields=xarg.get('hash_fields')
-    loopback=xarg.get('loopback')
-    beore_loopback=xarg.get('loopback')
-    data_line_number=xarg.get('data_line_number')
-    limit=xarg.get('limit')
+    hash_fields = xarg.get('hash_fields')
+    loopback = xarg.get('loopback')
+    before_loopback = xarg.get('before_loopback')  # исправил опечатку: beore -> before
+    data_line_number = xarg.get('data_line_number')
+    limit = xarg.get('limit')
+
+    # Определение расширения файла
+    ext = os.path.splitext(filename)[1].lower()
+
+    if ext not in ['.xls', '.xlsx', '.csv']:
+        return print_error(f"Неподдерживаемое расширение файла: {ext}")
+
+    # Чтение данных в виде строк (генератороподобно)
     try:
-        workbook = xlrd.open_workbook(full_path)
-        sh = workbook.sheet_by_index(0)
-        
+        if ext == '.xls':
+            workbook = xlrd.open_workbook(full_path)
+            sh = workbook.sheet_by_index(0)
+            rows = (sh.row(row_idx) for row_idx in range(sh.nrows))
+        elif ext == '.xlsx':
+            wb = load_workbook(full_path, read_only=True)
+            sh = wb.active
+            rows = sh.iter_rows(values_only=True)
+        elif ext == '.csv':
+            def open_csv():
+                encodings = ['utf-8', 'cp1251', 'latin1']
+                for enc in encodings:
+                    try:
+                        f = open(full_path, 'r', encoding=enc, newline='')
+                        sample = f.read(1024)
+                        f.close()
+                        f = open(full_path, 'r', encoding=enc, newline='')
+                        return f, enc
+                    except UnicodeDecodeError:
+                        continue
+                raise Exception("Не удалось определить кодировку CSV")
+            
+            file_obj, encoding = open_csv()
+            # Указываем разделитель вручную
+            reader = csv.reader(file_obj, delimiter=';')
+            rows = reader
+        else:
+            return print_error("Логика не должна доходить до сюда")
     except Exception as e:
         return print_error(f"Ошибка при чтении файла {str(e)} (go_parse)")
-    
-    # Номер строки в наборе данных, который мы получаем
-    line_number=0 
-    data=[]
-    cnt_empty_str=0
 
-    for row_index in range(sh.nrows):
-        if data_line_number and line_number<data_line_number:
-            line_number+=1
-            continue
+    # Переменные состояния
+    line_number = 0
+    data = []
+    cnt_empty_str = 0
+    inserted_records = 0
+    updated_records = 0
 
-        row = sh.row(row_index)
-        hash_str={}
-        _str=[]
-        col=0
-        for r in row:
-            v=str(r.value)
+    try:
+        for row in rows:
+            #print('row:\n',row)
+            # Пропуск строк до data_line_number
+            if data_line_number and line_number < data_line_number:
+                line_number += 1
+                continue
 
-            if hash_fields:
-                # при load-е
-                if name:=hash_fields.get(col): hash_str[name]=v
+            # Преобразуем строку в список значений
+            if ext in ['.xls']:
+                values = [str(cell.value) for cell in row]
+            elif ext == '.xlsx':
+                values = [str(cell) if cell is not None else '' for cell in row]
+            elif ext == '.csv':
+                values = [str(cell) if cell is not None else '' for cell in row]
+
+            # Формируем hash_str или _str
+            hash_str = {}
+            _str = []
+
+            for col, v in enumerate(values):
+                #v=v.replace('№','&#8470;')
+                if hash_fields:
+                    if name := hash_fields.get(col):
+                        hash_str[name] = v
+                else:
+                    _str.append(v)
+
+            # Логика обработки
+            if loopback:
+                # Проверка на пустую строку
+                if is_empty_xls_str(hash_str):
+                    cnt_empty_str += 1
+                else:
+                    cnt_empty_str = 0
+
+                # Вызов before_loopback, если задан
+                if before_loopback:
+                    before_loopback(hash_str)
+
+                operation = await loopback(hash_str)
+                if operation == 'update':
+                    updated_records += 1
+                elif operation == 'insert':
+                    inserted_records += 1
+
             else:
-                # при preload-е
-                _str.append(v)
-            
-            col+=1
-        #print('str:',_str)
-        if loopback:
-            # Loopback
-            if is_empty_xls_str(hash_str):
-                cnt_empty_str+=1
-            #else:
-                #if before_loopback:
-                #    before_loopback(hash_str)
-                #print('hash_str:',hash_str)
-            loopback(hash_str)
+                _str = clean_empty_tail(_str)
+                data.append(_str)
 
-        else:
-            _str=clean_empty_tail(_str)
-            data.append(_str)
-        
-        if cnt_empty_str>20:
-            break
-        
-        line_number+=1
-        if limit and line_number>=limit:
-            break
+            # Прерывание при большом количестве пустых строк
+            if cnt_empty_str > 20:
+                print('is_empty str > 20')
+                break
+
+            line_number += 1
+            if limit and line_number >= limit:
+                print('limit: ', limit)
+                break
+
+    except Exception as e:
+        return print_error(f"Ошибка при обработке строки: {str(e)}")
+    finally:
+        # Закрытие файла, если это CSV
+        if ext == '.csv' and 'file_obj' in locals():
+            file_obj.close()
+
+    message = f"Добавлено записей: {inserted_records}<br>Обновлено записей: {updated_records}"
+
     return {
-        'success':(True,False)[len(errors)>0],
-        'errors':errors,
-        'loaded_filename':filename,
-        'data':data
+        'success': len(errors) == 0,
+        'errors': errors,
+        'loaded_filename': filename,
+        'data': data,
+        'message': message
     }
+# Закомментировал 26.08.2025
+# async def go_parse(**xarg):
+#     errors=[]
+#     filename=xarg.get('filename')
+#     tmp_dir=xarg.get('tmp_dir')
+#     full_path=f"{tmp_dir}/{filename}"
 
-    #dt=df.to_dict(orient='records')
-    #dt=df.tolist()
-    #print('df:',df)
-    idx=0
-    #for o in df:
-    #   print(o)
-    #   data.append(o)
+#     #file_path=xarg.get('file')
+#     hash_fields=xarg.get('hash_fields')
+#     loopback=xarg.get('loopback')
+#     beore_loopback=xarg.get('loopback')
+#     data_line_number=xarg.get('data_line_number')
+#     limit=xarg.get('limit')
+#     try:
+#         workbook = xlrd.open_workbook(full_path)
+#         sh = workbook.sheet_by_index(0)
+        
+#     except Exception as e:
+#         return print_error(f"Ошибка при чтении файла {str(e)} (go_parse)")
+    
+#     # Номер строки в наборе данных, который мы получаем
+#     line_number=0 
+#     data=[]
+#     cnt_empty_str=0
+#     inserted_records=0
+#     updated_records=0
+#     for row_index in range(sh.nrows):
+#         if data_line_number and line_number<data_line_number:
+#             line_number+=1
+#             continue
 
-    #   idx+=1
-    #   if limit and idx>limit:
-    #       break
+#         row = sh.row(row_index)
+#         hash_str={}
+#         _str=[]
+#         col=0
+#         for r in row:
+#             v=str(r.value)
+
+#             if hash_fields:
+#                 # при load-е
+#                 if name:=hash_fields.get(col): hash_str[name]=v
+#             else:
+#                 # при preload-е
+#                 _str.append(v)
+            
+#             col+=1
+#         print('str:',hash_str)
+#         if loopback:
+#             # Loopback
+#             if is_empty_xls_str(hash_str):
+#                 print('is_empty:',hash_str)
+#                 cnt_empty_str+=1
+#             else:
+#                 cnt_empty_str=0
+#             #else:
+#                 #if before_loopback:
+#                 #    before_loopback(hash_str)
+#                 #print('hash_str:',hash_str)
+#             operation=await loopback(hash_str)
+#             if operation=='update':
+#                 updated_records+=1
+#             elif operation=='insert':
+#                 inserted_records+=1
+
+
+#         else:
+#             _str=clean_empty_tail(_str)
+#             data.append(_str)
+        
+#         if cnt_empty_str>20:
+#             print('is_empty str > 20')
+#             break
+        
+#         line_number+=1
+#         if limit and line_number>=limit:
+#             print('limit: ',limit)
+#             break
+
+#     message=''
+#     if inserted_records or updated_records:
+#         message=f"Добавлено записей: {inserted_records}<br>Обновлено записей: {updated_records}"
+
+#     return {
+#         'success':(True,False)[len(errors)>0],
+#         'errors':errors,
+#         'loaded_filename':filename,
+#         'data':data,
+#         'message':f"Добавлено записей: {inserted_records}<br>Обновлено записей: {updated_records}"
+#     }
+
+#     idx=0
+
 
 

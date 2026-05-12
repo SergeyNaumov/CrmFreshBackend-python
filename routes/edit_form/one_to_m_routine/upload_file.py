@@ -3,18 +3,12 @@ from lib.get_1_to_m_data import get_1_to_m_data
 from lib.resize import resize_one
 import shutil,os
 
-def upload_file(form,field,arg):
+async def upload_file(form,field,arg):
   child_field_name=arg['child_field_name']
   child_field=get_child_field(field,child_field_name)
   if not child_field:
     form.errors.append(f'не найдено поле {child_field_name} в {field["name"]} обратитесь к разработчику')
   
-
-  #if form.success():
-
-  
-
-
   # сохраняем файл
   if form.success():
     attach=arg['attach']
@@ -60,7 +54,7 @@ def upload_file(form,field,arg):
     
     if arg['one_to_m_id']:
 
-        oldfile=form.db.query(
+        oldfile = await form.db.query(
           query=f'SELECT {child_field["name"]} from {field["table"]} WHERE {field["foreign_key"]}=%s and {field["table_id"]}=%s',
           values=[form.id,arg["one_to_m_id"] ],
           onevalue=1,
@@ -82,19 +76,20 @@ def upload_file(form,field,arg):
         save_data={
           child_field['name']: db_value
         }
-        if field.get('sort'):
-          save_data['sort']=form.db.query(
-            query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
-            onevalue=1
-          )
-          if save_data['sort']:
-            save_data['sort']+=10
-          else:
-            save_data['sort']=1
+        # Убрал, потому что при обновлении файла запись улетала в конец
+        # if field.get('sort'):
+        #   save_data['sort'] = await form.db.query(
+        #     query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
+        #     onevalue=1
+        #   )
+          # if save_data['sort']:
+          #   save_data['sort']+=10
+          # else:
+          #   save_data['sort']=1
 
 
 
-        form.db.save(
+        await form.db.save(
           table=field['table'],
           update=1,
           where=f'{field["foreign_key"]}={form.id} and {field["table_id"]}={arg["one_to_m_id"]}',
@@ -104,9 +99,9 @@ def upload_file(form,field,arg):
         # Сделать ресайз!
         if form.success():
           field['_id']=arg["one_to_m_id"]
-          form.run_event('after_update_code',{'field':field})
-          form.run_event('after_save_code',{'field':field})
-        get_1_to_m_data(form,field)
+          await form.run_event('after_update_code',{'field':field})
+          await form.run_event('after_save_code',{'field':field})
+        await get_1_to_m_data(form,field)
         return {
           'success':form.success(),
           'errors':form.errors,
@@ -124,7 +119,7 @@ def upload_file(form,field,arg):
             child_field_name:db_value
         }
         if field.get('sort'):
-          save_data['sort']=form.db.query(
+          save_data['sort'] = await form.db.query(
             query=f"select sort from {field['table']} WHERE {field['foreign_key']}={form.id} order by sort desc limit 1",
             onevalue=1
           )
@@ -134,12 +129,11 @@ def upload_file(form,field,arg):
             save_data['sort']=1
 
 
-        print('sort:',field.get('sort'))
 
-        id = form.db.save(
+
+        id = await form.db.save(
           table=field['table'],
           data=save_data,
-          debug=1
         )
 
         # value={
@@ -150,10 +144,10 @@ def upload_file(form,field,arg):
         # }
 
         if form.success():
-          form.run_event('after_update_code',{'field':field})
-          form.run_event('after_save_code',{'field':field})
+          await form.run_event('after_update_code',{'field':field})
+          await form.run_event('after_save_code',{'field':field})
 
-        get_1_to_m_data(form,field,id)
+        await get_1_to_m_data(form,field,id)
         values=field['values']
 
         return {

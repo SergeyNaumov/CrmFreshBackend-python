@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request
 from lib.all_configs import read_config
 
 
@@ -12,6 +12,7 @@ router = APIRouter()
 @router.get('/{config}/{id}')
 async def process_page(config:str,id:int,referer:str): # 
   form=read_config(
+    request=request,
     action='',
     config=config,
     id=id,

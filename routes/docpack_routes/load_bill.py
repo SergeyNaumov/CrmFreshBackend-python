@@ -1,12 +1,22 @@
-from db import db
+from db import get_db
 import os.path 
 from fastapi.responses import HTMLResponse
 from .check_document_data import check_dogovor, out_debug
 from .num_to_text import num_to_text
 from .response_doc import response_doc
 
-def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
-	dp = db.query(
+async def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
+	db=get_db()
+	docpack = await db.query(query='SELECT * FROM docpack WHERE id = %s', values=[docpack_id], onerow=1)
+
+	buhgalter_card_id = docpack.get('buhgalter_card_requisits_id', 0)
+	if not (buhgalter_card_id):
+		buhgalter_card_id = await db.query(
+			query="select id from buhgalter_card_requisits where user_id=%s",
+			values=[docpack['user_id']], onevalue=1
+		) or 0
+
+	dp = await db.query(
 		query=f'''
 			SELECT
 				bcr.*,
@@ -16,8 +26,8 @@ def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
 				t.summ tarif_summ, t.cnt_orders tarif_cnt_orders,
 				t.count_days tarif_count_days, t.percent_pob, t.comment tarif_comment,
 				b_bill.header b_bill_header,
-				b_bill.attach bill_blank, b_bill.id b_bill_id,
-
+				if(ur_lico.with_nds,b_bill2.attach,b_bill.attach) bill_blank, b_bill.id b_bill_id,
+				ur_lico.with_nds,
 				dp.registered dp_registered, dp.id dp_id, dp.tarif_id,
 				ur_lico.firm ur_lico_firm, ur_lico.gen_dir_fio_im ur_lico_gen_dir_fio_im, ur_lico.gen_dir_fio_rod ur_lico_gen_dir_fio_rod,
 				ur_lico.buh_fio_im ur_lico_buh_fio_im, ur_lico.buh_fio_rod ur_lico_buh_fio_rod, ur_lico.inn ur_lico_inn, ur_lico.ogrn ur_lico_ogrn,
@@ -31,15 +41,16 @@ def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
 				DATE_FORMAT(b.registered,%s) bill_from, b.summ bill_summ
 			FROM
 				user u 
-				LEFT JOIN buhgalter_card_requisits bcr ON bcr.user_id = u.id
+				LEFT JOIN buhgalter_card_requisits bcr ON bcr.user_id = u.id and bcr.id={buhgalter_card_id}
 				LEFT JOIN manager m ON (u.manager_id =m.id)
 				JOIN docpack dp ON dp.user_id = u.id
 				JOIN bill b ON b.docpack_id = dp.id
 				LEFT JOIN dogovor  ON (dp.id=dogovor.docpack_id)
 				LEFT JOIN tarif t ON (t.id = dp.tarif_id)
 				LEFT JOIN blank_document b_bill ON (b_bill.id = t.blank_bill_id)
+				LEFT JOIN blank_document b_bill2 ON (b_bill2.id = t.blank_bill_id2)
 				LEFT JOIN ur_lico ON (ur_lico.id=dp.ur_lico_id)
-			WHERE dp.id = %s and b.id=%s GROUP BY u.id ORDER BY bcr.main LIMIT 1
+			WHERE dp.id = %s and b.id=%s LIMIT 1
 		''', 
 		#debug=1,
 		values=['%e %M %Y', '%e %M %Y', docpack_id, bill_id],onerow=1
@@ -65,6 +76,18 @@ def load_bill(docpack_id,bill_id,ext:str,need_print: int, debug=0):
 			Бланк счёта: <a href="/edit_form/blank_document/{dp['b_bill_id']}">{dp['b_bill_header']}</a><br>
 		'''
 		return HTMLResponse(message)
+
+	if dp['with_nds']:
+	    nds_percent = 5
+	    bill_summ = float(dp['bill_summ'])
+	    bill_summ_without_nds = round(bill_summ / (1 + nds_percent / 100), 2)
+	    summ_nds = round(bill_summ - bill_summ_without_nds, 2)  # ← вот здесь!
+
+	    dp['bill_summ_without_nds'] = bill_summ_without_nds
+	    dp['summ_nds'] = summ_nds
+
+
+
 
 	for a in ('ur_lico_gendir_podp', 'ur_lico_buh_podp', 'ur_lico_attach_pechat'):
 		if dp[a]: dp[a]=f'./files/ur_lico/{dp[a]}'

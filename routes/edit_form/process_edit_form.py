@@ -2,20 +2,20 @@ from lib.all_configs import read_config
 from lib.core import exists_arg, random_filename
 
 import re 
-def form_update_or_insert(form):
+async def form_update_or_insert(form):
 
     if form.read_only:
       form.errors.append('Вам запрещено сохранять изменения')
     else:
       if form.action=='update':
-          form.run_event('before_update')
+          await form.run_event('before_update')
       if form.action=='insert':
-          form.run_event('before_insert')
+          await form.run_event('before_insert')
       if form.action in ('insert','update'):
-          form.run_event('before_save')
+          await form.run_event('before_save')
       
       if not len(form.errors):
-        form.save()
+        await form.save()
 
     return {
       'success':form.success(),
@@ -24,7 +24,7 @@ def form_update_or_insert(form):
       'id':form.id
     }
 
-def process_edit_form(**arg):
+async def process_edit_form(**arg):
   action=arg['action']
   config=arg['config']
   R=arg['R']
@@ -34,7 +34,8 @@ def process_edit_form(**arg):
     values=R['values']
   if 'id' not in arg: arg['id']=''
   
-  form=read_config(
+  form = await read_config(
+    request=arg['request'],
     action=action,
     config=config,
     id=arg['id'],
@@ -42,7 +43,6 @@ def process_edit_form(**arg):
     values=values,
     script='edit_form'
   )
-
   if hasattr(form, 'response') and form.response:
     return form.response
   
@@ -57,43 +57,31 @@ def process_edit_form(**arg):
 
   form.fields=need_fields
 
-
-
-  
-  #print("\nField:\n",field)
-  #if len(form.errors): return form
-  
   if form.not_create and form.action in ['insert','new']:
     form.read_only=1
   
   if form.action == 'insert' and form.not_create:
     form.errors.append('Вам запрещено создавать новые записи')
   
-  #form.set_orig_types() # уже есть в all_configs.read_config
-  
-  # Перенёс в .lib.all_configs.read_form
-  #form.run_event('permissions')
-  
-  #form.get_values()
-  #form.run_all_before_code()
+
   
   if form.action in ['update','insert']:
     form.new_values=values
     form.check() # проверяем все поля в new_values
-    return form_update_or_insert(form)
+    return await form_update_or_insert(form)
   
   elif form.action == 'delete_file':
-    return form.DeleteFile()
+    return await form.DeleteFile()
   
   elif form.action == 'upload_file':
-    return form.UploadFile()
+    return await form.UploadFile()
     
   else:
     if form.action in ['new','edit']:
       if len(form.errors): form.read_only=1
     
     
-    form.edit_form_process_fields()
+    await form.edit_form_process_fields()
 
     return {
       'action':form.action,

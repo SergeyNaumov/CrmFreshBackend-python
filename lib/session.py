@@ -1,13 +1,15 @@
 from lib.core import exists_arg, gen_pas, join_ids
-from db import db,db_read,db_write
+from db import get_db
 from config import config
 from base64 import b64decode
 
 def session_project_create(s): # создание сессии для проекта
     pass
 
-def session_create(s,**arg):
+async def session_create(s,**arg):
+  request=arg['request']
 
+  db=get_db()
   errors=[]
   if not(exists_arg('login',arg)):
     arg['login']='adminX' # $R->{login}
@@ -47,7 +49,7 @@ def session_create(s,**arg):
       add_where += ' AND '+arg['where']
 
   if exists_arg('max_fails_login',auth) and exists_arg('max_fails_login_interval',auth):
-      fails=db.query(
+      fails=await db.query(
         query=f'select count(*) from {auth["session_fails_table"]} where login=%s and registered>=now() - interval %s second',
         values=[arg['login'],auth['max_fails_login_interval']],
         onevalue=True,
@@ -58,7 +60,7 @@ def session_create(s,**arg):
   
   # проверяем, сколько было попыток зайти с данного ip под данным паролем
   if exists_arg('max_fails_ip',auth) and exists_arg('max_fails_login_interval',auth):
-      fails=s.db.query(
+      fails=await s.db.query(
         query=f'select count(*) from {auth["session_fails_table"]} where ip=%s and registered>=now() - interval %s second',
         values=[arg['ip'],auth['max_fails_ip_interval']],
         onevalue=True,
@@ -70,35 +72,40 @@ def session_create(s,**arg):
   
 
   auth_id=None
-
+  #print('auth:',auth)
   if auth['encrypt_method']=='mysql_sha2':
-      auth_id=s.db.query(
+      auth_id=await s.db.query(
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=sha2(%s,256)'+add_where,
         values=[arg['login'],arg['password']],
+        #debug=1,
         onevalue=True,
       )
+      #print('auth_id:',auth_id)
   elif auth['encrypt_method']=='mysql_encrypt':
-      auth_id=s.db.query(
+      auth_id=await s.db.query(
         query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=encrypt(%s,password)'+add_where,
         values=[arg['login'],arg['password']],
         onevalue=True,
       )
   else:
-      auth_id=s.db.query(
+      auth_id=await s.db.query(
           query="SELECT "+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=%s '+add_where,
           values=[arg['login'], arg['password']],
           onevalue=True
       );
   
   if auth_id:
-    s.manager={
+    request.state.manager={
       'id':auth_id,
       'login':arg['login']
     }
 
     key=gen_pas(200)
+    await db.query(
+      query=f"delete from {auth['session_table']} where auth_id={auth_id}"
+    )
 
-    db.save(
+    await db.save(
       table=auth['session_table'],
       data={
         'auth_id':auth_id,
@@ -106,8 +113,10 @@ def session_create(s,**arg):
       },
       errors=errors
     )
-    s.set_cookie(name='auth_user_id',value=auth_id)
-    s.set_cookie(name='auth_key',value=key)
+    #s.set_cookie(name='auth_user_id',value=auth_id)
+    #s.set_cookie(name='auth_key',value=key)
+    request.state.cookies['auth_user_id']=auth_id
+    request.state.cookies['auth_key']=key
   else:
     errors.append('авторизационные данные неверны')
 
@@ -117,10 +126,10 @@ def session_create(s,**arg):
     'errors':errors
   }
 
-def session_start(s,**arg):
-  
-  user_id=s.get_cookie('auth_user_id')
-  key=s.get_cookie('auth_key')
+async def session_start(s,**arg):
+  request=arg.get('request')
+  user_id=request.cookies.get('auth_user_id') #s.get_cookie('auth_user_id')
+  key=request.cookies.get('auth_key')
   session_table='session'
   auth=config['auth']
   if 'session_table' in auth:
@@ -136,7 +145,7 @@ def session_start(s,**arg):
   manager={'login':'','id':False, 'password':''}
   
 
-
+  #print('auth:', auth)
   if  exists_arg('type',auth) and auth['type']=='env':
     if 'authorization' in s.env:
       auth=s.env['authorization']
@@ -145,8 +154,8 @@ def session_start(s,**arg):
       log=log_pas[0]
       
       if 'remote_user' in s.env:
-        m=s.db.query(
-          query=f"select *,{auth['manager_table_id']} id from {auth['manager_table']} WHERE {auth['login_field']} = %s ",
+        m=await s.db.query(
+          query=f"select *,{auth['manager_table_id']} id from {auth['manager_table']} WHERE gone=0 and {auth['login_field']} = %s ",
           values=[log],
           onerow=1,
         )
@@ -160,26 +169,29 @@ def session_start(s,**arg):
         manager_table='project_manager'
 
       
-      ok=s.db.query(
+      ok=await s.db.query(
         query=f'SELECT count(*) FROM {auth["session_table"]} WHERE auth_id=%s and session_key=%s',
         values=[user_id, key],
         onevalue=1,
+        #debug=1,
         errors=errors
       )
+      #print('ok:',ok)
       if ok:
-          manager=s.db.query(
-            query=f'select *,{auth["manager_table_id"]} id from {auth["manager_table"]} where {auth["manager_table_id"]}=%s',
+          manager=await s.db.query(
+            query=f'select *,{auth["manager_table_id"]} id from {auth["manager_table"]} where gone=0 and {auth["manager_table_id"]}=%s',
             values=[user_id],
             onerow=1,errors=errors
           );
 
-          print('manager:',manager)
+          #print('manager:',manager)
 
   if manager:
   #  manager['id']=str(manager['id'])
     
     del manager['password']
-    s.manager=manager
+    #request.state.manager=s.manager=manager
+    request.state.manager=manager
       
   s._content={
     'success':1,
@@ -193,30 +205,30 @@ def session_start(s,**arg):
   else:
     #s._content['redirect']=''
     s._content['redirect']=config['BaseUrl']+'/login'
-    
+    s._content['errors'].append('Вы не авторизованы')
     #s._content['referer']=s.request
     s._content['success']=0
     s.end()
 
-def session_logout(s):
+async def session_logout(s):
   user_id=s.get_cookie('auth_user_id')
   key=s.get_cookie('auth_key')
   if user_id and user_id.isdigit() and int(user_id) and key :
       if config['use_project']:
-        s.db.query(
+        await s.db.query(
           query='DELETE FROM project_session WHERE auth_id=%s and session_key=%s',
           values=[user_id,key]
         )
       else:
-          s.db.query(
+          await s.db.query(
             query='DELETE FROM session WHERE auth_id=%s and session_key=%s',
             values=[user_id,key]
           )
 
 
 
-def project_get_permissions_for(form,login):
-  manager=form.db.query(
+async def project_get_permissions_for(form,login):
+  manager=await form.db.query(
       query="""
         SELECT 
           m.*,
@@ -235,7 +247,7 @@ def project_get_permissions_for(form,login):
   )
   del manager['password']
 
-def child_groups(db,group_id):
+async def child_groups(db,group_id):
   if not len(group_id):
     return []
 
@@ -248,13 +260,13 @@ def child_groups(db,group_id):
   #j=0
   #for g in group_id:
   #  group_id[j]=group_id[j]
-  g_list=db.query(
+  g_list=await db.query(
     query=f"SELECT id from {group_table} where parent_id IN ({join_ids(group_id)})"
   )
   #print('g_list:',g_list)
   for g1 in g_list:
     g1['id']=int(g1['id'])
-    for g2 in child_groups(db,[g1['id']]):
+    for g2 in await child_groups(db,[g1['id']]):
       #print('g2:',[int(g2)])
       group_id.append(int(g2))
   #print('group_id:',group_id)
@@ -263,8 +275,9 @@ def child_groups(db,group_id):
 
 
 
-def get_permissions_for(form,login):
-  manager=form.db.query(
+async def get_permissions_for(form,login):
+
+  manager=await form.db.query(
     query="""
         SELECT 
           m.*,
@@ -277,14 +290,15 @@ def get_permissions_for(form,login):
           LEFT JOIN manager ow ON (mg.owner_id = ow.id) 
         WHERE m.login = %s
     """,
+    #debug=1,
     values=[login],onerow=1,log=form.log
   )
+  #print('manager:',manager)
   #manager['id']=str(manager['id'])
-  
   if manager and manager['password']:
     del manager['password']
   
-  permissions_list=form.db.query(
+  permissions_list=await form.db.query(
     query='''
       SELECT 
         p.pname, mp.permissions_id id
@@ -293,17 +307,19 @@ def get_permissions_for(form,login):
         LEFT JOIN manager_permissions mp ON p.id = mp.permissions_id and mp.manager_id = %s
       order by p.pname
     ''',
-    #debug=1,
+
     values=[manager['id']]
   );
+
   manager['permissions']={};
   for p in permissions_list:
       manager['permissions'][p['pname']]=p['id']
 
   manager['CHILD_GROUPS_HASH']={}
+
   if manager['group_id']:
     group_id=int(manager['group_id'])
-    gr_perm_list=form.db.query(
+    gr_perm_list=await form.db.query(
       query="""
         SELECT
           p.id, p.pname
@@ -317,12 +333,10 @@ def get_permissions_for(form,login):
     for p in gr_perm_list:
         manager['permissions'][p['pname']]=p['id']
     
-    
-    manager['CHILD_GROUPS']=child_groups(form.db,[group_id])
+    manager['CHILD_GROUPS'] = await child_groups(form.db,[group_id])
 
     for g_id in manager['CHILD_GROUPS']:
         manager['CHILD_GROUPS_HASH'][int(g_id)]=1
-    print('CHILD_GROUPS_HASH:',manager['CHILD_GROUPS_HASH'])
   manager['files_dir']='./files'
   manager['files_dir_web']='/files'
   return manager

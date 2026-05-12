@@ -3,13 +3,13 @@ from base64 import b64encode, b64decode
 from lib.core import exists_arg, del_file_and_resizes,get_name_and_ext, random_filename
 #from lib.resize import resize_all
 
-def save_base64_file(**arg):
+async def save_base64_file(**arg):
 
     # убиваем существующий файл, если он есть:
     if exists_arg('field',arg) and exists_arg('form',arg) and exists_arg('id',arg):
       form=arg['form']
       field=arg['field']
-      exists=form.db.query(
+      exists = await form.db.query(
         query=f'SELECT {field["name"]} from {form.work_table} where {form.work_table_id}={arg["id"]}',
         onevalue=1
 
@@ -119,12 +119,12 @@ def save_base64_file(**arg):
             filename+=';'+arg['orig_name']
 
           elif exists_arg('keep_orig_filename_in_field',field):
-            form.db.query(
+            await form.db.query(
               query=f'UPDATE {arg["table"]} SET {field["name"]}=%s, {field["keep_orig_filename_in_field"]}=%s where {form.work_table_id}=%s',
               values=[filename,arg['orig_name'],arg['id']]
             )
 
-          form.db.query(
+          await form.db.query(
             query=f'UPDATE {arg["table"]} SET {field["name"]}=%s where {form.work_table_id}=%s',
             errors=form.errors,
             values=[filename,arg['id']],

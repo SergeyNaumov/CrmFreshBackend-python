@@ -1,32 +1,33 @@
 from lib.core import cur_year,cur_date, exists_arg
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from config import config
 
-from lib.engine import s
+#from lib.engine import s
 #from lib.run_event import run_event
 from lib.all_configs import read_config
 from .get_result.process_result_list import process_result_list
 from .get_result.gen_query_search import gen_query_search
-import math
+import math, traceback
+
 
 router = APIRouter()
 #def get_search_tables(form):
 
 @router.post('/get-result')
-async def get_result(R: dict):
+async def get_result(R: dict, request: Request):
+  s = request.state.engine
   try:
-      form=read_config(
+      form=await read_config(
+        request=request,
         R=R,
         config=R['config'],
         script='find_objects'
       )
-
       if exists_arg('page',R):
         page=str(R['page'])
         if page.isnumeric(): form.page=page
       else:
         page=1
-
 
         #form.pre(f)
 
@@ -40,7 +41,7 @@ async def get_result(R: dict):
 
       if form.GROUP_BY:
         form.query_search['GROUP'].append(form.GROUP_BY)
-      
+
       form.SEARCH_RESULT={
         'log':form.log,
         'config':form.config,
@@ -58,25 +59,19 @@ async def get_result(R: dict):
         form.query_search['on_filters_hash'][values[0]]=values[1]
 
       
-      # 
-
-
-
-
       # если требуется подменить фильтры
-      form.run_event('before_search_tables')
+      await form.run_event('before_search_tables')
 
-      form.get_search_tables(R['query'])
-      
-      form.get_search_where(R['query'])
-
-      form.run_event('before_search')
-      form.run_event('before_search_mysql',
+      await form.get_search_tables(R['query'])
+      await form.get_search_where(R['query'])
+      await form.run_event('before_search')
+      await form.run_event('before_search_mysql',
         {
           'tables':' '.join(form.query_search['TABLES']),
           'where':' AND '.join(form.query_search['WHERE'])
         }
       )
+
 
       #   event=form.events[],
       #   description='events->before_search_mysql',
@@ -90,7 +85,7 @@ async def get_result(R: dict):
       
       #print('query:',query,"\n\nquery_count:",query_count)
       if query_count:
-        total_count=form.db.query(
+        total_count=await form.db.query(
           query='select sum(cnt) from ('+query_count+') x',
           onevalue=1,
           values=form.query_search['VALUES'],
@@ -101,7 +96,7 @@ async def get_result(R: dict):
           total_count=int(total_count)
         else:
           total_count=0
-        
+
         form.SEARCH_RESULT['count_total']=total_count
         
         
@@ -122,28 +117,21 @@ async def get_result(R: dict):
         print('===')
         print(form.explain_query)
         print('===')
-      print('get_result_list')
-      result_list=form.db.query(
+
+      result_list=await form.db.query(
         query=query,
         #debug=1,
         values=form.query_search['VALUES'],
         errors=form.errors,
       )
       
-
-
       if len(form.errors):
         return {'success':0,'errors':form.errors}
-
-
-
-
-      output=process_result_list(form,R,result_list)
-      #print('output:',output)
+      output=await process_result_list(form,R,result_list)
 
       form.SEARCH_RESULT['log']=form.log
       form.SEARCH_RESULT['output']=output
-      form.run_event('after_search')
+      await form.run_event('after_search')
       
       if form.plugin_output:
         return form.plugin_output
@@ -159,14 +147,12 @@ async def get_result(R: dict):
                   'out_after_search':form.out_after_search,
                   'explain_query':form.explain_query
           }
-          
-
-
 
       if len(form.errors):
         return {'success':0,'errors':form.errors}
 
       return form.SEARCH_RESULT
   except Exception as e:
-    form.errors.append(str(e))
+    err=traceback.format_exc()
+    form.errors.append(f"{err}")
     return {'success':False, 'errors':form.errors}

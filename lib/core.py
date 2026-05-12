@@ -1,5 +1,10 @@
 import random, re, time, datetime, os
 
+mon_list=('январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь')
+
+def get_mon_name(idx):
+  return mon_list[idx]
+
 def is_float(string):
     try:
         float(string)
@@ -36,13 +41,11 @@ def tree_to_list(tree_list,lst,level):
     if exists_arg('children',t) and len(t['children']):
       tree_to_list(t['children'],lst,level+1)
 
-def cur_year():
-  dat = datetime.date.today()
-  dat = dat + datetime.timedelta(days=0)
-  return dat.strftime("%Y")
 
 def exists_arg(key,dict):
   #print('dict:',key,dict)
+  if not dict:
+    return None
   # Сложная структура
   if isinstance(key,str):
     keys=key.split(';')
@@ -63,8 +66,22 @@ def exists_arg(key,dict):
 
 def gen_pas(length=8,letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678'):
   return ''.join(random.choice(letters) for i in range(length))
-  
+
+def cur_year():
+  dat = datetime.date.today()
+  dat = dat + datetime.timedelta(days=0)
+  return dat.strftime("%Y")
+
+def cur_hour():
+  now=datetime.datetime.now()
+  return now.hour
+ 
 def cur_date(delta=0,format="%Y-%m-%d"):
+  dat = datetime.date.today()
+  dat = dat + datetime.timedelta(days=delta)
+  return dat.strftime(format)
+
+def first_day_in_mon(delta=0,format="%Y-%m-01"):
   dat = datetime.date.today()
   dat = dat + datetime.timedelta(days=delta)
   return dat.strftime(format)
@@ -86,30 +103,57 @@ def get_func(f):
   return ''
 
 
+# def date_to_rus(d):
+#   d=str(d)
+#   rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
+#   if rez and rez[5]:
+#     return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
+#   elif rez:
+#     return f"{rez[4]}.{rez[3]}.{rez[2]}"
+#   return ''
 def date_to_rus(d):
-  d=str(d)
-  rez=re.search('^((\d{4})-(\d{2})-(\d{2}))( \d{2}:\d{2}:\d{2})?$',d)
-  if rez and rez[5]:
-    return f"{rez[4]}.{rez[3]}.{rez[2]} {rez[5]}"
-  elif rez:
-    return f"{rez[4]}.{rez[3]}.{rez[2]}"
-  return ''
-  # elif d:
-  #   date_list=d.split('-')
-  #   date_list.reverse()
-  #   return '.'.join(date_list)
+    if not d:
+        return ''
+    d = str(d)
+    # Пытаемся распарсить как ISO-формат (с миллисекундами и временной зоной)
+    try:
+        dt = datetime.datetime.fromisoformat(d.replace('Z', '+00:00'))
+        return dt.strftime("%d.%m.%Y %H:%M:%S") if dt.time() else dt.strftime("%d.%m.%Y")
+    except ValueError:
+        pass
+
+    # Регулярка для старых форматов (YYYY-MM-DD и YYYY-MM-DD HH:MM:SS)
+    rez = re.search(r'^(\d{4})-(\d{2})-(\d{2})(?:T|\s)?(\d{2}:\d{2}:\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?$', d)
+    if rez:
+        date_part = f"{rez.group(3)}.{rez.group(2)}.{rez.group(1)}"
+        time_part = f" {rez.group(4)}" if rez.group(4) else ""
+        return date_part + time_part
+
+    return ''
   
 
 
 def from_datetime_get_date(dt):
-  if not dt: return False
-  rez=re.search('^(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}(:\d{2})?)?$',dt)
-  if rez:
-    return rez[0]
-  else:
-    if rez:=re.search('^(\d{4}-\d{2}-\d{2}).*$',dt):
-      print('res: ',rez)
-      return rez[1]
+    if not dt:
+        return False
+
+    # Проверяем полный формат даты и времени с секундами
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})$', dt)
+    if rez:
+        return rez.group(0)  # Возвращаем полную строку без изменений
+
+    # Проверяем формат даты и времени без секунд
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})$', dt)
+    if rez:
+        return f"{rez.group(1)} {rez.group(2)}:00"  # Добавляем ":00" к времени
+
+    # Проверяем только дату (без времени)
+    rez = re.search(r'^(\d{4}-\d{2}-\d{2}).*$', dt)
+    if rez:
+        return rez.group(1)  # Возвращаем только дату
+
+    # Если ни одно из условий не выполнено
+    return False
 
 def create_fields_hash(form):
   form.fields_hash={}

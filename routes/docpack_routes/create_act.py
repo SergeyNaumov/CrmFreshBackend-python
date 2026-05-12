@@ -1,6 +1,6 @@
 from lib.core import exists_arg
 from .get_acts import get_acts
-def action_create_act(form,field,R):
+async def action_create_act(form,field,R):
   lst=[]
   summ=exists_arg('summ',R)
   #comment=exists_arg('comment',R)
@@ -17,7 +17,7 @@ def action_create_act(form,field,R):
   
 
   if form.success():
-      ur_lico_id=form.db.query(
+      ur_lico_id = await form.db.query(
         query="""
           SELECT
             dp.ur_lico_id
@@ -34,7 +34,7 @@ def action_create_act(form,field,R):
       if not(ur_lico_id):
         form.errors.append(f'не удалось определить юрлицо для счёта {bill_id}')
       else:
-        (number_today,number_act)=field['act_number_rule'](form, field,registered,ur_lico_id)
+        (number_today,number_act)=await field['act_number_rule'](form, field,registered,ur_lico_id)
 
 
         data={
@@ -49,10 +49,10 @@ def action_create_act(form,field,R):
 
 
 
-        form.db.save(
+        await form.db.save(
           table='act',
           data=data,
         );
-        lst=get_acts(form,field,R);
+        lst = await get_acts(form,field,R);
 
   return {'success':form.success(),'errors':form.errors, 'list':lst}

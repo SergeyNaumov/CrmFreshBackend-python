@@ -1,10 +1,10 @@
 from lib.core import exists_arg
-def get_role(db, manager_id: int):
+async def get_role(db, manager_id: int):
 
   manager_table='manager'
   manager_role_table='manager_role'
 
-  r=db.query(
+  r=await db.query(
     query="""
       SELECT
         m2.id
@@ -27,15 +27,19 @@ def get_triade(num):
 	else:
 		return num
 
-# получает словарь получателей, 
-def get_email_list_from_manager_id(db, to: dict):
+# получает словарь получателей,
+async def get_email_list_from_manager_id(db, to: dict):
+	if not(to) or not len(to):
+		return []
+
 	ids=[]
+
 	for manager_id in to:
 		ids.append(str(manager_id))
-	
+
 	if len(ids):
 		to_emails={}
-		for email in db.query(
+		for email in await db.query(
 			query=f'''
 				SELECT
 					me.email
@@ -43,11 +47,13 @@ def get_email_list_from_manager_id(db, to: dict):
 					manager m
 					join manager_email me ON me.manager_id=m.id
 				WHERE m.id in ({','.join(ids)}) and me.email<>''
+				GROUP BY me.manager_id
 			''',
 			massive=1
 		):
 			#print('email:',email)
-			to_emails[email]=True
+			if '@' in email:
+				to_emails[email]=True
 		#возвращает словарь email-ов их email-ов
 
 		return to_emails
@@ -55,38 +61,38 @@ def get_email_list_from_manager_id(db, to: dict):
 
 
 
-def child_groups(**arg):
+async def child_groups(**arg):
 	list_hash={}
 	db=arg['db']
 	if exists_arg('group_id',arg):
 		if isinstance(arg['group_id'], int):
 			list_hash[arg['group_id']]=1
 
-			_list=db.query(
+			_list = await db.query(
 				query='select id from manager_group where parent_id=%s',
 				values=[arg['group_id']],
 				massive=1
 			)
-			
+
 			for g in _list: list_hash[g]=1
 
 		else:
 			for g in arg['group_id']:
 				list_hash[g]=1
 				#print('g:',g)
-				_list=child_groups(db=arg['db'],group_id=g)
+				_list = await child_groups(db=arg['db'],group_id=g)
 				if _list:
 					for gl in _list:
 						list_hash[gl]=1
 	return list(list_hash.keys())
 
-def get_manager(**arg):
+async def get_manager(**arg):
 	where=[]
 	values=[]
 	if exists_arg('login',arg):
 		where.append('m.login=%s')
 		values.append(arg['login'])
-	
+
 	elif exists_arg('id',arg):
 		where.append(f'm.id={arg["id"]}')
 
@@ -115,7 +121,7 @@ def get_manager(**arg):
 	}
 
 	if exists_arg('errors',arg):
-		args_for_query['errors']=arg['errors']	
+		args_for_query['errors']=arg['errors']
 
 	if exists_arg('include_gone',arg):
 		manager_table='manager_full'
@@ -123,19 +129,19 @@ def get_manager(**arg):
 	#print('ERRORS:',errors, exists_arg('errors',arg), arg)
 	#quit()
 
-	m=db.query(
+	m = await db.query(
 		**args_for_query
 	)
-	
+
 	# Если не найден менеджер
 	if not(m) or not(m['id']): return None
 
 	# роль
 	if m and exists_arg('use_role',m) and m['current_role']:
-		m=get_manager(id=m['current_role'],db=arg['db'])
+		m=await get_manager(id=m['current_role'],db=arg['db'])
 
 	# руководитель?
-	m['owner']=db.query(
+	m['owner'] = await db.query(
 		query=f'SELECT id from manager_group where owner_id={m["id"]}',
 		onevalue=1
 	)
@@ -143,42 +149,57 @@ def get_manager(**arg):
 
 	if exists_arg('child_groups',arg) or exists_arg('use_role',arg):
 		if m['owner']:
-			m['CHILD_GROUPS']=child_groups(db=db,group_id=m['owner'])
+			m['CHILD_GROUPS'] = await child_groups(db=db,group_id=m['owner'])
 		elif m['group_id']:
-			m['CHILD_GROUPS']=child_groups(db=db,group_id=m['group_id'])
+			m['CHILD_GROUPS'] = await child_groups(db=db,group_id=m['group_id'])
 
 	# получаем права менеджера
-	if True and exists_arg('options_hash',arg):
+	if exists_arg('options_hash',arg):
 	    new_options={}
-	    for o in m['options'].split(';'):
-	      new_options[o]=1
-	    
+	    if m['options']:
+		    for o in m['options'].split(';'):
+		      new_options[o]=1
+
 	    m['options']=new_options
 
 	return m
 
-	
+async def get_group_options(**arg):
+	# get_group_options(db=db, group_id=ID)
+
+	if arg['group_id']:
+		result={}
+		_list = await arg['db'].query(
+			query="select p.pname from manager_group_permissions mgp join permissions p ON p.id=mgp.permissions_id where mgp.group_id=%s",
+			values=[arg['group_id']],
+			massive=1
+		)
+		for l in _list:
+			result[l]=True
+		return result
+	else:
+		return {}
 
 
 
 
-def get_owner(**arg):
+async def get_owner(**arg):
 	db=arg['db']
 	cur_manager=exists_arg('cur_manager',arg)
-	
-	if not(cur_manager) and arg['manager_id']:
-		cur_manager=get_manager(
+
+	if not(cur_manager) and arg.get('manager_id'):
+		cur_manager=await get_manager(
 			id=arg['manager_id'],
 			db=db,
 			include_gone=exists_arg('include_gone',arg)
 		)
-		
-	if cur_manager: 
+
+	if cur_manager:
 		path=f'{cur_manager["group_path"]}/{cur_manager["group_id"]}'
 		for group_id in list(reversed(path.split('/'))):
 
 			if not(group_id): next
-			r=db.query(
+			r=await db.query(
 				query=f'''
 					SELECT
 						m.id, m.name, m.group_id, m.phone, mg.id group_owner, me.email
@@ -194,10 +215,10 @@ def get_owner(**arg):
 				onerow=1
 			)
 			if r:
-				
+
 				if exists_arg('child_groups',arg) or exists_arg('child_groups_hash',arg):
 					r['CHILD_GROUPS']=child_groups(db=db,group_id=r['group_owner'])
-				
+
 				if exists_arg('child_groups_hash',arg) and len(r['CHILD_GROUPS']):
 					child_group_hash={}
 					for gr in r['CHILD_GROUPS']:
@@ -206,3 +227,71 @@ def get_owner(**arg):
 				return r
 	return None
 
+
+async def get_manager_email(db, manager_id):
+	email = await db.query(
+		query="select email from manager_email where manager_id=%s order by main desc limit 1",
+		values=[manager_id],
+		onevalue=1
+	)
+	if not email:
+		email = ''
+	return email
+
+
+async def format_sec_to_hours(seconds):
+	hours = seconds // 3600
+	minutes = (seconds % 3600) // 60
+	secs = seconds % 60
+	return f"{hours} ч. {minutes} м. {secs} с."
+
+
+async def get_numbers_for_bill(form,ur_lico_id):
+	prefix = await form.db.query(
+        query="select prefix from ur_lico where id=%s",
+        values=[ur_lico_id],
+        onevalue=1
+    )
+	item = await form.db.query(
+		query='''
+		SELECT
+			if(max(b.number_today),max(b.number_today)+1,1) number_today,
+			DATE_FORMAT(now(), %s) dat_bill
+		from
+			docpack dp
+			JOIN bill b ON b.docpack_id=dp.id
+		WHERE
+			dp.ur_lico_id=%s and b.registered=curdate()
+		''',
+		values=['%d%m%y',ur_lico_id],
+		onerow=1,
+    )
+	number_today=item['number_today']
+	dat_bill=item['dat_bill']
+
+	if prefix:
+		bill_number=f"{prefix}-{number_today}/{dat_bill}"
+	else:
+		bill_number=f"{number_today}/{dat_bill}"
+
+def select_from_table_perm(perm:str):
+  return f"""
+  select
+    m.id,m.name
+  FROM
+    manager m
+    join manager_permissions mp ON (mp.manager_id=m.id)
+    join permissions p ON (p.id=mp.permissions_id)
+  WHERE pname='{perm}'
+    UNION
+  select
+    m.id,m.name
+  FROM
+    manager m
+  	join manager_group_permissions mgp ON (mgp.group_id=m.group_id)
+  	join permissions p ON (p.id=mgp.permissions_id)
+          WHERE pname='{perm}'
+	"""
+
+async def select_managers_ids_from_perm(db,perm):
+	return [ row['id'] for row in await db.query( query=select_from_table_perm(perm),debug=0 ) ]

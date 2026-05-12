@@ -26,8 +26,19 @@ from .response_doc import response_doc
                 b.number bill_number,
                 DATE_FORMAT(b.registered,%s) bill_from, b.summ bill_summ
 """
-def load_act(act_id,ext:str,need_print: int, debug=0):
-    dp = db.query(
+async def load_act(act_id,ext:str,need_print: int, debug=0):
+    docpack = await db.query(
+        query='select * from docpack d left join bill b on d.id=b.docpack_id left join act a on a.bill_id=b.id where a.id=%s',
+        values=[act_id], onerow=1
+    )
+
+    buhgalter_card_id = docpack.get('buhgalter_card_requisits_id', 0)
+    if not (buhgalter_card_id):
+        buhgalter_card_id = await db.query(
+            query="select id from buhgalter_card_requisits where user_id=%s",
+            values=[docpack['user_id']], onevalue=1
+        ) or 0
+    dp = await db.query(
         query=f'''
             SELECT
                 bcr.*,
@@ -53,7 +64,7 @@ def load_act(act_id,ext:str,need_print: int, debug=0):
                 DATE_FORMAT(b.registered,%s) bill_from, b.summ bill_summ
             FROM
                 user u
-                LEFT JOIN buhgalter_card_requisits bcr ON bcr.user_id = u.id
+                LEFT JOIN buhgalter_card_requisits bcr ON bcr.user_id = u.id and bcr.id={buhgalter_card_id}
                 LEFT JOIN manager m ON (u.manager_id =m.id)
                 JOIN docpack dp ON dp.user_id = u.id
                 JOIN bill b ON b.docpack_id = dp.id
@@ -62,7 +73,7 @@ def load_act(act_id,ext:str,need_print: int, debug=0):
                 LEFT JOIN tarif t ON (t.id = dp.tarif_id)
                 LEFT JOIN blank_document b_act ON (b_act.id = t.blank_act_id)
                 LEFT JOIN ur_lico ON (ur_lico.id=dp.ur_lico_id)
-            WHERE a.id=%s GROUP BY u.id ORDER BY bcr.main LIMIT 1
+            WHERE a.id=%s GROUP BY u.id LIMIT 1
         ''',
         #debug=1,
         values=['%e %M %Y', '%e %M %Y', '%e %M %Y', act_id],onerow=1

@@ -1,8 +1,8 @@
 import importlib,os
 
-from lib.session import project_get_permissions_for, get_permissions_for
+from lib.session import project_get_permissions_for, get_permissions_for, session_start
 
-from lib.engine import s
+#from lib.engine import s
 from lib.core import exists_arg
 
 from config import config as sysconfig
@@ -19,8 +19,9 @@ def need_only_read(form):
 
   return False
 
-def get_cur_role(**arg):
+async def get_cur_role(**arg):
   form=arg['form']
+  s=form.s
   if(form.config == 'manager'):
     return arg['login']
   
@@ -30,7 +31,7 @@ def get_cur_role(**arg):
       manager_role_table='project_manager_role'
       manager_table='project_manager'
   
-  r=s.db.query(
+  r = await s.db.query(
     query="""
       SELECT
         m2.login
@@ -101,8 +102,8 @@ def load_form_from_dir(confdir,conflib_dir, arg):
       except ModuleNotFoundError as e:
         errors.append(f"Ошибка при загрузке конфига - 5 {arg['config']}/events.py: {e}")
       except Exception as e:
-        errors.append(f"ошибка при обработке конфига {arg['config']}: {e}")
-    
+        errors.append(f"ошибка при обработке конфига -6 {arg['config']}: {e}")
+
     if not len(errors):
       form=Form(arg)  
       form.load_data(form_data)
@@ -136,19 +137,23 @@ def load_form_from_dir(confdir,conflib_dir, arg):
                 f[event_name]=events[f['name']][event_name]
 
       except SyntaxError as e:
-          errors.append(f"Ошибка при загрузке конфига {arg['config']}/events_for_fields.py: {e}")
+          errors.append(f"Ошибка при загрузке конфига -7 {arg['config']}/events_for_fields.py: {e}")
       except ModuleNotFoundError as e:
-          errors.append(f"Ошибка при загрузке конфига {arg['config']}/events_for_fields: {e}")
+          errors.append(f"Ошибка при загрузке конфига -8 {arg['config']}/events_for_fields: {e}")
           
       #print('FIELDS:',form.fields)
         
 
   return [form,errors]
 
-def read_config(**arg):
+async def read_config(**arg):
+
+  request=exists_arg('request',arg)
+  s = request.state.engine
+  #if not(request):
+  #  request=s.request
 
   response={}
-  
   
   # это нужно для того, чтобы в конфиг не попали аргументы:
   arg["config"]=arg["config"].split('?')[0]
@@ -170,15 +175,14 @@ def read_config(**arg):
   if not(form):
     return error([f'конфиг {arg["config"]} не найден'])
   
-  form.s=s
-  s.form=form
+  form.s=request.state.engine
+
+  request.state.engine.form=form
   if 'after_read_form_config' in sysconfig:
       sysconfig['after_read_form_config'](form)
 
   form.config=arg['config']
   form.script=arg['script']
-
-
 
   if need_only_read(form): form.db=s.db_read
   else: form.db=s.db_write
@@ -187,47 +191,64 @@ def read_config(**arg):
 
   # Получаем manager-а 
   auth=sysconfig['auth']
-  login=s.login
+
+  if not(hasattr(request.state,'manager')) or not(request.state.manager.get('login')):
+    print('NO manager')
+    #await session_start(s)
+
+    print('REPEAT SESSION START: ',request.state.manager)
+    #s.request.state.manager=s.manager
+    
+  login=request.state.manager.get('login')#s.login
+  
   # form.manager содержит login
   if auth['use_roles']:
-    #print('use_roles:',auth)
-    form.manager=get_cur_role(
-     login=s.login,
+
+    #print('use_roles:',login)
+    login=await get_cur_role(
+     login=login,
      form=form
     )
-    
+    #form.manager=
+    #print('USE ROLES: ',form.manager)
     # if m2:
     #   form.manager=m2
     #print('use_roles:',form.manager)
-  
+
+  #print('login:',login)
   if auth['use_permissions']:
-    if s.use_project:
-      form.manager=project_get_permissions_for(form,login)
-    else:
-      form.manager=get_permissions_for(form,login)
-  
+      # print('USE PERMISSIONS:')
+      # print('LOGIN:',login)
+      # print('MANAGER:',s.request.state.manager)
+
+      # print("\n\n\n")
+      request.state.manager=await get_permissions_for(form,login)
+
+  form.manager=request.state.manager
   # Атрибуты по умолчанию
   if exists_arg('id',arg): form.id=arg['id']
   if exists_arg('action',arg): form.action=arg['action']
   if not form.work_table: form.work_table=arg['config']
   
-  form.run_event('permissions')
+  await form.run_event('permissions')
 
   # вызываем permissions для полей (если есть)
   for field in form.fields:
     if 'permissions' in field:
-      field['permissions'](form,field)
+      await field['permissions'](form,field)
 
   form.default_config_attr(arg)
   form.set_orig_types()
   
   # Перенёс из routes.edit_form.process_edit_form.py
+  if form.script !='history':
+    await form.get_values()
 
+  await form.run_all_before_code()
   
-  form.get_values()
-  form.run_all_before_code()
-  form.get_fields_values()
-
+  #if form.script!='history':
+  gfv = await form.get_fields_values()
+  await form.run_event('after_get_values')
   return form
 
 

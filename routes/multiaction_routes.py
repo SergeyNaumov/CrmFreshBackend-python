@@ -25,7 +25,7 @@ def get_ids(form):
         form.errors.append('отсутствует параметр ids')
     return ids
 
-def set_all_value_field(form,ids):
+async def set_all_value_field(form,ids):
     # Установить значение для множества записей
     R=form.R
     v=R.get('value')
@@ -41,10 +41,9 @@ def set_all_value_field(form,ids):
         if field:
             query=f"UPDATE {form.work_table} SET {name}=%s WHERE {form.work_table_id} IN ({join_ids(ids)})"
             values=[v]
-            form.db.query(
+            await form.db.query(
                 query=query,
                 values=values,
-                #debug=1
             )
         else:
             form.errors.append(f"Поле {name} не найдено")
@@ -55,7 +54,7 @@ def delete_records(form,ids):
        print(query)
     else:
         form.errors.append('Вам запрещено удалять записи')
-def change_price(form,ids):
+async def change_price(form,ids):
     R=form.R
     value=R.get('value')
 
@@ -100,11 +99,10 @@ def change_price(form,ids):
             set_field=f"{name} + {name}*{v}/100"
 
         query=f"UPDATE {form.work_table} SET {name} = {set_field} WHERE {form.work_table_id} IN ({join_ids(ids)})"
-        form.db.query(
+        await form.db.query(
             query=query,
-            debug=1
         )
-        print(query)
+
 
 
 

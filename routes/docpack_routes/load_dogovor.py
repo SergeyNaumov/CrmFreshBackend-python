@@ -1,7 +1,7 @@
 
 from subprocess import PIPE, run
 import random, time
-from db import db
+from db import get_db
 
 import os.path 
 from fastapi.responses import HTMLResponse
@@ -11,8 +11,18 @@ from .response_doc import response_doc
 
 
 
-def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
-	dp = db.query(
+async def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
+	db=get_db()
+	await db.query(query='set lc_time_names="ru_RU"')
+	docpack = await db.query(query='SELECT * FROM docpack WHERE id = %s', values=[docpack_id], onerow=1)
+	
+	buhgalter_card_id=docpack.get('buhgalter_card_requisits_id',0)
+	if not(buhgalter_card_id):
+		buhgalter_card_id = await db.query(
+			query="select id from buhgalter_card_requisits where user_id=%s", values=[docpack['user_id']], onevalue=1
+		) or 0
+
+	dp = await db.query(
 		query=f'''
 			SELECT
 				bcr.*,
@@ -22,7 +32,7 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 				t.count_days tarif_count_days, t.percent_pob, t.comment tarif_comment,
 				b_dog.header b_dog_header, 
 				b_dog.ur_lico_attach_pechat img_replace_ur_lico_attach_pechat,
-				b_dog.ur_lico_buh_podp img_replace_ur_lico_gendir_podp,
+				b_dog.ur_lico_gendir_podp img_replace_ur_lico_gendir_podp,
 
 				b_dog.attach dogovor_blank, b_dog.id b_dog_id,
 				dp.registered dp_registered, dp.id dp_id, dp.tarif_id,
@@ -36,18 +46,20 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 				DATE_FORMAT(dogovor.registered,%s) dogovor_from
 			FROM
 				user u 
-				LEFT JOIN buhgalter_card_requisits bcr ON bcr.user_id = u.id
+				LEFT JOIN buhgalter_card_requisits bcr ON bcr.user_id = u.id and bcr.id={buhgalter_card_id}
 				LEFT JOIN manager m ON (u.manager_id =m.id)
 				JOIN docpack dp ON dp.user_id = u.id
 				LEFT JOIN dogovor  ON (dp.id=dogovor.docpack_id)
 				LEFT JOIN tarif t ON (t.id = dp.tarif_id)
 				LEFT JOIN blank_document b_dog ON (b_dog.id = t.blank_dogovor_id)
 				LEFT JOIN ur_lico ON (ur_lico.id=dp.ur_lico_id)
-			WHERE dp.id = %s GROUP BY u.id ORDER BY bcr.main LIMIT 1
+			WHERE dp.id = %s LIMIT 1
 		''', 
+		debug=1,
 		values=['%e %M %Y', docpack_id],onerow=1
 	)
 	#return dp
+
 	if debug: return out_debug(dp)
 	if not(dp):
 		return {'error': f'пакет документов №{docpack_id} не найден'}
@@ -72,10 +84,10 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 			Бланк договора: <a href="/edit_form/blank_document/{dp['b_dog_id']}">{dp['b_dog_header']}</a><br>
 		'''
 		return HTMLResponse(message)
-		
 
-	for a in ('ur_lico_gendir_podp', 'ur_lico_buh_podp', 'ur_lico_attach_pechat'):
-		if dp[a]: dp[a]=f'./files/ur_lico/{dp[a]}'
+
+	#for a in ('ur_lico_gendir_podp', 'ur_lico_buh_podp', 'ur_lico_attach_pechat'):
+	#	if dp[a]: dp[a]=f'./files/ur_lico/{dp[a]}'
 
 	# список переменных, являющихся изображениями
 	# images_list=[
@@ -91,14 +103,19 @@ def load_dogovor(docpack_id: int, ext: str, need_print: int, debug=0):
 		dp['ur_lico_attach_pechat']=empty
 
 	replace_images=[]
-	if debug:
+	if 1:
 		for f in ('ur_lico_attach_pechat','ur_lico_gendir_podp'):
 			if dp[f"img_replace_{f}"]:
 				for pic_name in dp[f"img_replace_{f}"].split(','):
+
 					pic_name=pic_name.replace(' ','')
-					replace_images.append([pic_name,f])
-		return replace_images
+					print('pic_name: ',pic_name, "./files/ur_lico/"+dp[f])
+					replace_images.append([pic_name,"./files/ur_lico/"+dp[f] ])
+		#return replace_images
 	else:
+		print('img_replace_ur_lico_gendir_podp: ',"./files/ur_lico/"+dp['img_replace_ur_lico_gendir_podp'])
+		print('img_replace_ur_lico_attach_pechat',"./files/ur_lico/"+dp['img_replace_ur_lico_attach_pechat'])
+		...
 		replace_images=[
 			['ur_lico_gendir_podp',dp['ur_lico_gendir_podp'] ],
 			['ur_lico_attach_pechat',dp['ur_lico_attach_pechat'] ]

@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request
 from lib.all_configs import read_config
 import datetime as dt
 from lib.core import date_to_rus
@@ -7,8 +7,9 @@ router = APIRouter()
 
 
 @router.get('/get/{config}/{field_name}/{id}')
-async def get_memo(config:str, field_name:str,id:int): # 
-  form=read_config(
+async def get_memo(config:str, field_name:str,id:int,request: Request): #
+  form = await read_config(
+    request=request,
     action='get',
     config=config,
     id=id,
@@ -25,8 +26,12 @@ async def get_memo(config:str, field_name:str,id:int): #
 
   
   if not len(errors):
-
-    data=form.db.query(
+    
+    where=f"memo.{field['memo_table_foreign_key']}=%s"
+    if add_where:=field.get('add_where'):
+      where+=f' AND {add_where}'
+    print('MEMO_WHERE: ',where )
+    data = await form.db.query(
       query=f"""
         SELECT
           memo.{field['memo_table_id']} id, user.{field['auth_id_field']} user_id,
@@ -35,7 +40,7 @@ async def get_memo(config:str, field_name:str,id:int): #
           {field['memo_table']} memo
           LEFT JOIN {field['auth_table']} user ON (memo.{field['memo_table_auth_id']} = user.{field['auth_id_field']} )
         WHERE
-          memo.{field['memo_table_foreign_key']}=%s ORDER BY memo.{field['memo_table_registered']} desc
+          {where} ORDER BY memo.{field['memo_table_registered']} desc
 
       """,
       log=form.log,
@@ -45,7 +50,7 @@ async def get_memo(config:str, field_name:str,id:int): #
 
 
     if 'before_out_tags' in field:
-      field['before_out_tags'](form,data)
+      await field['before_out_tags'](form,data)
 
     for d in data:
       d['date']=date_to_rus(d['date'])
@@ -66,23 +71,26 @@ async def get_memo(config:str, field_name:str,id:int): #
 
 
 @router.post('/add/{config}/{field_name}/{id}')
-async def get_memo(config:str, field_name:str,id:int, R:dict): 
-  form=read_config(
+async def get_memo(config:str, field_name:str,id:int, R:dict,request: Request):
+  form = await read_config(
+    request=request,
     action='add',
     config=config,
     id=id,
     #R=R,
     script='memo'
   )
+
   field=form.get_field(field_name)
   errors=form.errors
   if not(field):
     errors.append(f"Поле {field_name} не найдено")
   
   if form.read_only or ('read_only' in field and field['read_only']):
-    errors.append('вы не можете добавлять записи в это поле')
+    errors.append(f"вы не можете добавлять записи в это поле form: {form.read_only} ")
 
   memo_id=None
+  data={}
   if not len(errors) and 'message' in R and R['message']:
     data={
         field['memo_table_foreign_key']:form.id,
@@ -90,13 +98,13 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
         field['memo_table_auth_id']:form.manager['id'],
         field['memo_table_comment']:R['message']
     }
-    memo_id=form.db.save(
+    memo_id = await form.db.save(
       table=field['memo_table'],
       data=data
     )
     data['id']=memo_id
 
-    form.run_event('after_add',{'field':field,'data':data})
+    await form.run_event('after_add',{'field':field,'data':data})
 
   success=1
   if len(form.errors): success=0
@@ -111,7 +119,7 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
 
   tags=[data]
   if 'before_out_tags' in field:
-    field['before_out_tags'](form, tags)
+    await field['before_out_tags'](form, tags)
 
   for t in tags:
     t['date']=date_to_rus(t['date'])
@@ -128,8 +136,9 @@ async def get_memo(config:str, field_name:str,id:int, R:dict):
   }
 # Обновление записи
 @router.post('/update/{config}/{field_name}/{id}/{memo_id}')
-async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
-  form=read_config(
+async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict,request: Request):
+  form = await read_config(
+    request=request,
     config=config,
     id=id,
     #R=R,
@@ -145,7 +154,7 @@ async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
     errors.append('вы не можете изменить эту запись')
 
   if not len(errors) and 'message' in R and R['message']:
-    form.db.query(
+    await form.db.query(
       query=f"""
         UPDATE
           {field['memo_table']}
@@ -174,8 +183,9 @@ async def update_memo(config:str, field_name:str,id:int, memo_id:int, R:dict):
   }
 
 @router.get('/delete/{config}/{field_name}/{id}/{memo_id}')
-async def delete_from_memo(config:str, field_name:str,id:int, memo_id:int):
-  form=read_config(
+async def delete_from_memo(config:str, field_name:str,id:int, memo_id:int,request:Request):
+  form = await read_config(
+    request=request,
     action='delete',
     config=config,
     id=id,
@@ -189,7 +199,7 @@ async def delete_from_memo(config:str, field_name:str,id:int, memo_id:int):
     errors.append('вы не можете удалить эту запись')
 
   if not len(errors):
-    form.db.query(
+    await form.db.query(
       query=f"""
         DELETE FROM {field['memo_table']} WHERE {field['memo_table_id']}=%s and {field['memo_table_foreign_key']}=%s
       """,

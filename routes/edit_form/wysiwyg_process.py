@@ -28,11 +28,8 @@ def get_file_list(**arg):
         error=f'Ошибка wysiwyg: {dirname} -- это файл (а должна быть директория), обратитесь к разработчику'
         return res,error
       else:
-        os.makedirs(form.manager['files_dir']+path, exist_ok=True)
-        #os.mkdirs(form.manager['files_dir']+path)
+        os.makedirs(f"{form.manager['files_dir']}{path}", exist_ok=True)
 
-
-    #print('path_directory:',path_directory)
     _list=sorted(os.listdir(path_directory))
 
     for l in _list:
@@ -47,10 +44,11 @@ def get_file_list(**arg):
     #['file1.png','file2.png','file3.png']
     return res,error
 
-def wysiwyg_process(**arg):
+async def wysiwyg_process(**arg):
   #print('wysiwyg_process - реализовать')
   config=arg['config']
   field_name=arg['field_name']
+  request=arg['request']
   errors=[]
   R={}
 
@@ -77,10 +75,11 @@ def wysiwyg_process(**arg):
     id=R['id']
   if 'config' in R:
     config=R['config']
-  form=read_config(
+  form = await read_config(
     action=action,
     config=config,
     id=id,
+    request=request,
     #values=values,
     script='wysiwyg'
   )
@@ -154,7 +153,7 @@ def wysiwyg_process(**arg):
         if arg['path']:
             P= path[:0] + path[(0+1):] # удаляем начальный слэш
             full_path=f"{form.manager['files_dir']}/{P}{file.filename}"
-        print('upload_to:',full_path)
+        #print('upload_to:',full_path)
         with open(full_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 

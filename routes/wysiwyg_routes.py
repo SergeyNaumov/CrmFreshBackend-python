@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile, Form
+from fastapi import APIRouter, File, UploadFile, Form, Request
 from fastapi.responses import HTMLResponse
 
 from lib.all_configs import read_config
@@ -15,12 +15,13 @@ async def wysiwyg_upload(
   config:str,
   field_name:str,
   _id:int,
+  request: Request,
   path: str=Form(...),
   file: UploadFile = File(...)
 ): # 
 
 
-  return wysiwyg_process(
+  return await wysiwyg_process(
     action='upload',
     path=path,
     file=file,
@@ -28,6 +29,7 @@ async def wysiwyg_upload(
     id=_id,
     field_name=field_name,
     script='wysiwyg',
+    request=request,
     R={}
   )
 
@@ -36,45 +38,50 @@ async def wysiwyg_upload(
 async def wysiwyg_upload(
   config:str,
   field_name:str,
+  request: Request,
   path: str=Form(...),
   file: UploadFile = File(...)
 ): # 
 
   #print('path:',path)
-  return wysiwyg_process(
+  return await wysiwyg_process(
     action='upload',
     path=path,
     file=file,
     config=config,
     field_name=field_name,
     script='wysiwyg',
+    request=request,
     R={}
   )
 
 @router.post('/wysiwyg/{config}/{field_name}')
-async def wysiwyg1(config:str,field_name:str,R:dict):
-  return wysiwyg_process(
+async def wysiwyg1(config:str,field_name:str,R:dict, request:Request):
+  return await wysiwyg_process(
     config=config,
     field_name=field_name,
     script='wysiwyg',
+    request=request,
     R=R
   )
 
 @router.post('/wysiwyg/{config}/{field_name}/{id}')
-async def wysiwyg2(config:str,field_name:str,id:int,R:dict):
-  return wysiwyg_process(
+async def wysiwyg2(config:str,field_name:str,id:int,R:dict, request:Request):
+  return await wysiwyg_process(
     config=config,
     field_name=field_name,
     id=id,
     R=R,
+    request=request,
     script='wysiwyg'
   )
 
 # опции инициализации
 @router.get('/wysiwyg/{config}/{field}/init_options')
-async def wysiwyg_init_options(config:str,field:str):
-  form=read_config(
+async def wysiwyg_init_options(config:str,field:str, request:Request):
+  form = await read_config(
     script='wysiwyg', config=config,
+    request=request,
     R={},
   )
   
@@ -99,9 +106,10 @@ async def wysiwyg_init_options(config:str,field:str):
 
 # загрузка шаблона в wysiwyg
 @router.get('/wysiwyg/load-template/{config}/{field}/{template_id}')
-async def load_template(config:str,field:str,template_id:int):
-  form=read_config(
+async def load_template(config:str,field:str,template_id:int, request:Request):
+  form = await read_config(
     script='wysiwyg', config=config,
+    request=request,
     R={},
   )
   if ('wysiwyg' in system_config) and system_config['wysiwyg']:

@@ -76,6 +76,16 @@ def thousand(rest, sex):
     return plural, name
 
 def num_to_text(num, main_units=(('', '', ''), 'm')):
+    if isinstance(num, float):
+        rub = int(num)
+        kop = round((num - rub) * 100)
+        if kop == 100:
+            rub += 1
+            kop = 0
+        rub_text = num_to_text(rub, (('рубль', 'рубля', 'рублей'), 'm')) if rub != 0 else 'ноль рублей'
+        kop_text = num_to_text(kop, (('копейка', 'копейки', 'копеек'), 'f'))
+        return f"{rub_text} {kop_text}"
+    num=int(num)
     _orders = (main_units,) + orders
     if num == 0:
         return ' '.join((units[0], _orders[0][0][2])).strip() # ноль

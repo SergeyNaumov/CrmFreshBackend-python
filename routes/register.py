@@ -1,8 +1,8 @@
 from lib.core import cur_year,cur_date, gen_pas
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from config import config
 #from db import db,db_read,db_write
-from lib.engine import s
+#from lib.engine import s
 from lib.session import *
 #import re
 from lib.send_mes import send_mes
@@ -12,7 +12,8 @@ from lib.form_control import check_rules, is_email, is_phone
 #valid_phone=re.compile(r"")
 router = APIRouter()
 errors=[]
-def exist_login(R):
+def exist_login(request: Request, R):
+  s = request.state.engine
   # Проверяем заявку
   exists=s.db.get(
     table='order_reg_company',
@@ -42,7 +43,8 @@ def exist_login(R):
 
 # Регистрация
 @router.post('/register')
-async def register(R: dict):
+async def register(request: Request, R: dict):
+  s = request.state.engine
   errors=[]
   response={'success':0,'errors':[]}
   #print('REGISTER!')
@@ -99,7 +101,8 @@ async def register(R: dict):
   return response
 # Напоминание пароля
 @router.post('/remember/get-access-code')
-async def remember_get_code(R: dict):
+async def remember_get_code(request: Request, R: dict):
+  s = request.state.engine
   response={'success':1,'errors':[]}
   if R:
     manager=s.db.get(
@@ -141,7 +144,8 @@ async def remember_get_code(R: dict):
 
 # Проверка кода
 @router.post('/remember/check-access-code')
-async def remember_check_code(R: dict):
+async def remember_check_code(request: Request, R: dict):
+  s = request.state.engine
   response={'success':0,'errors':[]}
   if R:
     code_value=s.db.get(
@@ -161,7 +165,8 @@ async def remember_check_code(R: dict):
 
 # Проверка кода
 @router.post('/remember/change-password')
-async def remember_check_code(R: dict):
+async def remember_check_code(request: Request, R: dict):
+  s = request.state.engine
   response={'success':0,'errors':[]}
   if R:
     code_value=s.db.get(
