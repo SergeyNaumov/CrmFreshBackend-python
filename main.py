@@ -9,10 +9,11 @@ from db import get_db
 # uvicorn main:app --reload --port=5000
 app = FastAPI(Debug=True)
 origins = [
-    "http://localhost",
-    "http://localhost:8081",
-    "http://localhost:8082",
-    "*:*",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+    "http://dev-crm.test",
+    "http://dev-crm.test:5000",
+    "http://dev-crm.test:8081",  # если фронт на 8081
 ]
 
 app.add_middleware(

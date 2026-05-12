@@ -1,0 +1,22 @@
+<table class="tbl1 sm" style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    <tr>
+        <td style="border: 1px solid black;">Название компании</td>
+        <td style="border: 1px solid black;">Бренд</td>
+        <td style="border: 1px solid black;">ИНН</td>
+        <td style="border: 1px solid black;">Менеджер ОП</td>
+        <td style="border: 1px solid black;">Юрист</td>
+        <td style="border: 1px solid black;">Вид продукта</td>
+        <td style="border: 1px solid black;">Контактные данные</td>
+    </tr>
+    {%for a in data_to_send%}
+		<tr>
+			<td style="border: 1px solid black;">{{a.firm}}</td>
+			<td style="border: 1px solid black;">{{a.brand_name}}</td>
+            <td style="border: 1px solid black;">{{a.inn}}</td>
+			<td style="border: 1px solid black;">{{a.name}}</td>
+			<td style="border: 1px solid black;">{{a.lawyer}}</td>
+            <td style="border: 1px solid black;">{{a.product_name}}</td>
+			<td style="border: 1px solid black;">{{a.contact_data}}</td>
+		</tr>
+    {%endfor%}
+</table>

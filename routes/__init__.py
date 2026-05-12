@@ -29,14 +29,14 @@ from .filters_load_save import router as router_filters_load_save
 # messenger
 from .messenger import router as router_messenger
 from .gptassist import router as router_gptassist
-from .fas import router as router_fas
-from .beeline import router as router_beeline
+
+
 #from .api import router as router_api
 from .transfere_cards import router as router_transfere_cards
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
 #from .svcms import router as router_svcms
-from .t_pass import router as router_tpass
+
 
 # Расширения
 from .extend_routes import router as router_extend
@@ -51,10 +51,8 @@ router.include_router(router_password)
 
 # /login, /logout, /mainpage, /startpage
 router.include_router(router_core)
-router.include_router(router_fas,prefix='/fas')
-#router.include_router(router_api,prefix='/api')
 
-router.include_router(router_beeline,prefix='/beeline')
+
 router.include_router(router_history,prefix='/history')
 router.include_router(router_filters_load_save,prefix='/filters_load_save')
 router.include_router(router_transfere_cards,prefix='/transfere-cards')
@@ -85,7 +83,7 @@ router.include_router(router_autocomplete,prefix='/autocomplete')
 router.include_router(stat_tool,prefix='/stat-tool')
 router.include_router(router_ajax)
 router.include_router(router_gptassist,prefix='/gpt-assist')
-router.include_router(router_tpass,prefix='/tpass')
+
 
 # Переносим проблемные импорты и их регистрацию в самый конец
 from .parser_excel import router as router_parser_excel

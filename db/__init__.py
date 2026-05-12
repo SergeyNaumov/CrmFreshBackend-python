@@ -1,43 +1,53 @@
-# from peewee import *
- 
-# user = 'crm'
-# password = ''
-# db_name = 'crm'
- 
-# dbhandle = MySQLDatabase(
-#     db_name, user=user,
-#     password=password,
-#     host='localhost'
-# )
-
-# class BaseModel(Model):
-#     class Meta:
-#         database = dbhandle
-
+#from config import config
+import os
 from .freshdb import FreshDB
-from config import config
-#def connect():
-#  return FreshDB(dbname='crm',user='crm')
+from .freshdbs import FreshDB as FreshDBSync
 
 
-crm_read=config['connects']['crm_read']
-crm_write=config['connects']['crm_write']
-
-#print('connect_read!')
-db_read=FreshDB(
-  dbname=crm_read['dbname'],
-  user=crm_read['user'],
-  password=crm_read['password'],
-  host=crm_read['host'],
-)
-#print('connect_write')
-db_write=FreshDB(
-  dbname=crm_write['dbname'],
-  user=crm_write['user'],
-  password=crm_write['password'],
-  host=crm_write['host'],
-)
-db_write.query(query="set sql_mode=''")
-db=db_write
 
 
+db_user=os.environ.get('DB_USER')
+db_host=os.environ.get('DB_HOST')
+db_port=os.environ.get('DB_PORT')
+db_password=os.environ.get('DB_PASSWORD','')
+db_name=os.environ.get('DB_NAME')
+PRODUCTION = os.environ.get('PRODUCTION')
+
+if not(db_name):
+    db_user='crm'
+    db_host='localhost'
+    db_name='crm'
+    db_port='3306'
+
+if db_port:
+    db_port=int(db_port)
+
+crm_write={
+  'user':db_user,
+  'password':db_password,
+  'host':db_host,
+  'port':db_port,
+  'dbname':db_name,
+}
+#crm_write=config['connects']['crm_write']
+#crm_read=config['connects']['crm_read']
+
+db=None
+
+def get_db(**arg):
+    global db
+    if db:
+        return db
+
+    if arg.get('sync'):
+        db=FreshDBSync(crm_write)
+    else:
+        db=FreshDB(crm_write)
+    return db
+
+
+# {'host':'localhost', 'port':3306, 'user':'fas', 'password':'', 'db':'fas'}
+
+    #with engine.connect() as conn:
+    #    result = conn.execute(text("SELECT * FROM user limit 1"))
+    #    pprint(result.all())

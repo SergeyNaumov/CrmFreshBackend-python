@@ -1,5 +1,5 @@
-from lib.fas.create_fin_card import create_fin_card
-from lib.fas.create_ofp_card import create_ofp_card
+#from lib.fas.create_fin_card import create_fin_card
+#from lib.fas.create_ofp_card import create_ofp_card
 
 async def action_create_sr(form,field,R):
 	db=form.db
@@ -39,12 +39,7 @@ async def action_create_sr(form,field,R):
 		if form.success():
 			card_id=None
 			sr_link=None
-			if app['type']==1:
-				# юр. услуга
-				card_id=await create_ofp_card(form, app['user_id'])
-			elif app['type']==2:
-				# фин. услуга
-				card_id=await create_fin_card(form, app['user_id'])
+
 
 			print('card_id: ',card_id)
 			if card_id:

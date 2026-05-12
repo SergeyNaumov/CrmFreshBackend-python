@@ -11,8 +11,10 @@ import vk_api
 from vk_api.utils import get_random_id
 API_TOKEN = config['telegram']['bot_token']
 VK_API_TOKEN = config['vk']['bot_token']
-bot = telebot.TeleBot(API_TOKEN)
-vk_session = vk_api.VkApi(token=VK_API_TOKEN)
+if API_TOKEN:
+    bot = telebot.TeleBot(API_TOKEN)
+if VK_API_TOKEN:    
+    vk_session = vk_api.VkApi(token=VK_API_TOKEN)
 # Инициализация бота и диспетчера
 
 
