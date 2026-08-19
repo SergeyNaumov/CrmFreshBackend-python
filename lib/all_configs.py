@@ -193,7 +193,7 @@ async def read_config(**arg):
     print('NO manager')
     #await session_start(s)
 
-    print('REPEAT SESSION START: ',request.state.manager)
+    #print('REPEAT SESSION START: ',request.state.manager)
     #s.request.state.manager=s.manager
     
   login=request.state.manager.get('login')#s.login

@@ -114,12 +114,15 @@ async def startpage(request: Request):
         manager_menu_table='project_manager_menu'
 
     else:
+        bot_name=''
+        if 'telegram' in config and  'bot_name' in config['telegram']:
+          bot_name=config['telegram']['bot_name']
         manager=await s.db.query(
           query=f'''
             select
               *,
               concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link,
-              concat('https://t.me/{config['telegram']['bot_name']}/?start=linkcrm-',id,'-',md5(password)) tg_link
+              concat('https://t.me/{bot_name}/?start=linkcrm-',id,'-',md5(password)) tg_link
             from
               {config['auth']['manager_table']} where login=%s
             ''',

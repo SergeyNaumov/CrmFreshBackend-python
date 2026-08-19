@@ -72,19 +72,23 @@ async def websocket_endpoint(websocket: WebSocket, socket_name: str):
 @router.get('')
 async def init_messenger(request:Request):
 	s.request=request
-	r = await messenger_rules['init'](s,request.state.manager['id'])
-	return r
+
+	if 'init' in messenger_rules:
+		r = await messenger_rules['init'](s,request.state.manager['id'])
+		return r
 	#config['messenger_rules']['init']()
 
 # список чатов
 @router.get('/chatlist')
 async def get_chatlist(request: Request):
-	return await messenger_rules['chat_list'](s,request.state.manager['id'])
+	if 'chat_list' in messenger_rules:
+		return await messenger_rules['chat_list'](s,request.state.manager['id'])
 
 # получение списка сообщений в чате
 @router.get('/chat/{user_id}')
 async def get_chat(user_id: int, request: Request):
-	return await messenger_rules['get_chat'](s, request.state.manager['id'], user_id)
+	if 'get_chat' in messenger_rules:
+		return await messenger_rules['get_chat'](s, request.state.manager['id'], user_id)
 
 # загрузка "вперёд"
 @router.get('/chat-forward/{user_id}/{last_id}')
@@ -116,7 +120,8 @@ curl -d "message=Сообщение от пользователя&shop_id=1&user
 
 @router.get('/get-socket-name')
 async def get_socket_name(request:Request):
-	return messenger_rules['get_socket_name'](request.state.manager['id'])
+	if 'get_socket_name' in messenger_rules:
+		return messenger_rules['get_socket_name'](request.state.manager['id'])
 
 # приём локальных сообщений
 @router.post('/local-send')
