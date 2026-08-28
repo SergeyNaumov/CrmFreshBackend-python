@@ -71,29 +71,34 @@ async def wysiwyg2(config:str,field_name:str,id:int,R:dict):
   )
 
 # опции инициализации
-@router.get('/wysiwyg/{config}/{field}/init_options')
-async def wysiwyg_init_options(config:str,field:str):
-  form = await read_config(
+@router.get('/wysiwyg/{config}/{field_name}/init_options')
+async def wysiwyg_init_options(config:str,field_name:str):
+  form=read_config(
     script='wysiwyg', config=config,
     R={},
   )
   
   response={
-    #'project_id':form.s.project_id,
+    'project_id':form.s.project_id,
     'success':True,
   }
-
+  #print('config:',system_config)
   if ('wysiwyg' in system_config) and system_config['wysiwyg']:
     response['step1']=True
     ww=system_config['wysiwyg']
     #print('ww:',ww)
     if 'options_modify' in ww:
       response['step2']=True
-      response['options']=ww['options_modify'](form,field)
+      response['options']=ww['options_modify'](form,field_name)
     
     if not(response['options']) and 'options' in ww:
       response['step3']=True
       response['options']=ww['get_options']()
+    options=response['options']
+
+    field=form.get_field(field_name)
+    if content_css:=field.get('style'):
+      options['content_css']=content_css
 
   return response
 

@@ -127,6 +127,7 @@ form={
             'description':'Анонс (в списке товаров)',
             'type':'wysiwyg',
             'name':'anons',
+            'style':['https://armit-new.design-b2b.com/templates/2026/arm-it/assets/fonts/font-awesome/font-awesome.min.css'],
             'tab':'desc',
         },
 
@@ -134,6 +135,7 @@ form={
             'description':'Описание',
             'name':'body',
             'type':'wysiwyg',
+            'style':['https://armit-new.design-b2b.com/templates/2026/arm-it/assets/fonts/font-awesome/font-awesome.min.css'],
             'tab':'desc',
         },
         {
