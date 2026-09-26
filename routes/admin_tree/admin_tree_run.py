@@ -154,7 +154,8 @@ async def admin_tree_run(**arg):
     config=arg['config'],
     script='admin_tree',
     action=action,
-    id=id
+    id=id,
+    request=arg['request']
   )
   
   

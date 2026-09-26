@@ -8,6 +8,7 @@ def check_path(path,errors):
 
 def get_file_list(**arg):
     error=''
+    manager=arg['form'].request.state.manager
     res_dirs=[]
     res_files=[]
     res=[]
@@ -16,11 +17,11 @@ def get_file_list(**arg):
     form=arg['form']
     path=arg['path']
     
-    path_directory=form.manager['files_dir']+path
+    path_directory=manager['files_dir']+path
 
     # если нет директории -- создаём её
-    if not os.path.isdir(form.manager['files_dir']+path):
-      dirname=form.manager['files_dir']
+    if not os.path.isdir(manager['files_dir']+path):
+      dirname=manager['files_dir']
       if path != '/':
         dirname+=path
 
@@ -28,8 +29,8 @@ def get_file_list(**arg):
         error=f'Ошибка wysiwyg: {dirname} -- это файл (а должна быть директория), обратитесь к разработчику'
         return res,error
       else:
-        os.makedirs(form.manager['files_dir']+path, exist_ok=True)
-        #os.mkdirs(form.manager['files_dir']+path)
+        os.makedirs(manager['files_dir']+path, exist_ok=True)
+        #os.mkdirs(manager['files_dir']+path)
 
 
     #print('path_directory:',path_directory)
@@ -78,12 +79,16 @@ async def wysiwyg_process(**arg):
   if 'config' in R:
     config=R['config']
   form = await read_config(
+    request=arg['request'],
     action=action,
     config=config,
     id=id,
     #values=values,
     script='wysiwyg'
   )
+  # manager берём только из request.state.manager: form.manager -- костыль,
+  # при параллельных запросах значение может перепутаться
+  manager=form.request.state.manager
   check_path(path,errors)
   #print('action:',action,' errors:',errors,'path: ',path)
   if not len(errors):
@@ -97,18 +102,18 @@ async def wysiwyg_process(**arg):
             'success':form.success(),
             'errors':errors,
             'file_list':file_list,
-            'files_dir_web':form.manager['files_dir_web']
+            'files_dir_web':manager['files_dir_web']
         }
 
     elif action=='create_folder':
         new_folder_name=R['new_folder_name']
         if re.match(r'^[a-zA-Z0-9\.\-_]+$',new_folder_name):
             try:
-                print('files_dir:',form.manager['files_dir'])
+                print('files_dir:',manager['files_dir'])
                 print('path:',path)
                 print('new_folder_name:',new_folder_name)
 
-                os.mkdir(form.manager['files_dir']+path+'/'+new_folder_name)
+                os.mkdir(manager['files_dir']+path+'/'+new_folder_name)
             except FileExistsError:
                 errors.append('уже существует файл или папка с таким именем')
         else:
@@ -127,7 +132,7 @@ async def wysiwyg_process(**arg):
             if re.match(r'\/',name):
                 errors.append('ошибка, странный параметр name')
             else:
-                obj_path=form.manager['files_dir']+path+name
+                obj_path=manager['files_dir']+path+name
 
                 if os.path.isdir(obj_path):
                     os.rmdir(obj_path)
@@ -141,7 +146,7 @@ async def wysiwyg_process(**arg):
                     'success':(1,0)[len(errors)],
                     'errors':errors,
                     'file_list':file_list,
-                    'files_dir_web':form.manager['files_dir_web']
+                    'files_dir_web':manager['files_dir_web']
                 }
         else:
             errors.append('не указан параметр name')
@@ -150,10 +155,10 @@ async def wysiwyg_process(**arg):
         file=arg['file']
         
         
-        full_path=f"{form.manager['files_dir']}/{file.filename}"
+        full_path=f"{manager['files_dir']}/{file.filename}"
         if arg['path']:
             P= path[:0] + path[(0+1):] # удаляем начальный слэш
-            full_path=f"{form.manager['files_dir']}/{P}{file.filename}"
+            full_path=f"{manager['files_dir']}/{P}{file.filename}"
         #print('upload_to:',full_path)
         with open(full_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -169,5 +174,4 @@ async def wysiwyg_process(**arg):
     else:
         errors.append('action не указан, либо не известен')
 
-  return 
-  {'success':(0,1)[len(errors)],'errors':errors}
+  return {'success':(1,0)[len(errors)],'errors':errors}

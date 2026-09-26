@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi import WebSocket, WebSocketDisconnect
 
-from lib.engine import s
 from config import config
 import json
 
@@ -58,8 +57,13 @@ async def websocket_endpoint(websocket: WebSocket, socket_name: str):
 			try:
 				R = json.loads(data)
 				
-				if R['action']=='send_message':
-					messenger_rules['send'](s,R)
+				# движок берём из request.state (для websocket его нет из-за
+				# middleware; рассылка для этого деплоя настроена пустой)
+				s = getattr(websocket.state, 'engine', None)
+				if s and R['action']=='send_message' and messenger_rules:
+					send= messenger_rules.get('send')
+					if send:
+						await send(s,R)
 
 			except ValueError as e:
 				pass
@@ -71,29 +75,36 @@ async def websocket_endpoint(websocket: WebSocket, socket_name: str):
 # получаем кол-во новых сообщений
 @router.get('')
 async def init_messenger(request:Request):
+	s=request.state.engine
 	s.request=request
-	r = await messenger_rules['init'](s,request.state.manager['id'])
-	return r
+	if init:=messenger_rules.get('init'):
+		r = await init(s,request.state.manager['id'])
+		return r
+	return None
 	#config['messenger_rules']['init']()
 
 # список чатов
 @router.get('/chatlist')
 async def get_chatlist(request: Request):
+	s=request.state.engine
 	return await messenger_rules['chat_list'](s,request.state.manager['id'])
 
 # получение списка сообщений в чате
 @router.get('/chat/{user_id}')
 async def get_chat(user_id: int, request: Request):
+	s=request.state.engine
 	return await messenger_rules['get_chat'](s, request.state.manager['id'], user_id)
 
 # загрузка "вперёд"
 @router.get('/chat-forward/{user_id}/{last_id}')
-async def get_forward(user_id:int, last_id:int):
+async def get_forward(user_id:int, last_id:int, request: Request):
+	s=request.state.engine
 	return await messenger_rules['get_chat'](s,user_id,last_id)
 
 # отправка сообщения
 @router.post('/send')
-async def send(R: dict):
+async def send(R: dict, request: Request):
+	s=request.state.engine
 	return messenger_rules['send'](s,R)
 
 
@@ -116,11 +127,13 @@ curl -d "message=Сообщение от пользователя&shop_id=1&user
 
 @router.get('/get-socket-name')
 async def get_socket_name(request:Request):
-	return messenger_rules['get_socket_name'](request.state.manager['id'])
+	if get_socket_name:=messenger_rules.get('get_socket_name'):
+		return get_socket_name(request.state.manager['id'])
+	return None
 
 # приём локальных сообщений
 @router.post('/local-send')
-async def from_script(R:dict):
+async def from_script(R:dict, request: Request):
 	"""
 		curl -X POST -H "Content-Type: application/json" -d '{"user_id":1,"message":"Здорово!"}' http://localhost:5000/messenger/local-send
 	"""
@@ -129,6 +142,7 @@ async def from_script(R:dict):
 	#print('local_send:', shop_id, user_id, message)
 	#print('connections_hash:',connector_manager.active_connections_hash)
 	
+	s=request.state.engine
 	result= await messenger_rules['script_send_to_manager'](s,user_id, message, connector_manager.active_connections_hash)
 
 	return {'success':True, "result":result}

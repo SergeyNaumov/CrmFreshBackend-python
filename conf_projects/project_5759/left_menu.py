@@ -7,6 +7,15 @@ left_menu=[
          "show":True,
          "child":[
             {
+               "header":"Файлы для поисковиков",
+               "value":"admin-table",
+               "type":"vue",
+               "child":[],
+               "params":{
+                  "config":"find_files"
+               }
+            },
+            {
                "header":"Promo",
                "value":"admin-table",
                "type":"vue",
@@ -62,7 +71,14 @@ left_menu=[
             },
          ]
       },
-
+      {
+         "header":"Администрирование бота",
+         "value":"admin-tree",
+         "type":"vue",
+         "child":[],
+         "params":{"config":"bot_rules"},
+         "icon":"fa-duotone fa-image"
+      },
       {
          "header":"Слайдер изображений",
          "value":"admin-tree",
@@ -80,39 +96,46 @@ left_menu=[
          "show":True,
          "child":[
                {
-                  "header":"Виды кейсов",
+                  "header":"Сферы деятельности",
                   "value":"admin-tree",
                   "type":"vue",
                   "child":[],
-                  "params":{ "config":"case_type" }
+                  "params":{ "config":"opportunity" }
                },
                {
                   "header":"Кейсы РК",
-                  "value":"admin-tree",
+                  "value":"admin-table",
                   "type":"vue",
                   "child":[],
                   "params":{ "config":"case_rk" }
                },
                {
                   "header":"Кейсы SMM",
-                  "value":"admin-tree",
+                  "value":"admin-table",
                   "type":"vue",
                   "child":[],
                   "params":{ "config":"case_smm" }
                },
                {
                   "header":"Кейсы SEO",
-                  "value":"admin-tree",
+                  "value":"admin-table",
                   "type":"vue",
                   "child":[],
                   "params":{ "config":"case_seo" }
                },
                {
                   "header":"Кейсы сайты",
-                  "value":"admin-tree",
+                  "value":"admin-table",
                   "type":"vue",
                   "child":[],
                   "params":{ "config":"case_sites" }
+               },
+               {
+                  "header":"Кейсы айдентика",
+                  "value":"admin-table",
+                  "type":"vue",
+                  "child":[],
+                  "params":{ "config":"case_identity" }
                },
          ],
          
@@ -123,6 +146,13 @@ left_menu=[
          "type":"vue",
          "child":[],
          "params":{ "config":"service" }
+      },
+      {
+         "header":'Блок "Вас может заинтересовать"',
+         "value":"admin-table",
+         "type":"vue",
+         "child":[],
+         "params":{ "config":"interest" }
       },
       {
          "header":"Клиенты",
@@ -174,6 +204,13 @@ left_menu=[
          "params":{ "config":"why_we" }
       },
       {
+         "header":"Готовые решения",
+         "value":"admin-tree",
+         "type":"vue",
+         "child":[ ],
+         "params":{ "config":"solution" }
+      },
+      {
          "header":"Формы обратной связи",
          "type":"",
          'icon':'fa fa-arrow-right',
@@ -184,6 +221,20 @@ left_menu=[
                "type":"vue",
                "child":[ ],
                "params":{ "config":"send_request" }
+            },
+            {
+               "header":"Оставить заявку (со страницы услуг)",
+               "value":"admin-table",
+               "type":"vue",
+               "child":[ ],
+               "params":{ "config":"send_request2" }
+            },
+            {
+               "header":"Заявки на готовое решение",
+               "value":"admin-table",
+               "type":"vue",
+               "child":[ ],
+               "params":{ "config":"send_request_solution" }
             },
             {
                "header":"Остались вопросы?",

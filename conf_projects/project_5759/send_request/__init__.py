@@ -44,10 +44,11 @@ form={
         },
         {
             'description':'Дата и время регистрации',
-            'type':'datetime',
+            'type':'text',
             'name':'registered',
-            'filter_on':1,
+            'read_only':True,
             
+            'filter_on':1
         }
   ]  
     

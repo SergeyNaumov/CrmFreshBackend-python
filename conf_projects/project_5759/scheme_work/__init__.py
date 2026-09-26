@@ -14,18 +14,18 @@ form={
             'type':'text',
             'name':'header',
         },
+        #{
+        #    'description':'Число',
+        #    'type':'text',
+        #    'name':'num',
+        #},
         {
-            'description':'Число',
-            'type':'text',
-            'name':'num',
+             'description':'Иконка',
+             'add_description':'227x173',
+             'filedir':'./files/project_5759/scheme_work',
+             'type':'file',
+             'name':'icon',
         },
-        # {
-        #     'description':'Иконка',
-        #     'add_description':'347x265',
-        #     'filedir':'./files/project_5759/scheme_work',
-        #     'type':'file',
-        #     'name':'icon',
-        # },
         {
             'description':'Текст',
             'type':'wysiwyg',

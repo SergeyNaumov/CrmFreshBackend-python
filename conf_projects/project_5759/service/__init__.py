@@ -1,42 +1,4 @@
-"""
 
-create table struct_5759_service_stage(
-    id int unsigned primary key auto_increment,
-    service_id int unsigned not null,
-    header varchar(200) not null default '',
-    photo varchar(200) not null default '',
-    body text,
-    enabled tinyint unsigned not null default '0',
-    constraint foreign key(service_id) references struct_5759_service(id) on update cascade on delete cascade
-) engine=innodb default charset=utf8;
-
-create table struct_5759_service_tarif1(
-    id int unsigned primary key auto_increment,
-    service_id int unsigned not null,
-    header varchar(200) not null default '',
-    anons varchar(256) not null default '',
-    price int unsigned not null default '0',
-    photo varchar(200) not null default '',
-    body text,
-    enabled tinyint unsigned not null default '0',
-    constraint foreign key(service_id) references struct_5759_service(id) on update cascade on delete cascade
-) engine=innodb default charset=utf8 comment 'Тарифы1'; 
-
-create table struct_5759_service_tarif2(
-    id int unsigned primary key auto_increment,
-    service_id int unsigned not null,
-    header varchar(200) not null default '',
-    
-    price int unsigned not null default '0'
-    anons varchar(256) not null default '',
-    deadline varchar(255)
-    photo varchar(200) not null default '',
-    body text,
-    enabled tinyint unsigned not null default '0',
-    constraint foreign key(service_id) references struct_5759_service(id) on update cascade on delete cascade
-) engine=innodb default charset=utf8;
-
-"""
 form={
     'work_table':'struct_5759_service',
     'work_table_id':'id',
@@ -50,14 +12,27 @@ form={
     'default_find_filter':'',
     'max_level':2,
     'wide_form':True,
-    
     'fields': [ 
         {
             'description':'Наименование услуги',
             'type':'text',
             'name':'header',
-            'tab':'main'
+            'tab':'main',
+            #'frontend':{
+            #    'ajax':{
+            #        'name':'in_ext_url'
+            #    }
+            #}
         },
+        # {
+        #     'description':'url',
+        #     'name':'in_ext_url',
+        #     'type':'in_ext_url',
+        #     'in_url':'/service/<%id%>',
+        #     'foreign_key':'project_id',
+        #     'foreign_key_value':5759,
+        #     'tab':'main'
+        # },
         # Здесь помещаем только те поля, которые нам нужны для сайта (чтение структуры)
         {
             'description':'Иконка',
@@ -91,6 +66,13 @@ form={
             'add_description':'без нумерации',
             'name':'promo_body',
             'type':'textarea',
+            'tab':'promo'
+        },
+        {
+            'description':'Фоновое изображение promo',
+            'type':'file',
+            'filedir':'./files/project_5759/service_promo_bg',
+            'name':'promo_bg',
             'tab':'promo'
         },
         # Тарифы
@@ -150,7 +132,7 @@ form={
             'table_id':'id',
             'foreign_key':'service_id',
             'sort':1,
-            'view_type':'list',
+            #'view_type':'list',
             'fields':[
                 {'description':'Наименование', 'name':'header','type':'text'},
                 {'description':'Цена', 'name':'price','type':'text'},
@@ -162,6 +144,12 @@ form={
             'tab':'tarifs2'
         },
         # Этапы работ
+        {
+            'description':'Заголовок блока "Этапы работ"',
+            'name':'stages_header',
+            'type':'text',
+            'tab':'stages'
+        },
         {
             'description':'Содержимое блока "Этапы работ"',
             'name':'stages',

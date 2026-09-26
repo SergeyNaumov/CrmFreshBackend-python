@@ -236,7 +236,7 @@ async def project_get_permissions_for(form,login):
           LEFT JOIN project_manager ow ON (mg.owner_id = ow.id) 
         WHERE m.login = %s and m.project_id=%s
       """,
-      values=[login,s.project.id],
+      values=[login,form.s.project['id']],
       onerow=1,
       log=form.log 
   )

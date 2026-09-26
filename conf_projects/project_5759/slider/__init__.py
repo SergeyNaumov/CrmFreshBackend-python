@@ -78,6 +78,11 @@ form={
             'type':'text',
             'name':'button',
         },
+        {
+            'description':'Вкл',
+            'type':'checkbox',
+            'name':'enabled',
+        }
 
 
   ]  

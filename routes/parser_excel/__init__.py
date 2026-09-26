@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
 from config import config as sysconfig
 #from lib.engine import s
 from .load_parser_from_config import *
@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.post('/{config}')
-async def process_parser_excel(config: str, R:dict):
+async def process_parser_excel(config: str, R:dict, request: Request):
 
     config_folder=sysconfig.get('config_folder')
 
@@ -38,4 +38,4 @@ async def process_parser_excel(config: str, R:dict):
         return await preload(parser, R)
 
     if action == 'load':
-        return await load(parser, R)
+        return await load(parser, R, request.state.engine.db)

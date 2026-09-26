@@ -2,14 +2,18 @@ import aiomysql, asyncio
 from .functions import *
 
 
-loop = asyncio.get_event_loop()
-
 class FreshDB():
     def __init__(self,settings):
         self.settings = settings ; self.error_str='' ; self.pool = None
 
     async def create_pool(self, **arg):
         settings=self.settings
+        # Раньше здесь был module-level loop=asyncio.get_event_loop() и loop=loop
+        # в create_pool. На python 3.12+ uvicorn импортирует приложение ДО
+        # запуска event loop, поэтому get_event_loop() создавал отдельный loop и
+        # пул бд падал с "got Future attached to a different loop".
+        # create_pool -- корутина, поэтому берём loop уже запущенного цикла.
+        loop=asyncio.get_running_loop()
         self.pool = await aiomysql.create_pool(
             minsize=settings.get('min_size_pool',2),
             maxsize=settings.get('max_size_pool',20),

@@ -1,4 +1,3 @@
-from lib.engine import s
 from .go_parse import go_parse
 import re
 
@@ -30,7 +29,7 @@ def check_before_load_values(errors:list, parser: dict, R:dict):
     return False
 
 
-async def load(parser:dict, R:dict):
+async def load(parser:dict, R:dict, db):
     errors=[]; fields=R.get('fields')
     loaded_filename=R.get('loaded_filename')
     data_line_number=R.get('data_line_number')
@@ -86,7 +85,7 @@ async def load(parser:dict, R:dict):
                     #record+=f"{field_names.get('field_name')}: {data[field_name]}"
 
             if len(where):
-                if exists:=await s.db.query(
+                if exists:=await db.query(
                         query=f"select * from {parser['work_table']} where {' AND '.join(where) } limit 1",
                         values=[values],
                         onerow=1
@@ -111,7 +110,7 @@ async def load(parser:dict, R:dict):
                 work_table_id=parser['work_table_id']
                 exists_id=e[ work_table_id ]
 
-                await s.db.save(
+                await db.save(
                     table=parser.get('work_table'),
                     data=data,
                     update=1,
@@ -121,7 +120,7 @@ async def load(parser:dict, R:dict):
                 
             else:
                 # запись ещё не существует
-                await s.db.save(
+                await db.save(
                     table=parser.get('work_table'),
                     data=data,
                     #debug=1,

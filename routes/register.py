@@ -1,8 +1,7 @@
 from lib.core import cur_year,cur_date, gen_pas
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from config import config
 #from db import db,db_read,db_write
-from lib.engine import s
 from lib.session import *
 #import re
 from lib.send_mes import send_mes
@@ -11,10 +10,12 @@ from lib.form_control import check_rules, is_email, is_phone
 #valid_email=re.compile(r"^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$")
 #valid_phone=re.compile(r"")
 router = APIRouter()
-errors=[]
-def exist_login(R):
+
+# errors передаётся аргументом: глобальный список нельзя -- при параллельных
+# запросах ошибки смешаются
+async def exist_login(request, R, errors):
   # Проверяем заявку
-  exists=s.db.get(
+  exists=await request.state.engine.db.get(
     table='order_reg_company',
     where='login = %s',
     errors=errors,
@@ -25,7 +26,7 @@ def exist_login(R):
   
   # если заявки нет, проверяем есть ли такой менеджер
   if not exists:
-    exists=s.db.get(
+    exists=await request.state.engine.db.get(
       table='manager',
       where='login = %s',
       errors=errors,
@@ -42,23 +43,26 @@ def exist_login(R):
 
 # Регистрация
 @router.post('/register')
-async def register(R: dict):
+async def register(R: dict, request: Request):
   errors=[]
   response={'success':0,'errors':[]}
   #print('REGISTER!')
   if R:
+    # exist_login ходит в БД, поэтому проверяем его до сбора rules
+    login_exists=await exist_login(request,R,errors)
+
     rules=[
        [ (R['phone']),'Телефон не указан'],
        [ is_phone(R['phone']),'Телефон указан не корректно' ],
        [ (R['login']),'Email не указан'],
        [ is_email(R['login']),'Email указан не корректно' ],
-       [ not exist_login(R), 'Такой Emal уже существует в нашей системе. Пожалуйста укажите другой, или воспользуетесь <a href="/remember">формой восстановления пароля</a>']
+       [ not login_exists, 'Такой Emal уже существует в нашей системе. Пожалуйста укажите другой, или воспользуетесь <a href="/remember">формой восстановления пароля</a>']
     ]
 
     check_rules(rules,response['errors'])
 
     if(not len(response['errors'])): # все проверки пройдены, сохраняем
-      response['reg_order_id']=s.db.save(
+      response['reg_order_id']=await request.state.engine.db.save(
         table='order_reg_company',
         errors=response['errors'],
         data=R
@@ -99,10 +103,10 @@ async def register(R: dict):
   return response
 # Напоминание пароля
 @router.post('/remember/get-access-code')
-async def remember_get_code(R: dict):
+async def remember_get_code(R: dict, request: Request):
   response={'success':1,'errors':[]}
   if R:
-    manager=s.db.get(
+    manager=await request.state.engine.db.get(
       table='manager',
       where='login = %s',
       values=[R['login']],
@@ -111,7 +115,7 @@ async def remember_get_code(R: dict):
     
     if(manager):
       remember_code=gen_pas(10,'012345678')
-      s.db.save(
+      await request.state.engine.db.save(
         table='remember_code',
         data={
           'id':manager['id'],
@@ -141,10 +145,10 @@ async def remember_get_code(R: dict):
 
 # Проверка кода
 @router.post('/remember/check-access-code')
-async def remember_check_code(R: dict):
+async def remember_check_code(R: dict, request: Request):
   response={'success':0,'errors':[]}
   if R:
-    code_value=s.db.get(
+    code_value=await request.state.engine.db.get(
       table='remember_code',
       where='code = %s',
       values=[R['remember_code']],
@@ -161,10 +165,10 @@ async def remember_check_code(R: dict):
 
 # Проверка кода
 @router.post('/remember/change-password')
-async def remember_check_code(R: dict):
+async def remember_check_code(R: dict, request: Request):
   response={'success':0,'errors':[]}
   if R:
-    code_value=s.db.get(
+    code_value=await request.state.engine.db.get(
       table='remember_code',
       tables=[
         {'t':'manager','a':'m','l':'m.id=wt.id'}
@@ -174,7 +178,7 @@ async def remember_check_code(R: dict):
     )
 
     if(code_value):
-      s.db.query(
+      await request.state.engine.db.query(
         query='UPDATE manager set password=sha2(%s,256) where id=%s',
         values=[R['password'],R['id']],
       )

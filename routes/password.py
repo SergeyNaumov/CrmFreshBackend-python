@@ -1,6 +1,5 @@
 from lib.core import cur_year,cur_date, exists_arg
 from fastapi import FastAPI, APIRouter, Request
-from lib.engine import s
 
 #import re
 from lib.send_mes import send_mes

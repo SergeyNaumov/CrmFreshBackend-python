@@ -1,12 +1,12 @@
 from lib.core import cur_year,cur_date, cur_hour
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 #from config import config
-from lib.engine import s
+#from lib.engine import s
 from lib.core_crm import get_role, get_manager, get_group_options
 
 router = APIRouter()
 
-async def get_email_list():
+async def get_email_list(s):
   # учитываем роль
 
   manager_id = await get_role(s.db, s.request.state.manager['id'])
@@ -19,8 +19,8 @@ async def get_email_list():
 
 # Дни рождения на главной странице
 @router.get('/birthdays')
-async def get_birthdays():
-
+async def get_birthdays(request: Request):
+  s=request.state.engine
   config=s.config
   manager_table=config["auth"]["manager_table"]
   _list=await s.db.query(
@@ -30,10 +30,11 @@ async def get_birthdays():
 
 # Уведомления на главной
 @router.get('/notifications')
-async def get_notifications():
+async def get_notifications(request: Request):
+  s=request.state.engine
   _list=[]
 
-  email_list=await get_email_list()
+  email_list=await get_email_list(s)
 
   if len(email_list):
     #return email_list
@@ -45,9 +46,10 @@ async def get_notifications():
 
 # Получение новых сообщений
 @router.get('/notifications/update/{max_id}')
-async def new_notifications(max_id: int):
+async def new_notifications(max_id: int, request: Request):
+  s=request.state.engine
   _list=[]
-  email_list=await get_email_list()
+  email_list=await get_email_list(s)
   if len(email_list):
     #return email_list
     _list=await s.db.query(
@@ -60,12 +62,13 @@ async def new_notifications(max_id: int):
 
 
 @router.get('/notifications/set-readed/{_id}/{v}')
-async def set_readed(_id:int, v:int):
+async def set_readed(_id:int, v:int, request: Request):
+  s=request.state.engine
   if v:
     v=1
   else:
     v=0
-  email_list=await get_email_list()
+  email_list=await get_email_list(s)
   if len(email_list):
     await s.db.query(
       query="UPDATE mail_send set readed=%s where id=%s and to_addr in ('"+"','".join(email_list)+"')" ,
@@ -76,7 +79,8 @@ async def set_readed(_id:int, v:int):
 
 
 @router.get('/manager-load/save/{percent}')
-async def save_manager_load(percent: int):
+async def save_manager_load(percent: int, request: Request):
+  s=request.state.engine
   manager_id = await get_role(s.db, s.request.state.manager['id'])
   h=cur_hour()
   if h>=11:
@@ -106,8 +110,8 @@ async def save_manager_load(percent: int):
 
 # Инициализация компонента manager-load (загрузка менеджера)
 @router.get('/manager-load/init')
-async def init_manager_load():
-  
+async def init_manager_load(request: Request):
+  s=request.state.engine
   manager_id = await get_role(s.db, s.request.state.manager['id'])
   #print('MANAGER_ID:',manager_id)
   #return {'manager_id':manager_id}
@@ -130,7 +134,8 @@ async def init_manager_load():
 
 # Главная
 @router.get('')
-async def mainpage():
+async def mainpage(request: Request):
+  s=request.state.engine
   config=s.config
   curdate=cur_date(format="%d.%m.%Y")
   response={'curdate':curdate,'errors':[],'success':1}

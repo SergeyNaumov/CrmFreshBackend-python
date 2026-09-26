@@ -37,6 +37,12 @@ form={
                     'size':'800x0',
                     'quality':'90'
                 },
+                {
+                    'description':'Миниатюры в модалке',
+                    'file':'<%filename_without_ext%>_mini3.<%ext%>',
+                    'size':'78x109',
+                    'quality':'90'
+                },
             ]
         },
         {
@@ -45,6 +51,13 @@ form={
             'name':'dat',
             'make_change_in_search':1,
             'filter_on':1
+        },
+        {
+            'description':'На главную',
+            'type':'checkbox',
+            'name':'main',
+            'make_change_in_search':1,
+            'filter_on':1,
         },
         {
             'description':'Вкл',

@@ -28,7 +28,7 @@ form={
                 {
                     'description':'Для главной и внутренней страниц',
                     'file':'<%filename_without_ext%>_mini1.<%ext%>',
-                    'size':'243x240',
+                    'size':'249x0',
                     'quality':'90'
                 },
                 {
@@ -44,6 +44,13 @@ form={
             'description':'Дата',
             'type':'date',
             'name':'dat',
+            'make_change_in_search':1,
+            'filter_on':1,
+        },
+        {
+            'description':'На главную',
+            'type':'checkbox',
+            'name':'main',
             'make_change_in_search':1,
             'filter_on':1,
         },

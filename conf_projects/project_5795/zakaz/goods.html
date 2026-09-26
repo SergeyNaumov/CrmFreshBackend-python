@@ -1,0 +1,27 @@
+<style>
+    table.goods {border-collapse: collapse;}
+    .goods td {border: 1px solid gray; padding: 2px 5px;}
+    .goods tr.h td {font-weight: bold;}
+</style>
+<table class="goods">
+    <tr class="h">
+        <td>Название / артикул</td>
+        <td>Цена</td>
+        <td>Кол-во</td>
+        <td>Сумма</td>
+    </tr>    
+    {%for g in good_list%}
+    <tr>
+        <td>{{g.header}}<br>
+            <small>{{g.artikul}}</small>
+        </td>
+        <td>{{g.price}}</td>
+        <td>{{g.cnt}}</td>
+        <td>{{g.price * g.cnt}}</td>
+    </tr>
+    {%endfor%}
+    <tr>
+        <td colspan="3">Итого:</td>
+        <td>{{total_price}}</td>
+    </tr>
+</table>

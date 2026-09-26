@@ -2,7 +2,7 @@ import importlib,os
 
 from lib.session import project_get_permissions_for, get_permissions_for, session_start
 
-from lib.engine import s
+#from lib.engine import s
 from lib.core import exists_arg
 
 from config import config as sysconfig
@@ -19,7 +19,7 @@ def need_only_read(form):
 
   return False
 
-async def get_cur_role(**arg):
+async def get_cur_role(s, **arg):
   form=arg['form']
   if(form.config == 'manager'):
     return arg['login']
@@ -146,9 +146,22 @@ def load_form_from_dir(confdir,conflib_dir, arg):
   return [form,errors]
 
 async def read_config(**arg):
-
+  
   if not(request:=exists_arg('request',arg)):
-    request=s.request
+  #  request=s.request
+    print("ERROR READ CONFIG NOT request!")
+  
+  s = request.state.engine  
+  project_id=request.state.project['project_id']
+  print('project_id: ',project_id)
+  # попытка загрузки локального конфига
+  if project_id:
+    [form,errors]=load_form_from_dir(f'./conf_projects/project_{project_id}', f'conf_projects.project_{project_id}',arg)
+
+    if len(errors):
+      return error(errors)
+
+
 
   response={}
   
@@ -158,22 +171,23 @@ async def read_config(**arg):
   
   # попытка загрузки локального конфига
   config_folder=exists_arg('config_folder',sysconfig)
-  
-  if not(config_folder): config_folder='conf'
+  #print('config_folder:',config_folder, 'form: ',form)
+  if not(form):
+    if not(config_folder): config_folder='conf'
+    [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
 
-  [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
   if len(errors): return error(errors)
   
   # Если локальной папки нет -- загружаем глобальный конфиг
   if not(form):
     [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
     if len(errors): return error(errors)
-
+  print('form: ',form)
   if not(form):
     return error([f'конфиг {arg["config"]} не найден'])
   
   form.s=s
-
+  form.request=request
   s.form=form
   if 'after_read_form_config' in sysconfig:
       sysconfig['after_read_form_config'](form)
@@ -203,6 +217,7 @@ async def read_config(**arg):
 
     #print('use_roles:',login)
     login=await get_cur_role(
+     s,
      login=login,
      form=form
     )
@@ -222,6 +237,7 @@ async def read_config(**arg):
       request.state.manager=await get_permissions_for(form,login)
 
   form.manager=request.state.manager
+  
   # Атрибуты по умолчанию
   if exists_arg('id',arg): form.id=arg['id']
   if exists_arg('action',arg): form.action=arg['action']
@@ -243,7 +259,8 @@ async def read_config(**arg):
 
   await form.run_all_before_code()
   gfv = await form.get_fields_values()
-
+  
+  print('REQUEST: ',form.request)
   return form
 
 

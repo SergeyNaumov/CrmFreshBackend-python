@@ -2,7 +2,6 @@ from lib.core import cur_year,cur_date, exists_arg
 from fastapi import APIRouter, Request
 from config import config
 
-from lib.engine import s
 #from lib.run_event import run_event
 from lib.all_configs import read_config
 from .get_result.process_result_list import process_result_list

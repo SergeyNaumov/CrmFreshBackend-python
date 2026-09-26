@@ -25,7 +25,7 @@ class Engine():
     s.request=request=arg['request']
     s.headers=[]
     s.request.state.cookies={}
-    s.request.state.cookies_for_delete=[]
+    s.request.state.cookies_for_delete={}
     s._end=False
     s._content_type='application/json'
     s._content=''
@@ -39,7 +39,7 @@ class Engine():
     for k in s.request['headers']:
       s.env[str(k[0].decode("utf-8"))]=str(k[1].decode("utf-8"))
       #print(str( k[0].decode("utf-8") ),'=>',str(k[1].decode("utf-8")) )
-    
+    #print('ENV: ',s.env)
     #self.cookies['User-Agent']=''
 
     
@@ -88,7 +88,7 @@ class Engine():
       #print('RESET self.request.state.manager:',self.request.state.manager)
       manager=request.state.manager
       if manager['id'] and ('after_create_engine' in config):
-        config['after_create_engine'](s)
+        await config['after_create_engine'](s,request)
 
       #print('MANAGER:',self.manager)
 
@@ -98,13 +98,27 @@ class Engine():
     if len(par)==2:
       arg['name']=par[0]
       arg['value']=par[1]
-    
+
     #print('arg',arg)
-    if arg['value'] or str(arg['value'])=='0' or not(arg['value']):
-      self.request.state.cookies[arg['name']]=arg['value']
-    else:
-      self.request.state.cookies_for_delete.append(arg['name'])
-    
+    # Атрибуты cookie -- из config['cookie'], их можно переопределить
+    # конкретным вызовом: s.set_cookie(name='x',value=1,samesite='none')
+    cookie_conf=config.get('cookie',{})
+    cookie_attr={
+      'path':arg.get('path',cookie_conf.get('path','/')),
+      'samesite':arg.get('samesite',cookie_conf.get('samesite','lax')),
+      'secure':arg.get('secure',cookie_conf.get('secure',False)),
+      'httponly':arg.get('httponly',cookie_conf.get('httponly',True)),
+    }
+
+    # value=None -- удаление cookie. Раньше условие
+    # (arg['value'] or str(arg['value'])=='0' or not(arg['value']))
+    # было всегда истинным, и ветка с cookies_for_delete была недостижима.
+    if arg['value'] is None:
+      self.request.state.cookies.pop(arg['name'],None)
+      self.request.state.cookies_for_delete[arg['name']]=cookie_attr
+      return
+
+    self.request.state.cookies[arg['name']]=dict(value=arg['value'],**cookie_attr)
 
   def get_cookie(self,cookie_name):
     return self.request.cookies.get(cookie_name)

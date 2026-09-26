@@ -1,7 +1,6 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import Request, WebSocket, WebSocketDisconnect
 from config import config as sysconfig
-from lib.engine import s
 
 from .sockets_connector import sockets_connector
 from .models import *
@@ -15,12 +14,12 @@ router = APIRouter()
 
 
 @router.get('/init')
-async def init():
+async def init(request: Request):
     # Инициализация GPT для формы
     gpt_list=[] ; fields={} ; WS=None
     need_inited=False
     if gpt_assist_rules:=sysconfig.get('gptassist_rules'):
-        rules=gpt_assist_rules(s)
+        rules=await gpt_assist_rules(request)
         gpt_list=rules.get('gpt_list',[])
 
         if len(gpt_list):
@@ -39,10 +38,10 @@ async def init():
 
 # Отправка задачи в GPT
 @router.post('/send-task')
-async def send_request_to_gpt(r:RequestTask):
+async def send_request_to_gpt(request: Request,r:RequestTask):
     gpt_assist_rules=sysconfig.get('gptassist_rules')
     task_id=gen_pas(50)
-    s.db.save(
+    await request.state.engine.db.save(
         table='crm_gptassist',
         data={
             'task_id':task_id,
@@ -96,8 +95,8 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
             try:
                 R = json.loads(data)
 
-                if R['action']=='send_message':
-                    messenger_rules['send'](s,R)
+                # рассылка сообщений отключена: в конфиге svcms_manager
+                # messenger_rules={} -- отправлять нечем
 
             except ValueError as e:
                 pass

@@ -1,9 +1,6 @@
-from lib.engine import s
 from lib.core import create_fields_hash, exists_arg
 
 from .set_default_attributes import set_default_attributes
-def form_self():
-  return s
 
 
 
@@ -12,10 +9,11 @@ def form_self():
 
 def default_config_attr(form,arg): # Атрибуты формы по умолчанию
 
-
-
     # Атрибуты по умолчанию
-    s.form=form
+    # общий engine из модуля не использовать (s.form=form) -- при параллельных
+    # запросах это общее мутабельное состояние; контекст живёт в request.state
+    def form_self():
+      return form.request.state.engine
     # read_only
     if not hasattr(form,'read_only'): form.read_only=0
 

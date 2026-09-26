@@ -1,5 +1,5 @@
-from lib.engine import s
 import importlib,os
+from fastapi import  Request
 import json
 
 # def get_product_options():
@@ -19,16 +19,17 @@ import json
 
 
 
-def left_menu():
+async def left_menu(request: Request):
+  s = request.state.engine
   errors=[]
-  manager=None
+  manager=request.state.manager
   manager_menu_table=None
-  #print('manager',s.manager,s.project)
+  #print('MANAGER: ',request.state.manager)
 
     
   #s.pre('5555')  
 
-  left_menu=[
+  left_menu_data=[
     {
       'header':'Главная',
       'value':'mainpage',
@@ -39,7 +40,7 @@ def left_menu():
     },
     {
       'header':'Перейти на сайт',
-      'value':f'http://{s.manager["host"]}',
+      'value':f'http://{manager["host"]}',
       'type':'newtab',
       'child':[],
       'icon':'fa fa-arrow-right',
@@ -55,31 +56,32 @@ def left_menu():
     #standart_service,
     #extended_service
   ]
-  path_to_menu=f'./conf_projects/project_{s.project_id}/left_menu.py'
+  project_id=request.state.project['project_id']
+  path_to_menu=f'./conf_projects/project_{project_id}/left_menu.py'
   if os.path.isfile(path_to_menu): # Загружаем меню из файла
     #return {'file':'exists'}
     try:
-      module_path=f'conf_projects.project_{s.project_id}.left_menu'
+      module_path=f'conf_projects.project_{project_id}.left_menu'
       module=importlib.import_module(module_path)
       _list=module.left_menu
       for m in _list:
-        left_menu.append(m)
+        left_menu_data.append(m)
     except SyntaxError as e:
       errors.append(f'Ошибка синтаксиса в {path_to_menu}')
   else: # Формируем на основании БД
-      left_menu.append(get_standart_service(errors))
-      left_menu.append(get_extended_service(errors))
+      left_menu_data.append(await get_standart_service(request,errors))
+      left_menu_data.append(await get_extended_service(request,errors))
     
 
-  manager=s.db.query(
+  manager= await s.db.query(
     query='select manager_id id,login from manager where login=%s',
-    values=[s.login],
+    values=[manager['login']],
     onerow=1,
   )
 
 
   return {
-    'left_menu':left_menu,
+    'left_menu':left_menu_data,
 
     'manager':manager,
     'errors':errors,
@@ -87,7 +89,9 @@ def left_menu():
   }
   
 # Получение стандартных сервисов
-def get_standart_service(errors): # Получение стандартных сервисов
+async def get_standart_service(request,errors): # Получение стандартных сервисов
+  s = request.state.engine
+  project_id=request.state.project['project_id']
   standart_service={
       'header':'Стандартные сервисы',
       'value':'https://help.design-b2b.com/',
@@ -96,7 +100,7 @@ def get_standart_service(errors): # Получение стандартных с
       'child':[],
   }
   #print("srv: ",serv_list)
-  serv_list=s.db.query(
+  serv_list= await s.db.query(
       query='''
         SELECT
           header,link,json
@@ -105,7 +109,7 @@ def get_standart_service(errors): # Получение стандартных с
         WHERE sp.struct_public_id=psp.struct_public_id and psp.project_id=%s
        ''',
        errors=errors,
-       values=[s.project_id]
+       values=[project_id]
   )
 
   for srv in serv_list:
@@ -121,7 +125,9 @@ def get_standart_service(errors): # Получение стандартных с
 
 
 # Получение расширенных сервисов
-def get_extended_service(errors):
+async def get_extended_service(request,errors):
+    s = request.state.engine
+    project_id=request.state.project['project_id']
     extended_service={
       'header':'Расширенные сервисы',
       'value':'https://help.design-b2b.com/',
@@ -136,10 +142,12 @@ def get_extended_service(errors):
         # }
       ],
     }
+    
     #print('GET_EXTENDED')
-    serv_list=s.db.query(
+    serv_list=await s.db.query(
       query='select header,json from project_menu where project_id=%s order by sort',
-      values=[s.project_id],
+      values=[project_id],
+      debug=1,
       errors=errors,
     )
     for srv in serv_list:

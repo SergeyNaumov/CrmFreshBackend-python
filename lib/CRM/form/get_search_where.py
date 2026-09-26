@@ -20,7 +20,7 @@ def get_search_where(form,query):
   #print('get_search_where - доделать')
   if not len(query):
     if isinstance(form.default_find_filter,str):
-      form.default_find_filter=[form.default_find_filter.split(',')]
+      form.default_find_filter=form.default_find_filter.split(',')
 
     for name in form.default_find_filter:
         if name in form.fields_hash:

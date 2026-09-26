@@ -1,4 +1,3 @@
-from lib.engine import s
 from lib.core import exists_arg
 from lib.check_field import check_field
 from .get_search_tables import get_search_tables
@@ -209,6 +208,10 @@ class Form():
   # запускаем before_code для всех полей
   async def run_all_before_code(form):
     field_idx=0
+
+    if 'before_code' in form.events:
+      await form.run_event('before_code')
+
     for field in form.fields:
       if 'before_code' in field:
         #form.run_event(form,'before_code for '+f['name'],f)
@@ -266,7 +269,18 @@ class Form():
         new_fields.append(f)
     
     form.fields=new_fields
+  
+  def add_field(form,field,after=''):
+    if after:
+      new_fields=[]
+      for f in form.fields:
+        new_fields.append(f)
+        if f['name']==after:
+          new_fields.append(field)
 
+      form.fields=new_fields
+    else:
+      form.fields.append(field)
 
 
   def template(form,filename,**values): return func_template(form,filename,**values)

@@ -49,6 +49,11 @@ form={
             'name':'main',
         },
         {
+            'description':'Выводить на странице "готовые решения"',
+            'type':'checkbox',
+            'name':'solutions',
+        },
+        {
             'description':'Вкл',
             'type':'checkbox',
             'name':'enabled',

@@ -29,6 +29,12 @@ form={
             'regexp_rules':[ '^.+$','Заполните имя']
         },
         {
+            'description':'Email',
+            'name':'email',
+            'type':'text',
+            'filter_on':1,
+        },
+        {
             'description':'Телефон',
             'type':'text',
             'name':'phone',
@@ -50,6 +56,7 @@ form={
             'description':'Дата и время регистрации',
             'type':'text',
             'filter_on':1,
+            'read_only':True,
             'name':'registered',
         }
   ]  

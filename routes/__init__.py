@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 #from config import config
-from lib.engine import s
 from .core_routes import router as router_core
 from .mainpage import router as router_mainpage
 from .register import router as router_register
@@ -70,7 +69,7 @@ router.include_router(router_autocomplete,prefix='/autocomplete')
 router.include_router(stat_tool,prefix='/stat-tool')
 router.include_router(router_ajax) # /ajax
 router.include_router(router_gptassist,prefix='/gpt-assist')
-#router.include_router(router_svcms,prefix='/svcms')
+router.include_router(router_svcms,prefix='/svcms')
 
 
 

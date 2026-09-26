@@ -2,18 +2,20 @@ from lib.core import cur_year,cur_date
 from fastapi import FastAPI, APIRouter, Request
 from config import config
 #from db import db,db_read,db_write
-from lib.engine import s
+#from lib.engine import s
 from lib.session import *
 from lib.send_mes import send_mes
 
 router = APIRouter()
 @router.get('/test')
-async def test():
+async def test(request: Request):
+  s = request.state.engine
   return {'okay':await s.db.query(query="SELECT * from managers where login='naumov'",onerow=1)}
 
 # Левое меню по-умолчанию
 @router.get('/left-menu')
-async def leftmenu():
+async def leftmenu(request: Request):
+  s = request.state.engine
   errors=[]
   manager=None
   manager_menu_table=None
@@ -92,7 +94,7 @@ async def leftmenu():
 # Стартовая страница
 @router.get('/startpage')
 async def startpage(request: Request):
-
+  s = request.state.engine
   errors=s.errors
   manager=None
   manager_menu_table=None
@@ -100,7 +102,7 @@ async def startpage(request: Request):
   if hasattr(request.state,'manager'):
 
     if(config['use_project']):
-        print('Q1')
+        
         manager=await s.db.query(
           query=f'''
             select
@@ -114,17 +116,21 @@ async def startpage(request: Request):
         manager_menu_table='project_manager_menu'
 
     else:
+        select_fields=f"""
+            *,
+            concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link
+        """
+        if telegram:=config.get('telegram'):
+          select_fields+=f""", concat('https://t.me/{telegram['bot_name']}/?start=linkcrm-',id,'-',md5(password)) tg_link"""
+
         manager=await s.db.query(
           query=f'''
             select
-              *,
-              concat('/edit_form/manager/',{config['auth']['manager_table_id']}) link,
-              concat('https://t.me/{config['telegram']['bot_name']}/?start=linkcrm-',id,'-',md5(password)) tg_link
+              {select_fields}    
             from
               {config['auth']['manager_table']} where login=%s
             ''',
           values=[request.state.manager['login']],
-          #debug=1,
           onerow=1,
         )
   else:
@@ -156,8 +162,8 @@ async def startpage(request: Request):
   # В конфиге настроен вывод на ссылку карточки        
   if auth.get('out_manager_card_link'):
     manager['out_manager_card_link']=True
-  if exists_arg('left-menu',s.config['controllers']):
-    left_menu_controller=s.config['controllers']['left_menu']
+  if exists_arg('left_menu',config['controllers']):
+    left_menu_controller=config['controllers']['left_menu']
   response={
     'title':config['title'],
     'copyright':config['copyright'].replace('{{cur_year}}',CY),
@@ -190,7 +196,8 @@ async def get_events():
 
 # Авторизация
 @router.post('/login')
-async def login(R: dict):
+async def login(R: dict, request: Request):
+  s = request.state.engine
   response={'success':0}
   if R:
     if config['use_project']:
@@ -227,6 +234,7 @@ async def sm_test():
   return {'sended':True}
 
 @router.get('/logout')
-async def logout():
+async def logout(request: Request):
+  s = request.state.engine
   await session_logout(s)
   return {"success":1}
