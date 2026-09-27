@@ -34,10 +34,10 @@
 | `allready_out_on_result` | Уже выводится в результате (не дублировать) |
 | `make_change_in_search` | Редактируемое поле прямо в списке |
 | `tab` | Имя блока/вкладки (`cols`/`tabs`) |
-| `width` | Ширина (CSS) |
-| `style` | Инлайн-стиль контрола |
+| `width` | Ширина (CSS); для `date`/`time`/`datetime`/`daymon`/`yearmon` — ограничивает контрол (иначе 200px) |
+| `style` | Инлайн-стиль контрола; для date-подобных полей перекрывает `width` |
 | `placeholder` | Плейсхолдер (text/in_ext_url) |
-| `icon` | Иконка (для отдельных типов/кнопок) |
+| `icon` | Иконка: выводится **слева от поля** (MDI/FontAwesome/голое имя), см. `FormBlock.vue` |
 | `add_description` | Подпись-подсказка под полем |
 | `before_html` / `after_html` | HTML до/после поля |
 | `error_message` / `warning_message` | Сообщение об ошибке/предупреждении (можно ставить из `before_code`/зависимостей) |
