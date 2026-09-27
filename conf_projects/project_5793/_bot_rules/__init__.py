@@ -10,14 +10,14 @@ alter table struct_5759_slider add photo_mob varchar(20) not null default ''
 
 from .command import after_html as command_after_html
 from .ajax import ajax
-def url_before_code(form,field):
+async def url_before_code(form,field):
     #form.pre({'shop':form.shop})
     #field['description']=form.shop['domain']
-    shop=form.s.shop
+    shop=getattr(form.request.state,'shop',None) or {}
     #form.pre(shop)
     field['fields'][1]['values']=[
-        {'d':'ссылка на каталог товаров','v':f'https://{shop["domain"]}/good-catalog'},
-        {'d':'ссылка на каталог услуг','v':f'https://{shop["domain"]}/service-catalog'},
+        {'d':'ссылка на каталог товаров','v':f'https://{shop.get("domain","")}/good-catalog'},
+        {'d':'ссылка на каталог услуг','v':f'https://{shop.get("domain","")}/service-catalog'},
     ],
 
 form={

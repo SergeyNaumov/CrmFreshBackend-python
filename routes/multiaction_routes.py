@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 
 
@@ -48,10 +48,12 @@ async def set_all_value_field(form,ids):
         else:
             form.errors.append(f"Поле {name} не найдено")
 
-def delete_records(form,ids):
+async def delete_records(form,ids):
     if form.make_delete:
        query=f"DELETE FROM {form.work_table} WHERE {form.work_table_id} IN ({join_ids(ids)})"
-       print(query)
+       await form.db.query(
+           query=query,
+       )
     else:
         form.errors.append('Вам запрещено удалять записи')
 async def change_price(form,ids):
@@ -110,8 +112,9 @@ async def change_price(form,ids):
 
 # Выполняем действие над несколькими записями
 @router.post('/{config}')
-async def process(config:str, R:dict):
-    form=read_config(
+async def process(config:str, R:dict, request: Request):
+    form=await read_config(
+        request=request,
         action='save_value',
         config=config,
         R=R,
@@ -126,13 +129,13 @@ async def process(config:str, R:dict):
 
     if form.success():
         if subaction == 'set_all_value_field':
-            set_all_value_field(form,ids)
+            await set_all_value_field(form,ids)
 
         elif subaction == 'delete':
-            delete_records(form,ids)
+            await delete_records(form,ids)
 
         elif subaction == 'change_price':
-            change_price(form,ids)
+            await change_price(form,ids)
         else:
             form.errors.append(f"неизвестное действие: {subaction}")
 

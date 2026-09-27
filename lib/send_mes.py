@@ -4,7 +4,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from config import config
-from db import db
 
 
 def send_mes(**opt): # через t-pass

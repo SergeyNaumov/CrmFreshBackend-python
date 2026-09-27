@@ -1,0 +1,19 @@
+{
+  "models": {
+    "reasoning_provider": "openai",
+    "reasoning_model": "r1-coder",
+    "api_base": "http://localhost:11434/v1",
+    "api_key": "ollama",
+    "temperature": 0.6,
+    "max_tokens": 8192
+  },
+  "agents": {
+    "architect": {
+      "model": "r1-coder",
+      "system_prompt_style": "reasoning"
+    },
+    "coder": {
+      "model": "rafw007/ornith-claude-coder:latest"
+    }
+  }
+}

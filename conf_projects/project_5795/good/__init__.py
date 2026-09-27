@@ -1,5 +1,5 @@
 
-def enabled_before_code(form,field):
+async def enabled_before_code(form,field):
     if form.action=='new':
         field['value']=1
 

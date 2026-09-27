@@ -1,17 +1,17 @@
 from .ajax import ajax
-def permissions(form):
+async def permissions(form):
     #form.s.project_id=0
     form.ajax=ajax
 
-    if hasattr(form.s,'project_id') and form.s.project_id:
+    if getattr(form.request.state,'project',None):
       fld=form.get_field('photo')
-      fld['filedir']=fld['filedir'].replace('[project_id]',str(form.s.project_id) )
+      fld['filedir']=fld['filedir'].replace('[project_id]',str(form.request.state.project['project_id']) )
 
     header_field=form.get_field('header')
     header_field['frontend']={'ajax':{'name':'gen_url','timeout':100}}
 
     if form.id:
-      r=form.ov=form.db.query(
+      r=form.ov=await form.db.query(
         query=f"""
           select
             r.tech, r2.tech rp_tech

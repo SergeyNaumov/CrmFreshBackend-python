@@ -1,5 +1,4 @@
 from lib.core import exists_arg, gen_pas, join_ids
-from db import db
 from config import config
 from base64 import b64decode
 
@@ -47,7 +46,7 @@ async def session_create(s,**arg):
       add_where += ' AND '+arg['where']
 
   if exists_arg('max_fails_login',auth) and exists_arg('max_fails_login_interval',auth):
-      fails=await db.query(
+      fails=await s.db.query(
         query=f'select count(*) from {auth["session_fails_table"]} where login=%s and registered>=now() - interval %s second',
         values=[arg['login'],auth['max_fails_login_interval']],
         onevalue=True,
@@ -99,11 +98,11 @@ async def session_create(s,**arg):
     }
 
     key=gen_pas(200)
-    await db.query(
+    await s.db.query(
       query=f"delete from {auth['session_table']} where auth_id={auth_id}"
     )
 
-    await db.save(
+    await s.db.save(
       table=auth['session_table'],
       data={
         'auth_id':auth_id,

@@ -34,7 +34,7 @@ fields_for_reply=[
     },
 ]
 
-def ajax_keyboard_type(form, values):
+async def ajax_keyboard_type(form, values):
     result=[]
     #
     keyboard_type=values['keyboard_type']

@@ -1,8 +1,8 @@
-def permissions(form):
+async def permissions(form):
     #form.s.project_id=0
-    if hasattr(form.s,'project_id') and form.s.project_id:
+    if getattr(form.request.state,'project',None):
       icon_fld=form.get_field('photo')
-      icon_fld['filedir']=icon_fld['filedir'].replace('[project_id]',str(form.s.project_id) )
+      icon_fld['filedir']=icon_fld['filedir'].replace('[project_id]',str(form.request.state.project['project_id']) )
 
       #form.pre(icon_fld)
 

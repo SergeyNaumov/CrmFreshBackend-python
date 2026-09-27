@@ -1,14 +1,14 @@
-def permissions(form):
+async def permissions(form):
     #form.s.project_id=0
     
     #print('PERMISSIONS RUNNED',form.s.project_id)
-    if not(hasattr(form.s,'project_id')) or not(form.s.project_id):
+    if not(getattr(form.request.state,'project',None)):
         print('Доступ запрещён!')
         form.errors.append('Доступ запрещён!')
         return 
-    bot_id=form.db.query(
+    bot_id=await form.db.query(
         query='SELECT id from bot where project_id=%s',
-        values=[form.s.project_id],
+        values=[form.request.state.project['project_id']],
         onevalue=1
     )
     #form.pre({'bot_id:': bot_id})
@@ -20,10 +20,10 @@ def permissions(form):
     #    form.errors.append('Боты не найдены, обратитесь к администратору')
     #print('PERMISSIONS!',form.foreign_key,form.s.project_id  )
 
-def events_before_code(form):
+async def events_before_code(form):
     pass
 
-def before_delete(form):
+async def before_delete(form):
     pass
     
 

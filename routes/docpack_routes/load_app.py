@@ -1,4 +1,4 @@
-from db import get_db, db
+from db import get_db
 import os.path 
 from fastapi.responses import HTMLResponse
 from .check_document_data import check_dogovor, out_debug

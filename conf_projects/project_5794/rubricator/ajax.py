@@ -1,13 +1,13 @@
 import re
 from transliterate import translit
 
-def exists_url(form,url):
+async def exists_url(form,url):
   # если такой url занят, то возвращает ошибку
   where='where url=%s'
   if form.id:
     where+=f" AND id<>{form.id}"
 
-  exists=form.db.query(
+  exists=await form.db.query(
     query=f"select id,header,url from {form.work_table} {where}",
     values=[url],
     onerow=1
@@ -17,7 +17,7 @@ def exists_url(form,url):
   else:
     return ''
 
-def ajax_url(form,v):
+async def ajax_url(form,v):
   url=v.get('url')
   if not(url):
     return [
@@ -26,12 +26,12 @@ def ajax_url(form,v):
       }
     ]
 
-  if err:=exists_url(form,url):
+  if err:=await exists_url(form,url):
     return ['url',{'error':err}]
 
   return []
 
-def ajax_gen_url(form,v):
+async def ajax_gen_url(form,v):
 
   title=''
   old_url=v.get('url')
@@ -50,7 +50,7 @@ def ajax_gen_url(form,v):
 
 
   if url:
-    url_error=exists_url(form,url)
+    url_error=await exists_url(form,url)
   else:
     url_error='url не должен быть пустым'
 

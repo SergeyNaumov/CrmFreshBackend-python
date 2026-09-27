@@ -1,0 +1,85 @@
+# Известные проблемы
+
+Не чинить, пока не понадобится; список, чтобы не открывать заново.
+
+## Python 3.12
+
+Исправлено: в `db/freshdb.py` убран module-level `asyncio.get_event_loop()` и
+аргумент `loop=loop` в `aiomysql.create_pool`. Uvicorn импортирует приложение
+до запуска event loop, поэтому старый код создавал второй loop и падал с
+`got Future attached to a different loop`.
+
+## Исправлено (2026-09-27): глобальный `s` / `db`, `read_config`
+
+- Убран живой `from lib.engine import s` из `lib/CRM/plugins/search/xlsx.py`.
+  Глобал `s=Engine()` в `lib/engine.py` оставлен **только** как legacy-шим для
+  конфигов вне svcms_manager (см. `00-overview.md`).
+- `lib/session.py`, `lib/send_mes.py` — убран `from db import db`; `session_create`
+  использует `s.db`.
+- `routes/docpack_routes/load_act.py`, `load_app.py` — `get_db()` вместо
+  глобального `db`.
+- `routes/testing.py` — `s.db` вместо глобального `db`, `pymysql.escape_string`.
+- Добавлены `await read_config(request=request, ...)`: `routes/ajax.py`,
+  `page_routes.py`, `table_routes.py`, `documentation_routes.py`,
+  `extend_routes.py`, `multiaction_routes.py`, `news_routes.py`,
+  `video_routes.py`, `autocomplete.py`, `const_routes.py`,
+  `edit_form/multiconnect.py`.
+- `routes/multiaction_routes.py` — `await` у `set_all_value_field`/`change_price`,
+  `delete_records` теперь реально выполняет DELETE.
+
+## `conf_projects/` — миграция выполнена
+
+`project_5759/5782/5793/5794/5795` переведены на async (2026-09-27): хуки
+`async def`, `form.db.*` через `await`, `form.s.project_id` → `request.state`.
+Все модули импортируются. Осталось: в них встречаются вызовы `form.errors(...)`
+как функции и похожие исторические дефекты (срабатывают только в ветках ошибок).
+
+## Прочее
+
+- `routes/core_routes.py` — в рабочем дереве был случайно дописан артефакт
+  `<system> NOTE: Updated ...` и потерян `return response` (SyntaxError, роутер
+  не импортировался). Исправлено.
+- `routes/core_routes.py` → `/core/get-manager` вызывает
+  `project_get_permissions_for(form=None, ...)` и `get_permissions_for(R=R)` —
+  обе сигнатуры не совпадают, эндпоинт всегда возвращает ошибку.
+- `start/translab.sh` ссылается на несуществующий `config_translab`.
+- `start/svcms_admin.sh` делает `export config=svcms_manager` — модуля с таким
+  именем нет.
+- `routes/beeline/` создан, но нигде не подключён.
+- `models/` — нерабочий Peewee, `peewee` нет в зависимостях.
+- `lib/CRM/plugins/search/xlsx.py` импортирует `pandas`, `lib/seo.py` —
+  `transliterate`, `lib/svcmsmanager/cache_pages.py` — `pymemcache`. Ни одного
+  нет в `requirements.txt`, модули падают на импорте.
+- `celery`, `redis`, `kombu`, `amqp`, `billiard` в `requirements.txt` не
+  используются; `tasks/` пуста.
+- `db/functions.py:116` — `query_count += " WHERE {where}"` без `f`, WHERE не
+  попадает в count-запрос (ломается `maxpage`).
+- `SET lc_time_names='ru_RU'` выполняется на **каждом** запросе
+  (`db/freshdb.py:76`) — лишний round-trip.
+- `db.close_pool()` нигде не вызывается, shutdown-хука нет.
+- `lib/multiconnect.py` — устаревшая копия `lib/CRM/form/multiconnect.py`,
+  смешивает sync/await и не работает.
+- `lib/run_event.py` и `lib/run_event.py.back` — заглушки.
+- `lib/save_url_file.py` — заглушка (`pass`).
+- `lib/CRM/form/multiconnect_save.py` — пустой файл.
+- `db/freshdbs.py:19` переопределяет `exists_arg`; дублирует
+  `out_error`/`get_query`/`rez_to_str`/`get_func` из `db/functions.py`.
+- `routes/testing.py` подключён в прод (`routes/__init__.py:49`) и отдаёт
+  `/config` целиком (включая пароли БД). Отладочные эндпоинты оставлены
+  по решению команды; при ужесточении безопасности — убрать из-под prod.
+- `routes/core_routes/login.py` — мёртвый, никем не импортируется.
+- `daemons/gpt-daemon.py` — отдельный процесс, использует глобальный
+  `from db import db` (вне зоны правок).
+- `configs/beyeezy/bottom_menu/fields.py` — синтаксическая ошибка (непарные
+  скобки), конфиг beyeezy вне зоны правок.
+
+## Прочее по проекту
+
+- `requirements.txt` — полный `pip freeze`, не минимальный набор.
+- `.gitignore` — только `__pycache__` и `files/*`.
+- Тестового фреймворка нет. Проверка — запустить uvicorn и `curl` по эндпоинту.
+- `test.py`, `test_sync.py`, `test_resize.py` в корне — ручные скрипты.
+  `testform.html` — ручная тест-страница.
+- `js/Chart.bundle.min.js` — вендоренный Chart.js, из Python не подключается.
+- `starlette==1.7.0`, `fastapi==0.141.1`; `TestClient` требует `httpx2`,
+  которого нет в `.venv` — проверяйте реальным uvicorn и `curl`.

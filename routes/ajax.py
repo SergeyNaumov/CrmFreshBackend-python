@@ -1,3 +1,4 @@
+import inspect
 from lib.core import cur_year,cur_date, exists_arg
 from fastapi import FastAPI, APIRouter, Request
 #from lib.engine import s
@@ -11,15 +12,23 @@ from lib.all_configs import read_config
 #valid_phone=re.compile(r"")
 router = APIRouter()
 
+# Контроллеры в конфигах бывают и sync, и async -- поддерживаем оба.
+async def run_ajax(form,ajax_name):
+  res=form.ajax[ajax_name](form,form.R.get('values'))
+  if inspect.isawaitable(res):
+    res=await res
+  return res
+
 @router.get('/ajax/{config}/{ajax_name}')
-async def ajax_get(config:str,ajax_name:str):
+async def ajax_get(config:str,ajax_name:str,request: Request):
   success=True ; errors=[] ; result=[]
-  form=read_config(
+  form=await read_config(
+    request=request,
     script='ajax', config=config,
   )
 
   if exists_arg(ajax_name,form.ajax):
-    result = form.ajax[ajax_name](form)
+    result = await run_ajax(form,ajax_name)
   else:
     errors.append(f'не найден ajax-контроллер с именем: {ajax_name} обратитесь к разработчику')
 
@@ -42,7 +51,7 @@ async def ajax(config:str,ajax_name:str,R: dict, request: Request):
   result=[];
   
   if exists_arg(ajax_name,form.ajax):
-    result = await form.ajax[ajax_name](form,R.get('values'))
+    result = await run_ajax(form,ajax_name)
   else:
     errors.append(f'не найден ajax-контроллер с именем: {ajax_name} обратитесь к разработчику')
   

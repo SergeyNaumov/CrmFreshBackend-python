@@ -1,4 +1,4 @@
-def filter_code_body(form,field,row):
+async def filter_code_body(form,field,row):
   return f"<pre><small>{row['wt__body']}</small></pre>"
 
 #from .fields import get_fields

@@ -1,5 +1,5 @@
 from lib.core import cur_year,cur_date, exists_arg, get_name_and_ext
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 #from lib.engine import s
 
 #import re
@@ -13,12 +13,13 @@ router = APIRouter()
 
 # изменение пароля
 @router.post('/{config}')
-async def autocomplete(config:str,R: dict):
+async def autocomplete(config:str,R: dict,request: Request):
   success=1
   errors=[]
   field=''
   result_list=[]
   form = await read_config(
+    request=request,
     script='autocomplete', config=config,
     R=R,
     #id=R['id']

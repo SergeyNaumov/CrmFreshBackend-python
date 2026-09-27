@@ -8,9 +8,9 @@ from lib.CRM.plugins.InExtUrl import InExtUrl
 
             
         
-def permissions(form):
+async def permissions(form):
     # После поля header добавляем поле in_ext_url:
-    InExtUrl(form,
+    await InExtUrl(form,
      {
         'foreign_key':'project_id',
         'foreign_key_value':'5759',
@@ -46,7 +46,7 @@ def permissions(form):
             ]
         ]
         
-        form.ov=form.db.query(
+        form.ov=await form.db.query(
             query=f"select * from {form.work_table} where {form.work_table_id}={form.id}",
             onerow=1
         )

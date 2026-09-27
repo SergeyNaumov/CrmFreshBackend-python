@@ -1,4 +1,4 @@
-def add_gpt_fields(form):
+async def add_gpt_fields(form):
     form.tabs.append(
         {'name':'bot','description':'Настройки бота'},
     )

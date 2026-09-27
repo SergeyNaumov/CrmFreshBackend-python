@@ -1,5 +1,5 @@
 from lib.all_configs import read_config
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 import requests
 import urllib
 import json
@@ -7,11 +7,11 @@ import json
 router = APIRouter()
 
 @router.post('/extend/KLADR')
-async def kladr(R: dict):
+async def kladr(R: dict, request: Request):
   action='onestring'
   errors=[]
   if 'action' in R:
-    action==R['action']
+    action=R['action']
   
   list=[]
   query=R['query']
@@ -38,7 +38,7 @@ async def kladr(R: dict):
       
       if data:
         if config and name:
-            form=read_config(config=config,script='edit_form')
+            form=await read_config(request=request,config=config,script='edit_form')
             
             field=form.fields_hash[name]
             

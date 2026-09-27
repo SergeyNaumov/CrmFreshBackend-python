@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, Request
 from config import config
-from db import db
+from pymysql.converters import escape_string
 #from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
 from lib.send_mes import send_mes
 
@@ -32,7 +32,7 @@ async def test_cookie_write():
 
 @router.get('/test/quote')
 async def test_quote():
-  string=db.connect.escape_string('sv " \' cms')
+  string=escape_string('sv " \' cms')
   return {'result':string}
 @router.get('/test-cookie-read')
 async def test_cookie_read(request: Request):
@@ -42,14 +42,15 @@ async def test_cookie_read(request: Request):
   return {'cookie_reading':'ok'}
 
 @router.get("/config")
-async def show_config():
-  print(db)
+async def show_config(request: Request):
+  print(request.state.engine.db)
   return config
 
 @router.get('/test-query')
-async def test_query():
+async def test_query(request: Request):
+  s=request.state.engine
   errors=[]
-  result=db.query(
+  result=await s.db.query(
     query='desc test',
     values=[],
     errors=errors

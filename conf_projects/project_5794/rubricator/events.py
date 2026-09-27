@@ -1,11 +1,11 @@
 from .ajax import ajax
-def permissions(form):
-    project_id=form.s.project_id
+async def permissions(form):
+    project_id=form.request.state.project['project_id']
     form.work_table=f'struct_{project_id}_rubricator'
     #form.pre(project_id)
     form.ov=None
     if form.id:
-        form.ov=form.db.query(
+        form.ov=await form.db.query(
             query=f"select * from {form.work_table} where id={form.id}",
             onerow=1
         )
@@ -16,7 +16,7 @@ def permissions(form):
         photo_field['filedir']=f'./files/project_{project_id}/rubricator'
 
     if form.script=='edit_form' and form.id:
-        form.ov=form.db.query(
+        form.ov=await form.db.query(
             query=f"select * from {form.work_table} where {form.work_table_id}={form.id}",
             onerow=1
         )
@@ -29,9 +29,9 @@ def permissions(form):
     url_field['frontend']={'ajax':{'name':'url','timeout':100}}
     #form.pre(url_field)
 
-def after_insert(form):
+async def after_insert(form):
 
-    form.db.query(
+    await form.db.query(
         query=f"UPDATE {form.work_table} SET url='/catalog/{form.id}' where id={form.id}"
     )
 

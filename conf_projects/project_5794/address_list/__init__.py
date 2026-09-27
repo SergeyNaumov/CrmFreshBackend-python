@@ -1,5 +1,5 @@
 #from .fields import get_fields
-def map_zoom_before_code(form,field):
+async def map_zoom_before_code(form,field):
     if form.script=='edit_form':
         if form.action=='new':
             field['value']='7'

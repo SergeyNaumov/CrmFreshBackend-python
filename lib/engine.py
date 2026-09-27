@@ -128,4 +128,7 @@ class Engine():
   def to_json(self,data):
       return json.dumps(data, sort_keys=False,indent=4,ensure_ascii=False,separators=(',', ': '))
 
+# Legacy-шим для конфигов вне svcms_manager (configs/teleweb/**, configs/test/**),
+# которые всё ещё делают `from lib.engine import s`. В коде и в рамках
+# svcms_manager использовать запрещено -- только request.state.engine.
 s=Engine()

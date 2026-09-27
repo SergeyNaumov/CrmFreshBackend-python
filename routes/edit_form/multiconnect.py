@@ -78,6 +78,7 @@ async def multiconnect_process(**arg):
   
   #print('R:',R)
   form = await read_config(
+    request=arg['request'],
     script='multiconnect',
     config=arg['config'],
     action=action,

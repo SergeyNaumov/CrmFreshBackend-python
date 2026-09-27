@@ -1,4 +1,4 @@
-def accepted_before_code(form,field):
+async def accepted_before_code(form,field):
   if form.id:
     bot=form.bot
     #if form.id field['value']=='0':

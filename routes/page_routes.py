@@ -1,4 +1,5 @@
 from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import Request
 from lib.all_configs import read_config
 
 
@@ -10,8 +11,9 @@ router = APIRouter()
 #, 
 # Загрузка файла в wysiwyg
 @router.get('/{config}/{id}')
-async def process_page(config:str,id:int,referer:str): # 
-  form=read_config(
+async def process_page(config:str,id:int,referer:str,request: Request): # 
+  form=await read_config(
+    request=request,
     action='',
     config=config,
     id=id,

@@ -1,4 +1,4 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 #import datetime as dt
 from lib.save_base64_file import save_base64_file
@@ -7,8 +7,9 @@ import os
 
 router = APIRouter()
 @router.post('/get')
-async def get_list(R:dict): # 
+async def get_list(R:dict, request: Request): # 
     form=await read_config(
+        request=request,
         action='get',
         config=R['config'],
         #id=exists_arg('id',arg),
@@ -77,8 +78,9 @@ async def get_list(R:dict): #
 
 # Сохранение константы
 @router.post('/save_value')
-async def save_value(R:dict):
+async def save_value(R:dict, request: Request):
     form = await read_config(
+        request=request,
         action='save_value',
         config=R['config'],
         #id=exists_arg('id',arg),

@@ -1,5 +1,5 @@
 
-def user_id_filter_code(form,field,row):
+async def user_id_filter_code(form,field,row):
 
     if row['u__id']:
         #form.pre(row)
@@ -7,7 +7,7 @@ def user_id_filter_code(form,field,row):
     else:
         return ''
 
-def user_id_before_code(form,field):
+async def user_id_before_code(form,field):
     if hasattr(form, 'bot'):
         field['where']=f'bot_id={form.bot["id"]}'
     else:
@@ -16,13 +16,13 @@ def user_id_before_code(form,field):
     if form.script=='find_objects':
         field['header_field']='username'
 
-def goods_before_code(form,field):
+async def goods_before_code(form,field):
     if not(form.script=='edit_form' and form.id):
         return
 
-    project_id=form.s.project_id
+    project_id=form.request.state.project['project_id']
 
-    good_list=form.db.query(
+    good_list=await form.db.query(
         query=f"""
             SELECT 
                 zg.*, g.header, g.artikul
@@ -37,7 +37,7 @@ def goods_before_code(form,field):
     
 
     field['after_html']=form.template(
-        filename=f'conf_projects/project_{form.s.project_id}/zakaz/goods.html',
+        filename=f'conf_projects/project_{form.request.state.project['project_id']}/zakaz/goods.html',
         good_list=good_list,
         total_price=total_price
     )

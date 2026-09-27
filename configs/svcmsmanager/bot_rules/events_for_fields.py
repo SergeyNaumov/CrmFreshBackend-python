@@ -1,4 +1,4 @@
-def cols_before_code(form,field):
+async def cols_before_code(form,field):
 	if not(field['value']):
 		field['value']=1
 

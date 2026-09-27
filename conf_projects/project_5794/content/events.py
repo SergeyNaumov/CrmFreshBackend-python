@@ -2,7 +2,7 @@
     #form.s.project_id=0
     #print('EVENTS PERMISSIONS!')
     #print('project_id:',form.s.project_id)
-    #if not(hasattr(form.s,'project_id')) or not(form.s.project_id):
+    #if not(getattr(form.request.state,'project',None)) or not(form.s.project_id):
     #    form.errors.append('Доступ запрещён!')
     #    return
     
@@ -11,10 +11,10 @@
     
     
 
-def events_before_code(form):
+async def events_before_code(form):
     pass
 
-def before_delete(form):
+async def before_delete(form):
     pass
     
 

@@ -1,16 +1,17 @@
-from fastapi import APIRouter #, File, UploadFile, Form, Depends
+from fastapi import APIRouter, Request #, File, UploadFile, Form, Depends
 from lib.all_configs import read_config
 
 router = APIRouter()
 
 
 @router.post('/{config}')
-async def post_actions(config:str, R:dict): # 
+async def post_actions(config:str, R:dict, request: Request): # 
   action=''
   if 'action' in R:
     action=R['action']
   
   form = await read_config(
+    request=request,
     action=action,
     config=config,
     #id=id,
@@ -46,9 +47,10 @@ async def post_actions(config:str, R:dict): #
   }
 
 @router.get('/{config}')
-async def get_videos(config:str, limit: int = 0): # 
+async def get_videos(config:str, request: Request, limit: int = 0): # 
   
   form= await read_config(
+    request=request,
     action='',
     config=config,
     #id=id,

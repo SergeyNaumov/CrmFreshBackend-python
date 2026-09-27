@@ -1,4 +1,4 @@
-def permissions(form):
+async def permissions(form):
 	form.fields.append(
         {
             'description':'Дата и время регистрации',

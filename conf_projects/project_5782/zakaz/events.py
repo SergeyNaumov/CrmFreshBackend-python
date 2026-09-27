@@ -1,9 +1,9 @@
 
 #from lib.CRM.plugins.InExtUrl import InExtUrl
         
-def permissions(form):
-    if hasattr(form.s, 'project_id'):
-        project_id=form.s.project_id
+async def permissions(form):
+    if getattr(form.request.state,'project',None):
+        project_id=form.request.state.project['project_id']
 
         form.work_table=f'struct_{project_id}_zakaz'
         print('zakaz/work_table: ',form.work_table )
@@ -19,7 +19,7 @@ def permissions(form):
         paid_field=form.get_field('paid_id')
         paid_field['table']=f'struct_{project_id}_paid'
 
-        form.bot=form.db.query(
+        form.bot=await form.db.query(
             query=f"select * from bot where project_id={project_id}",
             values=[],
             onerow=1,
@@ -33,7 +33,7 @@ def permissions(form):
         
         
     if form.script=='edit_form' and form.id:
-        form.ov=form.db.query(
+        form.ov=await form.db.query(
             query=f"select * from {form.work_table} where {form.work_table_id}={form.id}",
             onerow=1
         )

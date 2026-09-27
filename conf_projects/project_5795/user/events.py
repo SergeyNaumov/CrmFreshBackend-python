@@ -1,12 +1,12 @@
 
 #from lib.CRM.plugins.InExtUrl import InExtUrl
         
-def permissions(form):
+async def permissions(form):
 
 
-    bot_id=form.db.query(
+    bot_id=await form.db.query(
         query="select id from bot where project_id=%s",
-        values=[form.s.project_id],
+        values=[form.request.state.project['project_id']],
         onevalue=1
     )
     if not(bot_id):
@@ -16,7 +16,7 @@ def permissions(form):
     form.foreign_key_value=bot_id
         
     if form.script=='edit_form' and form.id:
-        form.ov=form.db.query(
+        form.ov=await form.db.query(
             query=f"select * from {form.work_table} where {form.work_table_id}={form.id}",
             onerow=1
         )

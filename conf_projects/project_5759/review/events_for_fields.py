@@ -1,10 +1,10 @@
 from lib.core import cur_date
 
-def enabled_before_code (form,field):
+async def enabled_before_code (form,field):
     if form.action=='new':
         field['value']=1
 
-def dat_before_code(form,field):
+async def dat_before_code(form,field):
     if form.action=='new':
         field['value']=cur_date()
         

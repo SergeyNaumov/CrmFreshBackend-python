@@ -1,22 +1,22 @@
 from .update_bot_commands_var import update_bot_commands_var
-def permissions(form):
+async def permissions(form):
     
     
 
     
-    form.db.query(query="set character_set_results=utf8mb4")
+    await form.db.query(query="set character_set_results=utf8mb4")
     #print('PERMISSIONS RUNNED',form.s.project_id)
-    if not(hasattr(form.s,'project_id')) or not(form.s.project_id):
+    if not(getattr(form.request.state,'project',None)):
         print('Доступ запрещён!')
         form.errors.append('Доступ запрещён!')
         return 
 
-    project_id=form.s.project_id
+    project_id=form.request.state.project['project_id']
     photo_field=form.get_field('photo')
     photo_field['filedir']=f'./files/project_{project_id}/bot_photos'
-    bot_id=form.db.query(
+    bot_id=await form.db.query(
         query='SELECT id from bot where project_id=%s',
-        values=[form.s.project_id],
+        values=[form.request.state.project['project_id']],
         onevalue=1
     )
     #form.pre({'bot_id:': bot_id})
@@ -28,16 +28,16 @@ def permissions(form):
     #    form.errors.append('Боты не найдены, обратитесь к администратору')
     #print('PERMISSIONS!',form.foreign_key,form.s.project_id  )
 
-def events_before_code(form):
+async def events_before_code(form):
     pass
 
-def before_delete(form):
+async def before_delete(form):
     pass
     
 
-def after_save(form):
+async def after_save(form):
     if form.id:
-        update_bot_commands_var(form)
+        await update_bot_commands_var(form)
         #print(f'after_save bot rules {form.foreign_key_value}')
 events={
   'permissions':[
