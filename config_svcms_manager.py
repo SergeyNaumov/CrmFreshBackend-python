@@ -84,6 +84,7 @@ config={
   'BaseUrl':'/manager',
   'title':'CMS Digitalstrateg',
   'BaсkendBase':'http://digitalstrateg.test/backend',
+  'config_folder':'configs/svcmsmanager',
   # Разрешённые Origin'ы для CORSMiddleware (см. main.py).
   # Локальная петля (localhost/127.0.0.1 на любом порту) разрешена всегда
   # через dev_origin_regex, отдельно перечислять её не нужно.

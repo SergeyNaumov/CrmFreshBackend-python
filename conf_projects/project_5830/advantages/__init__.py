@@ -5,12 +5,15 @@ form={
     #'work_table_foreign_key':'project_id',
     #'work_table_foreign_key_value':4664,
     'title':'Наши преимущества',
+    'view_type':'gallery',
+    'cols':3,
+    'photo_for_gallery':'photo',
     'sort':1,
     'tree_use':False,
     'header_field':'header',
-    'max_level':2,
+    'max_level':0,
     'default_find_filter':'header',
-    'changed_in_tree':False, # Возможность изменять в дереве, не заходя в карточки
+    'changed_in_tree':1, # Возможность изменять в дереве, не заходя в карточки
     'fields':[
 
         {

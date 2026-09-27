@@ -153,7 +153,7 @@ async def read_config(**arg):
   
   s = request.state.engine  
   project_id=request.state.project['project_id']
-  print('project_id: ',project_id)
+  
   # попытка загрузки локального конфига
   if project_id:
     [form,errors]=load_form_from_dir(f'./conf_projects/project_{project_id}', f'conf_projects.project_{project_id}',arg)
@@ -174,6 +174,7 @@ async def read_config(**arg):
   #print('config_folder:',config_folder, 'form: ',form)
   if not(form):
     if not(config_folder): config_folder='conf'
+    print('config_folder:',config_folder)
     [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
 
   if len(errors): return error(errors)

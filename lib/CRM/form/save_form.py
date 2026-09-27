@@ -1,6 +1,7 @@
 from lib.core import exists_arg, is_wt_field, from_datetime_get_date
 #from routes.edit_form.multiconnect import save as multiconnect_save
 from .multiconnect import save as multiconnect_save
+from .save_in_ext_url import save_in_ext_url
 async def update_1_to_1(form):
   if not(form.id):
     # выходим, если нет form.id

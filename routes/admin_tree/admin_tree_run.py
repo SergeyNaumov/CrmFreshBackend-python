@@ -1,3 +1,4 @@
+import re
 from lib.core import exists_arg
 from lib.all_configs import read_config
 from .move import move
@@ -110,6 +111,16 @@ async def get_branch(**arg):
       'id':id,
     }
     el['sort']=exists_arg('sort',item) or ''
+    # Для галерейного вида отдаём полный веб-путь к фото элемента ветки
+    if getattr(form,'view_type',None)=='gallery' and getattr(form,'photo_for_gallery',None):
+      photo=exists_arg(form.photo_for_gallery,item) or ''
+      filedir=''
+      if pf:=form.get_field(form.photo_for_gallery):
+        filedir=exists_arg('filedir',pf) or ''
+      if photo and filedir:
+        el['photo']=re.sub(r'^\.\/','/',filedir)+'/'+photo
+      else:
+        el['photo']=photo
     if form.tree_use:
       if exists_arg('get_childs',arg):
         el['childs']=await get_branch(
@@ -356,23 +367,29 @@ async def admin_tree_run(**arg):
     branch=await get_branch(form=form,get_childs=1,parent_id='')
     if len(form.errors):
       return {'success':0,'errors':form.errors}
+    out_form={
+      'sort':form.sort,
+      'title':form.title,
+      'header_field':form.header_field,
+      'sort_field':form.sort_field,
+      'config':form.config,
+      'not_create':form.not_create,
+      'tree_use':form.tree_use,
+      'make_delete':form.make_delete,
+      'read_only':form.read_only,
+      'max_level':form.max_level,
+      #'changed_in_tree':getattr(form,'changed_in_tree',False),
+    }
+    # для галереи
+    for name in ['view_type','photo_for_gallery','cols', 'changed_in_tree']:
+      if(hasattr(form,name)):
+        out_form[name]=getattr(form, name)
+    
 
     return {
       'success':1,
-      'form':{
-            'sort':form.sort,
-            'title':form.title,
-            'header_field':form.header_field,
-            'sort_field':form.sort_field,
-            'config':form.config,
-            'not_create':form.not_create,
-            'tree_use':form.tree_use,
-            'make_delete':form.make_delete,
-            'read_only':form.read_only,
-            'max_level':form.max_level,
-            'changed_in_tree':hasattr(form,'changed_in_tree')
-        },
-         'log':form.log,
+      'form':out_form,
+        'log':form.log,
         'errors':form.errors,
         'tree':branch
     }

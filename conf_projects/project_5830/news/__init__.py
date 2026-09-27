@@ -9,17 +9,18 @@ form={
     #'work_table_foreign_key':'project_id',
     #'work_table_foreign_key_value':4664,
     'title':'Новости',
-    'sort':1,
+    'sort':0,
     'tree_use':False,
     'header_field':'header',
     
     'default_find_filter':'header',
-    'changed_in_tree':False, # Возможность изменять в дереве, не заходя в карточки
+    'changed_in_tree':True, # Возможность изменять в дереве, не заходя в карточки
     'fields':[
         {
             'description':'Название новости',
             'type':'text',
             'name':'header',
+            'icon':'mdi-domain',
         },
         {
             'description':'Дата (для сортировки)',
@@ -29,6 +30,9 @@ form={
         {
             'description':'Анонс',
             'type':'textarea',
+            'regexp_rules':[
+                "/^.{3,255}$/",'длина анонса должна быть не менее 3 символов'
+            ],
             'name':'anons',
         },
         {

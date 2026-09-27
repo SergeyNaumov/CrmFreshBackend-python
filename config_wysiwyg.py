@@ -3,7 +3,7 @@ def get_options():
 
     return {
             #'selector':f'#{name}.mce',
-            'content_css': 'https://newds.digitalstrateg.ru/templates/2023/digitalstrateg.ru/css/styles.css',
+            'content_css': 'https://design-b2b.com/templates/2023/digitalstrateg.ru/css/styles.css',
             'browser_spellcheck': True,
             'relative_urls' : False,
 
