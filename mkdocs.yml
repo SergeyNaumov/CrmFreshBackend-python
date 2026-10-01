@@ -1,0 +1,127 @@
+site_name: Разработка конфигов CRM
+site_description: Документация для разработчиков конфигов (инструментов) бэкенда CRM
+docs_dir: docs-developer
+site_dir: docs-html
+use_directory_urls: false
+copyright: Открытая документация проекта
+
+theme:
+  name: material
+  language: ru
+  features:
+    - navigation.top
+    - navigation.sections
+    - navigation.indexes
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Тёмная тема
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Светлая тема
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify {kwds: {case: lower}}
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - search:
+      lang: ru
+
+nav:
+  - Обзор:
+      - README.md
+      - 01-overview.md
+  - Формы и поля:
+      - 02-form-keys.md
+      - 03-fields-common.md
+      - 04-field-types.md
+  - Типы полей:
+      - field-types/README.md
+      - Текстовые:
+          - field-types/text.md
+          - field-types/textarea.md
+          - field-types/wysiwyg.md
+          - field-types/code.md
+          - field-types/header.md
+      - Логические:
+          - field-types/checkbox.md
+          - field-types/switch.md
+      - Выбор:
+          - field-types/select_values.md
+          - field-types/select_from_table.md
+          - field-types/multiconnect.md
+          - field-types/multiconnect_old.md
+      - Даты и время:
+          - field-types/date.md
+          - field-types/datetime.md
+          - field-types/time.md
+          - field-types/daymon.md
+          - field-types/yearmon.md
+      - Файлы и прочее:
+          - field-types/file.md
+          - field-types/password.md
+          - field-types/memo.md
+          - field-types/in_ext_url.md
+          - field-types/1_to_1.md
+          - field-types/1_to_m.md
+          - field-types/font-awesome.md
+          - field-types/docpack.md
+          - field-types/time_table.md
+          - field-types/table.md
+          - field-types/chart.md
+          - field-types/accordion.md
+          - field-types/component.md
+          - field-types/gptassist.md
+          - field-types/multiaction.md
+      - Фильтры:
+          - field-types/filter_extend.md
+  - Связи: 05-relations.md
+  - Файлы и wysiwyg: 06-files-wysiwyg.md
+  - Валидация и зависимости: 07-validation-deps.md
+  - События: 08-events.md
+  - Ajax: 09-ajax.md
+  - Списки и фильтры: 10-lists-filters.md
+  - Дерево и галерея: 11-tree-gallery.md
+  - Раскладка фронта: 12-layout-frontend.md
+  - Хитрости: 13-tricks.md
+  - Примеры: 14-examples.md
+  - Соглашения: 15-conventions.md
+  - Бэкенд и фронт:
+      - Обработка типов полей: 16-field-types-backend.md
+      - Контракт с фронтендом: 17-frontend-contract.md
+      - Панель svcms-admin: 18-svcms-admin.md
+      - Известные расхождения: 19-known-gaps.md

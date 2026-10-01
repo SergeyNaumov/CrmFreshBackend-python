@@ -1,5 +1,6 @@
 import inspect
 from lib.core import exists_arg, date_to_rus
+from lib.CRM.form.idn import domain_to_unicode
 async def process_result_list(form,R,result_list):
 
   # Обрабатывает результат, возвращает output
@@ -57,6 +58,9 @@ async def process_result_list(form,R,result_list):
       tbl = exists_arg('tablename',field) or 'wt'
       db_name=exists_arg('db_name',field) or name
       value=exists_arg(tbl+'__'+db_name,r)
+      # нормализация вывода (атрибут punycode: домен punycode -> unicode)
+      if exists_arg('punycode', field) and value not in (None, ''):
+        value = domain_to_unicode(value)
       if not exists_arg('type_orig',type):
         field['type_orig']=field['type']
       

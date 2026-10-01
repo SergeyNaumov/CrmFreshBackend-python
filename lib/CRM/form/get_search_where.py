@@ -1,4 +1,5 @@
 from lib.core import exists_arg, get_func, from_datetime_get_date, join_ids
+from .idn import prepare_search_domain
 import re
 import shlex
 def get_search_where(form,query):
@@ -130,9 +131,10 @@ def get_search_where(form,query):
 
         v=values
         if v:
-          # form.db.connect.escape_string(v)
+          # нормализация значения поиска (атрибут punycode: домен -> punycode)
+          if exists_arg('punycode', f):
+            v = prepare_search_domain(v)
 
-          #v="'"+v+"'"
           func=get_func(f)
           if func:
             WHERE.append('('+dn_name+' LIKE %s)')
@@ -225,12 +227,11 @@ def get_search_where(form,query):
               map_rezult.append(v)
 
           if len(map_rezult):
-            if f['type']=='filter_extend_select_from_table':
-              
-
+            # для filter_extend_* колонка лежит в смежной таблице (алиас table),
+            # для обычных select -- в текущей (wt)
+            if f['type'].startswith('filter_extend_'):
               WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')
             else:
-              
               WHERE.append(' (wt.'+db_name+' IN ('+','.join(map_rezult)+'))')
 
       elif f['type'] == 'multiconnect':

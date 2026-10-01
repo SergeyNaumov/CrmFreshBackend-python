@@ -55,6 +55,7 @@
 |---|---|
 | `1_to_m` | [1_to_m.md](1_to_m.md) |
 | `multiconnect` | [multiconnect.md](multiconnect.md) |
+| `multiconnect_old` | [multiconnect_old.md](multiconnect_old.md) |
 | `1_to_1_*` | [1_to_1.md](1_to_1.md) |
 
 ## Прочие

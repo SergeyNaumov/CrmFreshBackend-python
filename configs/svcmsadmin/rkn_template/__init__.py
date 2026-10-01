@@ -1,0 +1,31 @@
+form={
+  'work_table':'rkn_template',
+  'work_table_id':'id',
+  'title':'Шаблоны для РКР',
+  'make_delete':1,
+  'read_only':0,
+  'tree_use':0,
+  'sort':0,
+  'default_find_filter':'header',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'url',
+      'type':'text',
+      'name':'url',
+      'filter_on':True,
+    },
+    {
+      'description':'наименование',
+      'type':'text',
+      'name':'header',
+      'filter_on':True,
+    },
+    {
+      'description':'Текст',
+      'type':'wysiwyg',
+      'name':'body',
+      'add_description':'Переменные шаблона: [%domain%], [%orgname%], [%process_owner%], [%inn%], [%ogrn%], [%ur_address%], [%address%], [%email%]',
+    },
+  ],
+}

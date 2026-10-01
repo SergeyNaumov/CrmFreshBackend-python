@@ -48,7 +48,7 @@ async def normalize_value_row(form,field,d):
               d['preview_img']=fdir+'/'+attach_name
           d[c_name+'_filename']=filename
       if exists_arg('slide_code',cf):
-        d[c_name]=await form.run_event('slide_code',{'field':cf,'data':d})
+        d[c_name+'_slide']=await form.run_event('slide_code',{'field':cf,'data':d})
 
 
 
@@ -77,6 +77,8 @@ async def get_1_to_m_data(form,f,id=None):
 
           'change_in_slide':exists_arg('change_in_slide',c)
       }
+      if exists_arg('slide_code',c):
+        cur_header['slide_code']=True
       if st:=exists_arg('subtype',c):
         cur_header['subtype']=st
 

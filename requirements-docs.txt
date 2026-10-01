@@ -1,0 +1,3 @@
+# Зависимости для сборки HTML-версии docs-developer (mkdocs-material тянет mkdocs и pymdown-extensions)
+mkdocs==1.6.1
+mkdocs-material==9.7.7

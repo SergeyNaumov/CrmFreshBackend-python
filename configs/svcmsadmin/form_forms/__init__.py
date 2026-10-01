@@ -1,0 +1,93 @@
+form={
+  'work_table':'form_forms',
+  'work_table_id':'id',
+  'title':'Формы',
+  'make_delete':1,
+  'read_only':0,
+  'tree_use':0,
+  'default_find_filter':'header',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'UID',
+      'type':'text',
+      'name':'uid',
+      'add_description':'Уникальный код',
+      'read_only':True,
+    },
+    {
+      'description':'Название',
+      'type':'text',
+      'name':'header',
+      'filter_on':True,
+    },
+    {
+      'description':'Тема письма',
+      'type':'text',
+      'name':'subject',
+    },
+    {
+      'description':'Получатель письма',
+      'type':'text',
+      'name':'mailto',
+    },
+    {
+      'description':'Поля',
+      'type':'1_to_m',
+      'name':'fields',
+      'table':'form_form_fields',
+      'table_id':'id',
+      'sort':True,
+      'foreign_key':'form_id',
+      'fields':[
+        {
+          'description':'Тип поля',
+          'type':'select_from_table',
+          'name':'type',
+          'table':'form_field_types',
+          'value_field':'id',
+          'header_field':'header',
+        },
+        {
+          'description':'Название в форме',
+          'type':'text',
+          'name':'name',
+        },
+        {
+          'description':'Название для сайта',
+          'type':'text',
+          'name':'description',
+        },
+        {
+          'description':'Значение',
+          'type':'text',
+          'name':'val',
+        },
+        {
+          'description':'Правило проверки',
+          'type':'text',
+          'name':'regexp_code',
+          'add_description':'Если поле обязательное',
+        },
+        {
+          'description':'Обязательное',
+          'type':'checkbox',
+          'name':'required',
+        },
+      ],
+    },
+    {
+      'description':'шаблон письма',
+      'type':'textarea',
+      'name':'msg',
+      'add_description':'Имеет приоритет над автогенерируемым',
+    },
+    {
+      'description':'Вкл',
+      'type':'checkbox',
+      'name':'enabled',
+      'value':1,
+      'filter_on':True,
+    },
+  ],
+}

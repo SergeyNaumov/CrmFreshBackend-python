@@ -8,6 +8,32 @@ from .edit_form.multiconnect import multiconnect_process
 router = APIRouter()
 
 
+# get-ы нужны для обработки кастомных запросов
+@router.get('/edit-form/{config}')
+async def edit_form_custom(config: str, request: Request):
+  # request.query_params - это мультидикт, преобразуем в обычный dict
+  R = dict(request.query_params)
+  return await process_edit_form(
+    request=request,
+    action=R.get('action',''),
+    config=config,
+    id=R.get('id'),
+    R=R
+  )
+  return R
+@router.get('/edit-form/{config}/{_id}')
+async def edit_form_custom(config: str, _id:int, request: Request):
+  # request.query_params - это мультидикт, преобразуем в обычный dict
+  R = dict(request.query_params)
+  return await process_edit_form(
+    request=request,
+    action=R.get('action',''),
+    config=config,
+    id=_id,
+    R=R
+  )
+  return R
+
 # форма добавления элемента
 @router.post('/edit-form/{config}')
 async def new_or_insert_form(config: str,R: dict,request:Request):

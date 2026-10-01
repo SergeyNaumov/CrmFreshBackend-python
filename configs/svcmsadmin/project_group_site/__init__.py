@@ -1,0 +1,35 @@
+form={
+  'work_table':'project_group_site',
+  'work_table_id':'project_id',
+  'title':'Настройки типового проекта',
+  'make_delete':1,
+  'read_only':0,
+  'tree_use':0,
+  'default_find_filter':'header',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'Проект',
+      'type':'select_from_table',
+      'name':'project_id',
+      'table':'project',
+      'header_field':'header',
+      'value_field':'project_id',
+      'read_only':True,
+    },
+    {
+      'description':'Опции',
+      'type':'multiconnect',
+      'name':'options',
+      # опции: service_promo, service_const, service_text_page, service_top_menu,
+      # service_bottom_menu, service_news, service_articles, service_goodkat,
+      # service_service, service_feedback, service_basket
+      'relation_table':'project_group_site_options',
+      'relation_table_header':'header',
+      'relation_table_id':'option_id',
+      'relation_save_table':'project_group_site_options_link',
+      'relation_save_table_id_relation':'option_id',
+      'relation_save_table_id_worktable':'project_id',
+    },
+  ],
+}

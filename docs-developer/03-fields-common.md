@@ -28,6 +28,7 @@
 | `replace_rules` | Пары `[regex, replacement]` на фронте (см. [07](07-validation-deps.md)) |
 | `before_code` | `def/async def(form, field)` — модификация поля перед рендером |
 | `permissions` | `async def(form, field)` — права поля |
+| `punycode` | Домен: при поиске (AdminTable/autocomplete) кириллица → punycode, при выводе punycode → юникод (`lib/CRM/form/idn.py`) |
 | `filter_on` | Показывать в фильтрах списка |
 | `filter_code` | `async def(form, field, row)` — как выводить значение в списке |
 | `not_filter` | Не выводить в фильтрах |

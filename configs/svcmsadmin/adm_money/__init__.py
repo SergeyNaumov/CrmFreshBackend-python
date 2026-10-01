@@ -1,0 +1,47 @@
+form={
+  'work_table':'adm_money',
+  'work_table_id':'id',
+  'title':'Деньги и доходы',
+  'make_delete':1,
+  'default_find_filter':'registered,header,type,price',
+  'fields':[
+    {'description':'Заголовок','type':'text','name':'header','filter_on':True},
+    {
+      'description':'Кошелёк',
+      'type':'select_from_table',
+      'name':'purse_id',
+      'table':'adm_purse',
+      'value_field':'id',
+      'header_field':'header',
+    },
+    {'description':'Дата','type':'date','name':'registered','filter_on':True},
+    {
+      'description':'Тип',
+      'type':'select_values',
+      'name':'type',
+      'values':[
+        {'v':0,'d':'доход'},
+        {'v':1,'d':'расход'},
+      ],
+      'filter_on':True,
+    },
+    {
+      'description':'Админ',
+      'type':'select_from_table',
+      'name':'admin_id',
+      'table':'admin',
+      'value_field':'admin_id',
+      'header_field':'login',
+    },
+    {'description':'Сумма','type':'text','name':'price','filter_on':True},
+    {'description':'Комментарий','type':'textarea','name':'comment'},
+    {
+      'description':'Клиент',
+      'type':'select_from_table',
+      'name':'client_id',
+      'table':'adm_client',
+      'value_field':'id',
+      'header_field':'fio',
+    },
+  ],
+}

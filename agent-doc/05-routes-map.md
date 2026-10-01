@@ -36,6 +36,7 @@
 | `routes/ajax.py` | — | `GET/POST /ajax/{config}/{ajax_name}` | Универсальный диспетчер AJAX-контроллеров |
 | `routes/gptassist/` | `/gpt-assist` | `GET /init`, `POST /send-task`, `/daemon-result`, `WS /ws/{task_id}` | GPT-ассистент |
 | `routes/svcms/` | `/svcms` | `GET /left-menu` | Левое меню SV-CMS (проект 5830) |
+| `routes/svcmsadmin/` | `/svcmsadmin` | `GET /left-menu-admin` | Левое меню админки `config_svcms_admin` из `admin_menu_new` |
 
 ## Не подключены
 

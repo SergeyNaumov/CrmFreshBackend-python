@@ -1,0 +1,47 @@
+form = {
+  'work_table': 'const',
+  'work_table_id': 'const_id',
+  'title': 'Константы',
+  'make_delete': 1,
+  'default_find_filter': 'name',
+  'read_only': 0,
+  'tree_use': 0,
+  'QUERY_SEARCH_TABLES': [
+    {'t': 'const', 'a': 'wt'},
+    {'t': 'project', 'a': 'p', 'l': 'p.project_id = wt.project_id', 'lj': 1},
+  ],
+  'fields': [
+    {
+      'description': 'Только чтение',
+      'name': 'read_only',
+      'type': 'checkbox',
+      'filter_on': True,
+    },
+    {
+      'description': 'имя константы',
+      'name': 'name',
+      'type': 'text',
+      'add_description': 'только латинские буквы и цифры',
+      'regexp_rules': ['^[0-9a-zA-Z\\_]+$'],
+      'filter_on': True,
+    },
+    {
+      'description': 'Значение',
+      'name': 'value',
+      'type': 'textarea',
+      'add_description': 'только латинские буквы и цифры',
+    },
+    {
+      'description': 'Проект',
+      'name': 'project_id',
+      'type': 'select_from_table',
+      'table': 'project',
+      'header_field': 'header',
+      'value_field': 'project_id',
+      'order': 'header',
+      'add_description': 'только латинские буквы и цифры',
+      'regexp_rules': ['^[0-9]+$'],
+      'filter_on': True,
+    },
+  ],
+}

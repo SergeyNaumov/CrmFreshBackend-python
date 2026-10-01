@@ -251,6 +251,11 @@ M2M через таблицу связи. | Атрибут | Смысл | |---|-
 
 ---
 
+### `multiconnect_old`
+Старый мультичекбокс (совместимость со Perl-типом `multicheckbox`): опции
+задаются строкой `extended`, выбранное хранится строкой `;key1;;key2;` в поле
+основной таблицы. Подробно — [field-types/multiconnect_old.md](field-types/multiconnect_old.md).
+
 ## Прочие типы (кратко)
 
 | Тип | Назначение | Документ |
@@ -297,18 +302,23 @@ await InExtUrl(form, {
 
 ## Типы только для фильтров (admin_table)
 
-Эти типы существуют ради фильтров списка, в `edit_form` они вырезаются
-(`process_edit_form.py:53-58`):
+`filter_extend_*` — фильтры списка, ищущие по **смежной** таблице
+(`QUERY_SEARCH_TABLES`); обычные типы фильтруют текущую `work_table` и
+выводятся в карточке.
 
-| Тип | Смысл |
-|---|---|
-| `filter_extend_text` | текстовый фильтр по колонке/выражению (`db_name`) |
-| `filter_extend_select_values` | select-фильтр по `values` |
-| `filter_extend_select_from_table` | select-фильтр из таблицы |
-| `filter_extend_date` / `filter_extend_datetime` | диапазон дат |
-| `filter_extend_checkbox` / `filter_extend_switch` | булев фильтр |
+| Тип | Аналог | В карточке | Смысл |
+|---|---|---|---|
+| `filter_extend_text` | `text` | нет* | текст по `db_name` (LIKE) |
+| `filter_extend_select_values` | `select_values` | вырезается | select по `values` |
+| `filter_extend_select_from_table` | `select_from_table` | вырезается | select из таблицы |
+| `filter_extend_date` / `filter_extend_datetime` | `date`/`datetime` | нет* | диапазон дат |
+| `filter_extend_checkbox` / `filter_extend_switch` | `checkbox`/`switch` | нет* | булев фильтр по JOIN |
 
-Пример — `configs/beyeezy/manager/fields.py`.
+\* Бэкенд вырезает из `edit_form` только поля с `orig_type`, начинающимся на
+`filter_extend_` (а он ставится лишь для двух select-типов). Остальные
+`filter_extend_*` остаются в форме, но фронт их не рисует (нет компонента).
+Подробности — [field-types/filter_extend.md](field-types/filter_extend.md) и
+[19-known-gaps.md](19-known-gaps.md).
 
 ## Массовые действия (`search_multi_action`)
 

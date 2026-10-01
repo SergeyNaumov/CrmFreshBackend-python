@@ -1,0 +1,38 @@
+<small>
+<p>Для того, чтобы Lets Encrypt заработал:</p>
+<ol>
+
+  <li{% if cur_step == 0 %} style="font-weight: bold;"{% elif cur_step > 1 %} style="color: gray; text-decoration: line-through;"{% endif %}>
+    <a href="/svcmsadmin/domain/{{ form_id }}/lets-encrypt-a"
+       onclick="return confirm('А-записи пересоздадутся. Уверены?')">установите A-записи</a>
+    для доменов {{ domain }} и www.{{ domain }} в значение {{ addr }} и подождите, пока они обновятся<br>
+    <b>dig @8.8.8.8 {{ domain }} +short</b> должен возвращать {{ addr }}
+  </li>
+
+  <li{% if cur_step == 1 %} style="font-weight: bold;"{% elif cur_step > 2 %} style="color: gray; text-decoration: line-through;"{% endif %}>
+    A-записи установлены
+  </li>
+
+  {% if cur_step == 3 %}
+    <li style="font-weight: bold; color: red;">
+      Команда создания (cerdbot --dry-run) не прошла
+    </li>
+  {% else %}
+    <li{% if cur_step == 2 %} style="font-weight: bold;"{% elif cur_step > 3 %} style="color: gray; text-decoration: line-through;"{% endif %}>
+      Команда создания (cerdbot --dry-run) прошла
+    </li>
+  {% endif %}
+
+  {% if cur_step == 4 %}
+    <li style="font-weight: bold; color: red;">
+      секция на месте, время сертификата истекает, ушла команда на пересоздание
+    </li>
+  {% endif %}
+  {% if cur_step == 5 %}
+    <li style="font-weight: bold; color: green;">
+      Сертификат работает
+    </li>
+  {% endif %}
+
+</ol>
+</small>

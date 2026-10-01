@@ -1,0 +1,50 @@
+form={
+  'work_table':'landing_block_options',
+  'work_table_id':'id',
+  'title':'Опции для блока лэндинга',
+  'make_delete':0,
+  'read_only':1,
+  'sort':True,
+  'sort_field':'sort',
+  'default_find_filter':'header',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'Наименование',
+      'type':'text',
+      'name':'header',
+      'filter_on':True,
+    },
+    {
+      'description':'name',
+      'type':'text',
+      'name':'name',
+      'filter_on':True,
+    },
+    {
+      'description':'Подпеременные',
+      'type':'1_to_m',
+      'name':'op_subs',
+      'table':'landing_block_options_sub',
+      'table_id':'id',
+      'foreign_key':'opt_id',
+      'fields':[
+        {
+          'description':'Название',
+          'type':'text',
+          'name':'header',
+        },
+        {
+          'description':'Имя переменной',
+          'type':'text',
+          'name':'name',
+        },
+        {
+          'description':'Код поля',
+          'type':'codelist',
+          'name':'body',
+        },
+      ],
+    },
+  ],
+}

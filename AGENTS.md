@@ -1,7 +1,7 @@
 # AGENTS.md — CrmFreshBackend-python-async
 
 Асинхронный JSON-бэкенд CRM на FastAPI (Python 3.12, `.venv`). Фронт — отдельное
-Vue 3 приложение (`../CrmFreshFront-v3`). Текущая ветка — `async`.
+Vue 3 приложение (`~/projects/CrmFreshFront`). Текущая ветка — `async`.
 Подробности — в `agent-doc/` (читай только нужный файл, не весь проект).
 
 ## Железные правила (действуют всегда)
@@ -36,10 +36,26 @@ Vue 3 приложение (`../CrmFreshFront-v3`). Текущая ветка �
 | `agent-doc/10-known-issues.md` | известные дефекты и «мёртвый код» — не чинить без нужды |
 | `agent-doc/11-conventions-security.md` | соглашения кода и заметки по безопасности |
 | `agent-doc/12-configs.md` | как составлять конфиги-инструменты: `form`, поля, события, добавление инструмента |
+| `agent-doc/13-field-types.md` | типы полей и матрица обработки (`get-filters`/WHERE/edit-form/result/save), `filter_extend_*` |
+| `agent-doc/14-frontend-contract.md` | контракт с фронтом (`~/projects/CrmFreshFront`): меню, AdminTable/AdminTree/EditForm, type→компонент |
+| `agent-doc/15-svcms-admin.md` | панель `config_svcms_admin`: авторизация `admin*`, `admin_menu_new`, контроллер меню, конфиги |
 
 Как искать: задача про конкретный роут → `05-routes-map.md` → при необходимости
-`07-core-routes.md`; задача про формы/поля → `03-forms.md` и `12-configs.md`;
-про деплой svcms_manager → `09-svcms-manager.md`.
+`07-core-routes.md`; задача про формы/поля → `03-forms.md`, `12-configs.md`,
+`13-field-types.md`; про фронт → `14-frontend-contract.md`; про деплой
+svcms_manager → `09-svcms-manager.md`; про админку `config_svcms_admin` →
+`15-svcms-admin.md`.
+
+## Документация (HTML)
+
+`docs-developer/` (markdown) собирается в статические страницы `docs-html/`
+(MkDocs + Material):
+
+```bash
+.venv/bin/pip install -r requirements-docs.txt   # один раз
+./build_docs.sh                                   # → docs-html/index.html
+.venv/bin/mkdocs serve                            # предпросмотр с поиском
+```
 
 ## Быстрый запуск
 

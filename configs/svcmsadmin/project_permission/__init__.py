@@ -1,0 +1,35 @@
+form={
+  'work_table':'project_permission',
+  'work_table_id':'project_id',
+  'title':'Доступы к проекту',
+  'default_find_filter':'project_id',
+  'fields':[
+    {
+      'description':'Проект',
+      'type':'select_from_table',
+      'name':'project_id',
+      'table':'project',
+      'table_id':'project_id',
+      'header_field':'header',
+      'value_field':'project_id',
+      'filter_on':True,
+    },
+    {
+      'description':'Пользователь',
+      'type':'select_from_table',
+      'name':'admin_id',
+      'table':'admin',
+      'table_id':'admin_id',
+      'header_field':'login',
+      'value_field':'admin_id',
+      'filter_on':True,
+    },
+    {
+      'description':'Разрешено',
+      'type':'text',
+      'name':'allow',
+      'value':1,
+      'hide':True,
+    },
+  ],
+}

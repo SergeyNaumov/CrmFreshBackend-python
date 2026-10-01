@@ -1,0 +1,63 @@
+form={
+  'work_table':'struct',
+  'work_table_id':'struct_id',
+  'title':'Уникальная структура таблиц',
+  'make_delete':1,
+  'read_only':0,
+  'tree_use':0,
+  'default_find_filter':'project_id,header,table_name',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'Проект',
+      'type':'select_from_table',
+      'name':'project_id',
+      'table':'project',
+      'value_field':'project_id',
+      'header_field':'header',
+      'regexp_rules':['^[0-9]+$','Выберите проект'],
+      'order':'header',
+      'filter_on':True,
+    },
+    {
+      'description':'Вкл',
+      'type':'checkbox',
+      'name':'enabled',
+      'value':1,
+    },
+    {
+      'description':'Название уникальной сущности',
+      'type':'text',
+      'name':'header',
+      'filter_on':True,
+    },
+    {
+      'description':'Имя таблицы',
+      'type':'text',
+      'name':'table_name',
+      'regexp_rules':['^.+$','Заполните имя таблицы'],
+      'filter_on':True,
+    },
+    {
+      'description':'ссылка на инструмент',
+      'type':'text',
+      'name':'url_tool',
+    },
+    {
+      'description':'Описание структуры',
+      'type':'codelist',
+      'name':'body',
+      'regexp_rules':['^.+$','Заполните описание структуры'],
+    },
+    {
+      'description':'Скрипт для администрирования структуры',
+      'type':'select_values',
+      'name':'admin_script',
+      'values':[
+        {'v':'admin_table.pl','d':'admin_table'},
+        {'v':'admin_tree.pl','d':'admin_tree'},
+      ],
+      'regexp_rules':['.+','Выберите скрипт'],
+    },
+  ],
+}

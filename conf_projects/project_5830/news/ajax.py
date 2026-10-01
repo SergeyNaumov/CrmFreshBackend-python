@@ -12,7 +12,7 @@ async def exists_url(form,url):
   exists=await form.db.query(
     query=f"""
       select 
-        wt.id,wt.header,url
+        wt.id,wt.header,ieu.ext_url
       from
         {form.work_table} wt
         JOIN in_ext_url ieu ON ieu.project_id={project_id} and ieu.in_url=concat('/news/',wt.id)
@@ -52,7 +52,6 @@ async def in_ext_url(form,v):
   url=''
   url_error=''
   
-  where='ieu.ext_url<>""'
   if form.id:
     
 
@@ -63,15 +62,14 @@ async def in_ext_url(form,v):
         from
             {form.work_table} wt
             JOIN in_ext_url ieu ON ieu.project_id={project_id} and ieu.in_url=concat('/news/',wt.id)
-        WHERE wt.id<>{form.id}
+        WHERE wt.id={form.id}
         """,
         values=[],
         onerow=1,
     )
-    #return {'Exists':exists}
-    # Если уже есть 
+    # Если у записи уже есть ЧПУ -- отдаём его
     if exists and exists['ext_url']:
-        return []
+        return ['in_ext_url',{'value':exists['ext_url']}]
   
   if header:=v.get('header'):
     #print('header:',header)

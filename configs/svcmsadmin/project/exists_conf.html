@@ -1,0 +1,21 @@
+<style>
+  #exists_conf td.config { padding-right: 2em; }
+  #exists_conf td.myspec, #exists_conf td.myspec2 { font-size: 9px; }
+  #exists_conf td.grey a { color: #555; }
+</style>
+
+<div>
+  <p><b>
+    <a href="/edit_form/struct?project_id={{ form_id }}" target="_blank">Новый список</a> |
+    <a href="/edit_form/struct?project_id={{ form_id }}" target="_blank">Новое дерево</a>
+  </b></p>
+</div>
+
+<table id="exists_conf">
+{% for l in list %}
+  <tr>
+    <td class="config"><a href="/edit_form/struct/{{ l.id }}" target="_blank">{{ l.header }}</a></td>
+    <td class="myspec2 grey"><a target="_blank" href="{{ l.t_url }}">ЧПУ</a></td>
+  </tr>
+{% endfor %}
+</table>

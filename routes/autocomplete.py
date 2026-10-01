@@ -1,4 +1,5 @@
 from lib.core import cur_year,cur_date, exists_arg, get_name_and_ext
+from lib.CRM.form.idn import prepare_search_domain, domain_to_unicode
 from fastapi import FastAPI, APIRouter, Request
 #from lib.engine import s
 
@@ -119,13 +120,38 @@ async def get_list(**arg):
       ''',
       values=['%'+arg['value']+'%']
     )
-  if T == 'filter_extend_text':
-    for x in form.QUERY_SEARCH_TABLES:
-      if x['alias'] == element['filter_table']:
-        work_table=x['table']
-        element['name']=element['db_name']
-        T='text'
-        break
+  if T in ('filter_extend_text', 'text', 'textarea'):
+    # Поиск по текстовой колонке. У filter_extend_text колонка может лежать в
+    # смежной таблице (QUERY_SEARCH_TABLES): алиас задаётся в tablename, либо
+    # таблица -- в filter_table. Раньше тут безусловно читался filter_table,
+    # из-за чего падало с KeyError, если в поле указан только tablename.
+    table_for_search = form.work_table if T in ('text', 'textarea') else ''
+    col = exists_arg('db_name', element) or element.get('name')
+    if T == 'filter_extend_text':
+      target_alias = exists_arg('tablename', element)
+      target_table = exists_arg('filter_table', element)
+      for x in getattr(form, 'QUERY_SEARCH_TABLES', None) or []:
+        alias = x.get('alias') or x.get('a')
+        table = x.get('table') or x.get('t')
+        if (target_alias and alias == target_alias) or (target_table and table == target_table):
+          table_for_search = table
+          break
+    # Атрибут punycode: кириллицу ищем как punycode, а показываем в юникоде.
+    if exists_arg('punycode', element):
+      like_val = prepare_search_domain(like_val)
+
+    if table_for_search and col:
+      rows = await form.db.query(
+        query=f'SELECT DISTINCT {col} AS value FROM {table_for_search} '
+              f'WHERE {col} LIKE %s ORDER BY {col} LIMIT 30',
+        values=['%' + like_val + '%'],
+        errors=arg['errors'],
+      )
+      values = [r['value'] for r in (rows or []) if r.get('value') not in (None, '')]
+      if exists_arg('punycode', element):
+        values = [domain_to_unicode(v) for v in values]
+      return values
+    return []
 
   if T in ['select_from_table','filter_extend_select_from_table']:
     
@@ -163,15 +189,17 @@ async def get_list(**arg):
     if T=='filter_extend_select_from_table' and exists_arg('filter_table',element):
       element['table']=element['filter_table']
 
-    if not exists_arg('search_query',element):
+    search_query=exists_arg('search_query',element)
+    if not search_query:
       if where: where='WHERE '+where
-      element['search_query']=f'''
-          SELECT {select_fields} from {element['table']}  {where}  ORDER by {element['header_field']} limit 30
+      search_query=f'''
+          SELECT {select_fields} from {element['table']}  {where}  ORDER by {element['header_field']}
       '''
 
-    if exists_arg('search_query',element):
-      element['search_query']+=' limit 30'
-      element['search_query']=element['search_query'].replace('<%like%>',like_val).replace('<%v%>','%s')
+    # limit добавляем один раз (раньше он дублировался: "limit 30 limit 30")
+    if 'limit' not in search_query.lower():
+      search_query+=' limit 30'
+    element['search_query']=search_query.replace('<%like%>',like_val).replace('<%v%>','%s')
     
     #print('query:',element['search_query'])
     #print('like_values:',like_values)
@@ -181,7 +209,8 @@ async def get_list(**arg):
       values=like_values
     );
 
-
+  # ничего не подошло -- отдаём пустой список, а не None
+  return []
 
   # T -- type
 def ecran_ind(v):

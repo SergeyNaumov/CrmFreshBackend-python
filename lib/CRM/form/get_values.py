@@ -1,6 +1,7 @@
 from lib.core import is_wt_field, exists_arg, tree_to_list
 from lib.get_1_to_m_data import get_1_to_m_data
 from .get_values_for_select_from_table import get_values_for_select_from_table
+from .multiconnect_old import parse_extended
 
 
 async def get_in_ext_url(form,f):
@@ -81,6 +82,10 @@ async def func_get_values(form):
             
       if f['type'] == '1_to_m':
         await get_1_to_m_data(form,f)
+
+      # multiconnect_old: список опций берём из строки extended
+      if f['type'] == 'multiconnect_old' and exists_arg('extended', f):
+        f['values'] = parse_extended(f['extended'])
 
 
       # Если это 1_to_1

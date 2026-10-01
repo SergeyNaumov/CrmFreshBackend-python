@@ -44,7 +44,8 @@
   обе сигнатуры не совпадают, эндпоинт всегда возвращает ошибку.
 - `start/translab.sh` ссылается на несуществующий `config_translab`.
 - `start/svcms_admin.sh` делает `export config=svcms_manager` — модуля с таким
-  именем нет.
+  именем нет. **Исправлено (2026-09-28):** теперь `config=config_svcms_admin`
+  (см. `15-svcms-admin.md`).
 - `routes/beeline/` создан, но нигде не подключён.
 - `models/` — нерабочий Peewee, `peewee` нет в зависимостях.
 - `lib/CRM/plugins/search/xlsx.py` импортирует `pandas`, `lib/seo.py` —
@@ -72,6 +73,53 @@
   `from db import db` (вне зоны правок).
 - `configs/beyeezy/bottom_menu/fields.py` — синтаксическая ошибка (непарные
   скобки), конфиг beyeezy вне зоны правок.
+
+## Исправлено (2026-09-28): админка svcms_admin
+
+- `lib/all_configs.py:read_config` — при пустом `project_id` переменная `form`
+  не инициализировалась (`UnboundLocalError` на `if not(form)`). Добавлены
+  `form=False; errors=[]` до ветки проекта. Нужно для админки без проекта.
+- `config_svcms_admin.py` — дописан `alter_all_change_action` (был `NameError`),
+  добавлен `BaseUrl:''`, авторизация переведена на `admin`/`admin_session`/
+  `admin_session_fails` + `mysql_encrypt`, добавлен `after_create_engine`.
+- `start/svcms_admin.sh` — запускает `config_svcms_admin` (было `svcms_manager`).
+- Новый контроллер `routes/svcmsadmin/left_menu_admin.py`
+  (`GET /svcmsadmin/left-menu-admin`).
+- `db/migrate_admin_menu_new.py` — перенос меню из `admin_menu` в `admin_menu_new`.
+- Подробнее — `15-svcms-admin.md`.
+
+## Типы полей: filter_extend_* (расхождение кода и docs)
+
+- `set_orig_types.py:25` ставит `orig_type` и подменяет `type='select'` только
+  для `select_from_table`/`select_values`/`filter_extend_select_from_table`/
+  `filter_extend_select_values`.
+- `process_edit_form.py:55` вырезает из карточки только поля с `orig_type^=filter_extend_`.
+  Значит `filter_extend_text/checkbox/switch/date/datetime` остаются в
+  `form.fields` (фронт их не рисует — нет компонента).
+- `get_filters_routes.py` не конвертирует `filter_extend_checkbox/switch/datetime`
+  → фильтр на фронте не отрисуется. Обход: `checkbox`+`filter_on` для текущей
+  таблицы.
+- `get_filters_routes.py:9` — заглушка `get_values_for_select_from_table` (возвращает
+  `[]`, вызывается с обратным порядком аргументов) → select-фильтры без `values`.
+- **Исправлено (2026-09-28):** `lib/CRM/form/get_search_where.py` для
+  `filter_extend_select_values` использовал `wt.db_name` вместо алиаса
+  `tablename` — фильтры по смежной таблице (`author`→`apv.login`,
+  `tmp_type`→`t.type`) падали. Теперь для `filter_extend_*` берётся `table`.
+- Добавлен тип `multiconnect_old` (старый `multicheckbox`, строка `;key;`):
+  `lib/CRM/form/multiconnect_old.py`, `lib/core.py`, `get_values.py`,
+  фронт `multiconnect_old.vue`.
+- Подробнее — `13-field-types.md` и `docs-developer/field-types/filter_extend.md`.
+
+## Исправлено (2026-09-28): autocomplete
+
+- `routes/autocomplete.py` — ветка `filter_extend_text` безусловно читала
+  `element['filter_table']` → `KeyError` (500), если в поле задан только
+  `tablename` (например, `project.domain`). Теперь таблица ищется по
+  `tablename` (алиас) или `filter_table`, и для `filter_extend_text` строится
+  `SELECT DISTINCT db_name ... LIKE %s`.
+- Там же `search_query` получал `limit 30` дважды (`limit 30 limit 30`) → SQL-
+  ошибка и `list:null` у select-автокомплита. `limit` добавляется один раз.
+- В `get_list` добавлен финальный `return []` (раньше мог вернуться `None`).
 
 ## Прочее по проекту
 

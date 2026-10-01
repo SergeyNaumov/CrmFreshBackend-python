@@ -1,0 +1,37 @@
+form={
+  'work_table':'good',
+  'work_table_id':'good_id',
+  'title':'Товар',
+  'make_delete':1,
+  'read_only':1,
+  'tree_use':1,
+  'default_find_filter':'header',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'наименование',
+      'type':'text',
+      'name':'header',
+      'filter_on':True,
+    },
+    {
+      'description':'Описание товара',
+      'type':'wysiwyg',
+      'name':'body',
+    },
+    {
+      'description':'Связь с рубрикатором',
+      'type':'multiconnect',
+      'name':'relation',
+      'relation_table':'rubricator',
+      'relation_table_header':'header',
+      'relation_table_id':'rubricator_id',
+      'relation_order':'sort',
+      'relation_tree_order':'sort',
+      'relation_save_table':'rubricator_good',
+      'relation_save_table_id_relation':'rubricator_id',
+      'relation_save_table_id_worktable':'good_id',
+      'tree_use':1,
+    },
+  ],
+}

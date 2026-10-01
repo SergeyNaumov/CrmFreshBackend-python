@@ -1,93 +1,57 @@
-# UPDATE manager set password=sha2('123',256);
-from configs.teleweb.messenger_rules import messenger_rules
-from configs.teleweb.gptassist_rules import gptassist_rules
+#from configs.teleweb.messenger_rules import messenger_rules
+#from configs.teleweb.gptassist_rules import gptassist_rules
+from configs.svcmsadmin.config_wysiwyg import config_wysiwyg
 
-def after_create_engine(s,errors=[]):
-  #print('after_create_engine')
-  if not(s.manager):
-    return
 
-  host=s.env['host']
+# Админка работает вне проекта, но read_config всегда читает
+# request.state.project['project_id'] (lib/all_configs.py:155),
+# поэтому after_create_engine обязан заполнить request.state.project.
+async def after_create_engine(s, request, errors=[]):
+  if not getattr(request.state, 'project', None):
+    request.state.project = {
+      'project_id': None,
+      'template_id': None,
+      'access_for_cur_domain': 1,
+    }
+  manager = request.state.manager
+  manager['files_dir']='./files'
+  manager['files_dir_web']='/files'
+  if manager and manager.get('id'):
+    manager['host'] = s.env.get('host', '')
+    request.state.manager = manager
 
-  host='site1.assist-ant.su' #s.env['host']
 
-  d=host.split('.')
-  if d[0]=='www':
-    host='.'.join(d[1:])
-
-  shop=s.db.query(
-    query=f'''
-      SELECT
-        o.*, s.id shop_id, s.domain, s.template_id, s.botname, s.token,
-        s.need_serv, s.need_good, s.serv_fast_robokassa
-      FROM
-        owner o
-        join shop s ON s.owner_id=o.id
-      WHERE o.id=%s and s.domain=%s
-    ''',
-    values=[s.manager['id'],host],
-    onerow=1,
-    #debug=1
-  )
-  #print('shop:',shop)
-  s.manager['filedir_http']=''
-  if shop:
-    s.manager=shop
-    s.shop=shop
-    s.shop_id=shop['shop_id']
-    s.template_id=shop['template_id']
-    s.manager['filedir_http']=f'/files/project_{s.shop_id}'
-
-  else:
-    s.errors.append(f'У Вас нет права для администрирования {host}')
-    return
-
-def after_read_form_config(form):
-  if len(form.s.errors):
-    form.errors=form.s.errors
-  
-  form.manager=form.s.manager
-  form.manager['files_dir']=f'./files/project_{form.s.shop_id}'
-  form.manager['files_dir_web']=f'/files/project_{form.s.shop_id}'
-
+# Будет выполняться для каждой операции insert / delete / update в crm.
+# Для админки сброс кэша клиентских сайтов не нужен -- заглушка.
 def alter_all_change_action(form):
-  # Это нужно для сброса кэша у клиентских сайтов
+  pass
 
-  # Если вносятся изменения конструкторе бота, то обновляем контсанту, 
-  # тем самым сообщая боту, что необходимо обновить правила
-  if form.config=='bot_rules':
-    form.db.query(
-        query='UPDATE const set value=unix_timestamp(now()) where shop_id=%s and name=%s',
-        values=[form.s.shop_id,'_last_update_botcommands'],
-        #debug=1,
-    )
 
 config={
-  'title':'AssistWeb admin panel',
+  'title':'DigitalStrateg Admin Panel',
   'app_components':{
     'navigator':True
   },
+  'BaseUrl':'',
   'BaсkendBase':'http://dev-crm.test/backend',
   'copyright':'copyright 2004 - {{cur_year}}',
    'bottom_menu': [
       #{'header':'Политика конфиденциальности','type':'url','url':'/securitypolicy.html','target':'_blank'}
    ],
-  'encrypt_method':'mysql_sha2',
+  'encrypt_method':'mysql_encrypt',
   'use_project':False,
-  
+
   'auth':{
-    # Таблица авторизации:
-    'manager_table':'owner',
-    'manager_table_id':'id',
+    # Таблица авторизации (админы SV-CMS):
+    'manager_table':'admin',
+    'manager_table_id':'admin_id',
     'auth_log_field':'login',
     'auth_pas_field':'password',
-    #'encrypt_method':'mysql_encrypt',
-    'encrypt_method':'mysql_sha2',
-    # b2bb2bconnect / 123
-    # UPDATE manager password=sha2('123',256) where login='b2bb2bconnect';
+    # Пароли в admin хранятся в старом MySQL ENCRYPT (varchar(40))
+    'encrypt_method':'mysql_encrypt',
     # Сессия:
-    'session_table':'session_owner',
-    'session_fails_table':'session_owner_fails',
+    'session_table':'admin_session',
+    'session_fails_table':'admin_session_fails',
     'max_fails_login':50,
     'max_fails_login_interval':3600,
     'max_fails_ip':20,
@@ -96,42 +60,38 @@ config={
     'use_permissions':False
   },
 
-  'messenger_rules':messenger_rules,
-  'gptassist_rules':gptassist_rules, # функция,
+  'messenger_rules':{},#messenger_rules,
+  'gptassist_rules':{},#gptassist_rules, # функция,
 
   'startpage':{ # указываем, какой компонент будет загружаться на главной странице
     'type':'src',
     'value':'/manager/mainpage.html',
   },
   'after_create_engine':after_create_engine,
-  'after_read_form_config':after_read_form_config,
+  #'after_read_form_config':after_read_form_config,
   'system_email':'svcomplex@gmail.com',
   'after_all_change_action':alter_all_change_action,
-  'system_url':'https://adminbot.assist-ant.su/',
-  'config_folder':'configs/teleweb',
+  'system_url':'https://admin.design-b2b.com/',
+  'config_folder':'configs/svcmsadmin',
   #'stat_log':1, # Записываем статистику посещений
   'connects':{
     'crm_read':{
-      'user':'teleweb',
+      'user':'svcms',
       'password':'',
       'host':'localhost',
-      'dbname':'teleweb',
+      'dbname':'svcms',
     },
     'crm_write':{
-      'user':'teleweb',
+      'user':'svcms',
       'password':'',
       'host':'localhost',
-      'dbname':'teleweb',
+      'dbname':'svcms',
     },
   },
   'controllers':{
-    'left_menu':'/assist-ant/left-menu'
+    'left_menu':'/svcmsadmin/left-menu-admin' # меню из таблицы admin_menu_new
   },
 
-  'docpack':{
-    'user_table':'user',
-    'docpack_foreign_key':'user_id'
-  },
   'const':{
     'project_id':''
   },
@@ -142,16 +102,34 @@ config={
   'login':{
     'register':False, # возможность регистрации
     'remember':True, # возможность напоминания пароля
-    
+
     # Доступно без авторизации
     'not_login_access': [
         '/login','/test/mailsend','/register','/remember/get-access-code','/remember/check-access-code','/remember/change-password'
     ]
   },
-  # 8Xiddqdidkfa#762x
+  'wysiwyg':config_wysiwyg,
+  
   'debug':{ # для отладки
     'hosts':['sv-home','sv-digital','sv-HP-EliteBook-2570p','sv-romanovka'],
-    'manager_id':1,
+    'manager_id':51, # naumov
+  },
+
+  # Фоновые задачи (очередь crm_background): воркеры стартуют внутри uvicorn.
+  'background':{
+    'enabled':True,
+    'workers':4,
+    'poll':0.5,
+    'stale_minutes':10,
+  },
+
+  # Пути серверных действий админки (экспорт/клонирование/структуры).
+  'paths':{
+    'cms':'/var/www/sv-cms/htdocs',
+    'exported_projects':'/var/www/sv-cms/htdocs/exported_projects',
+    'templates':'/var/www/sv-cms/htdocs/templates',
+    'files':'./files',
+    'export_script':'/var/www/sv-cms/htdocs/admin2/api/scripts/copy_and_create',
   },
 
 

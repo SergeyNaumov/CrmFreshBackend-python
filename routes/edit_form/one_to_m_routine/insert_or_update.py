@@ -52,17 +52,21 @@ async def insert_or_update(form,field,arg):
             data=data,
           )
 
+          # onerow=1: возвращаем одну строку-dict, а не список -- иначе
+          # normalize_value_row (slide_code) падает на list indices
           data = await form.db.query(
             query=f'SELECT * from {field["table"]} WHERE {field["table_id"]}=%s',
-            values=[arg["one_to_m_id"]]
+            values=[arg["one_to_m_id"]],
+            onerow=1,
+            errors=form.errors,
           )
           #print('data0:',data)
           if not data:
             form.errors.append('данной записи уже не существует, возможно, кто-то удалил её')
-          
-          await normalize_value_row(form,field,data)
-          #print('data1:',data)
-          field['values']=data
+          else:
+            await normalize_value_row(form,field,data)
+            #print('data1:',data)
+            field['values']=data
 
           field['_id']=arg["one_to_m_id"]
           await form.run_event('after_update_code',{'field':field,'data':data})

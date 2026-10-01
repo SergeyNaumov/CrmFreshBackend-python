@@ -49,10 +49,18 @@
 | `select_values`, `filter_extend_select_values` | select |
 | `select_from_table`, `filter_extend_select_from_table` | select из таблицы |
 | `date`, `time`, `datetime`, `daymon`, `yearmon` | с `range` по умолчанию |
-| `checkbox`, `switch`, `filter_extend_checkbox` | да/нет |
+| `checkbox`, `switch` | да/нет (фронт `AdminTable.vue` превращает в select) |
 | `file` | `1` — есть файл, `2` — нет |
 | `multiconnect` | выбор связанных сущностей |
 | `memo` | фильтр по комментариям |
+| `filter_extend_date` | дата-диапазон |
+| `filter_extend_checkbox` / `filter_extend_switch` | ⚠ **не конвертируется**; фронт не рисует (см. [19-known-gaps.md](19-known-gaps.md)) |
+
+> `filter_extend_checkbox`/`filter_extend_switch`/`filter_extend_datetime` в
+> `get_filters` не конвертируются и не имеют компонента на фронте. Для булева
+> фильтра по текущей таблице используйте `checkbox` + `filter_on`; для JOIN —
+> `filter_extend_select_values`/`filter_extend_text`. Подробно —
+> [field-types/filter_extend.md](field-types/filter_extend.md).
 
 Из фильтров удаляются поля типов `password`, `code`, `1_to_m`, `hidden`.
 Из копии поля для фильтра вырезаются служебные атрибуты

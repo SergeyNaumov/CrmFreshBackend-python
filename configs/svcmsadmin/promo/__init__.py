@@ -1,0 +1,40 @@
+form={
+  'work_table':'promo',
+  'work_table_id':'promo_id',
+  'title':'Promo (для оптимизаторов)',
+  'make_delete':0,
+  'read_only':1,
+  'tree_use':0,
+  'default_find_filter':'url',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'url',
+      'type':'text',
+      'name':'url',
+      'add_description':'url без домена',
+      'filter_on':True,
+    },
+    {
+      'description':'promo_title',
+      'type':'text',
+      'name':'title',
+      'filter_on':True,
+    },
+    {
+      'description':'promo_description',
+      'type':'textarea',
+      'name':'description',
+    },
+    {
+      'description':'promo_keywords',
+      'type':'textarea',
+      'name':'keywords',
+    },
+    {
+      'description':'promo_body',
+      'type':'textarea',
+      'name':'body',
+    },
+  ],
+}

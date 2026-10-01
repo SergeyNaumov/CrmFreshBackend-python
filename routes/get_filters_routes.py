@@ -38,7 +38,7 @@ async def get_filters_controller(config: str, R:dict, request: Request):
     # }
     if exists_arg('not_filter',f) or exists_arg('allready_out_on_result',f):
       continue
-    if f['type'] in ('password','code','1_to_m','hidden'): continue
+    if f['type'] in ('password','code','1_to_m','hidden','multiconnect_old'): continue
 
     if f['type'] in ('textarea','filter_extend_text','text'):
       f['type']='text'

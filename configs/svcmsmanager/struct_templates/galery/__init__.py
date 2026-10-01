@@ -1,0 +1,19 @@
+# Эталон уникальной структуры "Галерея".
+form={
+  'work_table':'[%table_name%]',
+  'work_table_id':'[%table_id%]',
+  'title':'[%header%]',
+  'header_field':'header',
+  'default_find_filter':'header',
+  'make_delete':1,
+  'read_only':0,
+  'tree_use':0,
+  'fields':[
+    {'description':'Название','type':'text','name':'header','filter_on':True},
+    {'description':'Анонс','type':'textarea','name':'anons'},
+    {'description':'Описание','type':'wysiwyg','name':'body'},
+    {'description':'Фото','type':'file','name':'photo'},
+    {'description':'Сортировка','type':'text','name':'sort'},
+    {'description':'Вкл','type':'checkbox','name':'enabled','value':1,'filter_on':True},
+  ],
+}

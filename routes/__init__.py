@@ -11,6 +11,7 @@ from .one_to_m_routes import router as router_one_to_m
 from .memo import router as router_memo
 from .password import router as router_password
 from .ajax import router as router_ajax
+from .background import router as router_background
 from .autocomplete import router as router_autocomplete
 from .stat_tool import router as stat_tool
 from .documentation_routes import router as router_documentation
@@ -29,7 +30,8 @@ from .transfere_cards import router as router_transfere_cards
 # Роутеры, не входящие в систему
 from .testing import router as router_testing
 from .svcms import router as router_svcms
-
+from .svcmsadmin import router as router_svcmsadmin
+from .filenavigator import router as router_filenavigator
 # Расширения
 from .extend_routes import router as router_extend
 
@@ -68,8 +70,11 @@ router.include_router(router_news,prefix='/NewsList')
 router.include_router(router_autocomplete,prefix='/autocomplete')
 router.include_router(stat_tool,prefix='/stat-tool')
 router.include_router(router_ajax) # /ajax
+router.include_router(router_background, prefix='/background') # /background/...
 router.include_router(router_gptassist,prefix='/gpt-assist')
+router.include_router(router_filenavigator,prefix='/filenavigator')
 router.include_router(router_svcms,prefix='/svcms')
+router.include_router(router_svcmsadmin,prefix='/svcmsadmin')
 
 
 

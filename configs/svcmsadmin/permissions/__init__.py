@@ -1,0 +1,29 @@
+form={
+  'work_table':'permissions',
+  'work_table_id':'id',
+  'title':'Права доступа',
+  'header_field':'header',
+  'default_find_filter':'header',
+  'sort':True,
+  'sort_field':'sort',
+  'fields':[
+    {
+      'description':'Наименование',
+      'type':'text',
+      'name':'header',
+      'filter_on':True,
+    },
+    {
+      'description':'Ключевое название',
+      'type':'text',
+      'name':'pname',
+      'filter_on':True,
+      'uniquew':1,
+    },
+    {
+      'description':'Сортировка',
+      'type':'text',
+      'name':'sort',
+    },
+  ],
+}

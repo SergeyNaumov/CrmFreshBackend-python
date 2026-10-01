@@ -1,0 +1,83 @@
+form = {
+  'work_table': 'admin_menu_new',
+  'work_table_id': 'id',
+  'title': 'Меню',
+  'default_find_filter': 'header',
+  'header_field': 'header',
+  'tree_use': True,
+  'sort': True,
+  'sort_field': 'sort',
+  'max_level': 2,
+  'make_delete': 0,
+  'read_only': 1,
+  'not_create': 1,
+  'fields': [
+    {
+      'description': 'Название',
+      'type': 'text',
+      'name': 'header',
+      'filter_on': True,
+    },
+    {
+      'description': 'Тип',
+      'type': 'select_values',
+      'name': 'type',
+      'values': [
+        {'v': 'vue', 'd': 'VUE'},
+        {'v': 'src', 'd': 'internal_prog'},
+        {'v': 'newtab', 'd': 'newtab'},
+      ],
+    },
+    {
+      'description': 'Значение',
+      'type': 'text',
+      'name': 'value',
+    },
+    {
+      'description': 'Параметры запуска',
+      'type': 'textarea',
+      'name': 'params',
+      'add_description': 'для типа vue например: {"config":"manager"}',
+    },
+    {
+      'description': 'Иконка',
+      'type': 'font-awesome',
+      'name': 'icon',
+    },
+    {
+      'description': 'Вкл',
+      'type': 'checkbox',
+      'name': 'enabled',
+      'value': 1,
+      'filter_on': True,
+    },
+    {
+      'description': 'Права доступа',
+      'name': 'permissions',
+      'type': '1_to_m',
+      'table': 'admin_menu_permissions',
+      'table_id': 'id',
+      'foreign_key': 'menu_id',
+      'fields': [
+        {
+          'description': 'Право доступа',
+          'name': 'permission_id',
+          'type': 'select_from_table',
+          'table': 'permissions',
+          'value_field': 'id',
+          'header_field': 'header',
+          'order': 'sort',
+        },
+        {
+          'description': 'Если включено, то',
+          'name': 'denied',
+          'type': 'select_values',
+          'values': [
+            {'v': 0, 'd': 'давать доступ'},
+            {'v': 1, 'd': 'запрещать доступ'},
+          ],
+        },
+      ],
+    },
+  ],
+}

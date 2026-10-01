@@ -43,6 +43,10 @@ async def startup():
 
     print('create_pool end')
 
+    # Фоновые задачи (очередь crm_background): воркеры внутри процесса uvicorn.
+    from lib.background import start_workers
+    await start_workers()
+
 
 @app.middleware("http") # ""
 async def for_all_requests(request: Request,call_next): # , response=Response

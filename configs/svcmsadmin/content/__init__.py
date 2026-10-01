@@ -1,0 +1,40 @@
+form={
+  'work_table':'content',
+  'work_table_id':'content_id',
+  'title':'Статичные страницы',
+  'make_delete':1,
+  'read_only':0,
+  'tree_use':0,
+  'default_find_filter':'header',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'Название страницы',
+      'type':'text',
+      'name':'header',
+      'regexp_rules':['^.+$','Заполните название страницы'],
+      'filter_on':True,
+    },
+    {
+      'description':'Содержимое',
+      'type':'wysiwyg',
+      'name':'body',
+    },
+    {
+      'description':'url',
+      'type':'text',
+      'name':'url',
+      'filter_on':True,
+    },
+    {
+      'description':'Проект',
+      'type':'select_from_table',
+      'name':'project_id',
+      'table':'project',
+      'value_field':'project_id',
+      'header_field':'header',
+      'order':'header',
+      'filter_on':True,
+    },
+  ],
+}

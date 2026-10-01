@@ -1,0 +1,164 @@
+{
+  "comment": "Базовый набор страниц шаблона. Блоки соответствуют секциям preview-страниц (templates/t1/preview). Редактируйте под нужды шаблона.",
+  "header": { "type": "header", "params": { "layout": "classic", "sticky": true, "topbar": true } },
+  "footer": { "type": "footer", "params": { "columns": "4", "catalog": true, "contacts": true, "socials": true, "note": true, "copyright": "© 2026 Компания" } },
+  "pages": [
+    {
+      "url": "/",
+      "header": "Главная",
+      "blocks": [
+        { "type": "slider", "variant": "hero", "params": { "varname": "slider_list", "animation": "rise", "transition": "fade", "speed": 0.7, "autoplay": 5000 } },
+        { "type": "advantages", "params": { "varname": "advantages_list", "header": "Наши преимущества", "sub": "Почему покупатели выбирают наш магазин." } },
+        { "type": "catalog", "variant": "grid", "params": { "varname": "catalog_list", "columns": 4, "effect": "flip", "enter": "rise", "header": "Каталог товаров", "sub": "Разделы каталога охватывают всю электронику — от смартфонов и ноутбуков до умного дома и аксессуаров." } },
+        { "type": "goods", "variant": "grid", "params": { "varname": "new_goods_list", "dataKey": "good_new", "show": "carousel", "title": "Новинки", "sub": "Самые свежие и ожидаемые модели этого сезона.", "linkText": "Все новинки", "linkHref": "/catalog/", "types": "2", "autoplay": "3500", "animation": "rise" } },
+        { "type": "goods", "variant": "grid", "fill": "fill-2", "params": { "varname": "sale_goods_list", "dataKey": "good_specpredl", "show": "carousel", "title": "Спецпредложения", "sub": "Лучшие цены этой недели. Успейте, пока действует скидка!", "linkText": "Все акции", "linkHref": "/catalog/", "types": "2", "autoplay": "3500", "animation": "rise" } },
+        { "type": "goods", "variant": "grid", "params": { "varname": "popular_goods_list", "dataKey": "good_popular", "show": "carousel", "title": "Популярные товары", "sub": "То, что заказывают чаще всего — выбор клиентов магазина.", "linkText": "Все товары", "linkHref": "/catalog/", "types": "2", "autoplay": "3500", "animation": "rise" } },
+        { "type": "services", "fill": "fill-2", "params": { "varname": "services_list", "header": "Услуги", "sub": "Не только продаём технику — помогаем с доставкой, установкой и обслуживанием." } },
+        { "type": "text", "variant": "split", "fill": "fill-2", "params": { "eyebrow": "О компании", "title": "О компании", "lead": "Более 12 лет мы помогаем выбирать надёжную технику.", "p1": "Работаем напрямую с производителями, гарантируем подлинность товаров и честные цены.", "photo": "images/about.png", "btnText": "Узнать больше", "btnUrl": "/about" } },
+        { "type": "news_list", "variant": "grid", "params": { "varname": "news_list", "header": "Новости", "sub": "Актуальные события, обзоры и анонсы из мира технологий.", "limit": 6, "columns": 3 } },
+        { "type": "article_list", "variant": "rows", "fill": "fill-2", "params": { "varname": "articles_list", "header": "Статьи и обзоры", "sub": "Полезные материалы, которые помогут сделать правильный выбор.", "limit": 6 } },
+        { "type": "reviews", "params": { "varname": "reviews_list", "header": "Что говорят клиенты", "sub": "Более 4 800 отзывов со средней оценкой 4.2 из 5." } },
+        { "type": "clients", "fill": "fill-2", "params": { "varname": "clients_list", "header": "Наши клиенты", "sub": "Крупные компании и тысячи частных покупателей по всей стране." } },
+        { "type": "contact_form", "params": { "header": "Контакты и обратная связь" } }
+      ]
+    },
+    {
+      "url": "/galery",
+      "header": "Галерея",
+      "blocks": [
+        { "type": "photo_gallery", "variant": "grid", "params": { "varname": "galery_list", "header": "Галерея", "filter": true } }
+      ]
+    },
+    {
+      "url": "/favorites",
+      "header": "Избранное",
+      "blocks": [
+        { "type": "page_favorites", "params": { "perpage": 12, "search": true, "priceFilter": true, "sort": true, "chips": true } }
+      ]
+    },
+    {
+      "url": "/catalog",
+      "header": "Список рубрик",
+      "blocks": [
+        { "type": "rubric_list", "variant": "rubs", "params": { "varname": "catalog_list" } }
+      ]
+    },
+    {
+      "url": "/goodlist",
+      "header": "Список товаров",
+      "blocks": [
+        { "type": "product_list", "variant": "listing", "params": { "varname": "goods_list", "perpage": 12, "sidebar": "left", "search": true, "priceFilter": true, "sort": true, "chips": true, "source": "good_list" } }
+      ]
+    },
+    {
+      "url": "/good/{id}",
+      "header": "Страница товара",
+      "blocks": [
+        { "type": "product_detail", "variant": "gv-classic", "params": { "varname": "content", "showTabs": true, "showSpecs": true } }
+      ]
+    },
+    {
+      "url": "/services/{id}",
+      "header": "Страница услуги",
+      "blocks": [
+        { "type": "service_detail", "params": { "varname": "content", "showPrice": true, "showRegion": true } }
+      ]
+    },
+    {
+      "url": "/news/{id}",
+      "header": "Страница новости",
+      "blocks": [
+        { "type": "page_news_detail", "params": { "varname": "content" } }
+      ]
+    },
+    {
+      "url": "/article/{id}",
+      "header": "Страница статьи",
+      "blocks": [
+        { "type": "page_article_detail", "params": { "varname": "content" } }
+      ]
+    },
+    {
+      "url": "/contacts",
+      "header": "Контакты",
+      "blocks": [
+        { "type": "contacts_info", "params": { "varname": "contacts_list", "header": "Контакты", "showMap": false, "showSocials": true } },
+        { "type": "map", "variant": "embed", "params": { "url": "https://yandex.ru/map-widget/v1/?ll=37.617700%2C55.755800&z=12&pt=37.617700%2C55.755800%2Cpm2rdm", "height": 400 } }
+      ]
+    },
+    {
+      "url": "/basket",
+      "header": "Корзина",
+      "blocks": [
+        { "type": "page_basket", "params": {} }
+      ]
+    },
+    {
+      "url": "/news",
+      "header": "Новости",
+      "blocks": [
+        { "type": "news_list", "variant": "grid", "params": { "varname": "news_list", "header": "Новости", "limit": 12, "columns": 3 } }
+      ]
+    },
+    {
+      "url": "/certificates",
+      "header": "Сертификаты",
+      "blocks": [
+        { "type": "certificates", "variant": "grid", "params": { "varname": "certificates_list", "header": "Сертификаты и документы", "cols": 4, "fancybox": true } }
+      ]
+    },
+    {
+      "url": "/about",
+      "header": "О компании",
+      "blocks": [
+        { "type": "text", "variant": "prose", "params": { "eyebrow": "О компании", "title": "О компании", "lead": "Коротко о компании и подходе к работе.", "p1": "Основной текст о компании." } },
+        { "type": "text", "variant": "cards", "params": { "cols": "3" } },
+        { "type": "team", "variant": "cards", "params": { "varname": "managers_list", "header": "Наша команда" } },
+        { "type": "text", "variant": "stats", "params": { "count": "4" }, "items": [
+          { "num": "12", "label": "лет на рынке" },
+          { "num": "850 000", "label": "доставленных заказов" },
+          { "num": "98%", "label": "довольных клиентов" },
+          { "num": "4.9", "label": "рейтинг сервиса" }
+        ] },
+        { "type": "contact_form", "params": { "header": "Связаться с нами" } }
+      ]
+    },
+    {
+      "url": "/reviews",
+      "header": "Отзывы",
+      "blocks": [
+        { "type": "reviews", "params": { "varname": "reviews_list", "header": "Отзывы клиентов" } }
+      ]
+    },
+    {
+      "url": "/compare",
+      "header": "Сравнение",
+      "blocks": [
+        { "type": "page_compare", "params": {} }
+      ]
+    },
+    {
+      "url": "/articles",
+      "header": "Статьи",
+      "blocks": [
+        { "type": "article_list", "variant": "rows", "params": { "varname": "articles_list", "header": "Статьи", "limit": 12 } }
+      ]
+    },
+    {
+      "url": "/404",
+      "header": "Страница 404",
+      "blocks": [
+        { "type": "page_404", "params": { "code": "404", "title": "Страница уехала на подзарядку", "text": "Похоже, страница не найдена. Вернитесь на главную, загляните в каталог или воспользуйтесь поиском.", "image": "images/404/404.webp" } }
+      ]
+    },
+    {
+      "url": "/services",
+      "header": "Услуги",
+      "blocks": [
+        { "type": "services", "params": { "varname": "services_list", "header": "Наши услуги" } },
+        { "type": "advantages", "params": { "varname": "advantages_list", "header": "Наши преимущества" } },
+        { "type": "contact_form", "params": { "header": "Связаться с нами" } }
+      ]
+    }
+  ]
+}

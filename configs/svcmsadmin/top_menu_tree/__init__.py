@@ -1,0 +1,20 @@
+form={
+  'work_table':'top_menu_tree',
+  'work_table_id':'top_menu_tree_id',
+  'work_table_foreign_key':'project_id',
+  'title':'Рубрикатор',
+  'make_delete':0,
+  'read_only':1,
+  'tree_use':True,
+  'max_level':0,
+  'default_find_filter':'header',
+  'header_field':'header',
+  'fields':[
+    {
+      'description':'Наименование',
+      'type':'text',
+      'name':'header',
+      'filter_on':True,
+    },
+  ],
+}

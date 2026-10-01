@@ -1,4 +1,4 @@
-import importlib,os
+import importlib,os,re
 
 from lib.session import project_get_permissions_for, get_permissions_for, session_start
 
@@ -72,6 +72,75 @@ class error():
       self.success=0
 
       
+
+# События для полей из events_for_fields.py (и для структур из body).
+FIELD_EVENTS = (
+  'permissions','before_code',
+  'before_insert', 'before_update', 'before_save',
+  'before_insert_code', 'before_update_code', 'before_save_code','before_delete_code',
+  'after_add',
+  'after_insert', 'after_update', 'after_save',
+  'after_insert_code','after_update_code','after_save_code','after_delete_code',
+  'code','slide_code',
+  'filter_code',
+)
+
+
+# Загрузка уникальной структуры проекта (config=struct_<project_id>_<name>) из
+# таблицы struct. Поле body -- исходник Python-модуля с form/events/events_for_fields
+# (аналог легаси, где body был perl-конфигом и eval-ился в edit_form.pl).
+async def load_form_from_struct_db(request, arg):
+  form = False
+  errors = []
+  config = arg['config']
+  if not re.match(r'^struct_\d+_.+$', config):
+    return [form, errors]
+
+  s = request.state.engine
+  try:
+    row = await s.db_read.query(
+      query='SELECT body, enabled FROM struct WHERE table_name=%s LIMIT 1',
+      values=[config],
+      onerow=1,
+      errors=errors,
+    )
+  except Exception as e:
+    errors.append(f'ошибка загрузки структуры {config}: {e}')
+    return [form, errors]
+
+  if not row or not row.get('body'):
+    return [form, errors]
+
+  ns = {}
+  try:
+    exec(row['body'], ns)
+  except Exception as e:
+    errors.append(f'ошибка в описании структуры {config}: {e}')
+    return [form, errors]
+
+  form_data = copy.deepcopy(ns.get('form') or {})
+  if not form_data:
+    return [False, []]
+  if isinstance(ns.get('events'), dict):
+    form_data['events'] = ns['events']
+
+  try:
+    form = Form(arg)
+    form.load_data(form_data)
+  except Exception as e:
+    errors.append(f'ошибка формы структуры {config}: {e}')
+    return [False, errors]
+
+  evf = ns.get('events_for_fields')
+  if isinstance(evf, dict):
+    for f in form.fields:
+      if 'name' in f and f['name'] in evf:
+        for event_name in FIELD_EVENTS:
+          if event_name in evf[f['name']]:
+            f[event_name] = evf[f['name']][event_name]
+
+  return [form, errors]
+
 
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
@@ -154,6 +223,11 @@ async def read_config(**arg):
   s = request.state.engine  
   project_id=request.state.project['project_id']
   
+  # form объявляется до ветки проекта: админка работает без project_id,
+  # и при project_id=None локальный конфиг не загружается
+  form=False
+  errors=[]
+  
   # попытка загрузки локального конфига
   if project_id:
     [form,errors]=load_form_from_dir(f'./conf_projects/project_{project_id}', f'conf_projects.project_{project_id}',arg)
@@ -183,6 +257,13 @@ async def read_config(**arg):
   if not(form):
     [form,errors]=load_form_from_dir(config_folder, config_folder,arg)
     if len(errors): return error(errors)
+
+  # Уникальные структуры проекта (config=struct_<project_id>_<name>) хранятся в БД.
+  # Только в контексте проекта (менеджер), у админки project_id=None.
+  if not(form) and project_id:
+    [form,errors]=await load_form_from_struct_db(request,arg)
+    if len(errors): return error(errors)
+
   print('form: ',form)
   if not(form):
     return error([f'конфиг {arg["config"]} не найден'])

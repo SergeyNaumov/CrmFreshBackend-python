@@ -1,0 +1,62 @@
+form={
+  'work_table':'site_redirect',
+  'work_table_id':'site_redirect_id',
+  'title':'Редиректы для проекта',
+  'make_delete':1,
+  'read_only':0,
+  'tree_use':0,
+  'default_find_filter':'project_id,url_from,url_to',
+  'QUERY_SEARCH_TABLES':[
+    {'t':'site_redirect','a':'wt'},
+    {'t':'domain','a':'domain','l':'wt.project_id=domain.project_id','lj':1},
+  ],
+  'fields':[
+    {
+      'description':'Проект',
+      'type':'select_from_table',
+      'name':'project_id',
+      'table':'project',
+      'table_id':'project_id',
+      'header_field':'header',
+      'value_field':'project_id',
+      'sort':True,
+      'order':'project_id desc',
+      'not_filter':True,
+    },
+    {
+      'description':'Домен',
+      'type':'filter_extend_text',
+      'name':'domain',
+      'filter_table':'domain',
+      'tablename':'domain',
+      'db_name':'domain',
+      'autocomplete':True,
+      'filter_on':True,
+    },
+    {
+      'description':'Откуда',
+      'type':'text',
+      'name':'url_from',
+      'regexp_rules':[
+        '/^\\/[a-zA-Z0-9\\-\\.\\_\\/\\?\\,\\=]+$/','Недопустимый формат URL «Откуда»',
+      ],
+      'filter_on':True,
+    },
+    {
+      'description':'Куда',
+      'type':'text',
+      'name':'url_to',
+      'regexp_rules':[
+        '/^(https?:\\/\\/|\\/)[a-zA-Z0-9\\-\\.\\_\\/]+$/','Недопустимый формат URL «Куда»',
+      ],
+      'filter_on':True,
+    },
+    {
+      'description':'Вкл',
+      'type':'checkbox',
+      'name':'enabled',
+      'value':1,
+      'filter_on':True,
+    },
+  ],
+}
