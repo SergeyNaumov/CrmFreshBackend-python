@@ -61,7 +61,7 @@ async def template_slide_code(form, field, data):
   header = (tpl or {}).get('header') or str(tid)
   folder = (tpl or {}).get('folder') or ''
   nav = (
-    f'/admin2/template_editor/navigator.pl?fname={folder}'
+    f'/filenavigator/filenavigator?dir={folder}&charset=windows-1251'
     if str(data.get('server_type')) == '3'
     else f'/filenavigator/filenavigator?dir={folder}'
   )
@@ -292,7 +292,7 @@ form={
       'table_id':'domain_id',
       'foreign_key':'project_id',
       'full_str':True,
-      #'view_type':'list',
+      'view_type':'list',
       'tab':'info',
       'fields':[
         {
