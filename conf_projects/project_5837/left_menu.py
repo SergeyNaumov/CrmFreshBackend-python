@@ -142,4 +142,18 @@ left_menu = [
         'icon': 'fa fa-bars',
         'params': {'config': 'ds_top_menu'},
     },
+    {
+        'description': 'Нижнее меню',
+        'value': 'admin-tree',
+        'type': 'vue',
+        'icon': 'fa fa-grip-lines',
+        'params': {'config': 'ds_bottom_menu'},
+    },
+    {
+        'description': 'Настройки',
+        'value': 'const',
+        'type': 'vue',
+        'icon': 'fa fa-wrench',
+        'params': {'config': 'template_const'},
+    },
 ]

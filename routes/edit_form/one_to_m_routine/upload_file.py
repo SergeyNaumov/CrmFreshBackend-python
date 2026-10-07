@@ -1,4 +1,4 @@
-from lib.core import get_child_field, exists_arg, get_ext, random_filename
+from lib.core import get_child_field, exists_arg, get_ext, random_filename, del_file_and_resizes
 from lib.get_1_to_m_data import get_1_to_m_data
 from lib.resize import resize_one, convert_to_webp, out_ext_for, is_raster_ext
 import shutil,os
@@ -72,16 +72,10 @@ async def upload_file(form,field,arg):
           errors=form.errors
         )
 
-        # удаляем старый файл
+        # удаляем старый файл и ВСЕ его ресайзы (иначе остаются «хвосты»).
+        # del_file_and_resizes корректно разбирает value с ';org' и учитывает to_webp.
         if form.success() and oldfile:
-
-
-          oldfile_arr=oldfile.split(':')
-          if len(oldfile_arr)==2:
-            oldfile=oldfile_arr[1]
-          
-          if os.path.exists(child_field['filedir']+'/'+oldfile):
-            os.remove(child_field['filedir']+'/'+oldfile)
+          del_file_and_resizes(field=child_field, value=oldfile)
 
 
         save_data={

@@ -105,6 +105,15 @@ async def delete_element(config: str,id:int,request:Request):
 
   
   if form.success():
+    # Каскад перед удалением записи: файлы (base+ресайзы) записи и её file-полей,
+    # дети 1_to_m, потомки дерева — чтобы не оставалось файловых «хвостов».
+    try:
+      from lib.svcmsmanager import ds_files
+      await ds_files.cascade_delete(form, form.id)
+    except Exception as e:
+      form.errors.append(f'ошибка удаления связанных данных: {e}')
+
+  if form.success():
     await form.db.query(
       query=f'DELETE FROM {form.work_table} WHERE {form.work_table_id}=%s',
       values=[form.id],
@@ -118,6 +127,22 @@ async def delete_element(config: str,id:int,request:Request):
         await form.run_event('after_delete',{'field':f})
 
   return {'success':form.success(),'errors':form.errors,'log':form.log}
+
+@router.get('/children-count/{config}/{id}')
+async def children_count(config: str, id: int, request: Request):
+  """Число дочерних (1_to_m) и потомков дерева — для попапа подтверждения удаления."""
+  form = await read_config(
+    request=request, config=config, id=id,
+    script='delete_element', action='delete',
+  )
+  n = 0
+  if not form.errors:
+    try:
+      from lib.svcmsmanager import ds_files
+      n = await ds_files.children_count(form, id)
+    except Exception:
+      n = 0
+  return {'success': 1, 'children_count': n, 'errors': form.errors}
 
 @router.post('/multiconnect/{config}/{field_name}')
 async def multiconnect(config:str,field_name:str,R:dict, request:Request):
