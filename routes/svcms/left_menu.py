@@ -68,9 +68,33 @@ async def left_menu(request: Request):
         left_menu_data.append(m)
     except SyntaxError as e:
       errors.append(f'Ошибка синтаксиса в {path_to_menu}')
-  else: # Формируем на основании БД
-      left_menu_data.append(await get_standart_service(request,errors))
-      left_menu_data.append(await get_extended_service(request,errors))
+  else: # Формируем меню из опций проекта (ds_options + ds_options_project)
+      opts=await s.db.query(
+        query='''
+          SELECT o.header,o.icon,o.tool,o.type,o.config
+          FROM ds_options o
+          JOIN ds_options_project op ON op.option_id=o.id
+          WHERE op.project_id=%s and o.is_menu=1
+          ORDER BY o.sort,o.id
+        ''',
+        values=[project_id],
+        errors=errors,
+      )
+      if opts:
+        for o in opts:
+          item={
+            'header':o['header'],
+            'value':o['tool'],
+            'type':o['type'] or 'vue',
+            'icon':o['icon'],
+            'child':[],
+          }
+          if o.get('config'):
+            item['params']={'config':o['config']}
+          left_menu_data.append(item)
+      else: # фолбэк: прежний источник (struct_public + project_menu)
+        left_menu_data.append(await get_standart_service(request,errors))
+        left_menu_data.append(await get_extended_service(request,errors))
     
 
   manager= await s.db.query(

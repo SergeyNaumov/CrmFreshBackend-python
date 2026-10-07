@@ -112,6 +112,36 @@ async def _project_id_for_domain(db, domain_id):
     return (row or {}).get('project_id')
 
 
+async def _block_types_for_project(db, project_id):
+    """Разрешённые типы блоков конструктора для проекта.
+
+    restricted — блоки, у которых есть привязки к опциям (ds_blocks_options);
+    allowed — из них те, все опции которых включены у проекта
+    (ds_options_project). Блоки без привязок фронт считает доступными всегда.
+    Если привязок нет или у проекта не настроены опции — ([], []) = без фильтра.
+    """
+    links = await db.query(
+        query='SELECT block_name, option_id FROM ds_blocks_options',
+        errors=[],
+    ) or []
+    if not links:
+        return [], []
+    proj = await db.query(
+        query='SELECT option_id FROM ds_options_project WHERE project_id=%s',
+        values=[project_id], errors=[],
+    ) or []
+    enabled = {str(r['option_id']) for r in proj}
+    if not enabled:
+        return [], []
+    by_block = {}
+    for l in links:
+        by_block.setdefault(str(l['block_name']), []).append(str(l['option_id']))
+    restricted = sorted(by_block.keys())
+    allowed = sorted(
+        b for b, ids in by_block.items() if all(i in enabled for i in ids))
+    return restricted, allowed
+
+
 def _folder_slug(folder):
     """Санитайз подпапки block-images: только [a-z0-9_-]."""
     return re.sub(r'[^a-z0-9_-]', '', (folder or '').lower()).strip('-_')
@@ -492,6 +522,10 @@ async def page_constructor_init(request: Request, r: InitIn):
     config['filesBase'] = '%s/project_%s/' % (_engine_files_url(), d.get('project_id'))
     for axis in THEME_AXES:
         config[axis] = theme[axis]['name']
+    # Фильтр палитры блоков по опциям проекта (ds_blocks_options + ds_options_project).
+    restricted, allowed = await _block_types_for_project(db, d.get('project_id'))
+    config['block_types_restricted'] = restricted
+    config['block_types_allowed'] = allowed
     return {
         'success': True,
         'errors': [],

@@ -24,20 +24,6 @@ left_menu = [
         'params': {'config': 'ds_params'},
     },
     {
-        'description': 'Параметры рубрик',
-        'value': 'admin-table',
-        'type': 'vue',
-        'icon': 'fa fa-indent',
-        'params': {'config': 'ds_params_catalog'},
-    },
-    {
-        'description': 'Значения характеристик',
-        'value': 'admin-table',
-        'type': 'vue',
-        'icon': 'fa fa-table',
-        'params': {'config': 'ds_params_good'},
-    },
-    {
         'description': 'Бренды',
         'value': 'admin-table',
         'type': 'vue',

@@ -336,8 +336,13 @@ async def admin_tree_run(**arg):
       return {'success':0,'error':'Редактирование запрещено!'}
     else:
       if form.id:
+        where=[f'{form.work_table_id}=%s']
+        # Применяем foreign_key (project_id), если задан, — чтобы нельзя было
+        # переименовать ветку чужого проекта, подменив id.
+        add_where_foreign_key(form,where)
+        query=add_where_to_query(f'UPDATE {form.work_table} SET {form.header_field}=%s',where)
         await form.db.query(
-          query=f'UPDATE {form.work_table} SET {form.header_field}=% WHERE {form.work_table_id}=%s',
+          query=query,
           values=[R['header'],form.id]
         )
         return {'success':1}

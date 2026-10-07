@@ -63,6 +63,11 @@ async def autocomplete(config:str,R: dict,request: Request):
     #  errors.append('не указан term')
   
   if not('values' in R): R['values']=[]
+  # values может прийти скаляром/строкой (одиночный select) — нормализуем к
+  # списку, иначе ниже `for v in values` падает с TypeError (500).
+  if not isinstance(R['values'], list):
+    _v=R['values']
+    R['values']=[] if _v in (None,'') else [_v]
 
 
   if not field:
@@ -176,8 +181,12 @@ async def get_list(**arg):
       like_values.append('%'+like_val+'%')
 
       if exists_arg('values',arg):
+        # на всякий случай: значение может прийти не-списком
+        _vals=arg['values']
+        if not isinstance(_vals,(list,tuple)):
+          _vals=[] if _vals in (None,'') else [_vals]
         values_array=[]
-        for v in arg['values']:
+        for v in _vals:
           values_array.append(str(v))
         
         if len(values_array):

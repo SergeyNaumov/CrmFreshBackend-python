@@ -206,6 +206,38 @@ def get_search_where(form,query):
             else:
               WHERE.append(' (wt.'+db_name+' IN ('+','.join(map_rezult)+'))')
 
+      elif f['type']=='multiselect':
+        # Фильтр «пары характеристик» (admin_table/search_results): conditions =
+        # [{param_id,type,value}|{param_id,type,from,to}, ...], между условиями AND.
+        # Каждое условие -> EXISTS по ds_params_good (без join/дублей товаров).
+        g_table=f.get('values_table','ds_params_good')
+        g_good=f.get('values_good_field','good_id')
+        g_param=f.get('values_param_field','param_id')
+        g_value=f.get('values_value_field','value')
+        if isinstance(values,dict): values=[values]
+        for cond in (values or []):
+          if not isinstance(cond,dict): continue
+          pid=cond.get('param_id')
+          if not pid: continue
+          cond_sql=[]; cond_vals=[]
+          if str(cond.get('type'))=='1':
+            # число (в ds_params_good может быть с единицами: "0.20 кг")
+            num=f"(REPLACE(SUBSTRING_INDEX(pg.{g_value},' ',1),',','.')+0)"
+            frm=cond.get('from'); to=cond.get('to')
+            if frm not in (None,''):
+              cond_sql.append(f"{num}>=%s"); cond_vals.append(frm)
+            if to not in (None,''):
+              cond_sql.append(f"{num}<=%s"); cond_vals.append(to)
+          else:
+            text=cond.get('value')
+            if text in (None,''): continue
+            cond_sql.append(f"pg.{g_value} LIKE %s"); cond_vals.append('%'+str(text)+'%')
+          sql=f"(EXISTS (SELECT 1 FROM {g_table} pg WHERE pg.{g_good}=wt.id AND pg.{g_param}=%s"
+          if cond_sql: sql+=' AND '+' AND '.join(cond_sql)
+          sql+='))'
+          WHERE.append(sql)
+          VALUES.append(pid); VALUES.extend(cond_vals)
+
       elif f['type'] in ['select_from_table','filter_extend_select_from_table','filter_extend_select_values','select_values']:
 
         db_name=f.get('db_name')

@@ -167,5 +167,11 @@ async def get_result(R: dict, request: Request):
       return form.SEARCH_RESULT
   except Exception as e:
     err=traceback.format_exc()
-    form.errors.append(f"{err}")
-    return {'success':False, 'errors':form.errors}
+    # form может быть не определён, если read_config упал до присваивания:
+    # тогда раньше ловили UnboundLocalError и отдавали 500 вместо ошибки.
+    try:
+      form.errors.append(f"{err}")
+      errors=form.errors
+    except Exception:
+      errors=[err]
+    return {'success':False, 'errors':errors}

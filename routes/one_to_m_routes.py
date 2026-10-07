@@ -168,3 +168,50 @@ async def delete_file(config: str, field_name:str, child_field_name:str, id:int,
   #with open("ZZZ.png", "wb") as buffer:
   #    shutil.copyfileobj(attach.file, buffer)
  # return {'success':1}
+
+
+# Пересчёт итоговой суммы родителя из 1_to_m-таблицы.
+# Конфиг задаёт: total_sum_from (имя 1_to_m-поля), total_sum_field (колонка
+# родителя), total_sum_expr (SQL-выражение, напр. 'price*cnt').
+@router.post('/recalc_total/{config}/{id}')
+async def recalc_total(config: str, id: int, request: Request):
+  form = await read_config(
+    request=request,
+    config=config,
+    id=id,
+    script='recalc_total',
+    action='edit',
+  )
+  if not form.success():
+    return {'success': 0, 'errors': form.errors}
+
+  # Защита: запись должна принадлежать текущему проекту.
+  if getattr(form, 'foreign_key', '') and getattr(form, 'foreign_key_value', ''):
+    cnt = await form.db.query(
+      query=f'SELECT COUNT(*) FROM {form.work_table} '
+            f'WHERE {form.work_table_id}=%s AND {form.foreign_key}=%s',
+      values=[form.id, form.foreign_key_value], onevalue=1, errors=form.errors,
+    )
+    if not cnt:
+      return {'success': 0, 'errors': ['Запись принадлежит другому проекту']}
+
+  from_field = getattr(form, 'total_sum_from', '')
+  sum_field = getattr(form, 'total_sum_field', '')
+  expr = getattr(form, 'total_sum_expr', '') or '1'
+  if not (from_field and sum_field):
+    return {'success': 0, 'errors': ['конфиг не поддерживает пересчёт суммы']}
+
+  f = form.get_field(from_field)
+  if not f:
+    return {'success': 0, 'errors': [f'не найдено поле {from_field}']}
+
+  total = await form.db.query(
+    query=f'SELECT COALESCE(SUM({expr}),0) FROM {f["table"]} WHERE {f["foreign_key"]}=%s',
+    values=[form.id], onevalue=1, errors=form.errors,
+  )
+  total = int(total or 0)
+  await form.db.query(
+    query=f'UPDATE {form.work_table} SET {sum_field}=%s WHERE {form.work_table_id}=%s',
+    values=[total, form.id], errors=form.errors,
+  )
+  return {'success': form.success(), 'errors': form.errors, 'total_sum': total}

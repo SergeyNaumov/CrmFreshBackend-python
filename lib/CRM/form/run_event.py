@@ -1,5 +1,6 @@
 from lib.core import exists_arg
 import traceback
+import inspect
 
 async def run_event(form,event_name,arg={}):
     
@@ -11,11 +12,16 @@ async def run_event(form,event_name,arg={}):
       if event_name in field: # Если мы в аргументах передаём поле -- событие ищем внутри этого поля
         event_func=field[event_name]
         try:
-          if event_name in ('slide_code', 'after_add'):
-            data=exists_arg('data',arg) or {}
+          # data передаём третьим аргументом, если обработчик его принимает
+          # (before_/after_*_code). Иначе вызываем с двумя (form, field).
+          data=exists_arg('data',arg)
+          try:
+            nparams=len(inspect.signature(event_func).parameters)
+          except (TypeError, ValueError):
+            nparams=2
+          if data is not None and nparams>=3:
             return await event_func(form,field,data)
-          else:
-            return await event_func(form,field)
+          return await event_func(form,field)
         except Exception as e:
           err=traceback.format_exc()
 
