@@ -92,12 +92,15 @@ async def template_id_filter_code(form, field, row):
   tid = row.get('t__template_id')
   if not tid:
     return ''
-  folder = row.get('t__folder') or ''
-  nav = (
-    f'/admin2/template_editor/navigator.pl?fname={folder}'
-    if str(row.get('d__server_type')) == '3'
-    else f'/admin/template_editor/navigator.pl?fname={folder}'
-  )
+  folder = './templates/'+row.get('t__folder') or ''
+  
+  
+  
+  if str(row.get('d__server_type')) in ('1'):
+    nav=f'/filenavigator/filenavigator?dir={folder}&charset=windows-1251'
+  else:
+    nav=f'/filenavigator/filenavigator?dir={folder}'
+  
   header = row.get('t__header') or tid
   return (
     f'<a href="/edit_form/template/{tid}" target="_blank">{header}</a>'

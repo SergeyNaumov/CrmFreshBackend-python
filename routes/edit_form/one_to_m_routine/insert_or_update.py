@@ -29,6 +29,34 @@ async def insert_or_update(form,field,arg):
         await form.run_event('before_save_code',{'field':field,'data':data})
 
         if form.success():
+          # Сортировка 1_to_m: новый слайд добавляется в конец группы (max+1),
+          # иначе драг-сортировка работает, но новые записи встают по sort=0
+          # в начало списка (ORDER BY sort).
+          if exists_arg('sort',field):
+            sort_field=exists_arg('sort_field',field) or 'sort'
+            if sort_field not in data:
+              cur_sort=await form.db.query(
+                query=f'SELECT max({sort_field}) from {field["table"]} where {field["foreign_key"]}={foreign_key_value}',
+                onevalue=1,
+                errors=form.errors,
+              )
+              data[sort_field]=1 if not cur_sort else int(cur_sort)+1
+
+          # Таблицы слайдов конструкторных проектов имеют project_id (FK на project):
+          # без него INSERT падает с нарушением внешнего ключа. Проверяем наличие
+          # колонки один раз (кэш на поле) и заполняем из контекста проекта.
+          if 'project_id' not in data and 'project_id' not in (field.get('_cols') or ()):
+            if field.get('_cols') is None:
+              cols=await form.db.query(
+                query=f'SHOW COLUMNS FROM `{field["table"]}`',
+                errors=form.errors,
+              ) or []
+              field['_cols']=[str(r.get('Field', '')).lower() for r in cols]
+            if 'project_id' in field['_cols']:
+              pid=(form.project or {}).get('project_id')
+              if pid:
+                data['project_id']=pid
+
           data[field['table_id']] = await form.db.save(
             table=field['table'],
             data=data,

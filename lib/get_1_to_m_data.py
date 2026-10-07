@@ -1,7 +1,9 @@
-from lib.core import exists_arg
+from lib.core import exists_arg, get_name_and_ext
+from lib.resize import out_ext_for
 from lib.CRM.form.get_values_for_select_from_table import get_values_for_select_from_table
 #from lib.CRM.form.run_event import run_event
 import re
+import os
 
 async def normalize_value_row(form,field,d):
   for cf in field['fields']:
@@ -29,9 +31,10 @@ async def normalize_value_row(form,field,d):
           #print(f'preview: {cf["preview"]}\n\n')
           #print(f'resize: {cf["resize"]}\n\n')
           if filedir and filename:  # для превью на фронте
-            #print('filedir: ',filedir)
-            resize_for_preview=None
+            original=fdir+'/'+attach_name
+            preview_img=''
             if exists_arg('preview',cf) and exists_arg('resize',cf) and len(cf['resize'])>0:
+              resize_for_preview=None
               for r in cf['resize']:
                 #print('r:',r['size'])
                 if r['size']==cf['preview']:
@@ -40,12 +43,16 @@ async def normalize_value_row(form,field,d):
               
               if resize_for_preview:
                 #print('resize_for_preview:',resize_for_preview)
-                name,ext=filename.split('.')
+                name,ext=get_name_and_ext(filename)
+                ext=out_ext_for(cf, ext)
                 tmp_file=resize_for_preview['file'].replace('<%filename_without_ext%>',name).replace('<%ext%>',ext)
-                d['preview_img']=fdir+'/'+tmp_file  
+                # Сырой путь './files/...' для проверки существования файла.
+                raw=filedir+'/'+tmp_file
+                if os.path.isfile(raw):
+                  preview_img=fdir+'/'+tmp_file
 
-            else:
-              d['preview_img']=fdir+'/'+attach_name
+            # Нет подходящей миниатюры (или файла на диске) — показываем оригинал.
+            d['preview_img']=preview_img or original
           d[c_name+'_filename']=filename
       if exists_arg('slide_code',cf):
         d[c_name+'_slide']=await form.run_event('slide_code',{'field':cf,'data':d})

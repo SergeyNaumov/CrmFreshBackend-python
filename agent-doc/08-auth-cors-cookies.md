@@ -10,6 +10,15 @@ whitelist — либо debug-обход, либо `session_start(s, request)`.
   `mysql_sha2`, `mysql_encrypt` или plain. Проверяет лимиты неудачных попыток
   по логину/IP (`max_fails_*`), создаёт запись в `session_table`, ставит
   cookies `auth_user_id` и `auth_key`.
+- **MySQL 8 и пароли.** В MySQL 8 удалена функция `ENCRYPT()`, поэтому SQL-ветка
+  `mysql_encrypt` (`password=encrypt(%s,password)`) падает. После неудачной/пустой
+  SQL-проверки `session_create` делает резервную проверку на стороне Python
+  (`lib/password.py: verify_password`): поддерживает plaintext, sha2-256 (64),
+  md5 (32) и crypt — DES/ENCRYPT (13 символов, исторические `admin`/`manager`)
+  и `$1$/$5$/$6$`. Хэширование при записи — `lib/password.py: hash_password`
+  (`mysql_encrypt` → DES-совместимый crypt, `mysql_sha2` → sha2-256); используется
+  в `save_form.py`, `routes/password.py` и создании проекта
+  (`routes/svcmsadmin/project_create.py`).
 - `session_start(s, request)` — читает `auth_user_id`/`auth_key`, сверяет с
   `auth['session_table']`, кладёт менеджера в `request.state.manager`, иначе
   `s.end()` с `redirect` на `/login`.

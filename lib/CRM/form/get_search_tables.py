@@ -59,23 +59,36 @@ async def get_search_tables(form,query):
             break
 
     else:
-      t_str='`'+t['table']+'` `'+t['alias']+'`'
+      tbl=str(t['table']).lstrip()
+      # work_table может быть подзапросом "(select ...)": вокруг него
+      # обратные кавычки SQL невалидны, оборачиваем в derived table с алиасом
+      if tbl.startswith('('):
+        t_str=f'{tbl} as {t["alias"]}'
+      elif re.match(r'^select\b', tbl, re.I):
+        t_str=f'({tbl}) as {t["alias"]}'
+      else:
+        t_str='`'+t['table']+'` `'+t['alias']+'`'
 
     if need_add_table:
       TABLES.append(t_str)
       
       if not exists_arg('not_add_in_select_fields', t):
-        desc = await form.db.query(
-          query = f"desc {t['table']}",
-          errors=form.log
+        desc = await form.db.desc(
+          table = t['table'],
+          errors = form.log
         )
         if desc:
-            for db_field in desc:
+            for db_field in desc.values():
               #adding_select_fields(form,db_field,t)
               adding_select_fields_in_desc(form,db_field,t)
 
   for f in form.fields:
     func=get_func(f)
     if func: form.query_search['SELECT_FIELDS'].append(func+' '+f['name'])
+    elif exists_arg('expr',f):
+      # Виртуальное поле: значение — SQL-выражение (напр. подзапрос к галерее),
+      # а не колонка. Алиас как у обычной колонки: <tablename>__<name>.
+      tbl=exists_arg('tablename',f) or 'wt'
+      form.query_search['SELECT_FIELDS'].append(f"({f['expr']}) {tbl}__{f['name']}")
     
   form.query_search['TABLES']=TABLES

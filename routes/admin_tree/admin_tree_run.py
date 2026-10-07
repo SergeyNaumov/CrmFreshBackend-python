@@ -13,58 +13,45 @@ async def get_branch(**arg):
   branch={'path':[],'list':[]}
   
   if parent_id: # Если находимся не в корне, то собираем $branch->{path} (путь ветки)
-    where=add_where_foreign_key(form,where)
+    # Путь ветки собираем подъёмом по parent_id, а НЕ разбором столбца path:
+    # в БД его значения могут не соответствовать соглашению "цепочка id предков"
+    # (например, в ds_catalog лежит '/catalog/<id>' -- литеральный сегмент 'catalog'
+    # попадал в SQL как w.id=catalog и ронял запрос). В условие попадает только
+    # то, что прошло isnumeric().
+    cur_id=str(parent_id)
+    visited=set()
+    while cur_id and cur_id not in visited:
+      visited.add(cur_id)
+      if not cur_id.isnumeric():
+        break
 
-    query_path=f'SELECT path from {form.work_table}'
-    
-    if len(where):
-      query_path+=' WHERE '+' AND '.join(where)
-
-    pathstr=await form.db.query(
-      query=query_path,
-      onevalue=1,
-      errors=form.errors
-    )
-    pathstr+='/'+parent_id
-    
-    if len(form.errors):
-      return
-
-    # определяем уровень вложенности
-    #cur_level=len( list(pathstr.split('/')) ) -1 
-    path_elements=pathstr.split('/')
-    
-    for id in path_elements:
-      if not id:
-        continue
-
-      id=str(id)
-      where=[f'w.{form.work_table_id}={id}']
+      where=[f'w.{form.work_table_id}={cur_id}']
       add_where_foreign_key(form,where)
 
       query=''
       if form.tree_select_header_query:
-        query=f'{form.tree_select_header_query} AND (w.{form.work_table_id}={id})'
+        query=f'{form.tree_select_header_query} AND (w.{form.work_table_id}={cur_id})'
       else:
         query=f'SELECT * from {form.work_table} w'
-        
-        if len(where):
-          query+=' WHERE '+' AND '.join(where)
-      
+        query+=' WHERE '+' AND '.join(where)
+
       query+=' LIMIT 1000'
       item = await form.db.query(
         query=query,
         onerow=1,
-
         errors=form.errors,
       )
-      
+      if len(form.errors) or not item:
+        break
 
       header=form.default_find_filter or 'header'
-      if item:
-        for k in item.keys(): header=header.replace('<%'+k+'%>',str(item[k]))
+      for k in item.keys(): header=header.replace('<%'+k+'%>',str(item[k]))
 
-      branch['path'].append({'header':header,'id':id})
+      # Идём от листа к корню, поэтому вставляем в начало
+      branch['path'].insert(0,{'header':header,'id':cur_id})
+
+      parent=item.get('parent_id')
+      cur_id=str(parent) if parent is not None else ''
   
   # end if parent_id
   sql_query=''
@@ -93,29 +80,40 @@ async def get_branch(**arg):
   if form.sort:
     sql_query+=' ORDER BY w.'+form.sort_field
   else:
-    sql_query+=' ORDER BY w.'+form.header_field
+    # header_field бывает пустым (конфиги, сделанные под admin-table) -- тогда
+    # получался невалидный "ORDER BY w. LIMIT 1000"
+    sql_query+=' ORDER BY w.'+(form.header_field or form.work_table_id)
   
-  sql_query+' LIMIT 1000' # защита от дурака
+  sql_query+=' LIMIT 1000' # защита от дурака
 
   result_lst= await form.db.query(
     query=sql_query,
     errors=form.errors
   )
+  if form.errors:
+    # при ошибке в SQL db.query возвращает None -- не итерируем его
+    return []
   for item in result_lst:
-    if not(form.header_field) in item:
-      form.errors.append(f"в таблице {form.work_table} отсутствует поле {form.header_field}")
-      return []
+    if form.header_field:
+      if form.header_field not in item:
+        form.errors.append(f"в таблице {form.work_table} отсутствует поле {form.header_field}")
+        return []
+      header=item[form.header_field]
+    else:
+      header=item.get(form.work_table_id)
     id=item[form.work_table_id]
     el={
-      'header':item[form.header_field],
+      'header':header,
       'id':id,
     }
     el['sort']=exists_arg('sort',item) or ''
-    # Для галерейного вида отдаём полный веб-путь к фото элемента ветки
-    if getattr(form,'view_type',None)=='gallery' and getattr(form,'photo_for_gallery',None):
-      photo=exists_arg(form.photo_for_gallery,item) or ''
+    # Миниатюра элемента ветки: задаётся ключом photo_field (обычные списки)
+    # или photo_for_gallery (галерейный вид). Поле должно быть в SELECT-строке.
+    photo_field_name=getattr(form,'photo_field',None) or getattr(form,'photo_for_gallery',None)
+    if photo_field_name and exists_arg(photo_field_name,item):
+      photo=item[photo_field_name] or ''
       filedir=''
-      if pf:=form.get_field(form.photo_for_gallery):
+      if pf:=form.get_field(photo_field_name):
         filedir=exists_arg('filedir',pf) or ''
       if photo and filedir:
         el['photo']=re.sub(r'^\.\/','/',filedir)+'/'+photo
@@ -176,6 +174,15 @@ async def admin_tree_run(**arg):
        'errors':form.errors
     }
   if not form.sort_field: form.sort_field='sort'
+
+  # Составной первичный ключ (напр. "param_id,good_id" у ds_params_good):
+  # строка результата не содержит такого поля, item[work_table_id] падал бы с
+  # KeyError -> 500. admin-tree для таких конфигов неприменим, отдаём ошибку.
+  if ',' in str(form.work_table_id):
+    return {
+      'success':0,
+      'errors':[f'конфиг {form.config}: составной первичный ключ ({form.work_table_id}) не поддерживается в admin-tree']
+    }
 
 
 
@@ -346,20 +353,32 @@ async def admin_tree_run(**arg):
     data_result={}
 
     if len(obj_list):
+      photo_field_name=getattr(form,'photo_field',None) or getattr(form,'photo_for_gallery',None)
+      if photo_field_name and form.header_field and photo_field_name==form.header_field:
+        photo_field_name=None
       for id in obj_list:
         sort=''
         order=''
+        extra=''
+        if photo_field_name:
+          # для миниатюр в дочерних ветках берём и колонку фото
+          extra=f', {photo_field_name} photo'
 
         if form.sort:
           sort=f', {form.sort_field} sort'
           order=f'ORDER BY {form.sort_field}'
 
-        query=f'select {form.work_table_id} id,{form.header_field} header {sort} from {form.work_table} where parent_id={id} {order}'
+        query=f'select {form.work_table_id} id,{form.header_field} header {sort} {extra} from {form.work_table} where parent_id={id} {order}'
 
-        data_result[id]=await form.db.query(
-          #query=f'SELECT id,header,sort from {form.work_table} where parent_id={id} order by sort'
-          query=query
-        )#get_branch(form=form,get_childs=0,parent_id=id)
+        rows=await form.db.query(query=query)
+        if photo_field_name and rows:
+          filedir=''
+          if pf:=form.get_field(photo_field_name):
+            filedir=exists_arg('filedir',pf) or ''
+          for r in rows:
+            if r.get('photo') and filedir:
+              r['photo']=re.sub(r'^\.\/','/',filedir)+'/'+r['photo']
+        data_result[id]=rows
     return {'success':1,'data':data_result}
 
 
@@ -381,7 +400,7 @@ async def admin_tree_run(**arg):
       #'changed_in_tree':getattr(form,'changed_in_tree',False),
     }
     # для галереи
-    for name in ['view_type','photo_for_gallery','cols', 'changed_in_tree']:
+    for name in ['view_type','photo_for_gallery','photo_field','cols', 'changed_in_tree']:
       if(hasattr(form,name)):
         out_form[name]=getattr(form, name)
     

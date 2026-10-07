@@ -7,6 +7,27 @@ from .multiconnect_old import parse_extended
 async def get_in_ext_url(form,f):
   print('get_in_ext_url не готова')
 
+
+async def field_default(form, f):
+  """Значение поля по умолчанию для новой записи.
+
+  'func::<expr>' — выполнить MySQL-функцию (напр. func::now(), func::curdate()),
+  иначе — вернуть литерал как строку.
+  """
+  dv = f.get('default')
+  if isinstance(dv, str) and dv.startswith('func::'):
+    expr = dv[len('func::'):].strip()
+    try:
+      val = await form.db.query(
+        query='select ' + expr,
+        onevalue=1,
+        errors=form.errors,
+      )
+    except Exception:
+      val = None
+    return '' if val is None else str(val)
+  return str(dv)
+
 async def func_get_values(form):
     values={}
 
@@ -51,17 +72,15 @@ async def func_get_values(form):
       
       
       if is_wt_field(f):
-        #if name=='checkbox':
-          #print('not name checkbox:', (not name in values) )
-          #print('not value checkbox:', (not values[name]) )
-        # if name in values:
-        
-        if not name in values or (not (values[name]) and values[name]!=0 and values[name]!='0'):
-            values[name]=''
+        # Читаем значение по реальной колонке: db_name (если задан), иначе name.
+        # Поля с db_name (title→header и т.п.) раньше оставались пустыми.
+        col=exists_arg('db_name',f) or name
+        if not (col in values) or (not (values[col]) and values[col]!=0 and values[col]!='0'):
+            f['value']=''
         else:
-          values[name]=str(values[name])
-          if f['type']=='datetime' and values[name]=='0000-00-00 00:00:00':
-            values[name]=''    
+            f['value']=str(values[col])
+            if f['type']=='datetime' and f['value']=='0000-00-00 00:00:00':
+                f['value']=''    
       
 
       set_from_nv=True
@@ -133,7 +152,11 @@ async def func_get_values(form):
             values[name]=str(values[name])
           if set_from_nv and not(form.script == 'admin_table' and ('value' in f)):
             f['value']=values[name]         
-      
+
+      # Значение по умолчанию при создании новой записи (edit_form).
+      if form.action=='new' and 'default' in f:
+          f['value']=await field_default(form,f)
+
     #form.pre(f"v2: {form.fields[5]['value']}")
     form.values=values
 

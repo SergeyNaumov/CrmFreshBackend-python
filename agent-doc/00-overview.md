@@ -56,6 +56,14 @@ Vue 3 + Vuetify (`../CrmFreshFront-v3`), бэкенд отдаёт только 
 
 - **В работе**: `routes/`, `lib/`, `db/`, `main.py`, `config_svcms_manager.py`,
   `configs/svcmsmanager/**`, `conf_projects/project_5830/**`.
+- **Проект 5837** (CMS-конструктор `t1`, домен `demo1.digitalstrateg.ru`):
+  `conf_projects/project_5837/**` — инструменты `ds_*`; эталон — проект 5830.
+  «Золотые» копии инструментов живут в `/var/www/svcms-async/manager/backend/conf/`
+  (движок сайта читает их через `sites/lib/dbl/load_struct.py`:
+  `conf_projects/project_5837/` → `conf/`; в manager считаются как
+  `configs/svcmsmanager` или данные из БД). Конфиги-симлинки
+  `configs/svcmsmanager/ds_*` указывают туда же.
+  Соглашения конструкторных конфигов — `12-configs.md`.
 - **Вне области правок** (отдельные деплои, не трогать): `configs/teleweb/**`,
   `configs/test/**`, `configs/beyeezy/**`, `configs/crimea/**` и их
   `config_*.py`. Глобал `s=Engine()` в `lib/engine.py` сохранён исключительно

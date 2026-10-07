@@ -24,7 +24,7 @@ async def left_menu_admin(request: Request):
     query="""
       SELECT
         amn.id, amn.header, amn.type, amn.value, amn.params,
-        amn.icon, amn.parent_id, amn.sort,
+        amn.icon, amn.parent_id, amn.sort, amn.open,
         group_concat(concat(amp.permission_id,':',amp.denied) SEPARATOR ';') perm
       FROM
         admin_menu_new amn

@@ -1,5 +1,6 @@
 import inspect
-from lib.core import exists_arg, date_to_rus
+from lib.core import exists_arg, date_to_rus, get_name_and_ext
+from lib.resize import out_ext_for
 from lib.CRM.form.idn import domain_to_unicode
 async def process_result_list(form,R,result_list):
 
@@ -52,6 +53,8 @@ async def process_result_list(form,R,result_list):
         continue
       field=form.fields_hash[name]
       type='html' #field['type']
+      preview=''
+      is_img=0
       if exists_arg('make_change_in_search',field):
         type=field['type']
 
@@ -87,6 +90,26 @@ async def process_result_list(form,R,result_list):
         
         elif field['type']=='file':
           if value:
+            # Миниатюра для списка/поиска: resize с size==preview, иначе первый
+            # resize, иначе базовый файл (логика как в edit_form_process_fields).
+            filename=str(value).split(';')[0]
+            name_part, ext=get_name_and_ext(filename)
+            if ext and ext.lower() in ('jpg','jpeg','png','gif','webp','svg'):
+              is_img=1
+              out_ext=out_ext_for(field, ext)
+              r_sel=None
+              if exists_arg('resize',field):
+                if exists_arg('preview',field):
+                  for rz in field['resize']:
+                    if rz['size']==field['preview']:
+                      r_sel=rz
+                if not r_sel:
+                  r_sel=field['resize'][0]
+              if r_sel:
+                prev_file=r_sel['file'].replace('<%filename_without_ext%>',name_part).replace('<%ext%>',out_ext)
+                preview=(field['filedir']+'/'+prev_file).replace('./','/')
+              else:
+                preview=(field['filedir']+'/'+filename).replace('./','/')
             value=(field['filedir']+'/'+value).replace('./','/')
           
           type='file'
@@ -174,6 +197,8 @@ async def process_result_list(form,R,result_list):
           'name':name,
           'type':type,
           'value':value,
+          'preview':preview,
+          'is_img':is_img,
           'show_type':exists_arg('show_type',field) or ''
       })
 

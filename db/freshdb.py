@@ -55,10 +55,38 @@ class FreshDB():
                     arg['errors']+=errors
                 return {}
 
-            for f in fields:
-                result[ f['Field'] ] = f
+            for f in (fields or []):
+                if isinstance(f,dict) and 'Field' in f:
+                    result[ f['Field'] ] = f
 
-            return result
+            if result:
+                return result
+
+            # work_table -- подзапрос вида "(select ...)": desc выполняется как
+            # EXPLAIN и возвращает колонки id, select_type, ... без 'Field'.
+            # Имена реальных колонок достаём через SELECT ... LIMIT 0.
+            return await self._desc_of_subquery(table, errors=arg.get('errors'))
+
+    async def _desc_of_subquery(self, table, errors=None):
+        result = {}
+        self.error_str=''
+        inner = table.lstrip()
+        if not inner.startswith('('):
+            inner = f'({inner})'
+        query = f'SELECT * FROM {inner} AS __desc LIMIT 0'
+        try:
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(query)
+                    for col in (cur.description or []):
+                        result[col[0]] = {'Field': col[0], 'Type': ''}
+        except Exception as e:
+            err_arg = {'query': query}
+            if errors is not None:
+                err_arg['errors'] = errors
+            out_error(self, e, err_arg)
+            return {}
+        return result
 
     async def query(self, **arg):
 

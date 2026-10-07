@@ -24,7 +24,7 @@ async def run_event(form,event_name,arg={}):
 
       if event_name in form.events:
         event=form.events[event_name]
-
+        
         if isinstance(event,list):
           for e in event:
             try:

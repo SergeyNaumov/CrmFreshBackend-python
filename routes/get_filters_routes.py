@@ -1,13 +1,19 @@
 from fastapi import APIRouter, Request
 from lib.core import is_errors, create_fields_hash, exists_arg
 from lib.all_configs import read_config
+from lib.CRM.form.get_values_for_select_from_table import (
+  get_values_for_select_from_table as _get_values_for_select_from_table,
+)
 
 router = APIRouter()
 
 
 
 async def get_values_for_select_from_table(f,form):
-  return []
+  # Опции для выпадающих фильтров select_from_table. Раньше здесь возвращался
+  # пустой список — фильтр по бренду/рубрике нечем было заполнять.
+  # Порядок аргументов у обёртки (f,form) — как у места вызова.
+  return await _get_values_for_select_from_table(form, f)
 
 
 @router.get('/get-filters/{config}')

@@ -19,6 +19,11 @@ form = {
       'filter_on': True,
     },
     {
+      'description':'Сразу показывать подпункты',
+      'type': 'checkbox',
+      'name':'open'
+    },
+    {
       'description': 'Тип',
       'type': 'select_values',
       'name': 'type',

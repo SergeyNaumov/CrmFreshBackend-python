@@ -1,4 +1,5 @@
 from lib.core import exists_arg, is_wt_field, from_datetime_get_date
+from lib.password import hash_password
 #from routes.edit_form.multiconnect import save as multiconnect_save
 from .multiconnect import save as multiconnect_save
 from .save_in_ext_url import save_in_ext_url
@@ -75,6 +76,9 @@ async def save_form(form,arg):
      
       if exists_arg('read_only',f) or exists_arg('not_process',f):
         continue
+      # Вычисляемые поля (sql-выражения) не сохраняются в БД.
+      if f.get('sql'):
+        continue
       name=f['name']
      
 
@@ -88,6 +92,9 @@ async def save_form(form,arg):
 
       
       if is_wt_field(f):
+        
+        # Сохраняем в реальную колонку: db_name (если задан), иначе name.
+        col=f.get('db_name') or name
         
         if f['type'] in ['switch','checkbox','select_values','select_from_table','select'] and not v:
           v='0'
@@ -110,19 +117,17 @@ async def save_form(form,arg):
         if f['type']=='time' and not v:
           v='00:00:00'
 
-        save_hash[name]=v
+        save_hash[col]=v
       
 
 
 
-      # Если мы только создаём карточку -- пароль также разрешено сохранить
-      if(f['type']=='password' and form.action=='insert'):
-        if form.s.config['auth']['encrypt_method'] == 'mysql_sha2':
-          save_hash[name] = await form.db.query(
-            query="select sha2(%s,256)",
-            values=[v],
-            onevalue=1
-          )
+      # Пароль хэшируем на сервере: mysql_sha2 → sha2-256,
+      # mysql_encrypt/legacy → DES/ENCRYPT-совместимый crypt (lib/password.py).
+      if f['type']=='password' and v is not None:
+        if form.action=='insert' or v:
+          method = (form.s.config.get('auth') or {}).get('encrypt_method') or form.s.config.get('encrypt_method')
+          save_hash[name] = hash_password(v, method)
   
   if form.success() and len(save_hash):
     # FOREIGN KEY

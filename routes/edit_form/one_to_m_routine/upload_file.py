@@ -1,6 +1,6 @@
 from lib.core import get_child_field, exists_arg, get_ext, random_filename
 from lib.get_1_to_m_data import get_1_to_m_data
-from lib.resize import resize_one
+from lib.resize import resize_one, convert_to_webp, out_ext_for, is_raster_ext
 import shutil,os
 
 async def upload_file(form,field,arg):
@@ -28,17 +28,27 @@ async def upload_file(form,field,arg):
     with open(full_name, "wb") as buffer:
          shutil.copyfileobj(attach.file, buffer)
 
+    # to_webp: конвертируем основной файл в webp
+    if exists_arg('to_webp',child_field) and is_raster_ext(ext) and ext.lower()!='webp':
+      new_name=filename_without_ext+'.webp'
+      if convert_to_webp(full_name, child_field['filedir']+'/'+new_name,
+                         quality=exists_arg('base_quality',child_field) or 85):
+        os.remove(full_name)
+        filename=new_name
+        ext='webp'
+
     db_value=filename
     if exists_arg('keep_orig_filename',child_field):
       db_value+=";"+orig_filename
     
     # resize:
     if exists_arg('resize',child_field):
+      out_ext=out_ext_for(child_field, ext)
       for r in child_field['resize']:
         width,height=r['size'].split("x")
         resize_filename=r['file']
         resize_filename=resize_filename.replace('<%filename_without_ext%>',filename_without_ext)
-        resize_filename=resize_filename.replace('<%ext%>',ext)
+        resize_filename=resize_filename.replace('<%ext%>',out_ext)
         resize_one(
           fr=child_field['filedir']+'/'+filename_without_ext+'.'+ext,
           to=child_field['filedir']+'/'+resize_filename,
@@ -49,6 +59,7 @@ async def upload_file(form,field,arg):
           composite_gravity=exists_arg('composite_gravity',r),
           composite_resize=exists_arg('composite_resize',r),
           quality=exists_arg('quality',r),
+          to_webp=exists_arg('to_webp',child_field),
         )
 
     

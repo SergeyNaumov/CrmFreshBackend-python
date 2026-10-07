@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from inspect import signature
 
 from starlette.responses import JSONResponse, Response
 from routes import router
@@ -105,23 +106,32 @@ async def for_all_requests(request: Request,call_next): # , response=Response
 # возвращает Response напрямую, не вызывая вложенное приложение, и заголовки
 # Access-Control-Allow-* в ответ не попадают -- браузер показывает CORS-ошибку
 # вместо 401.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=dev_origin_regex,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=expose_headers,
-    # Chrome (Private Network Access) шлёт Access-Control-Request-Private-Network: true,
-    # когда страница открыта с внешнего/сетевого адреса, а запрос уходит на localhost
-    # или во внутреннюю сеть. Без этого флага starlette отвечает на такой preflight
-    # "400 Disallowed CORS private-network". На проверку origin это не влияет --
-    # allow_private_network добавляет только заголовок ответа.
-    allow_private_network=True,
+cors_kwargs = {
+    'allow_origins': origins,
+    'allow_origin_regex': dev_origin_regex,
+    'allow_credentials': True,
+    'allow_methods': ["*"],
+    'allow_headers': ["*"],
+    'expose_headers': expose_headers,
     # Кэшировать preflight в браузере, чтобы не слать его на каждый запрос.
-    max_age=3600,
-)
+    'max_age': 3600,
+}
+
+# Chrome (Private Network Access) шлёт Access-Control-Request-Private-Network: true,
+# когда страница открыта с внешнего/сетевого адреса, а запрос уходит на localhost
+# или во внутреннюю сеть. Без этого флага starlette отвечает на такой preflight
+# "400 Disallowed CORS private-network". На проверку origin это не влияет --
+# allow_private_network добавляет только заголовок ответа.
+# Параметр появился в starlette не сразу: в старом окружении (~/.venv,
+# starlette 0.48) его нет, и переданный kwargs роняет build_middleware_stack() c
+# TypeError на КАЖДОМ запросе (включая lifespan -> startup-хук create_pool не
+# выполняется). Поэтому передаём флаг только если он есть в сигнатуре.
+# try/except вокруг add_middleware не поможет: starlette собирает стек лениво,
+# уже при обработке запроса.
+if 'allow_private_network' in signature(CORSMiddleware.__init__).parameters:
+    cors_kwargs['allow_private_network'] = True
+
+app.add_middleware(CORSMiddleware, **cors_kwargs)
 
 app.include_router(router)
 

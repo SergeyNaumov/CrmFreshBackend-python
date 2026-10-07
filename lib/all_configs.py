@@ -1,4 +1,4 @@
-import importlib,os,re
+import importlib,os,re,sys
 
 from lib.session import project_get_permissions_for, get_permissions_for, session_start
 
@@ -142,6 +142,24 @@ async def load_form_from_struct_db(request, arg):
   return [form, errors]
 
 
+# mtime конфиг-модулей: importlib кэширует их в sys.modules, поэтому правки
+# (в т.ч. в /var/www за симлинками) не подхватывались без рестарта процесса.
+_CONFIG_MTIME = {}
+
+
+def import_module_fresh(full_name, file_path):
+  """Импорт модуля с перезагрузкой при изменении файла (по mtime)."""
+  mtime = os.path.getmtime(file_path)
+  if full_name in sys.modules and _CONFIG_MTIME.get(full_name) == mtime:
+    return sys.modules[full_name]
+  if full_name in sys.modules:
+    module = importlib.reload(sys.modules[full_name])
+  else:
+    module = importlib.import_module(full_name)
+  _CONFIG_MTIME[full_name] = mtime
+  return module
+
+
 def load_form_from_dir(confdir,conflib_dir, arg):
   form=False
   errors=[]
@@ -150,7 +168,10 @@ def load_form_from_dir(confdir,conflib_dir, arg):
   if os.path.isdir(f"{confdir}/{arg['config']}") and os.path.isfile(f"{confdir}/{arg['config']}/__init__.py"):
     try:
       #print(f"import_module: {module_dir}.{arg['config']}")
-      module=importlib.import_module(f"{module_dir}.{arg['config']}")
+      module=import_module_fresh(
+        f"{module_dir}.{arg['config']}",
+        f"{confdir}/{arg['config']}/__init__.py"
+      )
 
       form_data=copy.deepcopy(module.form)
 
@@ -163,7 +184,10 @@ def load_form_from_dir(confdir,conflib_dir, arg):
 
     if not len(errors) and os.path.isfile(f"{confdir}/{arg['config']}/events.py"):
       try:
-        module=importlib.import_module(module_dir+'.'+arg['config']+'.events')
+        module=import_module_fresh(
+          module_dir+'.'+arg['config']+'.events',
+          f"{confdir}/{arg['config']}/events.py"
+        )
         form_data['events']=module.events
       except SyntaxError as e:
         errors.append(f"Ошибка при загрузке конфига - 4 {arg['config']}/events.py: {e}")
@@ -178,7 +202,10 @@ def load_form_from_dir(confdir,conflib_dir, arg):
     
     if not len(errors) and  os.path.isfile(f"{confdir}/{arg['config']}/events_for_fields.py"):
       try:
-        module=importlib.import_module(module_dir+'.'+arg['config']+'.events_for_fields')
+        module=import_module_fresh(
+          module_dir+'.'+arg['config']+'.events_for_fields',
+          f"{confdir}/{arg['config']}/events_for_fields.py"
+        )
         events=module.events
         for f in form.fields:
           if 'name' not in f:
@@ -272,7 +299,22 @@ async def read_config(**arg):
   form.request=request
   s.form=form
   if 'after_read_form_config' in sysconfig:
-      sysconfig['after_read_form_config'](form)
+      sysconfig['after_read_form_config'](s,request,form)
+
+  # Подстановка плейсхолдера [project_id]: work_table может быть подзапросом
+  # ("... where project_id=[project_id]"), filedir — "./files/project_[project_id]/...".
+  # Без подстановки запрос падал с синтаксической ошибкой SQL (1064).
+  if project_id:
+    pid=str(project_id)
+    wt=form.work_table
+    if isinstance(wt,str) and '[project_id]' in wt:
+      form.work_table=wt.replace('[project_id]',pid)
+    for f in form.fields:
+      if not isinstance(f,dict): continue
+      for k in ('filedir','table'):
+        v=f.get(k)
+        if isinstance(v,str) and '[project_id]' in v:
+          f[k]=v.replace('[project_id]',pid)
 
   form.config=arg['config']
   form.script=arg['script']

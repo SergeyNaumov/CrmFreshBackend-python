@@ -47,6 +47,7 @@ form={
       'values':[
         {'v':1,'d':'CGI'},
         {'v':3,'d':'PSGI + utf8'},
+        {'v':4,'d':'Fastapi'},
       ],
       'filter_on':True,
     },
@@ -59,6 +60,7 @@ form={
       ],
       'filter_on':True,
     },
+
     {
       'description':'Папка с шаблонами',
       'type':'text',
@@ -79,6 +81,7 @@ form={
         {'v':3,'d':'Создан на основе эталона'},
         {'v':4,'d':'эталон Landing'},
         {'v':5,'d':'создан на основе эталона Landing'},
+        {'v':6,'d':'DS Конструктор'},
       ],
       'filter_on':True,
     },

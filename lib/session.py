@@ -1,4 +1,5 @@
 from lib.core import exists_arg, gen_pas, join_ids
+from lib.password import verify_password
 from config import config
 from base64 import b64decode
 
@@ -70,26 +71,44 @@ async def session_create(s,**arg):
 
   auth_id=None
   #print('auth:',auth)
-  if auth['encrypt_method']=='mysql_sha2':
-      auth_id=await s.db.query(
-        query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=sha2(%s,256)'+add_where,
-        values=[arg['login'],arg['password']],
-        #debug=1,
-        onevalue=True,
+  try:
+    if auth['encrypt_method']=='mysql_sha2':
+        auth_id=await s.db.query(
+          query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=sha2(%s,256)'+add_where,
+          values=[arg['login'],arg['password']],
+          #debug=1,
+          onevalue=True,
+        )
+        #print('auth_id:',auth_id)
+    elif auth['encrypt_method']=='mysql_encrypt':
+        auth_id=await s.db.query(
+          query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=encrypt(%s,password)'+add_where,
+          values=[arg['login'],arg['password']],
+          onevalue=True,
+        )
+    else:
+        auth_id=await s.db.query(
+            query="SELECT "+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=%s '+add_where,
+            values=[arg['login'], arg['password']],
+            onevalue=True
+        );
+  except Exception:
+    auth_id=None
+
+  # Резервная проверка на стороне Python: MySQL 8 удалил ENCRYPT(), а в БД
+  # есть записи в форматах DES/ENCRYPT, md5 и sha2 (см. lib/password.py).
+  if not auth_id:
+    try:
+      row=await s.db.query(
+        query='SELECT '+auth['manager_table_id']+' AS id, '+auth['auth_pas_field']+' AS password FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s'+add_where,
+        values=[arg['login']],
+        onerow=1,
+        errors=[]
       )
-      #print('auth_id:',auth_id)
-  elif auth['encrypt_method']=='mysql_encrypt':
-      auth_id=await s.db.query(
-        query='SELECT '+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=encrypt(%s,password)'+add_where,
-        values=[arg['login'],arg['password']],
-        onevalue=True,
-      )
-  else:
-      auth_id=await s.db.query(
-          query="SELECT "+auth['manager_table_id']+' FROM '+auth['manager_table']+' WHERE '+auth['auth_log_field']+'=%s AND '+auth['auth_pas_field']+'=%s '+add_where,
-          values=[arg['login'], arg['password']],
-          onevalue=True
-      );
+    except Exception:
+      row=None
+    if row and verify_password(arg['password'], row.get('password')):
+      auth_id=row.get('id')
   
   if auth_id:
     s.request.state.manager=s.manager={

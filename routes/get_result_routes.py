@@ -1,4 +1,4 @@
-from lib.core import cur_year,cur_date, exists_arg
+from lib.core import cur_year,cur_date, exists_arg, is_errors
 from fastapi import APIRouter, Request
 from config import config
 
@@ -21,6 +21,10 @@ async def get_result(R: dict, request: Request):
         config=R['config'],
         script='find_objects'
       )
+      # конфиг не найден/ошибка чтения: без этого form — объект error и
+      # обращение к form.GROUP_BY давало 500 с traceback
+      if is_errors(form):
+        return {'success':0,'errors':form.errors}
       if exists_arg('page',R):
         page=str(R['page'])
         if page.isnumeric(): form.page=page
@@ -36,6 +40,17 @@ async def get_result(R: dict, request: Request):
           priority_sort=params['priority_sort']
           if len(priority_sort)==2 and priority_sort[1] in ('asc','desc'):
             form.priority_sort=priority_sort
+
+      # Сортировка по умолчанию: если среди колонок поиска есть поле типа
+      # date/datetime, сортируем по нему по убыванию (свежие сверху), пока
+      # пользователь явно не выбрал сортировку.
+      if not form.priority_sort:
+        query_names=[str(q[0]) for q in (R.get('query') or [])]
+        for f in form.fields:
+          if f.get('name') in query_names and f.get('type') in (
+              'date','datetime','filter_extend_date','filter_extend_datetime'):
+            form.priority_sort=[f['name'],'desc']
+            break
 
       if form.GROUP_BY:
         form.query_search['GROUP'].append(form.GROUP_BY)

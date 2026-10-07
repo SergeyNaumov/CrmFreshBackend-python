@@ -86,6 +86,8 @@ form = {
 | `db_name` | имя колонки, если отличается от `name` |
 | `table`, `tablename`, `header_field`, `value_field`, `where`, `order` | для select/связей |
 | `filedir` | папка файла для `file`/`wysiwyg` |
+| `resize` | для `file`: `[{'file':'<%filename_without_ext%>_miniN.<%ext%>','size':'WxH','quality':..}]`; бэкенд добавляет каждому `loaded` (URL миниатюры) |
+| `preview` | размер из `resize` (напр. `'400x300'`), который показывать миниатюрой; фронт сам берёт `resize[].loaded` |
 | `1_to_m`-поля | `table`, `table_id`, `foreign_key`, `sort`, `view_type`, `fields` |
 
 ### Основные типы
@@ -104,6 +106,88 @@ form = {
 | `1_to_1_text/_select_values/_checkbox/_wysiwyg` | поле из отдельной таблицы (`save_table`, `foreign_key`) |
 | `header`, `code` | декоративные / формируемые кодом |
 | `memo` | заметки-комментарии (`routes/memo.py`) |
+
+### Файловые поля и превью
+
+- `file` с `resize` задаёт варианты миниатюр (для сеток/карточек сайта).
+  Бэкенд в `edit_form_process_fields` кладёт URL каждого варианта в
+  `r['loaded']`; в 1_to_m дополнительно считается `preview_img`
+  (`lib/get_1_to_m_data.py`).
+- `preview` (у `file` **и** у файлового поля внутри `1_to_m`) — строка-размер
+  из `resize`. Фронт показывает одну миниатюру сразу: берёт вариант с
+  `size == preview` (`resize[].loaded`), иначе первый `resize`, иначе базовый
+  файл. Поля без `resize` показывают базовый файл.
+- `crops` (bool) — включает ручную обрезку: фронт строит по одному
+  `Cropper`-кропу на каждый `resize` и требует подтвердить все до сохранения
+  (`file.vue`). Бэкенд использует присланные кропы как миниатюры
+  (`upload_file.py`). Без `crops` картинка просто ресайзится из оригинала
+  (центрирование), без подтверждения.
+- `video` (ds_video): отдельной колонки `rutube_id` нет — id ролика парсится из
+  поля `url` в движке сайта (`sites/lib/dsengine/page.py::_rutube_id_from_url`),
+  шаблон строит эмбед/постер из `v.id`.
+
+## Конструкторные проекты (5830/5837 и др.)
+
+Общие (не проектные) конфиги конструктора — `ds_*` — живут в
+`configs/svcmsmanager/`; в репозитории это **симлинки**, а канон-файлы физически
+лежат в `/var/www/svcms-async/manager/backend/conf/ds_*/` — именно их читает
+движок сайта. Дублировать `ds_*` в `conf_projects/project_<id>/` **нельзя**:
+project-папка в `read_config` имеет приоритет и затенит общий конфиг.
+
+Эталонный конфиг конструкторного проекта (см. `conf_projects/project_5830/`,
+а также каноны `conf/ds_*/` в движке сайта):
+
+- `work_table` — **чистое имя таблицы** (не подзапрос). Привязка к проекту —
+  через `events.py` → async `permissions`.
+- `work_table_id` — **один столбец** (`id`/`content_id`). Для
+  `ds_params_good` — суррогатный `id` (миграция 2026-10: PK=id + UNIQUE(param_id, good_id)).
+- `events.py` (шаблон):
+
+```python
+async def permissions(form):
+    project_id = form.project['project_id']
+    if not project_id:
+        form.errors.append('Доступ запрещён!')
+        return
+    form.foreign_key = 'project_id'
+    form.foreign_key_value = project_id
+```
+
+`foreign_key`/`foreign_key_value` дают: автоматический `WHERE wt.project_id=...`
+в списках/поиске (`get_search_where`) и `SET project_id=...` при save.
+
+- **Вычисляемые поля** (`date`, `url` у новостей/статей): атрибут
+  `'sql': "..."` с алиасом `wt.` (например `concat('/news/', wt.id)` и
+  `CONCAT(DAY(wt.registered), ...)`). `sql`-поля автоматически пропускаются
+  при сохранении (`save_form`) и не строят фильтры.
+- **`name` = реальная колонка таблицы.** Не «человеческое» имя с `db_name`:
+  шаблоны сайта, белый список `block_query` и детальные страницы движка читают
+  именно колонки (`header`, `body`, `name`, `rate`, `position`, `description`).
+  Переименовал колонку — правь и `name`, и шаблоны
+  `sites/templates/2026/ds-constructor/block/*.html`. (`db_name` движок
+  поддерживает — им пользуются другие конфиги, напр. `configs/svcmsadmin/*`, —
+  но в `ds_*` его быть не должно.)
+- **`select_from_table`** для справочников: `table`, `header_field`,
+  `value_field`, `tablename` (алиас JOIN в `QUERY_SEARCH_TABLES`), `tree_use:1`
+  (выбор `parent_id`, порядок по `parent_id`), `where` — скоуп. Плейсхолдер
+  `[project_id]` в `where` НЕ подставляется — ставь его в `events.py`
+  (`f['where']=f'project_id={project_id}'` по select-полям).
+- Чекбоксы-переключатели — `'type':'checkbox'`. Справочник брендов —
+  `ds_brands` (`name` конфига обязан совпадать с именем таблицы).
+- Левое меню — `left_menu.py` в корне проекта: плоский список
+  `{description, value: 'admin-table'|'admin-tree', type:'vue', icon, params:{config}}`.
+- **Правило выбора `value`:** короткие сортируемые списки (преимущества,
+  команда, слайдер, сертификаты, клиенты, отзывы, видео, галерея) — всегда
+  `admin-tree` (тягается мышью, порядок в колонке `sort`). `admin-table` — там,
+  где нужен поиск по фильтрам (новости, статьи, товары, бренды, параметры,
+  заказы, заявки, документы, статические страницы).
+- **`admin-tree` и `header_field`:** поле-заголовок обязано существовать в
+  таблице. Ошибка `в таблице ds_X отсутствует поле header` = в конфиге
+  `header_field` указывает на несуществующую колонку (или задан под
+  «человеческое» имя). Для `ds_reviews` заголовок — `name`, для остальных —
+  `header`.
+- Названия конфигов соответствуют таблицам: `ds_news`, `ds_article`, `ds_brands`
+  и т.д. (в отличие от старых `content`, `top_menu_tree`).
 
 ## События
 

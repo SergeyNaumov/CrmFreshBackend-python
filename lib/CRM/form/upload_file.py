@@ -1,4 +1,5 @@
-from lib.resize import resize_one
+import os
+from lib.resize import resize_one, convert_to_webp, out_ext_for, is_raster_ext
 from lib.core import exists_arg, get_ext, random_filename
 from lib.save_base64_file import save_base64_file, b64_split
 from pathlib import Path
@@ -69,37 +70,69 @@ async def upload_file(form):
           filename=filename_without_ext+'.'+ext
         )
 
+      # to_webp: конвертируем основной файл в webp и обновляем имя в БД
+      if form.success() and exists_arg('to_webp',field) and is_raster_ext(ext) and ext.lower()!='webp':
+        old_path=field['filedir']+'/'+filename_without_ext+'.'+ext
+        new_path=field['filedir']+'/'+filename_without_ext+'.webp'
+        if convert_to_webp(old_path, new_path, quality=exists_arg('base_quality',field) or 85):
+          if os.path.isfile(old_path):
+            os.remove(old_path)
+          ext='webp'
+          filename_for_out=filename_without_ext+'.webp'
+          db_value=filename_for_out
+          if exists_arg('keep_orig_filename',field):
+            db_value=filename_for_out+';'+orig_name
+          await form.db.query(
+            query=f'UPDATE {form.work_table} SET {field["name"]}=%s WHERE {form.work_table_id}=%s',
+            errors=form.errors,
+            values=[db_value, form.id],
+          )
+
     if form.success() and exists_arg('resize',field):
+      out_ext=out_ext_for(field, ext)
       if  exists_arg('crops',field) and len(crops):
-        for r in field['resize']:
-            width,height=r['size'].split("x")
+        # Ручная обрезка: кроп i соответствует resize[i] (порядок задаёт
+        # фронт, file.vue init()). Кроп — dataURL canvas, сохраняем его как
+        # миниатюру и доводим до точного размера. save_base64_file зовём с
+        # filedir/orig_filename -> ветка «только на диск», без UPDATE БД.
+        for i,r in enumerate(field['resize']):
+            width,height=str(r['size']).split("x")
             filename=r['file']
             filename=filename.replace('<%filename_without_ext%>',filename_without_ext)
-            filename=filename.replace('<%ext%>',ext)
-            for c in crops:
-                save_base64_file(
-                  form=form,
-                  src=c['data'],
-                  field=field,
-                  filename=filename,
-                  ext=ext
-                )
+            filename=filename.replace('<%ext%>',out_ext)
+            crop_data=crops[i].get('data') if i < len(crops) else None
+            if crop_data:
+              await save_base64_file(
+                form=form,
+                src=crop_data,
+                field=field,
+                filedir=field['filedir'],
+                orig_filename=filename,
+                filename=filename,
+                ext=out_ext
+              )
+              src_file=field['filedir']+'/'+filename
+            else: # кроп не подтверждён — ресайзим оригинал
+              src_file=field['filedir']+'/'+filename_without_ext+'.'+ext
 
-                resize_one(
-                    fr=field['filedir']+'/'+filename,
-                    to=field['filedir']+'/'+filename,
-                    width=width,
-                    height=height,
-                    grayscale=exists_arg('grayscale',field),
-                    composite_file=exists_arg('composite_file',field),
-                    quality=exists_arg('quality',field),
-                )
+            resize_one(
+                fr=src_file,
+                to=field['filedir']+'/'+filename,
+                width=width,
+                height=height,
+                grayscale=exists_arg('grayscale',r),
+                composite_file=exists_arg('composite_file',r),
+                composite_gravity=exists_arg('composite_gravity',r),
+                composite_resize=exists_arg('composite_resize',r),
+                quality=exists_arg('quality',r),
+                to_webp=exists_arg('to_webp',field),
+            )
       else: # ресайзим оригинальную фотографию
         for r in field['resize']:
             width,height=r['size'].split("x")
             filename=r['file']
             filename=filename.replace('<%filename_without_ext%>',filename_without_ext)
-            filename=filename.replace('<%ext%>',ext)
+            filename=filename.replace('<%ext%>',out_ext)
             
             resize_one(
               fr=field['filedir']+'/'+filename_without_ext+'.'+ext,
@@ -111,6 +144,7 @@ async def upload_file(form):
               composite_gravity=exists_arg('composite_gravity',r),
               composite_resize=exists_arg('composite_resize',r),
               quality=exists_arg('quality',r),
+              to_webp=exists_arg('to_webp',field),
             )
 
 

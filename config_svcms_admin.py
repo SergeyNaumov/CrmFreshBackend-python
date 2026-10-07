@@ -130,7 +130,24 @@ config={
     'templates':'/var/www/sv-cms/htdocs/templates',
     'files':'./files',
     'export_script':'/var/www/sv-cms/htdocs/admin2/api/scripts/copy_and_create',
+    # Файлы проектов на движке сайтов (/files/project_<id>/…). URL — относительный
+    # (/files/...): в превью конструктора и редакторе резолвится от домена админки.
+    'engine_files':'/var/www/svcms-async/sites/files',
+    'engine_files_url':'/files',
+    # Оптимизация загружаемых картинок блоков: длинная сторона (px) и
+    # качество webp. Растровые конвертируются в webp, svg — как есть.
+    'block_images_max_side':1920,
+    'block_images_quality':82,
+    # Корень движка сайтов и каталог per-project конфигов (для быстрого
+    # создания проекта: копирование файлов по чекбоксу «демо-контент»).
+    'engine_root':'/var/www/svcms-async/sites',
+    'conf_projects':'./conf_projects',
   },
 
+  # Быстрое создание проекта (svcmsadmin-createproject): проект-эталон для
+  # констант, демо-контента ds_* и файлов проекта.
+  'fast_create':{
+    'source_project_id':5837,
+  },
 
 }

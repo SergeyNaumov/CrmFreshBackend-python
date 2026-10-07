@@ -1,5 +1,6 @@
 from lib.core import cur_year,cur_date, exists_arg
 from fastapi import FastAPI, APIRouter, Request
+from lib.password import hash_password
 
 #import re
 from lib.send_mes import send_mes
@@ -34,13 +35,11 @@ async def password(config:str,field_name:str,id:int,R: dict, request: Request):
         errors.append(f'В запросе не указан новый пароль. обратитесь к разработчику')
 
       if not len(errors):
-        if form.s.config['encrypt_method'] == 'mysql_sha2':
-          await form.db.query(
-            query=f'UPDATE {form.work_table} SET {field_name}=sha2(%s,256) where id=%s',
-            values=[R['new_password'],form.id]
-          )
-        else:
-          errors.append('encrypt_method не указан или указан неизвестный метод. обратитесь к разработчику')
+        method = form.s.config.get('encrypt_method') or (form.s.config.get('auth') or {}).get('encrypt_method')
+        await form.db.query(
+          query=f'UPDATE {form.work_table} SET {field_name}=%s where id=%s',
+          values=[hash_password(R['new_password'], method), form.id]
+        )
       
       if len(errors):
         response['success']=0

@@ -196,10 +196,9 @@ def get_search_where(form,query):
         if type(values) is list:
           map_rezult=[]
           for v in values:
-            if (type(v) is int) or (type(values) is str):
-              if type(v) is int: v=str(v)
-              if v.isnumeric():
-                map_rezult.append(v)
+            if isinstance(v,int): v=str(v)
+            if isinstance(v,str) and v.isnumeric():
+              map_rezult.append(v)
           
           if len(map_rezult):
             if f['type']=='filter_extend_checkbox':
@@ -217,13 +216,13 @@ def get_search_where(form,query):
         elif not(db_name):
           db_name=name
 
-        if type(values) is int or type(values)=='str':
+        if isinstance(values,(int,str)):
           values=[values]
         if type(values) is list:
           map_rezult=[]
           for v in values:
-            if type(v) is int: v=str(v)
-            if v.isnumeric():
+            if isinstance(v,int): v=str(v)
+            if isinstance(v,str) and v.isnumeric():
               map_rezult.append(v)
 
           if len(map_rezult):
@@ -251,11 +250,13 @@ def get_search_where(form,query):
           
 
       else:
+        # не-список приводим к списку: итерация по str дала бы IN (1,2) из "12"
+        if not isinstance(values,(list,tuple)):
+          values=[values]
         map_rezult=[]
         for v in values:
-          if v and type(v)=='str':
-            if v.isnumeric():
-              map_rezult.append(v)
+          if v and isinstance(v,str) and v.isnumeric():
+            map_rezult.append(v)
 
         if len(map_rezult):
           WHERE.append(' ('+table+'.'+db_name+' IN ('+','.join(map_rezult)+'))')

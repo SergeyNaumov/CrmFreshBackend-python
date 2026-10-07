@@ -199,11 +199,12 @@ def del_file_and_resizes(**arg):
   if ext:
       # удаляем ресайзы
       if exists_arg('resize',field) and len(field['resize']):
+        out_ext='webp' if exists_arg('to_webp',field) else ext
         for r in field['resize']:
           #print('r:',r)
           f=r['file']
           f=f.replace('<%filename_without_ext%>',filename_without_ext)
-          f=f.replace('<%ext%>',ext)
+          f=f.replace('<%ext%>',out_ext)
           
           file_for_del=field['filedir']+'/'+f
           #print('rm: ',file_for_del)

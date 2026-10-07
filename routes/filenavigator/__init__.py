@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 
@@ -98,9 +99,16 @@ async def _get_chroot(config: str, request: Request) -> Path:
 
 
 def _safe_path(chroot: Path, rel: str | None) -> Path:
-    """Возвращает путь внутри chroot или кидает ошибку."""
+    """Возвращает путь внутри chroot или кидает ошибку.
+
+    Проверка лексическая (normpath), без раскрытия симлинков: симлинки внутри
+    chroot разрешены и раскрываются уже при доступе к файловой системе.
+    """
     rel = rel or "."
-    target = (chroot / rel).resolve()
+    rel_path = Path(rel)
+    if rel_path.is_absolute():
+        raise ValueError("путь вне chroot")
+    target = Path(os.path.normpath(str(chroot / rel_path)))
 
     if target != chroot and chroot not in target.parents:
         raise ValueError("путь вне chroot")
@@ -117,7 +125,7 @@ def _safe_child(chroot: Path, cur_dir: str | None, name: str) -> Path:
         raise ValueError("name должен быть именем, без / и ..")
 
     base = _safe_path(chroot, cur_dir)
-    target = (base / name).resolve()
+    target = base / name
 
     if target != chroot and chroot not in target.parents:
         raise ValueError("путь вне chroot")
@@ -328,10 +336,7 @@ async def move_endpoint(config: str, R: MoveIn, request: Request):
         if errors:
             return _err(errors)
 
-        dst = (dst_dir / R.name).resolve()
-
-        if dst != chroot and chroot not in dst.parents:
-            return _err("путь назначения вне chroot")
+        dst = _safe_child(chroot, R.to_dir, R.name)
 
         if dst.exists() or dst.is_symlink():
             return _err("объект назначения уже существует")

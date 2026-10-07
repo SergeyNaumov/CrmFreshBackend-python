@@ -46,7 +46,7 @@ async def ajax(config:str,ajax_name:str,R: dict, request: Request):
     request=request,
     script='ajax', config=config,
     R=R,
-    id=R['id']
+    id=R.get('id')
   )
   result=[];
   

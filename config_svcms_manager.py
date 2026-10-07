@@ -3,82 +3,15 @@ from lib.svcmsmanager.cache_pages import clear_cache_for_domain
 from configs.svcmsmanager.config_wysiwyg import config_wysiwyg
 from configs.svcmsmanager.gptassist_rules import gptassist_rules
 
-async def after_create_engine(s,request,errors=[]):
-  manager = request.state.manager
-  if not(manager) or not manager['login']:
-    return
-  host=s.env['host']
-  if host=='dev-crm.test':
-    host='armit-new.design-b2b.com'
 
-  #print('HOST: ',s.env['host'])
+  
 
-  d=host.split('.')
-  if d[0]=='www':
-    host='.'.join(d[1:])
-  
-  s.manager=await s.db.query(
-    query='select manager_id id,full_access,login from manager where manager_id=%s',
-    values=[manager['id']],
-    onerow=1
-  )
-
-  manager['host']=host
-  request.state.manager=manager
-  
-  project=await s.db.query(
-    query='''
-      select
-        d.project_id,d.template_id, if(mpa.id is null,0,1) access_for_cur_domain
-      from
-        domain d
-        LEFT JOIN manager_project_access mpa ON d.project_id=mpa.project_id and mpa.manager_id=%s
-      where d.domain=%s limit 1
-    ''',
-    errors=s.errors,
-    #debug=1,
-    values=[manager['id'],host],
-    onerow=1
-  )
-  
-  if not(project):
-    s.errors.append(f'Не найден проект, привязанный к {host}')
-    return 
-  elif not(project['access_for_cur_domain']) and not(manager['full_access']):
-    s.errors.append(f'У Вас нет доступа для администрирования сайта {host}')
-
-  #s.project_id=project['project_id']
-  #s.template_id=project['template_id']
-  request.state.project=project
-  
-  #s.project=project
-  #print("project_id:",project_id)
-  #print('MANAGER:',s.manager)
-  #s.errors=[f'Домен {host} не найден в базе данных! Доступ запрещён']
   
   
 
 
 # 
-def after_read_form_config(form):
-  s = form.request.state.engine
-  if len(s.errors):
-    form.errors=s.errors
-  # manager берём только из form.request.state.manager: form.manager -- костыль,
-  # при параллельных запросах значение может перепутаться
-  print('PROJECT: ',form.request.state.project)
-  project_id=form.request.state.project['project_id']
 
-  form.request.state.manager['files_dir']=f'./files/project_{project_id}'
-  form.request.state.manager['files_dir_web']=f'/files/project_{project_id}'
-
-# Будет выполняться для каждой операции insert / delete / update в crm
-def alter_all_change_action(form):
-  # Это нужно для сброса кэша у клиентских сайтов
-  manager  = form.request.state.manager
-  host=manager['host']
-  print('Alter_all_change_action: ',host)
-  clear_cache_for_domain(host)
 
 config={
   'BaseUrl':'/manager',
@@ -132,9 +65,10 @@ config={
   'gptassist_rules':gptassist_rules, # функция,
   'messenger_rules':{}, # отсутствует для  svcms manager
   'telegram':{},
-  'after_create_engine':after_create_engine,
-  'after_read_form_config':after_read_form_config, # Вызывается после чтения конфига от CRM
-  'after_all_change_action':alter_all_change_action,
+  # Перенёс вниз
+  #'after_create_engine':after_create_engine,
+  #'after_read_form_config':after_read_form_config, # Вызывается после чтения конфига от CRM
+  #'after_all_change_action':  alter_all_change_action,
   'system_email':'svcomplex@gmail.com',
   'system_url':'https://digitalstrateg.ru/',
   'connects':{
@@ -179,7 +113,81 @@ config={
   },
   'wysiwyg':config_wysiwyg,
   'debug':{ # для отладки
+    'manager_host':'demo1.digitalstrateg.ru',
     'hosts':['sv-home'],
     'manager_id': 5520, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага  
   }
 }
+
+
+async def after_create_engine(s,request,errors=[]):
+  manager = request.state.manager
+  if not(manager) or not manager['login']:
+    return
+  host=s.env['host']
+  debug = config.get('debug')
+  if host=='dev-crm.test' and 'manager_host' in debug:
+    host=debug['manager_host']
+
+  #print('HOST: ',s.env['host'])
+
+  d=host.split('.')
+  if d[0]=='www':
+    host='.'.join(d[1:])
+  
+  s.manager=await s.db.query(
+    query='select manager_id id,full_access,login from manager where manager_id=%s',
+    values=[manager['id']],
+    onerow=1
+  )
+
+  manager['host']=host
+  
+  request.state.manager=manager
+  
+  project=await s.db.query(
+    query='''
+      select
+        d.project_id,d.template_id, if(mpa.id is null,0,1) access_for_cur_domain
+      from
+        domain d
+        LEFT JOIN manager_project_access mpa ON d.project_id=mpa.project_id and mpa.manager_id=%s
+      where d.domain=%s limit 1
+    ''',
+    errors=s.errors,
+    debug=1,
+    values=[manager['id'],host],
+    onerow=1
+  )
+  
+  if not(project):
+    s.errors.append(f'Не найден проект, привязанный к {host}')
+    return 
+  elif not(project['access_for_cur_domain']) and not(manager['full_access']):
+    s.errors.append(f'У Вас нет доступа для администрирования сайта {host}')
+
+  request.state.project=project
+
+def after_read_form_config(s,request,form):
+  manager=request.state.manager
+  project=request.state.project
+  project_id=project['project_id']
+  if len(form.s.errors):
+    form.errors=form.s.errors
+
+  form.manager=manager
+  form.manager['files_dir']=f'./files/project_{project_id}'
+  form.manager['files_dir_web']=f'/files/project_{project_id}'
+  form.s=s
+  form.project=request.state.project
+
+def alter_all_change_action(form):
+  # Это нужно для сброса кэша у клиентских сайтов
+  manager=form.request.state.manager
+  host=manager['host']
+  print('Alter_all_change_action: ',host)
+  clear_cache_for_domain(host)
+
+config['after_create_engine']=after_create_engine
+config['after_read_form_config']=after_read_form_config
+config['alter_all_change_action']=alter_all_change_action

@@ -8,6 +8,7 @@
 |---|---|
 | `__init__.py` | 15 эндпоинтов конструктора, чтение/запись всех таблиц ниже |
 | `domain_migration.sql` | DDL новых таблиц + перенос данных из `template_*` (выполняется один раз) |
+| `base_sets_migration.sql` | DDL наборов базовых страниц (`base_pages_set`, `template_pages_base.set_id`, `domain_constructor.base_set_id`) |
 | `base_pages.json` | сид справочника `template_pages_base` (19 базовых страниц) |
 | `structure_migration.sql` | старый ALTER `template_constructor` (до переезда на `domain_id`) |
 
@@ -50,10 +51,24 @@
 | `is_custom` | tinyint(1) | 1 — созданная в UI схема (только такие удаляются) |
 | `updated` | datetime | авто |
 
-Правила выбора схем доменом: индивидуальная (`domain_id=<домен>`) приоритетнее одноимённой общей; общие схемы не перетираются доменом — индивидуальный заводит свою копию (чекбокс «Общая схема» в `ThemeTool` пишет в `domain_id=0`). `DELETE /theme-schemes/<axis>/<name>/delete` работает только по `domain_id>0` и `is_custom=1`.
+Правила выбора схем доменом: индивидуальная (`domain_id=<домен>`) приоритетнее одноимённой общей; общие схемы не перетираются доменом — индивидуальный заводит свою копию (чекбокс «Общая схема» в `ThemeTool` пишет в `domain_id=0`). `is_default=1` — схема по умолчанию, `is_custom=1` — созданная в UI. `POST /theme-schemes/<axis>/<name>/delete?domain_id=<0|домен>` удаляет только `is_custom=1` (и общие `domain_id=0`, и доменные); системные (`is_custom=0`) и используемые в `domain_constructor.<axis>` схемы удалить нельзя.
 
-### `template_pages_base` — справочник базовых страниц (не переносится)
-`url, header, sort, blocks`. Общий для всех доменов. `POST /base-pages` копирует строки в `domain_page` конкретного домена, уже существующие по `url` пропускает.
+### `base_pages_set` — наборы базовых страниц (справочник)
+| Поле | Тип | Смысл |
+|---|---|---|
+| `id` | int unsigned AI | PK |
+| `name` | varchar(100) | имя набора (уникальное), напр. `etalon-1` |
+| `sort` | int | порядок в списке |
+| `is_default` | tinyint(1) | 1 — набор для быстрого создания проектов; удалить нельзя |
+| `created` | datetime | авто |
+
+Текущий единственный набор — `etalon-1` (id=1, `is_default=1`). Новые наборы заводятся через `/base-sets/create` (пустыми или из страниц домена). Дефолтный — первый по `is_default DESC, sort, id`.
+
+### `template_pages_base` — страницы базового набора
+`set_id, url, header, sort, blocks`. `url` уникален в пределах набора (`UNIQUE(set_id,url)`, FK→`base_pages_set` ON DELETE CASCADE). `POST /base-pages` копирует строки выбранного набора в `domain_page` конкретного домена: существующие по `url` пропускает, а при `overwrite=true` — перезаписывает (`header`/`blocks`); страницы, которых нет в наборе, не трогает. `POST /base-sets/update-from-domain` заменяет содержимое набора страницами домена (редактирование набора «через домен»).
+
+### `domain_constructor.base_set_id`
+Набор, применённый к домену (`POST /base-pages`), — для преселекта в диалоге «Базовый набор». FK→`base_pages_set` ON DELETE SET NULL.
 
 ### Старые таблицы (только чтение, на удаление)
 `template_page`, `template_constructor`, `template_theme_color/style/layout/font` — предыдущая привязка к `template_id`. Код конструктора их больше не читает; удаляются после приёмки отдельным шагом. `template` (папка/шапка сайта) нужна: `/init` берёт `folder` через `JOIN domain → template` и отдаёт его как `templateBase`.
@@ -68,5 +83,6 @@ domain (domain_id) ──FK──> domain_page       страницы домен
                    └──> domain_theme_*  CSS схем (общие domain_id=0 + индивидуальные)
 
 template (template_id) ──JOIN по domain.template_id──> folder для превью
-template_pages_base ──копирование──> domain_page (кнопка «Базовый набор»)
+base_pages_set ──1:N──> template_pages_base ──копирование──> domain_page (кнопка «Базовый набор»)
+       └── domain_constructor.base_set_id (последний применённый набор)
 ```

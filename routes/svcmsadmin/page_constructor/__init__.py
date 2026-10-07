@@ -45,6 +45,31 @@ class InitIn(BaseModel):
     domain_id: int
 
 
+class BasePagesIn(BaseModel):
+    domain_id: int
+    set_id: int | None = None
+    overwrite: bool = False
+
+
+class BaseSetCreateIn(BaseModel):
+    name: str
+    domain_id: int | None = None
+
+
+class BaseSetRenameIn(BaseModel):
+    set_id: int
+    name: str
+
+
+class BaseSetDomainIn(BaseModel):
+    set_id: int
+    domain_id: int
+
+
+class BaseSetIdIn(BaseModel):
+    set_id: int
+
+
 class ThemeSaveIn(BaseModel):
     domain_id: int
     axis: str
@@ -76,7 +101,7 @@ def _engine_files():
 
 
 def _engine_files_url():
-    return (_paths().get('engine_files_url') or 'http://localhost:3009/files').rstrip('/')
+    return (_paths().get('engine_files_url') or '/files').rstrip('/')
 
 
 async def _project_id_for_domain(db, domain_id):
@@ -332,6 +357,9 @@ async def _apply_structure(db, domain_id, doc):
 
 
 THEME_AXES = ('color', 'style', 'layout', 'font')
+# Порядок сборки CSS = порядок каскада: style после layout (декор стиля
+# перекрывает оформление пресета компоновки). См. sites/lib/theme.py.
+THEME_ORDER = ('color', 'layout', 'style', 'font')
 THEME_DEFAULTS = {'color': 'digitalstrateg', 'style': 'soft', 'layout': 'standard', 'font': 'inter'}
 THEME_TABLES = {
     'color': 'domain_theme_color',
@@ -455,8 +483,10 @@ async def page_constructor_init(request: Request, r: InitIn):
         values=[r.domain_id],
         errors=[],
     )
-    theme = await _theme_json_db(db, await _theme_row(db, r.domain_id), r.domain_id)
+    theme_row = await _theme_row(db, r.domain_id)
+    theme = await _theme_json_db(db, theme_row, r.domain_id)
     structure = await _structure_get(db, r.domain_id)
+    base_sets = await _base_sets_list(db)
     config = _preview_config(d['folder'])
     # Базовый URL картинок проекта для превью (block-images конструктора).
     config['filesBase'] = '%s/project_%s/' % (_engine_files_url(), d.get('project_id'))
@@ -476,6 +506,8 @@ async def page_constructor_init(request: Request, r: InitIn):
         'config': config,
         'theme': theme,
         'structure': structure,
+        'base_set_id': theme_row.get('base_set_id'),
+        'base_sets': base_sets,
         'pages': pages or [],
     }
 
@@ -570,19 +602,83 @@ async def structure_save(request: Request, r: StructureSaveIn):
 
 # ---------- базовый набор страниц ----------
 
-@router.post('/base-pages')
-async def base_pages(request: Request, r: InitIn):
-    db = request.state.engine.db_write
-    rows = await db.query(
-        query='SELECT url, header, blocks FROM template_pages_base ORDER BY sort, url',
+async def _base_sets_list(db):
+    return await db.query(
+        query='SELECT s.id, s.name, s.sort, s.is_default, count(b.id) pages '
+              'FROM base_pages_set s '
+              'LEFT JOIN template_pages_base b ON b.set_id=s.id '
+              'GROUP BY s.id, s.name, s.sort, s.is_default '
+              'ORDER BY s.is_default DESC, s.sort, s.name',
         errors=[],
     ) or []
 
-    created, skipped = [], []
+
+async def _default_set_id(db):
+    row = await db.query(
+        query='SELECT id FROM base_pages_set ORDER BY is_default DESC, sort, id LIMIT 1',
+        onerow=1,
+        errors=[],
+    )
+    return row['id'] if row else None
+
+
+async def _remember_base_set(db, domain_id, set_id):
+    await db.query(
+        query='INSERT INTO domain_constructor(domain_id, base_set_id) VALUES(%s,%s) '
+              'ON DUPLICATE KEY UPDATE base_set_id=VALUES(base_set_id)',
+        values=[domain_id, set_id],
+        errors=[],
+    )
+
+
+async def _copy_domain_pages_to_set(db, domain_id, set_id):
+    rows = await db.query(
+        query='SELECT url, header, blocks FROM domain_page WHERE domain_id=%s ORDER BY id',
+        values=[domain_id],
+        errors=[],
+    ) or []
+    count = 0
+    for i, page in enumerate(rows):
+        url = (page.get('url') or '').strip()
+        if not url:
+            continue
+        await db.query(
+            query='INSERT INTO template_pages_base(set_id, url, header, blocks, sort) '
+                  'VALUES(%s,%s,%s,%s,%s)',
+            values=[set_id, url, page.get('header') or '', _normalize_blocks(page.get('blocks')), i],
+            errors=[],
+        )
+        count += 1
+    return count
+
+
+@router.post('/base-pages')
+async def base_pages(request: Request, r: BasePagesIn):
+    db = request.state.engine.db_write
+    set_id = r.set_id or await _default_set_id(db)
+    if not set_id:
+        return {'success': False, 'errors': ['не найдено ни одного набора страниц']}
+    st = await db.query(
+        query='SELECT id, name FROM base_pages_set WHERE id=%s',
+        values=[set_id],
+        onerow=1,
+        errors=[],
+    )
+    if not st:
+        return {'success': False, 'errors': ['набор не найден']}
+
+    rows = await db.query(
+        query='SELECT url, header, blocks FROM template_pages_base WHERE set_id=%s ORDER BY sort, url',
+        values=[set_id],
+        errors=[],
+    ) or []
+
+    created, updated, skipped = [], [], []
     for page in rows:
         url = (page.get('url') or '').strip()
         if not url:
             continue
+        doc = _normalize_blocks(page.get('blocks'))
         exists = await db.query(
             query='SELECT id FROM domain_page WHERE domain_id=%s AND url=%s',
             values=[r.domain_id, url],
@@ -590,9 +686,16 @@ async def base_pages(request: Request, r: InitIn):
             errors=[],
         )
         if exists:
-            skipped.append(url)
+            if r.overwrite:
+                await db.query(
+                    query='UPDATE domain_page SET header=%s, blocks=%s WHERE id=%s',
+                    values=[page.get('header') or '', doc, exists['id']],
+                    errors=[],
+                )
+                updated.append(url)
+            else:
+                skipped.append(url)
             continue
-        doc = _normalize_blocks(page.get('blocks'))
         await db.query(
             query='INSERT INTO domain_page(domain_id,url,header,blocks) VALUES(%s,%s,%s,%s)',
             values=[r.domain_id, url, page.get('header') or '', doc],
@@ -600,7 +703,119 @@ async def base_pages(request: Request, r: InitIn):
         )
         created.append(url)
 
-    return {'success': True, 'errors': [], 'created': created, 'skipped': skipped}
+    await _remember_base_set(db, r.domain_id, set_id)
+    return {
+        'success': True,
+        'errors': [],
+        'set_id': set_id,
+        'set_name': st.get('name'),
+        'created': created,
+        'updated': updated,
+        'skipped': skipped,
+    }
+
+
+@router.get('/base-sets')
+async def base_sets_list(request: Request):
+    db = request.state.engine.db_read
+    return {
+        'success': True,
+        'errors': [],
+        'sets': await _base_sets_list(db),
+        'default_set_id': await _default_set_id(db),
+    }
+
+
+@router.post('/base-sets/create')
+async def base_set_create(request: Request, r: BaseSetCreateIn):
+    db = request.state.engine.db_write
+    name = (r.name or '').strip()
+    if not name:
+        return {'success': False, 'errors': ['укажите имя набора']}
+    dup = await db.query(
+        query='SELECT id FROM base_pages_set WHERE name=%s',
+        values=[name],
+        onerow=1,
+        errors=[],
+    )
+    if dup:
+        return {'success': False, 'errors': ['набор с таким именем уже есть']}
+    errors = []
+    set_id = await db.save(table='base_pages_set', data={'name': name}, errors=errors)
+    if errors or not set_id:
+        return {'success': False, 'errors': errors or ['не удалось создать набор']}
+    pages = await _copy_domain_pages_to_set(db, r.domain_id, set_id) if r.domain_id else 0
+    return {'success': True, 'errors': [], 'set': {'id': set_id, 'name': name, 'pages': pages}}
+
+
+@router.post('/base-sets/rename')
+async def base_set_rename(request: Request, r: BaseSetRenameIn):
+    db = request.state.engine.db_write
+    name = (r.name or '').strip()
+    if not name:
+        return {'success': False, 'errors': ['укажите имя набора']}
+    dup = await db.query(
+        query='SELECT id FROM base_pages_set WHERE name=%s AND id<>%s',
+        values=[name, r.set_id],
+        onerow=1,
+        errors=[],
+    )
+    if dup:
+        return {'success': False, 'errors': ['набор с таким именем уже есть']}
+    await db.query(
+        query='UPDATE base_pages_set SET name=%s WHERE id=%s',
+        values=[name, r.set_id],
+        errors=[],
+    )
+    return {'success': True, 'errors': []}
+
+
+@router.post('/base-sets/update-from-domain')
+async def base_set_update_from_domain(request: Request, r: BaseSetDomainIn):
+    db = request.state.engine.db_write
+    st = await db.query(
+        query='SELECT id, name FROM base_pages_set WHERE id=%s',
+        values=[r.set_id],
+        onerow=1,
+        errors=[],
+    )
+    if not st:
+        return {'success': False, 'errors': ['набор не найден']}
+    await db.query(
+        query='DELETE FROM template_pages_base WHERE set_id=%s',
+        values=[r.set_id],
+        errors=[],
+    )
+    pages = await _copy_domain_pages_to_set(db, r.domain_id, r.set_id)
+    return {'success': True, 'errors': [], 'set_id': r.set_id, 'set_name': st.get('name'), 'pages': pages}
+
+
+@router.post('/base-sets/delete')
+async def base_set_delete(request: Request, r: BaseSetIdIn):
+    db = request.state.engine.db_write
+    st = await db.query(
+        query='SELECT id, name, is_default FROM base_pages_set WHERE id=%s',
+        values=[r.set_id],
+        onerow=1,
+        errors=[],
+    )
+    if not st:
+        return {'success': False, 'errors': ['набор не найден']}
+    if int(st.get('is_default') or 0) == 1:
+        return {'success': False, 'errors': ['нельзя удалить набор по умолчанию']}
+    total = await db.query(
+        query='SELECT count(*) FROM base_pages_set',
+        onevalue=1,
+        errors=[],
+    ) or 0
+    if total <= 1:
+        return {'success': False, 'errors': ['нельзя удалить последний набор']}
+    await db.query(
+        query='DELETE FROM base_pages_set WHERE id=%s',
+        values=[r.set_id],
+        errors=[],
+    )
+    return {'success': True, 'errors': []}
 
 
 # ---------- тема домена (конструкторы стилей) ----------
@@ -649,7 +864,7 @@ async def theme_css(request: Request, domain_id: int):
     db = request.state.engine.db_read
     row = await _theme_row(db, domain_id)
     parts = []
-    for axis in THEME_AXES:
+    for axis in THEME_ORDER:
         name = row.get(axis) or THEME_DEFAULTS[axis]
         css = await _scheme_css_db(db, axis, name, row.get(axis + '_css'), domain_id)
         if css:
@@ -747,6 +962,7 @@ class SchemeSaveIn(BaseModel):
     descr: str = ''
     css: str = ''
     scope: str = 'domain'
+    domain_id: int = 0
 
 
 @router.get('/theme-schemes/{axis}')
@@ -837,13 +1053,38 @@ async def scheme_delete(request: Request, axis: str, name: str, domain_id: int =
     if axis not in THEME_TABLES:
         return {'success': False, 'errors': ['неизвестная ось темы']}
     scope = int(domain_id or 0)
-    if scope <= 0:
-        return {'success': False, 'errors': ['общие схемы удалить нельзя']}
     db = request.state.engine.db_write
-    # удаляются только индивидуальные схемы домена
+    tbl = THEME_TABLES[axis]
+    row = await db.query(
+        query=f'SELECT header, label, is_custom FROM {tbl} WHERE domain_id=%s AND header=%s',
+        values=[scope, name],
+        onerow=1,
+        errors=[],
+    )
+    if not row:
+        return {'success': False, 'errors': ['схема не найдена']}
+    if int(row.get('is_custom') or 0) != 1:
+        return {'success': False, 'errors': ['системную схему удалить нельзя']}
+    # Нельзя удалять схему, выбранную у домена (общая схема — у любого домена).
+    if scope > 0:
+        used = await db.query(
+            query=f'SELECT count(*) FROM domain_constructor WHERE domain_id=%s AND {axis}=%s',
+            values=[scope, name],
+            onevalue=1,
+            errors=[],
+        ) or 0
+    else:
+        used = await db.query(
+            query=f'SELECT count(*) FROM domain_constructor WHERE {axis}=%s',
+            values=[name],
+            onevalue=1,
+            errors=[],
+        ) or 0
+    if used:
+        return {'success': False, 'errors': ['схема используется в %s домене(ах), удаление запрещено' % used]}
     await db.query(
-        query=f'DELETE FROM {THEME_TABLES[axis]} WHERE domain_id=%s AND header=%s AND is_custom=1',
+        query=f'DELETE FROM {tbl} WHERE domain_id=%s AND header=%s',
         values=[scope, name],
         errors=[],
     )
-    return {'success': True, 'errors': []}
+    return {'success': True, 'errors': [], 'deleted': True}

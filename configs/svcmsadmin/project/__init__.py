@@ -37,12 +37,30 @@ async def domain_slide_code(form, field, data):
     status.append(SSL_NAMES.get(is_ssl, 'SSL'))
   if paid_till:
     status.append(paid_till)
+
+  # Ссылка на конструктор страниц для DS-шаблона (template.type=6).
+  constructor = ''
+  tid = data.get('template_id')
+  if tid:
+    tpl = await form.db.query(
+      query='SELECT type FROM template WHERE template_id=%s',
+      values=[tid],
+      onerow=1,
+      errors=form.errors,
+    )
+    if tpl and int(tpl.get('type') or 0) == 6:
+      constructor = (
+        f' &middot; <a href="/page-constructor/{data.get("domain_id")}" '
+        'target="_blank">конструктор</a>'
+      )
+
   return (
     f'<a href="{protocol}://{domain}" target="_blank">{label}</a>'
     f'<div style="{SMALL}">{" &middot; ".join(status)}</div>'
     f'<div style="{SMALL}">'
     f'<a href="/edit_form/domain/{data.get("domain_id")}" target="_blank">админка домена</a>'
     f' &middot; <a href="{protocol}://{domain}{manager}" target="_blank">админка сайта</a>'
+    f'{constructor}'
     '</div>'
   )
 
@@ -60,6 +78,7 @@ async def template_slide_code(form, field, data):
   )
   header = (tpl or {}).get('header') or str(tid)
   folder = (tpl or {}).get('folder') or ''
+  folder='./templates/'+folder
   nav = (
     f'/filenavigator/filenavigator?dir={folder}&charset=windows-1251'
     if str(data.get('server_type')) == '3'
@@ -293,6 +312,7 @@ form={
       'foreign_key':'project_id',
       'full_str':True,
       'view_type':'list',
+      'cols':1,
       'tab':'info',
       'fields':[
         {
@@ -321,6 +341,7 @@ form={
             {'v':3,'d':'PSGI + utf8'},
             {'v':4,'d':'Python + Fastapi'},
           ],
+          'change_in_slide':True,
         },
         {
           'description':'Не кешировать',
