@@ -42,10 +42,12 @@ async def move(form, R):
         else:
             form.errors.append('в базе отсутствует элемент-источник. Возможно, состояние базы было изменено')
 
-        # Защита от цикла: нельзя перенести в себя или в собственного потомка
-        # (потомки имеют path, начинающийся с path узла + '/').
+        # Защита от цикла: нельзя перенести в себя или в собственного потомка.
+        # path узла = цепочка родителей без собственного id, поэтому потомки
+        # имеют path, начинающийся с <path узла>/<id узла>.
         if not form.errors and to:
-            if to_path == from_path or to_path.startswith(from_path + '/'):
+            self_prefix = (from_path + '/' + str(item_id)) if from_path else ('/' + str(item_id))
+            if to_path == self_prefix or to_path.startswith(self_prefix + '/'):
                 form.errors.append('Нельзя переместить элемент в собственный потомок')
 
         if not form.errors:
