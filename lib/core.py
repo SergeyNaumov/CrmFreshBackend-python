@@ -165,7 +165,7 @@ def random_filename(): # генерирует имя файла без расш�
 check_list=[
   'text','textarea','hidden','wysiwyg','select_from_table','select_values','checkbox','switch',
   'date','time','datetime','yearmon','daymon','hidden','font-awesome','file','codelist',
-  'multiconnect_old'
+  'multiconnect_old','page_blocks'
 ]
 def check_wt_field(t):
   return t in check_list
