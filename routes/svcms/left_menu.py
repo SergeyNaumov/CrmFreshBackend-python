@@ -65,6 +65,9 @@ async def left_menu(request: Request):
       module=importlib.import_module(module_path)
       _list=module.left_menu
       for m in _list:
+        # ds_params_good в левом меню не выводим ни в каких проектах.
+        if (m.get('params') or {}).get('config') == 'ds_params_good':
+          continue
         left_menu_data.append(m)
     except SyntaxError as e:
       errors.append(f'Ошибка синтаксиса в {path_to_menu}')
@@ -74,7 +77,7 @@ async def left_menu(request: Request):
           SELECT o.header,o.icon,o.tool,o.type,o.config
           FROM ds_options o
           JOIN ds_options_project op ON op.option_id=o.id
-          WHERE op.project_id=%s and o.is_menu=1
+          WHERE op.project_id=%s and o.is_menu=1 and o.config<>'ds_params_good'
           ORDER BY o.sort,o.id
         ''',
         values=[project_id],

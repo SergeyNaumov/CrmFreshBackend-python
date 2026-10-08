@@ -150,10 +150,17 @@ left_menu = [
         'params': {'config': 'ds_bottom_menu'},
     },
     {
+        'description': 'Филиалы',
+        'value': 'admin-table',
+        'type': 'vue',
+        'icon': 'fa fa-location-dot',
+        'params': {'config': 'ds_filials'},
+    },
+    {
         'description': 'Настройки',
         'value': 'const',
         'type': 'vue',
         'icon': 'fa fa-wrench',
-        'params': {'config': 'template_const'},
+        'params': {'config': 'ds_const'},
     },
 ]
