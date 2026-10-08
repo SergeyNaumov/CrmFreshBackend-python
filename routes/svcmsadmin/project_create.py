@@ -4,6 +4,7 @@ import os
 import random
 import shutil
 import string
+from typing import Optional
 
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
@@ -210,10 +211,10 @@ class CreateIn(BaseModel):
   domain: str
   template_id: int
   create_manager: bool = False
-  login: str | None = None
-  password: str | None = None
+  login: Optional[str] = None
+  password: Optional[str] = None
   demo: bool = False
-  source_project_id: int | None = None
+  source_project_id: Optional[int] = None
 
 
 @router.post('/project/create/start')

@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import APIRouter, Request, Response, File, Form, UploadFile
 from pydantic import BaseModel
@@ -47,13 +47,13 @@ class InitIn(BaseModel):
 
 class BasePagesIn(BaseModel):
     domain_id: int
-    set_id: int | None = None
+    set_id: Optional[int] = None
     overwrite: bool = False
 
 
 class BaseSetCreateIn(BaseModel):
     name: str
-    domain_id: int | None = None
+    domain_id: Optional[int] = None
 
 
 class BaseSetRenameIn(BaseModel):
@@ -79,7 +79,7 @@ class ThemeSaveIn(BaseModel):
 
 
 class PageSaveIn(BaseModel):
-    id: int | None = None
+    id: Optional[int] = None
     domain_id: int
     url: str = ''
     header: str = ''

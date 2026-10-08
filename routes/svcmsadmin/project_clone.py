@@ -1,6 +1,7 @@
 import os
 import shutil
 import asyncio
+from typing import Optional
 
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
@@ -227,8 +228,8 @@ class CloneStart(BaseModel):
   project_id: int
   domain: str
   folder: str
-  login: str | None = None
-  password: str | None = None
+  login: Optional[str] = None
+  password: Optional[str] = None
 
 
 @router.post('/project/clone/start')

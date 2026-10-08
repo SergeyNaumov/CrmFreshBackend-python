@@ -1,5 +1,6 @@
 import os
 import re
+from typing import List, Optional
 
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
@@ -115,7 +116,7 @@ async def struct_templates(request: Request):
 class StructStart(BaseModel):
   project_id: int
   structname: str
-  resize: list[dict] | None = None
+  resize: Optional[List[dict]] = None
 
 
 @router.post('/project/struct/start')
