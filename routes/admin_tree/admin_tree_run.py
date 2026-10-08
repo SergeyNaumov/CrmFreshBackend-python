@@ -241,7 +241,8 @@ async def admin_tree_run(**arg):
           
           form.id = await form.db.save(
             table=form.work_table,
-            data=data
+            data=data,
+            errors=form.errors
           )
           data_for_multi.append({
             'id':form.id,
@@ -249,8 +250,17 @@ async def admin_tree_run(**arg):
             'header':h,
             'childs':[]
           })
-          if not form.id:
-            form.errors.append('произошла ошибка при добавлении раздела. Возможно, превышен максимальный уровень вложенности')
+          if not form.id and not form.errors:
+            form.errors.append('не удалось добавить раздел: INSERT не выполнен (см. лог сервера)')
+
+          # ЧПУ: если у конфига заданы chpu_*-атрибуты — пишем slug в in_ext_url.
+          if form.id and getattr(form, 'chpu_in_url', None):
+            from lib.CRM.chpu import generate_ext_url, save_chpu
+            _pid = getattr(form, 'foreign_key_value', None)
+            _in_url = form.chpu_in_url.replace('<%id%>', str(form.id))
+            _ext_url = await generate_ext_url(
+              form, h, prefix=getattr(form, 'chpu_prefix', '') or '', project_id=_pid)
+            await save_chpu(form, _in_url, _ext_url, _pid)
 
           await form.run_event('after_insert')
           await form.run_event('after_save')

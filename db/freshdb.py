@@ -231,6 +231,12 @@ class FreshDB():
                     return cur.lastrowid
                 except Exception as e:
                     out_error(self,e,arg)
+                    # Пробрасываем реальную причину в errors (для диагностики),
+                    # иначе вызывающий код видит только пустой id и пишет
+                    # неинформативное сообщение.
+                    errs=arg.get('errors')
+                    if isinstance(errs, list):
+                        errs.append(str(e))
                     return False
 
 

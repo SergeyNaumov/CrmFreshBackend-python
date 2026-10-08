@@ -5,6 +5,8 @@ from lib.core import exists_arg
 async def move(form, R):
     """Перенос узла дерева в другую ветку (parent_id + path + пути потомков)."""
     to = str(exists_arg('to', R) or '').strip()
+    if to == '0':
+        to = ''  # 0 = корень (нет родителя)
     item_id = form.id
 
     if not item_id:

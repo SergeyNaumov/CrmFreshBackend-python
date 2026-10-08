@@ -3,6 +3,7 @@ from lib.password import hash_password
 #from routes.edit_form.multiconnect import save as multiconnect_save
 from .multiconnect import save as multiconnect_save
 from .save_in_ext_url import save_in_ext_url
+from lib.CRM.chpu import save_chpu_for_form
 async def update_1_to_1(form):
   if not(form.id):
     # выходим, если нет form.id
@@ -165,6 +166,10 @@ async def save_form(form,arg):
         #print('errors:',form.errors)
 
   await update_1_to_1(form)
+
+  # ЧПУ: если у конфига заданы chpu_*-атрибуты — пишем slug в in_ext_url.
+  if form.success():
+    await save_chpu_for_form(form)
 
   for f in form.fields:
     name=f['name']

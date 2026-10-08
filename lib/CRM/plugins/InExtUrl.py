@@ -98,7 +98,7 @@ async def InExtUrl(form, opt):
                 url=opt['url_prefix']+url
 
             if await check_exists_url(form,url,opt):
-                postfix=2
+                postfix=1
                 while await check_exists_url(form, url, opt, postfix):
                     postfix+=1
                 
