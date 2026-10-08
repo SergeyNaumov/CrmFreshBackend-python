@@ -49,9 +49,9 @@ async def leftmenu(request: Request):
 
     manager['permissions']=await s.db.query(
       query='SELECT permissions_id from manager_permissions where manager_id=%s',
-      values=[manager['id']],
+      values=[manager[config['auth']['manager_table_id']]],
       massive=1
-    )
+    ) or []
     j=0
 
     for p in manager['permissions']:
