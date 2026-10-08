@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from config import config as sysconfig
 from lib.password import hash_password
-from .common import manager, require_permission
+from .common import manager, require_permission, create_domain_rkn
 
 
 router = APIRouter()
@@ -363,6 +363,8 @@ async def project_create_start(request: Request, r: CreateIn):
       errors=errors,
     )
     _check(errors)
+    # RKN-страницы: заводим запись domain_rkn (обязательные /soglasie и т.п.).
+    await create_domain_rkn(db, domain_id, project_id)
     base_set = await db.query(
       query='SELECT id FROM base_pages_set ORDER BY is_default DESC, sort, id LIMIT 1',
       onerow=1,
