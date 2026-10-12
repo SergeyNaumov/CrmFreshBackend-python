@@ -53,6 +53,9 @@ class Engine():
       host_ok=not('hosts' in config['debug']) or (('hosts' in config['debug']) and  ( hostname in config['debug']['hosts'] ))
       
       pwd_ok=not('pwd' in config['debug']) or (('pwd' in config['debug']) and  ( pwd in config['debug']['pwd'] ))
+      # Признак debug-режима (обход авторизации). Используется, в частности,
+      # стартовой svcmsmanager: в дебаге письма не отправляются.
+      s.debug_mode=host_ok and pwd_ok
       #print('pwd:',pwd)
       #print('host_ok:',host_ok,' pwd_ok:',pwd_ok)
       if host_ok and pwd_ok:

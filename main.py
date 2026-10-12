@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse, Response
 from routes import router
 from lib.engine import Engine
 from config import config
-from db import get_db
+from db import get_db, get_strateg_db
 
 # uvicorn main:app --reload --port=5000
 app = FastAPI(Debug=True)
@@ -41,6 +41,10 @@ async def startup():
     db=get_db()
     await db.create_pool()
 
+    # Второе подключение (внешняя CRM strateg) -- только если настроено в конфиге.
+    strateg_db=get_strateg_db()
+    if strateg_db:
+        await strateg_db.create_pool()
 
     print('create_pool end')
 

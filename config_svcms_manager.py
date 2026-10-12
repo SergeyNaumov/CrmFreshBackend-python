@@ -84,6 +84,28 @@ config={
       'host':'localhost',
       'dbname':'svcms',
     },
+    # Внешняя CRM (strateg) -- данные ОП для стартовой страницы (user/manager/
+    # internet_project). Пул создаётся в main.py, если ключ задан.
+    'strateg':{
+      'user':'svcms',
+      'password':'',
+      'host':'localhost',
+      'dbname':'strateg',
+    },
+  },
+  # Компоненты главной страницы (рендерятся MainPage.vue по list_components)
+  'main_page_components':[
+    {'component':'svcms-manager-start','cols':12},
+  ],
+  # Отправка заявок со стартовой страницы (порт API.pl). В debug-режиме
+  # письма не отправляются (см. lib/engine.py: s.debug_mode).
+  'mail':{
+    'from':'info@design-b2b.com',
+    'default_from_addr':'info@design-b2b.com',
+    'server':'',
+    'port':587,
+    'user':'',
+    'password':'',
   },
   'stat_log':0, # Записываем статистику посещений
   'controllers':{
@@ -114,7 +136,7 @@ config={
   'wysiwyg':config_wysiwyg,
   'debug':{ # для отладки
     'manager_host':'demo2.digitalstrateg.ru',
-    'hosts':['sv-home'],
+    'hosts':['sv-home','sv-digital'],
     'manager_id': 5520, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага  
   }
 }

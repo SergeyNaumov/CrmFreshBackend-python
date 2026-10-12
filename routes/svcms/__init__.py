@@ -5,6 +5,7 @@ from fastapi import APIRouter, Request
 #from lib.core import exists_arg
 
 from .left_menu import left_menu
+from .startpage import router as router_startpage
 
 
 
@@ -20,6 +21,9 @@ router = APIRouter()
 @router.get('/left-menu')
 async def controller_left_menu(request: Request):
     return await left_menu(request)
+
+# Стартовая страница клиентской админки (карточка хостинга/домена + заявки)
+router.include_router(router_startpage)
 
 
 
