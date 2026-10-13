@@ -233,10 +233,13 @@ async def session_logout(s):
           values=[user_id,key]
         )
       else:
+          session_table=config['auth'].get('session_table','session')
           await s.db.query(
-            query='DELETE FROM session WHERE auth_id=%s and session_key=%s',
+            query=f'DELETE FROM {session_table} WHERE auth_id=%s and session_key=%s',
             values=[user_id,key]
           )
+  s.set_cookie(name='auth_user_id',value=None)
+  s.set_cookie(name='auth_key',value=None)
 
 
 
