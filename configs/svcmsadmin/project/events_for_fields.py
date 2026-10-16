@@ -29,6 +29,24 @@ async def exists_conf_before_code(form, field):
   field['html'] = form.template(tmpl, form_id=form.id, list=list_ or [])
 
 
+# Опции конструктора (ds_options_project) -- только для проектов на шаблоне
+# конструктора (template.type=6). У остальных поле не выводим.
+async def ds_options_before_code(form, field):
+  field['hide'] = 1
+  if not form.id:
+    return
+  row = await form.db.query(
+    query='''SELECT 1 FROM domain d
+             JOIN template t ON t.template_id=d.template_id
+             WHERE d.project_id=%s AND t.type=6 LIMIT 1''',
+    values=[form.id],
+    onerow=1,
+    errors=form.errors,
+  )
+  if row:
+    field['hide'] = 0
+
+
 # Домены в списке -- кнопка «добавить» с предзаполненным проектом.
 async def domains_before_code(form, field):
   if form.id:
@@ -113,6 +131,7 @@ events = {
   'size_template': {'before_code': size_before_code},
   'paid_on_year': {'before_code': size_before_code},
   'exists_conf': {'before_code': exists_conf_before_code},
+  'ds_options': {'before_code': ds_options_before_code},
   'domains': {'before_code': domains_before_code},
   'user_id': {'filter_code': user_id_filter_code},
   'disabled': {'filter_code': disabled_filter_code},

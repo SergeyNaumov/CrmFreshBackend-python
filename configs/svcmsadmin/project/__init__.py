@@ -120,6 +120,7 @@ form={
       {'description':'Инструменты','name':'tools'},
       {'description':'Работа с редиректами','name':'add_info'},
       {'description':'Опции','name':'opt'},
+      {'description':'Опции конструктора','name':'constructor'},
     ],
   ],
   'fields':[
@@ -302,6 +303,25 @@ form={
         'use_external_promo_exporter;Выгрузка promo;'
         'use_external_sitemap_file;Использовать <b>sitemap.xml</b> в каталоге проекта;'
         'yandex_yml;включить catalog.yml;',
+    },
+    {
+      # Связь проекта с опциями конструктора (ds_options_project).
+      # Выводится только для проектов на шаблоне конструктора (template.type=6) --
+      # см. ds_options_before_code в events_for_fields.py.
+      'description':'Опции конструктора',
+      'type':'multiconnect',
+      'name':'ds_options',
+      'relation_table':'ds_options',
+      'relation_table_id':'id',
+      'relation_table_header':'header',
+      'relation_tree_order':'sort',
+      'relation_save_table':'ds_options_project',
+      'relation_save_table_id_worktable':'project_id',
+      'relation_save_table_id_relation':'option_id',
+      'cols':2,
+      'fast_search':1,
+      'not_filter':1,
+      'tab':'constructor',
     },
     {
       'description':'Домены',
