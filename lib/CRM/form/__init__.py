@@ -75,6 +75,7 @@ class Form():
 
     if script=='admin_table':
       self.search_plugin=[]
+      self.search_plugin_panel=0
       self.filters_groups=[]
       self.search_on_load=0
       

@@ -352,5 +352,14 @@ form={
       'not_filter':1,
       'tab':'main',
     },
+    # Перенос/копирование настроек конструктора на другой домен (домен = сайт).
+    {
+      'description':'Конструктор и домен',
+      'type':'domain_sync',
+      'name':'domain_sync',
+      'not_filter':1,
+      'full_str':True,
+      'tab':'links',
+    },
   ],
 }

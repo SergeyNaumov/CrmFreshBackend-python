@@ -29,7 +29,7 @@ Vuetify 3). Конфиг бэкенда — это **схема админист
 
 ## AdminTable (список)
 
-- `POST /get-filters/<config>` → `{title, filters, permissions, search_plugin, log, errors}`.
+- `POST /get-filters/<config>` → `{title, filters, permissions, search_plugin, search_plugin_panel, log, errors}`.
 - `POST /get-result` `{config, query, params}` → `{results:{headers, output,...}, errors}`.
 - Фильтры: `src/components/AdminTable/OnFilters.vue`; результаты:
   `AdminTable/FindResults.vue`.
@@ -37,6 +37,10 @@ Vuetify 3). Конфиг бэкенда — это **схема админист
   `routes/get_result/process_result_list.py`.
 - Особенность фронта (`AdminTable.vue:333-341`): фильтр `checkbox`/`switch` без
   `values` → `select` «Не использовать/Да/Нет».
+- `search_plugin` — ссылки-инструменты (`[{name, icon, title, link?}]`, обычно из
+  `configs/<...>/plugins.py`). Ключ конфига `search_plugin_panel` (`__init__.py`,
+  по умолчанию 0) отдаётся как `search_plugin_panel` и заставляет фронт убрать
+  эти ссылки в раскрывающуюся панель «Инструменты» (см. `12-configs.md`).
 
 ## AdminTree (дерево/галерея)
 
@@ -52,6 +56,27 @@ Vuetify 3). Конфиг бэкенда — это **схема админист
   `AdminTree/FormInBranch.vue`.
 - Для дерева нужны колонки `parent_id` (+ `path` при `tree_use`), сортировка —
   по `sort_field`.
+
+## ParserExcel (импорт Excel)
+
+Компонент `parser-excel` (`src/components/ParserExcel/{ParserExcel.vue,methods.js}`),
+роут фронта `/vue/parser-excel/<config>`. Ходит в `POST /parser-excel/<config>`:
+
+- `init` → `d.parser` (`fields` с `selected:-1`, `refs`, `require_any_of`,
+  `before_load_fields`). `description` поля сверяется с заголовком колонки →
+  автосопоставление (`autofill_preload`).
+- `preload` (base64 файла) → `loaded_filename` + первые строки превью.
+- `check_refs` (только если у парсера есть `refs`) — перед загрузкой: вернуть
+  `refs:[{key,label,missing,bad_ids,unresolved,no_ref}]`. Если есть `missing`
+  или `bad_ids` → диалог: «Не найдены … / Id вне проекта …» с кнопками
+  «Создать и продолжить» (`create_refs` по каждому `ref`, затем `load`) и
+  «Продолжить без создания» (сразу `load`).
+- `create_refs` `{ref, names}` → создание отсутствующих значений в проекте.
+- `load` → сообщение (`message`) с итогом и замечаниями.
+
+`all_fields_selected` учитывает `required` полей и группы `require_any_of`
+(хотя бы одна колонка группы). Специфики конкретного инструмента в компоненте
+нет — поведение задаётся конфигом парсера и ответами `init`/`check_refs`.
 
 ## EditForm (карточка)
 

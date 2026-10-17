@@ -24,9 +24,10 @@ async def preload(parser, R):
 
             if not os.path.isdir(tmp_dir):
                 try:
-                  os.mkdir(tmp_dir)
-                except FileExistsError:
-                  return error(f'не удалось создать директорию {tmp_dir}')
+                  # makedirs: родительская ./tmp может отсутствовать
+                  os.makedirs(tmp_dir, exist_ok=True)
+                except OSError as e:
+                  return error(f'не удалось создать директорию {tmp_dir}: {e}')
 
 
 

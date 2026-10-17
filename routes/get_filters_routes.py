@@ -137,6 +137,7 @@ async def get_filters_controller(config: str, R:dict, request: Request):
     'filters_groups':form.filters_groups,
     'log':form.log,
     'search_plugin':form.search_plugin,
+    'search_plugin_panel':bool(getattr(form,'search_plugin_panel',0)),
     'search_multi_action':search_multi_action,
     'permissions':{
       'make_create':make_create,

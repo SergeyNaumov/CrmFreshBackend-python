@@ -60,6 +60,7 @@
 | [16-field-types-backend.md](16-field-types-backend.md) | обработка типов полей бэкендом (матрица этапов) |
 | [17-frontend-contract.md](17-frontend-contract.md) | контракт с фронтендом (AdminTable/AdminTree/EditForm/меню) |
 | [18-svcms-admin.md](18-svcms-admin.md) | панель SV-CMS admin (`config_svcms_admin`) |
+| [20-excel-import.md](20-excel-import.md) | инструменты-парсеры Excel: импорт/экспорт, справочники id/название |
 | [19-known-gaps.md](19-known-gaps.md) | известные расхождения и дефекты |
 
 ## HTML-версия

@@ -23,7 +23,8 @@
 | `routes/const_routes.py` | `/const` | `POST /get`, `/save_value` | Экран констант/настроек |
 | `routes/multiaction_routes.py` | `/multiaction` | `POST /{config}` (subaction: `set_all_value_field`, `delete`, `change_price`) | Массовые операции над выбранными |
 | `routes/docpack_routes/` | `/docpack` | `GET /load-dogovor/{docpack_id}/{ext}/{need_print}`, `/load-bill/...`, `/load-act/...`, `/load-app/...`, `POST /{config}/{field_name}` (list, create_docpack, create_bill, create_act, create_app, get_bills, link_sr, save_summ_bill и др.) | Пакет документов: договоры, счета, акты |
-| `routes/parser_excel/` | `/parser-excel` | `POST /{config}` (action: `init`, `preload`, `load`) | Загрузка/предпросмотр Excel |
+| `routes/parser_excel/` | `/parser-excel` | `POST /{config}` (action: `init`, `preload`, `load`, `check_refs`, `create_refs`) | Загрузка/предпросмотр Excel + справочники |
+| `routes/download_tmp.py` | — | `GET /download_tmp/{filename}` | Скачивание временных файлов (`files/tmp`): выгрузки/xlsx и т.п. |
 | `routes/messenger.py` | `/messenger` | `WS /ws/{socket_name}`, `GET ''`, `/chatlist`, `/chat/{user_id}`, `/chat-forward/{user_id}/{last_id}`, `POST /send`, `GET /connects`, `/get-socket-name`, `POST /local-send` | Мессенджер: WebSocket + REST |
 | `routes/extend_routes.py` | — | `POST /extend/KLADR` | Поиск адресов через внешний API KLADR |
 | `routes/documentation_routes.py` | `/documentation` | `GET /{config}` | Экран документации (дерево) |
@@ -37,6 +38,15 @@
 | `routes/gptassist/` | `/gpt-assist` | `GET /init`, `POST /send-task`, `/daemon-result`, `WS /ws/{task_id}` | GPT-ассистент |
 | `routes/svcms/` | `/svcms` | `GET /left-menu` | Левое меню SV-CMS (проект 5830) |
 | `routes/svcmsadmin/` | `/svcmsadmin` | `GET /left-menu-admin` | Левое меню админки `config_svcms_admin` из `admin_menu_new` |
+| `routes/svcmsadmin/project_create.py` | `/svcmsadmin` | `GET /project/create/{init,domains,options,next-port,check-domain}`, `POST /project/create/start` | «Создание проекта» (новый/клон, DS): фоновая задача `project_create` |
+| `routes/svcmsadmin/project_clone.py` | `/svcmsadmin` | `POST /project/clone/start` | Легаси-клон проекта (шаблон + папка + конфиги): задача `project_clone` |
+| `routes/svcmsadmin/domain_sync.py` | `/svcmsadmin` | `GET /domain/sync/preview`, `POST /domain/sync/start` | «Перенос на другой домен» (копировать/перенести): задача `domain_sync` |
+| `routes/svcmsadmin/domain.py` | `/svcmsadmin` | `GET /domain/{domain_id}/lets-encrypt-a` | Выпуск Let's Encrypt для домена |
+| `routes/svcmsadmin/page_constructor/` | `/svcmsadmin/page-constructor` | `GET /init`, `/pages*`, `/structure*`, `/theme*`, `/theme-schemes*`, `/base-pages*`, `/base-sets*` | Конструктор страниц: страницы/тема/схемы/наборы. Данные — по `domain_id` |
+| `routes/svcmsadmin/project_struct.py` | `/svcmsadmin` | `GET /project/struct/templates`, `POST /project/struct/start` | Уникальные структуры проекта (задача `project_struct`) |
+| `routes/svcmsadmin/project_export.py` | `/svcmsadmin` | `GET /project/export/info`, `POST /project/export/start`, `POST /project/export/drop` | Экспорт проекта (задача `project_export`) |
+| `routes/svcmsadmin/project_sitemap.py` | `/svcmsadmin` | `POST /project/sitemap/start` | Генерация карты сайта проекта |
+| `routes/background.py` | `/background` | `GET /status/{task_id}`, `WS /ws/{task_id}` | Статус/прогресс фоновых задач (`lib/background`) |
 
 ## Не подключены
 
@@ -51,7 +61,8 @@
   `wysiwyg_process`, `one_to_m_routine/*`.
 - `routes/get_result/` — `gen_query_search`, `process_result_list`.
 - `routes/docpack_routes/*` — обработчики действий докпака.
-- `routes/parser_excel/*` — `load_parser_from_config`, `load`, `go_parse`.
+- `routes/parser_excel/*` — `load_parser_from_config`, `preload`, `load`,
+  `refs` (`check_refs`/`create_refs`), `go_parse`.
 - `routes/admin_tree/` — `admin_tree_run`, `move`.
 - `routes/gptassist/` — `models` (pydantic), `sockets_connector`.
 

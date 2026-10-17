@@ -60,11 +60,80 @@
 `GET /docpack/load-*` — отдача файлов (`FileResponse`). Логика в `create_*`,
 `load_*`, `list.py`, `link_sr.py`.
 
-## `parser_excel`
+## `parser_excel` — импорт Excel/CSV
 
-`routes/parser_excel/`. `POST /parser-excel/{config}` с action `init` /
-`preload` / `load`. Логика — `load_parser_from_config`, `preload`, `load`,
-`go_parse`.
+`routes/parser_excel/`. `POST /parser-excel/{config}`. Конфиг парсера — папка
+инструмента, где `get_parser(arg)` (async) возвращает словарь (см.
+`conf/ds_good_import/`). `arg` — `{config, project_id, admin_id}` из
+`request.state`. Actions:
+
+| action | Файл | Назначение |
+|---|---|---|
+| `init` | `__init__.py` | отдать конфиг парсера (поля, `refs`, `require_any_of`, ...) |
+| `preload` | `preload.py` | base64 → временный файл в `tmp_dir`, вернуть первые строки для сопоставления колонок |
+| `load` | `load.py` | разобрать файл и upsert в `work_table` (события `before_loopback`/`after_item`/`after_load`) |
+| `check_refs` | `refs.py` | **только чтение**: каких значений справочников нет в проекте |
+| `create_refs` | `refs.py` | создать отсутствующие значения справочников по названию |
+
+Разбор файла — `go_parse.py` (`.xls` — xlrd, `.xlsx` — openpyxl; пустые
+строки пропускаются). `build_hash_fields(fields)` строит `{индекс колонки:
+имя поля}` (индекс `0` — валидная колонка, `-1` = не выбрано).
+
+### Ключи конфига парсера
+
+- `work_table`, `work_table_id`, `foreign_key`, `unique_fields` — как в `load`.
+- `const_values` — серверные значения (напр. `project_id`), перекрывают файл.
+- `fields` — список `{description, name, type, required}`. `description`
+  совпадает с заголовком колонки файла → автосопоставление на фронте
+  (`autofill_preload`). `required:0` — колонка необязательна.
+- `require_any_of` — группы имён полей, из которых должна быть выбрана **хотя
+  бы одна** колонка (иначе `load` вернёт ошибку «не выбрана колонка: ...»).
+  Проверка — `load.py::_check_require_any_of` и фронт (`all_fields_selected`).
+- `before_loopback(data, db)`, `after_item(data, record_id, db, errors)`,
+  `after_load(db, ctx)` — async-хуки (см. ниже).
+- `refs` — справочники «id или название» (см. ниже).
+
+### Справочники `refs` — значения по id **или** названию
+
+Конфиг может объявлять `refs` — список справочников, значения которых в файле
+приходят либо id, либо названием, строго **в рамках текущего проекта**.
+Дескриптор (резолвер — `lib/svcmsmanager/refs.py`, класс `RefResolver`):
+
+```python
+{
+  'key':'rubric', 'label':'рубрики', 'one':'рубрика',
+  'table':'ds_catalog', 'name_col':'header',
+  'id_field':'rubricator_id', 'name_field':'rubricator_name',
+  'scope':{'project_id':project_id},          # принадлежность проекту
+  'allow_zero':0,                              # 0 — допустимое значение (бренд)
+  'create':{'path':'','anons':'',...},         # значения для INSERT
+  'chpu':{'in_url':'/catalog/<%id%>','prefix':'/catalog/'},  # опц. ЧПУ
+}
+```
+
+Правило одно (`RefResolver.resolve`), им пользуются и `check_refs`, и
+`before_loopback` при `load`: числовой id проверяется на принадлежность
+`scope` (прежде всего `project_id`); не прошёл — пробуется название; чужой/
+несуществующий id и ненайденное название в БД **не пишутся**, а сообщаются
+(`bad_id`/`missing_name`, `foreign:0|1` — есть ли id в БД у другого проекта).
+Колонки-названия не являются полями `work_table` — хук их вырезает.
+
+- `check_refs` (read-only) — по маппингу колонок собирает для каждого `ref`:
+  `missing` (нет названий в проекте), `bad_ids` (`{id,foreign}`), `unresolved`/
+  `no_ref`. Ничего не создаёт — вызывается фронтом **до** записи в БД.
+- `create_refs` — `{ref, names:[...]}`: идемпотентно создаёт отсутствующие
+  (привязка `scope`), для рубрики дополнительно пишет ЧПУ в `in_ext_url`
+  (`lib/CRM/chpu.py::generate_ext_url`/`save_chpu`).
+- `build_hash_fields` в `load.py`/`refs.py` общий — проверка и загрузка видят
+  одинаковый маппинг.
+
+**Пример (товары):** экспорт — `conf/ds_good/plugins.py` (выгрузка всех товаров
+в xlsx, кнопки через `form.search_plugin`); импорт — `conf/ds_good_import/`
+(справочники `ds_catalog`/`ds_brands`, `require_any_of` для рубрики, фоновая
+обработка фото — `lib/svcmsmanager/ds_good_photos.py`). Детали — `12-configs.md`.
+
+Скачивание сформированных файлов — `GET /download_tmp/{filename}`
+(`routes/download_tmp.py`, каталог `files/tmp`).
 
 ## `ajax` — универсальный диспетчер
 

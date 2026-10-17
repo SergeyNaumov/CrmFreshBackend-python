@@ -51,6 +51,20 @@ config = importlib.import_module(conf_file).config
 | `after_all_change_action(form)` | хук после каждой insert/update/delete |
 | `const`, `events`, `controllers`, `telegram`, `mail`, `wysiwyg`, `messenger_rules`, `gptassist_rules`, `docpack`, `stat_log` | прочее |
 
+### Адрес MySQL — серверный (дев ↔ прод)
+
+`connects.crm_read` / `connects.crm_write.host` в репозитории — `localhost`
+(дев-значение). На **проде** это `185.76.252.12` (user `svcms`, пароль пустой):
+адрес правится в `config_*.py` **на самом сервере** (у `svcms_manager` на проде
+— `/var/www/svcms/manager/backend/config.py`; там же остаются `.bak`-копии).
+Репозиторное значение `localhost` не трогаем — иначе сломается дев.
+
+То же правило у движка сайтов: его адрес БД — в `sites/lib/config.py`
+(прод — `185.76.252.12`), и деплой `tools/sync_engine_to_prod.sh` из репо
+`svcms-async` этот файл **не заливает** (`--exclude='config.py'`). Заливка
+`localhost` на прод роняет все сайты — подробнее в
+`svcms-async/agent-doc/18_prod_runtime.md`.
+
 ## Debug-обход авторизации
 
 `lib/engine.py:52-91`: если `hostname` есть в `config['debug']['hosts']`

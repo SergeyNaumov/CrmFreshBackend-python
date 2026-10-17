@@ -3,6 +3,20 @@
 Кратко по `config_svcms_manager`. Общее — в `00-overview.md`, контракт
 Engine — в `02-engine.md`.
 
+## Прод-адреса (дев ↔ прод)
+
+| Что | Дев | Прод |
+|---|---|---|
+| MySQL `svcms` | `localhost` (`config_*.py` → `connects.crm_*`) | **`185.76.252.12`** (user `svcms`, пароль пустой) |
+| Web/движок сайтов | локально | `naumov@178.57.220.192:7725`, движок в `/var/www/svcms-async/sites` |
+| Бэкенд админки | `:5000` (`config_svcms_admin`) | `/var/www/svcms/admin/backend`, сервис `svcms.admin` (`:3011`), фронт `admin3.design-b2b.com` |
+
+`host` задаётся в конфиге **на сервере** и в репозитории остаётся `localhost`
+(дев-значение). Движок сайтов держит свой адрес БД в
+`sites/lib/config.py` — деплой `tools/sync_engine_to_prod.sh` из репо
+`svcms-async` его **не заливает** (`--exclude='config.py'`); заливка `localhost`
+на прод роняет все сайты (см. `agent-doc/18_prod_runtime.md` в репо `svcms-async`).
+
 ## Контракт request state (обязателен здесь)
 
 Всё состояние запроса живёт в `request.state` — никаких модульных глобалов,

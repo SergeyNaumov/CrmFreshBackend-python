@@ -29,22 +29,40 @@ async def exists_conf_before_code(form, field):
   field['html'] = form.template(tmpl, form_id=form.id, list=list_ or [])
 
 
+# Убираем блок «Опции конструктора» из колонок формы (cols -> name=constructor).
+# Нужно, когда проект не на шаблоне конструктора: поле скрыто, а заголовок
+# блока всё равно выводился бы (FormBody ориентируется по form.cols).
+def remove_constructor_block(form):
+  cols = getattr(form, 'cols', None)
+  if not cols:
+    return
+  out = []
+  for col in cols:
+    rest = [b for b in col if not (isinstance(b, dict) and b.get('name') == 'constructor')]
+    if rest:
+      out.append(rest)
+  form.cols = out
+
+
 # Опции конструктора (ds_options_project) -- только для проектов на шаблоне
-# конструктора (template.type=6). У остальных поле не выводим.
+# конструктора (template.type=6). У остальных поле и блок не выводим.
 async def ds_options_before_code(form, field):
   field['hide'] = 1
-  if not form.id:
-    return
-  row = await form.db.query(
-    query='''SELECT 1 FROM domain d
-             JOIN template t ON t.template_id=d.template_id
-             WHERE d.project_id=%s AND t.type=6 LIMIT 1''',
-    values=[form.id],
-    onerow=1,
-    errors=form.errors,
-  )
-  if row:
+  can_use = False
+  if form.id:
+    row = await form.db.query(
+      query='''SELECT 1 FROM domain d
+               JOIN template t ON t.template_id=d.template_id
+               WHERE d.project_id=%s AND t.type=6 LIMIT 1''',
+      values=[form.id],
+      onerow=1,
+      errors=form.errors,
+    )
+    can_use = bool(row)
+  if can_use:
     field['hide'] = 0
+  else:
+    remove_constructor_block(form)
 
 
 # Домены в списке -- кнопка «добавить» с предзаполненным проектом.

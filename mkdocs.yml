@@ -124,4 +124,5 @@ nav:
       - Обработка типов полей: 16-field-types-backend.md
       - Контракт с фронтендом: 17-frontend-contract.md
       - Панель svcms-admin: 18-svcms-admin.md
+      - Импорт/экспорт Excel: 20-excel-import.md
       - Известные расхождения: 19-known-gaps.md

@@ -11,7 +11,7 @@ async def load_parser_from_config(confdir,conflib_dir, arg):
       print('PARSER - 0: ', conflib_dir.replace('/','.')+'.'+arg['config'])
       module=importlib.import_module(conflib_dir.replace('/','.')+'.'+arg['config'])
       print('PARSER - 1')
-      parser=await module.get_parser()
+      parser=await module.get_parser(arg)
 
       print('PARSER: ',parser)
     except SyntaxError as e:

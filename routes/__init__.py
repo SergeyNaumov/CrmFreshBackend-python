@@ -23,6 +23,7 @@ from .const_routes import router as router_const
 from .docpack_routes import router as router_docpack
 from .multiaction_routes import router as router_multiaction
 from .parser_excel import router as router_parser_excel
+from .download_tmp import router as router_download_tmp
 # messenger
 from .messenger import router as router_messenger
 from .gptassist import router as router_gptassist
@@ -60,6 +61,7 @@ router.include_router(router_const,prefix='/const')
 router.include_router(router_multiaction,prefix='/multiaction')
 router.include_router(router_docpack,prefix='/docpack')
 router.include_router(router_parser_excel,prefix='/parser-excel')
+router.include_router(router_download_tmp)
 router.include_router(router_messenger,prefix='/messenger')
 router.include_router(router_extend)
 router.include_router(router_documentation,prefix='/documentation')

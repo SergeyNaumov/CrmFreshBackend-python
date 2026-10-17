@@ -22,6 +22,10 @@ whitelist — либо debug-обход, либо `session_start(s, request)`.
 - `session_start(s, request)` — читает `auth_user_id`/`auth_key`, сверяет с
   `auth['session_table']`, кладёт менеджера в `request.state.manager`, иначе
   `s.end()` с `redirect` на `/login`.
+  Ответ `{success:0, redirect:'<BaseUrl>/login', errors:['Вы не авторизованы']}`
+  отдаётся на **любой** запрос через middleware; фронт ловит его глобальным
+  axios-интерсептором (файл `main.js` репозитория CrmFreshFront) и уводит на
+  логин, запоминая `link_prev_login` для возврата после входа.
 - `session_logout(s)` — удаляет запись сессии.
 - `get_permissions_for` / `project_get_permissions_for` — права, группы,
   `files_dir` по умолчанию (`./files`, `/files`).

@@ -102,6 +102,46 @@ config=config_svcms_admin .venv/bin/python db/migrate_admin_menu_new.py
 Список в меню (включённые пункты `admin_menu_new`) ссылается на конфиги через
 `params.config`; `admin_menu` — единственный `admin-tree`.
 
+## Vue-инструменты админки
+
+Кроме карточек-форм есть страницы-инструменты (Vue). Подключаются четырьмя
+шагами: бэкенд-роутер в `routes/svcmsadmin/` (+ `include_router`), компонент
+`src/components/svcmsAdmin/<Tool>.vue`, маршруты в `src/router/index.js`
+(`/vue/<tool>` и full-screen `/<tool>`) и пункт меню в `admin_menu_new`
+(`type='vue'`, `value='<tool>'`) + маппинг `value → URL` в `LeftMenu.vue`.
+Долгие операции идут фоновой задачей (`lib/background`), прогресс — через
+`WS /background/ws/{id}`.
+
+| Инструмент | Роуты/меню | Что делает |
+|---|---|---|
+| Создание проекта | `/svcmsadmin/project/create/*`, меню `svcmsadmin-createproject` | «Новый»/«на базе существующего», DS-конструктор, опции, порт, менеджер; задача `project_create`. Для конструкторного клона шаблон переиспользуется (тот же `template_id`), данные `ds_*` копируются с перепривязкой id, переносятся ЧПУ (`in_ext_url`) и `promo` |
+| Перенос на другой домен | `/svcmsadmin/domain/sync/*`, меню `svcmsadmin-domainsync` + поле `domain_sync` в карточке домена | Копирование/перенос настроек конструктора между доменами (домен = сайт): страницы, тема, схемы, РКН; для обычных проектов — hosting/DNS/РКН и отдельная копия шаблона. Задача `domain_sync` |
+| Клонирование проекта (легаси) | `/svcmsadmin/project/clone/*`, поле `project_clone` в карточке проекта | Свой `template` + папка + `template_const`/`url_run_code`/`url_rules`; задача `project_clone` |
+
+Виртуальные поля-компоненты карточек (`project_clone`, `project_export`,
+`project_struct`, `project_sitemap`, `domain_sync`, `page_blocks`) в БД не
+сохраняются: `type` → `field-<type>` (см. `EditForm/FormBlock.vue` и
+`dynamic_component_loader.js`); компонент получает `form` (где `form.id` =
+`work_table_id` записи) и `field`.
+
+## Деплой админки (прод)
+
+Фронт — `admin3.design-b2b.com` (`/var/www/svcms/admin/frontend`), бэкенд —
+`/var/www/svcms/admin/backend` (сервис `svcms.admin`, `uvicorn main:app
+--port=3011`), nginx `location /backend/` → `127.0.0.1:3011/`.
+
+```bash
+cd ~/projects/CrmFreshFront && ./build/svcms.admin                  # сборка + rsync
+cd ~/projects/CrmFreshBackend-python-async && printf 'n\n' | bash sync/svcmsadmin.py
+sudo -n systemctl restart svcms.admin
+sudo -n systemctl is-active svcms.admin
+```
+
+`sync/svcmsadmin.py` синкает `configs/svcmsadmin/→conf/`, `lib/`, `routes/`, `db/`
+(rsync `--delete`), но **не** трогает серверный `config.py` и симлинк `files`.
+Новые импорты требуют установки в прод-venv (`.venv3.11`) — иначе воркер падает
+(так было с `openpyxl` для `routes/parser_excel`).
+
 ## Таблицы для дампа
 
 Часть legacy-таблиц отсутствует в dev-БД; для полноценной работы их дампят с
@@ -125,6 +165,20 @@ ssh -p7725 naumov@178.57.220.192 'mysqldump -u svcms --no-tablespaces --force --
 
 На проде **тоже отсутствуют** `adm_*`, `design`, `project_1_comp`,
 `struct_42_comp`, `for_robots` — соответствующие конфиги не задействованы в меню.
+
+Отдельно: для инструментов клона нужны `portfolio`, `service_rubricator`,
+`left_menu_tree` (они перечислены в `COLS` в
+`routes/svcmsadmin/project_clone.py`, но в дампе выше их нет — без них
+`SHOW COLUMNS` сыпет ошибками). Структуру с прода берут так:
+
+```bash
+ssh -p 7725 naumov@178.57.220.192 \
+  'for t in portfolio service_rubricator left_menu_tree; do
+     mysql -h 185.76.252.12 -u svcms -N -e "SHOW CREATE TABLE $t\G" svcms; done' \
+  > /tmp/missing_ddl.sql
+# в MySQL 8 у text/longtext снять DEFAULT NULL, AUTO_INCREMENT — с 1
+mysql -u svcms svcms < /tmp/missing_ddl.sql
+```
 
 ## Проверка
 

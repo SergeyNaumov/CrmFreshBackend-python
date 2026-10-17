@@ -53,6 +53,28 @@ font-awesome, file, codelist`.
 `routes/edit_form/process_edit_form.py:53-58`,
 `routes/get_result/process_result_list.py:60-164`, `lib/CRM/form/save_form.py`.
 
+## Типы-компоненты (виртуальные поля)
+
+Часть типов — не колонки, а «слоты» под Vue-компонент: в основную таблицу не
+сохраняются (`is_wt_field` их не знает), в `get-filters`/`get-result` не
+участвуют (в конфиге помечаются `not_filter:1`), а в карточке рендерятся
+компонентом `field-<type>`.
+
+| type | Компонент (фронт) | Смысл |
+|---|---|---|
+| `project_clone` | `ProjectClone.vue` | клон проекта (легаси: свой `template` + папка) |
+| `project_export` | `ProjectExport.vue` | выгрузка проекта |
+| `project_struct` | `ProjectCreateStruct.vue` | уникальные структуры проекта |
+| `project_sitemap` | `ProjectSitemap.vue` | карта сайта проекта |
+| `domain_sync` | `DomainSync.vue` | перенос/копирование настроек конструктора на другой домен |
+| `page_blocks` | редактор блоков | блоки страницы (конфиги DS) |
+
+Цепочка: `form.fields[].type` → `EditForm/FormBlock.vue` (`case '<type>'` →
+`field-<type>`) → `src/dynamic_component_loader.js`
+(`app.component('field-<type>', defineAsyncComponent(...))`). Компонент получает
+пропсы `form` и `field`; `form.id` — id записи (`work_table_id`), например в
+карточке домена это `domain_id`. Подробности про инструменты — `15-svcms-admin.md`.
+
 ## filter_extend_* — фильтры по JOIN
 
 - Обычный тип фильтрует **текущую** `work_table` (`wt`) и выводится в карточке.

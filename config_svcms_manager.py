@@ -18,6 +18,16 @@ config={
   'title':'CMS Digitalstrateg',
   'BaсkendBase':'http://digitalstrateg.test/backend',
   'config_folder':'configs/svcmsmanager',
+
+  # Фоновые задачи (очередь crm_background): воркеры стартуют внутри uvicorn.
+  # Используется инструментами svcms_manager, например обработкой изображений
+  # после импорта товаров ds_good_import.
+  'background':{
+    'enabled':True,
+    'workers':4,
+    'poll':0.5,
+    'stale_minutes':10,
+  },
   # Разрешённые Origin'ы для CORSMiddleware (см. main.py).
   # Локальная петля (localhost/127.0.0.1 на любом порту) разрешена всегда
   # через dev_origin_regex, отдельно перечислять её не нужно.
@@ -135,7 +145,7 @@ config={
   },
   'wysiwyg':config_wysiwyg,
   'debug':{ # для отладки
-    'manager_host':'demo2.digitalstrateg.ru',
+    'manager_host':'demo8.digitalstrateg.ru',
     'hosts':['sv-home','sv-digital'],
     'manager_id': 5520, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага  
   }

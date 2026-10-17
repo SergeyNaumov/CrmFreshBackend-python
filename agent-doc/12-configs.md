@@ -189,6 +189,54 @@ async def permissions(form):
 - Названия конфигов соответствуют таблицам: `ds_news`, `ds_article`, `ds_brands`
   и т.д. (в отличие от старых `content`, `top_menu_tree`).
 
+## Инструменты-парсеры xlsx (`parser-excel`)
+
+Конфиг такого инструмента — папка с **async `get_parser(arg)`**, возвращающей
+словарь парсера (не обычный `form`). `arg` = `{config, project_id, admin_id}`.
+Разбор и действия — `routes/parser_excel/` (детали и ключи — `07-core-routes.md`).
+
+Минимум:
+
+```python
+async def get_parser(arg):
+  project_id=arg['project_id']
+  return {
+    'work_table':'ds_good', 'work_table_id':'id', 'foreign_key':'project_id',
+    'tmp_dir':'./files/tmp/<config>',        # writable для сервиса (www-data)
+    'parser_engine':'xlsx',
+    'unique_fields':['project_id','artikul'],# пустой уникат → insert
+    'const_values':{'project_id':project_id},# перекрывает файл
+    'fields':[{'description':'Артикул (artikul)','name':'artikul','type':'text'}, ...],
+    'before_loopback':before_loopback, 'after_item':after_item, 'after_load':after_load,
+  }
+```
+
+- `description` поля = заголовку колонки в файле → автосопоставление
+  (`autofill_preload` на фронте). Экспорт обязан использовать те же заголовки.
+- `tmp_dir` — под сервисного пользователя (обычно `./files/tmp/...`;
+  рабочий каталог менеджера на проде `www-data`-доступен только на чтение).
+- `require_any_of:[['rubricator_id','rubricator_name']]` — хотя бы одна
+  колонка из группы обязательна (проверяет `load` и фронт).
+- `refs` — справочники «id или название» в рамках проекта (рубрики, бренды);
+  `check_refs`/`create_refs` дают фронту предложить создание отсутствующих.
+  Резолвер — `lib/svcmsmanager/refs.py`, дескриптор и пример — `07-core-routes.md`.
+- `before_loopback` обычно: обрезка пробелов (пустые ячейки не трогают поле),
+  нормализация чисел/чекбоксов, резолв `refs`. **Все хуки — async.**
+
+**Пример (товары `ds_good`):** выгрузка всех товаров проекта в xlsx —
+`conf/ds_good/plugins.py` (`form.search_plugin` + `before_search`/`after_search`,
+колонки-заголовки = `description` полей импорта, включая «Название рубрики» и
+«Название бренда»); импорт — `conf/ds_good_import/` (upsert по
+`project_id+artikul`, характеристики → `ds_params*`, фото — фоном через
+`lib/svcmsmanager/ds_good_photos.py`). Готовый файл отдаётся
+`GET /download_tmp/{filename}`.
+
+Ссылки плагинов по умолчанию рисуются инлайн над фильтрами. Ключ конфига
+`search_plugin_panel: True` в `__init__.py` (дефолт — 0, задаётся в `Form`
+для `script=='admin_table'`, отдаётся фронту в `/get-filters` как
+`search_plugin_panel`) сворачивает их в раскрывающуюся панель «Инструменты»
+(`AdminTable.vue`). Так сделано для `ds_good`.
+
 ## События
 
 - **Form-level** — `events.py` → `events = {'имя': func | [func, ...]}`.

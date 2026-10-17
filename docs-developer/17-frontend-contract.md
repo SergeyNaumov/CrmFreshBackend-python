@@ -38,7 +38,7 @@
 ## AdminTable (список)
 
 1. `POST /get-filters/<config>` — заголовок, `filters`, `permissions`,
-   `search_plugin`, `log`, `errors`.
+   `search_plugin`, `search_plugin_panel`, `log`, `errors`.
 2. `POST /get-result` `{config, query, params}` — `results` (заголовки + строки).
 3. Рендер фильтров: `src/components/AdminTable/OnFilters.vue`.
 
@@ -47,6 +47,11 @@
 
 Особенности фронта (`AdminTable.vue:333-341`): фильтр `checkbox`/`switch` без
 `values` превращается в `select` с вариантами «Не использовать/Да/Нет».
+
+Ссылки-инструменты (`search_plugin`): по умолчанию выводятся инлайн над
+фильтрами. Ключ конфига `search_plugin_panel: True` (в `__init__.py` инструмента,
+для `ds_good` уже включён) сворачивает их в раскрывающуюся панель «Инструменты»;
+состояние панели фронт помнит в `localStorage`.
 
 ## AdminTree (дерево/галерея)
 
