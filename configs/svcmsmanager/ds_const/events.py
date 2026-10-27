@@ -46,6 +46,26 @@ CONST_FIELDS = [
     ('req',    'rs',            'Расчётный счёт',                 'text'),
     ('req',    'corr_account',  'Корр. счёт',                     'text'),
     ('req',    'bik',           'БИК',                            'text'),
+
+    # SEO-шаблоны: движок применяет их, когда в карточке сущности
+    # соответствующие поля пустые (sites/lib/dsengine/process_page.py::
+    # promo_from_templates). Плейсхолдеры: {header}, {anons}, {orgname},
+    # {price}, {rubric}, {date}, {id}. Пример: «{header} — купить в {orgname}».
+    ('tpl', 'seo_news_title',          'Новости: Title',        'text'),
+    ('tpl', 'seo_news_description',    'Новости: Description',  'text'),
+    ('tpl', 'seo_news_keywords',       'Новости: Keywords',     'text'),
+    ('tpl', 'seo_article_title',       'Статьи: Title',         'text'),
+    ('tpl', 'seo_article_description', 'Статьи: Description',   'text'),
+    ('tpl', 'seo_article_keywords',    'Статьи: Keywords',      'text'),
+    ('tpl', 'seo_good_title',          'Товары: Title',         'text'),
+    ('tpl', 'seo_good_description',    'Товары: Description',   'text'),
+    ('tpl', 'seo_good_keywords',       'Товары: Keywords',      'text'),
+    ('tpl', 'seo_service_title',       'Услуги: Title',         'text'),
+    ('tpl', 'seo_service_description', 'Услуги: Description',   'text'),
+    ('tpl', 'seo_service_keywords',    'Услуги: Keywords',      'text'),
+    ('tpl', 'seo_catalog_title',       'Рубрики каталога: Title',       'text'),
+    ('tpl', 'seo_catalog_description', 'Рубрики каталога: Description', 'text'),
+    ('tpl', 'seo_catalog_keywords',    'Рубрики каталога: Keywords',    'text'),
 ]
 
 # Порядок табов.
@@ -56,6 +76,7 @@ CONST_TABS = [
     ('seo',    'Счётчики и SEO'),
     ('shop',   'Магазин (Яндекс.Маркет)'),
     ('req',    'Реквизиты'),
+    ('tpl',    'SEO-шаблоны'),
 ]
 
 

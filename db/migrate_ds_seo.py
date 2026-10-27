@@ -1,49 +1,103 @@
-# Миграция: SEO-поля карточки у конструкторных сущностей (ds_*).
+# Миграция: SEO-поля и H1 карточки у конструкторных сущностей (ds_*),
+# плюс константы SEO-шаблонов у DS-шаблонов.
 #
 #   export config=config_svcms_manager
 #   .venv/bin/python -m db.migrate_ds_seo
 #
-# Идемпотентна (ADD COLUMN IF NOT EXISTS). Добавляет в ds_news, ds_article,
-# ds_good, ds_service и ds_catalog колонки:
+# Идемпотентна (ADD COLUMN IF NOT EXISTS + NOT EXISTS для template_const).
 #
+# 1. Колонки в ds_news, ds_article, ds_good, ds_service и ds_catalog:
+#
+#   h1                 varchar(255) — заголовок <h1> на странице сущности
+#                                     (пусто → берётся header);
 #   promo_title        varchar(255) — <title> страницы (без «— orgname»);
 #   promo_description  varchar(512) — <meta name="description">;
 #   promo_keywords     varchar(512) — <meta name="keywords">.
 #
-# Редактируются в карточке сущности («Title/Description/Keywords (SEO)»,
-# конфиги configs/svcmsmanager/ds_*). Читает движок сайта:
-# sites/lib/dsengine/process_page.py::_set_seo (1. карточка → 2. таблица
-# promo → 3. автогенерация из заголовка). Пустое значение = фолбэк.
+#   Редактируются в карточке сущности («H1», «Title/Description/Keywords
+#   (SEO)», конфиги configs/svcmsmanager/ds_*). Читает движок сайта:
+#   sites/lib/dsengine/process_page.py::_set_seo.
+#
+# 2. Строки template_const для констант из configs/svcmsmanager/ds_const
+#   (SEO-шаблоны, доставка и т.п.) — чтобы движок сайта видел их в cnst:
+#   sites/lib/dsengine/__init__.py::get_const читает const JOIN template_const.
+#   Значения этих констант правятся в «Настройки сайта → SEO-шаблоны».
 
 import asyncio
 
 from config import config
 from db.freshdb import FreshDB
+from configs.svcmsmanager.ds_const.events import CONST_FIELDS
 
 TABLES = ('ds_news', 'ds_article', 'ds_good', 'ds_service', 'ds_catalog')
 
-# ADD COLUMN IF NOT EXISTS — поддерживается MariaDB 10.0+ (прод 11.8).
-DDL = [
-    "ALTER TABLE `%s` "
-    "ADD COLUMN IF NOT EXISTS `promo_title` varchar(255) NOT NULL DEFAULT '' "
-    "AFTER `anons`, "
-    "ADD COLUMN IF NOT EXISTS `promo_description` varchar(512) NOT NULL DEFAULT '' "
-    "AFTER `promo_title`, "
-    "ADD COLUMN IF NOT EXISTS `promo_keywords` varchar(512) NOT NULL DEFAULT '' "
-    "AFTER `promo_description`" % table
-    for table in TABLES
+# Колонки карточки: (name, ddl). Порядок важен для новых таблиц (AFTER).
+COLUMNS = [
+    ('h1', "varchar(255) NOT NULL DEFAULT ''"),
+    ('promo_title', "varchar(255) NOT NULL DEFAULT ''"),
+    ('promo_description', "varchar(512) NOT NULL DEFAULT ''"),
+    ('promo_keywords', "varchar(512) NOT NULL DEFAULT ''"),
 ]
+
+
+def add_column_sql(table, existing, name, ddl):
+    """ALTER для отсутствующей колонки (без IF NOT EXISTS — нет в MySQL)."""
+    if name in existing:
+        return None
+    return "ALTER TABLE `%s` ADD COLUMN `%s` %s" % (table, name, ddl)
+
+# Константы из «Настройки сайта» → template_const (иначе движок их не увидит).
+TEMPLATE_CONST_INSERT = (
+    "INSERT INTO template_const (template_id, header, sort, type, description) "
+    "SELECT %s, %s, %s, %s, %s FROM DUAL WHERE NOT EXISTS ("
+    "  SELECT 1 FROM template_const WHERE template_id=%s AND header=%s"
+    ")"
+)
+
+
+async def seed_template_const(db):
+  templates = await db.query(
+    query='SELECT DISTINCT template_id FROM template WHERE type=6',
+    values=[], errors=[],
+  ) or []
+  inserted = 0
+  for row in templates:
+    tid = row['template_id']
+    for index, (_tab, name, desc, ftype) in enumerate(CONST_FIELDS, start=1):
+      exists = await db.query(
+        query='SELECT id FROM template_const WHERE template_id=%s AND header=%s',
+        values=[tid, name], onevalue=1, errors=[],
+      )
+      if exists:
+        continue
+      await db.query(
+        query=TEMPLATE_CONST_INSERT,
+        values=[tid, name, index, ftype, desc, tid, name],
+        errors=[],
+      )
+      inserted += 1
+  return inserted
 
 
 async def main():
   db = FreshDB(config['connects']['crm_write'])
   await db.create_pool()
-  for query in DDL:
-    await db.query(query=query, values=[], errors=[])
+  for table in TABLES:
+    rows = await db.query(
+      query='SELECT column_name AS col FROM information_schema.columns '
+            'WHERE table_schema=DATABASE() AND table_name=%s',
+      values=[table], errors=[],
+    ) or []
+    existing = {str(r['col']).lower() for r in rows}
+    for name, ddl in COLUMNS:
+      statement = add_column_sql(table, existing, name, ddl)
+      if statement:
+        await db.query(query=statement, values=[], errors=[])
+  inserted = await seed_template_const(db)
   await db.close_pool()
   if db.error_str:
     raise SystemExit(f'ds_seo: {db.error_str}')
-  print('ds_seo: ' + ', '.join(TABLES) + ': ok')
+  print('ds_seo: ' + ', '.join(TABLES) + ': ok; template_const: +%s' % inserted)
 
 
 if __name__ == '__main__':
