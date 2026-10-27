@@ -177,3 +177,58 @@ async def save_chpu_for_form(form):
     ext_url = await generate_ext_url(
         form, header, prefix=prefix, project_id=project_id, exclude_in_url=in_url)
     await save_chpu(form, in_url, ext_url, project_id)
+
+
+async def ajax_in_ext_url(form, values):
+    """Ajax-генерация ЧПУ для edit-формы: POST /ajax/<config>/in_ext_url.
+
+    Фронт (`components/js/edit_form.js`, `field.frontend.ajax`) шлёт текущие
+    `values` при каждом изменении поля-зависимости и ждёт пару
+    `['in_ext_url', {'value': '/news/slug'}]`.
+    """
+    values = values if isinstance(values, dict) else {}
+    in_url_tpl = getattr(form, 'chpu_in_url', '') or ''
+    if not in_url_tpl:
+        return []
+    prefix = getattr(form, 'chpu_prefix', '') or ''
+    dep = getattr(form, 'chpu_dependence_field', 'header') or 'header'
+    project_id = getattr(form, 'foreign_key_value', None)
+
+    header = values.get(dep) or ''
+    if not header:
+        return ['in_ext_url', {'value': ''}]
+
+    in_url = ''
+    if getattr(form, 'id', None):
+        in_url = in_url_tpl.replace('<%id%>', str(form.id))
+
+    url = make_slug(header, prefix)
+    if not url:
+        return []
+    url = await unique_ext_url(form, url, project_id, in_url)
+    return ['in_ext_url', {'value': url}]
+
+
+def setup_chpu_ajax(form):
+    """Включить ajax-генерацию ЧПУ в карточке для конфига с chpu_*.
+
+    Вешает `frontend.ajax` на поле-источник (chpu_dependence_field): фронт
+    шлёт /ajax/<config>/in_ext_url при вводе заголовка, а ответ подставляет
+    slug в поле type=in_ext_url. Вызывается из lib/all_configs.read_config.
+    """
+    if not getattr(form, 'chpu_in_url', None):
+        return
+    if getattr(form, 'script', None) not in ('edit_form', 'ajax'):
+        return
+
+    dep = getattr(form, 'chpu_dependence_field', 'header') or 'header'
+    for f in (getattr(form, 'fields', None) or []):
+        if f.get('name') == dep:
+            frontend = f.setdefault('frontend', {})
+            if not frontend.get('ajax'):
+                frontend['ajax'] = {'name': 'in_ext_url', 'timeout': 150}
+            break
+
+    if not getattr(form, 'ajax', None):
+        form.ajax = {}
+    form.ajax.setdefault('in_ext_url', ajax_in_ext_url)

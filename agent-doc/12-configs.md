@@ -253,6 +253,24 @@ async def permissions(form):
 автоматически добавляет `LEFT JOIN in_ext_url` (по `chpu_in_url`-шаблону),
 `get_search_where.py` ищет по `in_ext_url.ext_url LIKE`.
 
+### Живая генерация (ajax)
+
+Пока печатают заголовок, slug подставляется сразу — тем же механизмом, что в
+не-DS конфигах (`field.frontend.ajax` → `POST /ajax/<config>/<name>`, движок
+`src/components/js/edit_form.js`):
+
+```python
+# ничего в конфиге писать не нужно — включается автоматически
+'chpu_in_url': '/article/<%id%>',  # есть chpu_* → lib/all_configs.read_config
+                                   # вызывает chpu.setup_chpu_ajax(form)
+```
+
+`setup_chpu_ajax` вешает `frontend.ajax = {'name':'in_ext_url','timeout':150}`
+на поле `chpu_dependence_field` и регистрирует `form.ajax['in_ext_url']`
+(`chpu.ajax_in_ext_url`). Ответ — `['in_ext_url', {'value': '/article/slug'}]`;
+дедуп `-1/-2` считается по проекту, свой текущий url исключается. Значение
+совпадает с тем, что сохранит `save_chpu_for_form` (один и тот же `make_slug`).
+
 ## Инструменты-парсеры xlsx (`parser-excel`)
 
 Конфиг такого инструмента — папка с **async `get_parser(arg)`**, возвращающей

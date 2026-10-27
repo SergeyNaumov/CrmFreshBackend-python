@@ -87,6 +87,12 @@ url есть и не менялся → **не трогаем** (переиме�
 `LEFT JOIN in_ext_url` (`get_search_tables.py` подмешивает join, если в
 `fields` есть такое поле) — иначе колонка `in_ext_url__ext_url` была бы пустой.
 
+Живая подстановка при вводе заголовка — `field.frontend.ajax`
+(`{'name':'in_ext_url'}`), вешается автоматически в
+`lib/all_configs.read_config` (`chpu.setup_chpu_ajax`) на поле-источник;
+контроллер — `chpu.ajax_in_ext_url`, ответ `['in_ext_url', {'value': url}]`.
+Фронтовый движок — `src/components/js/edit_form.js`.
+
 Цепочка: `form.fields[].type` → `EditForm/FormBlock.vue` (`case '<type>'` →
 `field-<type>`) → `src/dynamic_component_loader.js`
 (`app.component('field-<type>', defineAsyncComponent(...))`). Компонент получает

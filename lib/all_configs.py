@@ -374,6 +374,11 @@ async def read_config(**arg):
     if 'permissions' in field:
       await field['permissions'](form,field)
 
+  # Конфиги с chpu_*: ajax-генерация ЧПУ в карточке (field.frontend.ajax →
+  # POST /ajax/<config>/in_ext_url), см. lib/CRM/chpu.py::setup_chpu_ajax.
+  from lib.CRM.chpu import setup_chpu_ajax
+  setup_chpu_ajax(form)
+
   form.default_config_attr(arg)
   form.set_orig_types()
   
