@@ -135,6 +135,35 @@ robots/sitemap: `/robots.txt` и `/sitemap.xml`, заданные в `files`,
 отдаёт запись из БД для `/robots.txt`, `/sitemap.xml`, `/AGENTS.md`, `/rrrxxx`,
 а без записи — прежний ответ (`Disallow: /` для demo-поддомена, 404 для прочих).
 
+## Стартовая страница svcmsmanager (StartPage)
+
+После логина в клиентской админке рендерится `components/svcmsManager/StartPage.vue`
+(домен/хостинг/SSL + карточки услуг, заявки — `POST /svcms/startpage/request`).
+Компонент подключается **не роутом**, а через `/mainpage`:
+`routes/mainpage/__init__.py` отдаёт `main_page_components` из конфига, а
+`MainPage.vue` рендерит их как `<component :is>`
+(`dynamic_component_loader.js` регистрирует `svcms-manager-start`).
+
+Поэтому одной сборки фронта недостаточно — в **серверном** конфиге менеджера
+должен быть ключ:
+
+```python
+'main_page_components':[
+  {'component':'svcms-manager-start','cols':12},
+],
+```
+
+На проде конфиг менеджера — `/var/www/svcms/manager/backend/config.py`
+(server-файл, репозиторный `config_svcms_manager.py` — дев-версия, на прод не
+заливается). Симптом отсутствия ключа: локально страница услуг есть, а на
+проде `/manager/` показывает только панель менеджера. Правка применена
+2026-10-27 (бэкап `/tmp/svcms_manager_config_bak_*.py`), после неё нужен
+рестарт `svcms.manager` (`config.py` не входит в `--reload-dir`).
+
+Данные ОП (`firm` и т.п.) подтягиваются из внешней CRM `strateg`
+(`connects.strateg` в конфиге). Если пула нет, `get_strateg_db()` возвращает
+`None` и карточка хостинга отдаётся без данных ОП (страница при этом работает).
+
 ## Константы магазина (Яндекс.Маркет)
 
 Сервис «Настройки сайта» (`ds_const`, таблица `const`) — статический список
