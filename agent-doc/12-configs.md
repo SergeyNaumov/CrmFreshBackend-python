@@ -148,9 +148,15 @@ form = {
   SEO-шаблон из констант (`seo_<сущность>_title|description|keywords`,
   плейсхолдеры `{header}`, `{orgname}` и др.), затем генерирует из заголовка
   (`sites/lib/dsengine/process_page.py::_set_seo`).
+- **Шапка — глобальная настройка проекта.** Вид шапки и строка поиска задаются
+  не на странице, а константами «Настройки сайта» (`ds_const`, вкладка
+  «Основное»): `header_layout` (select: `search-row` — по умолчанию,
+  `classic`, `two`, `center`, `minimal`, `mini`) и `header_search`
+  (`1`/`0`). Движок читает их из `cnst` (`sites/lib/dsengine/page.py`),
+  параметры блока `header` (`params.layout`/`params.search`) — только фолбэк
+  для проектов, где константа ещё не заполнена.
 - `work_table` — **чистое имя таблицы** (не подзапрос). Привязка к проекту —
-  через `events.py` → async `permissions`.
-- `work_table_id` — **один столбец** (`id`/`content_id`). Для
+  через `events.py` → async `permissions`.- `work_table_id` — **один столбец** (`id`/`content_id`). Для
   `ds_params_good` — суррогатный `id` (миграция 2026-10: PK=id + UNIQUE(param_id, good_id)).
 - `events.py` (шаблон):
 

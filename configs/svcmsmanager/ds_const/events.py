@@ -13,6 +13,11 @@ CONST_FIELDS = [
     ('main',   'email',         'E-mail',                         'text'),
     ('main',   'phones',        'Доп. телефоны (через запятую)',  'text'),
     ('main',   'work_time',     'Режим работы',                   'text'),
+    # Вид шапки и строка поиска — глобальные для всего проекта (одна шапка
+    # на всех страницах). Раньше задавались на каждой странице в блоке
+    # header; страницы читают эти значения (sites/lib/dsengine/page.py).
+    ('main',   'header_layout', 'Вид шапки',                      'select'),
+    ('main',   'header_search', 'Строка поиска в шапке',          'select'),
 
     ('addr',   'address',       'Адрес',                          'textarea'),
     ('addr',   'map_lat',       'Широта',                         'text'),
@@ -68,6 +73,27 @@ CONST_FIELDS = [
     ('tpl', 'seo_catalog_keywords',    'Рубрики каталога: Keywords',    'text'),
 ]
 
+# Значения для select-полей шапки (тип поля — 'select', значения — values).
+HEADER_LAYOUT_VALUES = [
+    {'v': 'search-row', 'd': 'С поиском в строке (лого + поиск, меню под ними)'},
+    {'v': 'classic',    'd': 'Классическая (меню в строке с лого, поиск ниже)'},
+    {'v': 'two',        'd': 'Двухстрочная (поиск в строке с лого)'},
+    {'v': 'center',     'd': 'Центрированная'},
+    {'v': 'minimal',    'd': 'Минимальная (без топбара и меню)'},
+    {'v': 'mini',       'd': 'Компактная (бургер, без поиска)'},
+]
+
+HEADER_SEARCH_VALUES = [
+    {'v': '1', 'd': 'Показывать'},
+    {'v': '0', 'd': 'Скрыть'},
+]
+
+# Дополнительные параметры полей по имени константы.
+FIELD_EXTRA = {
+    'header_layout': {'values': HEADER_LAYOUT_VALUES},
+    'header_search': {'values': HEADER_SEARCH_VALUES},
+}
+
 # Порядок табов.
 CONST_TABS = [
     ('main',   'Основное'),
@@ -84,10 +110,11 @@ async def permissions(form):
     project = form.request.state.project
     project_id = project['project_id']
 
-    form.fields = [
-        {'name': name, 'description': desc, 'type': ftype, 'tab': tab}
-        for tab, name, desc, ftype in CONST_FIELDS
-    ]
+    form.fields = []
+    for tab, name, desc, ftype in CONST_FIELDS:
+        field = {'name': name, 'description': desc, 'type': ftype, 'tab': tab}
+        field.update(FIELD_EXTRA.get(name) or {})
+        form.fields.append(field)
     form.tabs = [{'name': name, 'description': desc} for name, desc in CONST_TABS]
 
     form.filedir = f"./files/project_{project_id}"
