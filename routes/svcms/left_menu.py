@@ -19,6 +19,35 @@ import json
 
 
 
+# «Файлы для поисковиков»: произвольные файлы домена из таблицы files
+# (/robots.txt, /sitemap.xml, /AGENTS.md, /rrrxxx …). Общий пункт для всех
+# проектов svcmsmanager — конфиг `files` (как в легаси-менеджере), записи
+# считаются по текущему project_id (conf/files/events.py).
+FILES_MENU_ITEM={
+  'header':'Файлы для поисковиков',
+  'value':'admin-table',
+  'type':'vue',
+  'child':[],
+  'icon':'fa fa-file-code',
+  'params':{'config':'files'},
+}
+
+# Имена конфигов того же сервиса у старых проектов (left_menu.py):
+# `robot_files` (5794) и `find_files` (5759) — встроенный пункт не дублируем.
+FILES_CONFIG_NAMES=('files','robot_files','find_files')
+
+
+def _menu_configs(items):
+  """Все config в пунктах меню (рекурсивно по child)."""
+  found=set()
+  for m in items or []:
+    cfg=(m.get('params') or {}).get('config')
+    if cfg:
+      found.add(cfg)
+    found|=_menu_configs(m.get('child'))
+  return found
+
+
 async def left_menu(request: Request):
   s = request.state.engine
   errors=[]
@@ -134,7 +163,16 @@ async def left_menu(request: Request):
       else: # фолбэк: прежний источник (struct_public + project_menu)
         left_menu_data.append(await get_standart_service(request,errors))
         left_menu_data.append(await get_extended_service(request,errors))
-    
+
+  # «Файлы для поисковиков» — встроенный пункт (таблица files, config `files`)
+  # сразу после «API и интеграции». Если проектный left_menu.py уже объявляет
+  # сервис файлов (files/robot_files/find_files, в т.ч. внутри группы) —
+  # встроенный не добавляем.
+  menu_configs=_menu_configs(left_menu_data)
+  if not (menu_configs & set(FILES_CONFIG_NAMES)):
+    idx=next((i+1 for i,m in enumerate(left_menu_data)
+              if m.get('value')=='ds-api'), len(left_menu_data))
+    left_menu_data.insert(idx, dict(FILES_MENU_ITEM))
 
   manager= await s.db.query(
     query='select manager_id id,login from manager where login=%s',

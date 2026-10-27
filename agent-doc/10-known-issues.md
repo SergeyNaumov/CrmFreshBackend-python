@@ -121,6 +121,20 @@
   ошибка и `list:null` у select-автокомплита. `limit` добавляется один раз.
 - В `get_list` добавлен финальный `return []` (раньше мог вернуться `None`).
 
+## Исправлено (2026-10-27): `FastAPI(Debug=True)` роняет воркер
+
+- `main.py` создавал приложение как `FastAPI(Debug=True)`. В старых FastAPI
+  лишние kwargs попадали в `**extra` (работало), в новых (прод-venv,
+  python3.13) — `TypeError: FastAPI.__init__() got an unexpected keyword
+  argument 'Debug'`, и uvicorn-воркер падает **на импорте** `main.py`.
+- Симптом: systemd показывает `active`, порт слушается, но ответы не идут
+  (`curl` → 000); в журнале — трейсбек импорта. Особенно коварно на проде:
+  процесс мог быть запущен до обновления venv и работать «на старом коде», а
+  первый же reload (touch в `lib/`) роняет все сайты.
+- Правильно: `app = FastAPI(debug=True)` (и в `sites/main.py` движка).
+  Проверка после деплоя/обновления venv: `curl -H 'Host: <домен>'
+  http://127.0.0.1:<port>/` → 200.
+
 ## Прочее по проекту
 
 - `requirements.txt` — полный `pip freeze`, не минимальный набор.

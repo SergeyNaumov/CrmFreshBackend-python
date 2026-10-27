@@ -79,6 +79,10 @@ TABLES = {
   'ds_news': dict(order=160, title='Новости', natural_key=None),
   'ds_reviews': dict(order=170, title='Отзывы', natural_key=None),
   'ds_text': dict(order=180, title='Текстовые страницы', natural_key=['url']),
+  # Произвольные файлы домена (сервис «Файлы для поисковиков»): robots.txt,
+  # sitemap.xml, AGENTS.md и прочее. Содержимое живёт в БД, поэтому переносится
+  # вместе с проектом; ключ — url внутри проекта.
+  'files': dict(order=185, title='Файлы для поисковиков', natural_key=['url']),
   'ds_doc': dict(order=190, title='Документы', natural_key=None),
   # const -- «Настройки сайта», уникальный ключ (name, project_id)
   # const -- «Настройки сайта», уникальный ключ (name, project_id)

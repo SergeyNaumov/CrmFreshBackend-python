@@ -7,7 +7,7 @@ set -euo pipefail
 
 # ---------- Настройки ----------
 REMOTE_USER="naumov"
-REMOTE_HOST="178.57.220.192"
+REMOTE_HOST="185.76.252.12"
 REMOTE_PORT="7725"
 REMOTE_BASE="/var/www/svcms/admin/backend"
 

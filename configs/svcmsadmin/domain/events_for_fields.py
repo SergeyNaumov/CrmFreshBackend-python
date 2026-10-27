@@ -65,7 +65,7 @@ async def whois_before_code(form, field):
 
 # Легаси domain.pl: этапы Lets Encrypt под полем SSL.
 # cur_step берётся из domain.lets_encrypt_status (0..5).
-LETS_ENCRYPT_ADDR = '178.57.220.192'
+LETS_ENCRYPT_ADDR = '185.76.252.12'
 
 
 async def ssl_steps_before_code(form, field):

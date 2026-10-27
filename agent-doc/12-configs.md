@@ -130,9 +130,13 @@ form = {
 
 Общие (не проектные) конфиги конструктора — `ds_*` — живут в
 `configs/svcmsmanager/`; в репозитории это **симлинки**, а канон-файлы физически
-лежат в `/var/www/svcms-async/manager/backend/conf/ds_*/` — именно их читает
-движок сайта. Дублировать `ds_*` в `conf_projects/project_<id>/` **нельзя**:
-project-папка в `read_config` имеет приоритет и затенит общий конфиг.
+лежат в `/var/www/svcms/manager/backend/conf/ds_*/` (дев-путь) — именно их
+читает движок сайта; на проде рантайм менеджера читает
+`/var/www/svcms/manager/backend/conf/ds_*/`. Так же сделаны `promo` и
+`files` («Файлы для поисковиков», таблица `files`; `robot_files` — симлинк на
+`files` для проекта 5794). Дублировать `ds_*` в
+`conf_projects/project_<id>/` **нельзя**: project-папка в `read_config` имеет
+приоритет и затенит общий конфиг.
 
 Эталонный конфиг конструкторного проекта (см. `conf_projects/project_5830/`,
 а также каноны `conf/ds_*/` в движке сайта):

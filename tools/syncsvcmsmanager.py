@@ -9,8 +9,9 @@ tools/syncsvcmsmanager.py — синхронизация кода менедже
   conf_projects/  -> {base}/conf_projects/   (только с флагом --projects)
 
 Не трогает config.py / config_*.py (их нет внутри lib|routes), conf/ и БД.
-Приёмник по умолчанию: /var/www/svcms-async/manager/backend
-(тот же каталог, что /var/www/svcms/manager/backend на проде).
+Приёмник по умолчанию: /var/www/svcms/manager/backend — это рантайм менеджера
+на проде (WorkingDirectory svcms.manager). /var/www/svcms-async/manager/backend
+там НЕ читается (дерево движка отдельное).
 
 Примеры:
   ./tools/syncsvcmsmanager.py --dry-run
@@ -35,12 +36,12 @@ def main() -> int:
   parser = argparse.ArgumentParser(
     description='Синхронизация кода svcms-manager (lib/routes[/conf_projects]) на прод.',
   )
-  parser.add_argument('--host', default=os.environ.get('SSH_HOST', '178.57.220.192'))
+  parser.add_argument('--host', default=os.environ.get('SSH_HOST', '185.76.252.12'))
   parser.add_argument('--port', default=os.environ.get('SSH_PORT', '7725'))
   parser.add_argument('--user', default=os.environ.get('SSH_USER', 'naumov'))
   parser.add_argument(
     '--base',
-    default=os.environ.get('REMOTE_BASE', '/var/www/svcms-async/manager/backend'),
+    default=os.environ.get('REMOTE_BASE', '/var/www/svcms/manager/backend'),
     help='каталог backend менеджера на сервере',
   )
   parser.add_argument('--projects', action='store_true',

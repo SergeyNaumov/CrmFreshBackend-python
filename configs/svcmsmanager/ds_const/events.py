@@ -28,6 +28,12 @@ CONST_FIELDS = [
     ('seo',    'counter',       'Счётчики сайта',                 'textarea'),
     ('seo',    'copyright',     'Копирайт',                       'text'),
 
+    # Яндекс.Маркет: значения уходят в автогенерируемый /catalog.yml
+    # (sites/lib/seo_files.py::catalog_yml), в коде ничего не хардкодим.
+    ('shop',   'delivery_cost', 'Стоимость доставки, ₽ (catalog.yml; пусто — доставку не выгружать)', 'text'),
+    ('shop',   'delivery_days', 'Срок доставки (например 1-3)',   'text'),
+    ('shop',   'pickup',        'Самовывоз: 1 — да, 0 — нет',     'text'),
+
     ('req',    'legal_name',    'Полное наименование',            'text'),
     ('req',    'short_name',    'Сокращённое наименование',       'text'),
     ('req',    'inn',           'ИНН',                            'text'),
@@ -48,6 +54,7 @@ CONST_TABS = [
     ('addr',   'Адрес и карта'),
     ('social', 'Соцсети'),
     ('seo',    'Счётчики и SEO'),
+    ('shop',   'Магазин (Яндекс.Маркет)'),
     ('req',    'Реквизиты'),
 ]
 

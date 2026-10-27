@@ -6,7 +6,7 @@ from .common import require_permission
 
 router = APIRouter()
 
-LETS_ENCRYPT_ADDR = '178.57.220.192'
+LETS_ENCRYPT_ADDR = '185.76.252.12'
 
 
 # Легаси domain.pl action=lets_enctypt1: пересоздать A-записи домена

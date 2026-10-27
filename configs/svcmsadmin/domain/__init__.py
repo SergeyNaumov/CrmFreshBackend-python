@@ -162,7 +162,7 @@ form={
           'name':'value',
           # быстрые кнопки IP (legacy field_a_records.pl: our_ip)
           'values':[
-            {'v':'178.57.220.192','d':'w01'},
+            {'v':'185.76.252.12','d':'w01'},
             {'v':'185.76.252.13','d':'w02_n'},
           ],
         },
@@ -194,7 +194,7 @@ form={
               'label':'spf для stg_w01',
               'values':{
                 'domain':'<%domain%>',
-                'value':'v=spf1 ip4:178.57.220.192 ~all',
+                'value':'v=spf1 ip4:185.76.252.12 ~all',
               },
             },
             {

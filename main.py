@@ -9,7 +9,7 @@ from config import config
 from db import get_db, get_strateg_db
 
 # uvicorn main:app --reload --port=5000
-app = FastAPI(Debug=True)
+app = FastAPI(debug=True)
 
 # Локальная отладка: фронт (vite/webpack dev-server) живёт на 127.0.0.1:8081 или
 # localhost:8081, поэтому перечислять порты списком бессмысленно -- vite меняет

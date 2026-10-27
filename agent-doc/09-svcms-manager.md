@@ -7,32 +7,30 @@ Engine — в `02-engine.md`.
 
 | Что | Дев | Прод |
 |---|---|---|
-| MySQL `svcms` | `localhost` (`config_*.py` → `connects.crm_*`) | **`185.76.252.12`** (user `svcms`, пароль пустой) |
-| Web/движок сайтов | локально | `naumov@178.57.220.192:7725`, движок в `/var/www/svcms-async/sites` |
+| MySQL `svcms` | `localhost` (`config_*.py` → `connects.crm_*`) | **`localhost`** (`mysql -u svcms svcms` на прод-хосте; user `svcms`, пароль пустой) |
+| Web/движок сайтов | локально | `naumov@185.76.252.12` (ssh `-p7725`), движок в `/var/www/svcms-async/sites` |
 | Бэкенд админки | `:5000` (`config_svcms_admin`) | `/var/www/svcms/admin/backend`, сервис `svcms.admin` (`:3011`), фронт `admin3.design-b2b.com` |
 
-`host` задаётся в конфиге **на сервере** и в репозитории остаётся `localhost`
-(дев-значение). Движок сайтов держит свой адрес БД в
-`sites/lib/config.py` — деплой `tools/sync_engine_to_prod.sh` из репо
-`svcms-async` его **не заливает** (`--exclude='config.py'`); заливка `localhost`
-на прод роняет все сайты (см. `agent-doc/18_prod_runtime.md` в репо `svcms-async`).
+`host` задаётся в конфиге **на сервере**; после переезда прода там снова
+`localhost`, т.е. совпадает с репозиторным (дев) значением. Движок сайтов держит
+свой адрес БД в `sites/lib/config.py` — деплой `tools/sync_engine_to_prod.sh` из
+репо `svcms-async` его **не заливает** (`--exclude='config.py'`). Правило
+оставляем: конфиг на сервере — серверный файл, не перезаписывать
+(см. `agent-doc/18_prod_runtime.md` в репо `svcms-async`).
 
-### На прод-хосте две MySQL — работать только с `185.76.252.12`
+### Прод-хост — `185.76.252.12`, MySQL на нём локальная
 
-На `178.57.220.192` локально поднят старый mysqld с базой `svcms` — это
-**устаревшая копия**, её не использует ни один конфиг (менеджер, движок и
-админка смотрят на `185.76.252.12`, `@@hostname = stg-web01-new`).
+С 2026-10 прод переехал: ssh — `ssh -p7725 naumov@185.76.252.12`, на этот же IP
+указывают DNS всех доменов (`demo1.digitalstrateg.ru`, `admin3.design-b2b.com`,
+`crm.digitalstrateg.ru`, …). База `svcms` снова живёт **на самом прод-хосте**:
 
-- `mysql -u svcms svcms` **без `-h`** (сокет/`127.0.0.1`) идёт в локальную
-  копию, а не в прод → миграции «применяются», но ничего не меняют.
-  Всегда указывать `-h 185.76.252.12`.
-- Сверка 2026-10-18: `ds_good` (503), `const` (62123), `domain` (7818),
-  `ds_zakaz` (5) совпадали, но локальная копия отставала по `ds_news`
-  (MAX(id) 308 против 314) и не имела миграций `ds_options.parent_id/note`
-  (31 опция против 33).
-- Локальную копию не трогаем и не синкаем: источник истины — только
-  `185.76.252.12`. `sync/pull_from_prod.sh` при этом дампит `127.0.0.1`
-  (устаревшая ветка скрипта) — для актуальных данных брать `-h 185.76.252.12`.
+- внутри прод-хоста: `mysql -u svcms svcms` (сокет, **без `-h`**);
+- конфиги на проде (менеджер, движок, админка): `host = 'localhost'`;
+- снаружи БД не слушает — дампы/миграции только через ssh;
+- прежняя схема (web-хост `178.57.220.192` + БД по `-h 185.76.252.12`) устарела:
+  не возвращать `-h 185.76.252.12`/`-h127.0.0.1` в скрипты и доки.
+- IP-адреса в конфигах админки (`LETS_ENCRYPT_ADDR`, шаблон DNS/SPF при
+  создании домена) — тоже `185.76.252.12`.
 
 ## Контракт request state (обязателен здесь)
 
@@ -80,9 +78,80 @@ Engine — в `02-engine.md`.
   `owner`, ...). Загружаются `read_config` через
   `load_form_from_dir('./conf_projects/project_<id>', ...)`.
 - `configs/svcmsmanager/**` (bottom_menu, top_menu_tree, bot_rules, content,
-  promo, robot_files, find_files, wysiwyg_template) — БД-аватары инструментов.
-  Как fallback **не загружаются** (`config_folder` в конфиге не задан), правки
-  там пока ни на что не влияют — но правила выше соблюдать.
+  promo, `files`/`robot_files`, find_files, wysiwyg_template) — **общие** конфиги
+  инструментов (`config_folder: 'configs/svcmsmanager'` в
+  `config_svcms_manager.py`). Загружаются, если у проекта нет своей папки
+  `conf_projects/project_<id>/<config>/`. Часть из них (`ds_*`, `promo`,
+  `files`, `robot_files`) — симлинки на канон в движке
+  `svcms-async/manager/backend/conf/` (дев-путь). На проде `config_folder` в
+  `config.py` не задан → читается `conf` рабочего каталога
+  `/var/www/svcms/manager/backend/conf/` — общий конфиг заливать туда.
+
+## Файлы для поисковиков (таблица `files`)
+
+Сервис в меню manager: **«Файлы для поисковиков»** — пункт встроен в базовое
+левое меню (`routes/svcms/left_menu.py`, `FILES_MENU_ITEM`) для всех проектов;
+конфиг называется **`files`** — как в легаси-менеджере
+(`admin_table.pl?config=files`, «Файлы на сайте»). Таблица `files`:
+`id, url, body, project_id, type`), записи фильтруются по текущему
+`project_id` (`conf/files/events.py: permissions`).
+
+Имена-синонимы: `robot_files` (его использует проект 5794) — **симлинк** на
+каталог `files`; `find_files` (5759) — свой legacy-конфиг, не трогаем.
+
+Канон конфига — в движке: `svcms-async/manager/backend/conf/files/`
+(как `ds_*` и `promo`), в этом репозитории
+`configs/svcmsmanager/files` и `configs/svcmsmanager/robot_files` — **симлинки**
+на него. На проде рантайм менеджера — `/var/www/svcms/manager/backend`
+(`WorkingDirectory` юнита `svcms.manager`), поэтому общий конфиг заливается в
+`/var/www/svcms/manager/backend/conf/files/` (`config_folder` на проде
+не задан → по умолчанию `conf`).
+
+Зачем: администратор размещает **произвольный контент файлов домена** —
+`/robots.txt`, `/sitemap.xml`, `/AGENTS.md`, `/ads.txt`, `/rrrxxx` и т.п.
+Движок (`svcms-async`, `sites/lib/server_files.py`) отдаёт их **раньше** штатных
+robots/sitemap: `/robots.txt` и `/sitemap.xml`, заданные в `files`,
+переопределяют автогенерацию (`lib/seo_files.py` / `for_robots_id`).
+Если записи в `files` нет — работает прежнее поведение (авто-robots/sitemap,
+иначе обычная страница/404).
+
+Правила заполнения:
+
+- `url` — путь с ведущего слэша (`/robots.txt`); расширение не обязательно
+  (`/rrrxxx`, `/ads`, `/AGENTS` тоже работают — движок проверяет любой путь,
+  кроме корня); events нормализуют значение и **не дают создать дубль**
+  `(project_id, url)` — в таблице нет уникального ключа;
+- `type` (MIME) — необязателен: пусто → по расширению (`.html`/`.htm` →
+  `text/html`, `.xml` → `application/xml`, `.md` → `text/markdown`, иначе
+  `text/plain`), для `text/*` движок дописывает `charset=utf-8`;
+- `body` — содержимое как есть (textarea в форме, в списке — экранированный
+  фрагмент, без inline-редактора);
+- `tree_use`/`sort` у `files` нет (плоская таблица) — в конфиге выключены,
+  иначе каскадное удаление ищет несуществующий `parent_id`.
+
+Проверено на деве (Host `demo1.digitalstrateg.ru`): `get-filters`/`get-result`
+(`files` и `robot_files`), insert (url нормализуется, `project_id`
+проставляется), дубль и пустой url отклоняются, edit/delete работают; движок
+отдаёт запись из БД для `/robots.txt`, `/sitemap.xml`, `/AGENTS.md`, `/rrrxxx`,
+а без записи — прежний ответ (`Disallow: /` для demo-поддомена, 404 для прочих).
+
+## Константы магазина (Яндекс.Маркет)
+
+Сервис «Настройки сайта» (`ds_const`, таблица `const`) — статический список
+полей в `configs/svcmsmanager/ds_const/events.py`. Для автогенерируемого
+`/catalog.yml` (движок `sites/lib/seo_files.py::catalog_yml`, см.
+`svcms-async/agent-doc/06_seo.md`) добавлен таб **«Магазин (Яндекс.Маркет)»**:
+
+| Константа | Что задаёт |
+|---|---|
+| `delivery_cost` | стоимость доставки, ₽; пусто — блок доставки в YML не выгружается, `0` — бесплатная |
+| `delivery_days` | срок доставки (`1-3`) — атрибут `days` у `<option>` (опционально) |
+| `pickup` | самовывоз: `1`/`да` → `<pickup>true</pickup>` |
+
+Значения — **per-project** (строка в `const` с `project_id`), в коде ничего не
+хардкодится. Имена должны быть и в `template_const` шаблона DS (иначе движок не
+попадёт ими в `cnst`, `lib/dsengine/__init__.py::get_const` фильтрует по
+`template_const`), поэтому для шаблона `2026/ds-constructor` они заведены там же.
 
 ## Импорт / экспорт данных проекта
 
