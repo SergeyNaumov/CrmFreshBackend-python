@@ -141,6 +141,11 @@ form = {
 Эталонный конфиг конструкторного проекта (см. `conf_projects/project_5830/`,
 а также каноны `conf/ds_*/` в движке сайта):
 
+- SEO-поля карточки: `promo_title` / `promo_description` / `promo_keywords`
+  (колонки есть в `ds_news`, `ds_article`, `ds_good`, `ds_service`,
+  `ds_catalog`; в форме — «Title/Description/Keywords (SEO)»). Пусто → движок
+  сайта берёт `promo` из таблицы `promo`, затем генерирует из заголовка
+  (`sites/lib/dsengine/process_page.py::_set_seo`).
 - `work_table` — **чистое имя таблицы** (не подзапрос). Привязка к проекту —
   через `events.py` → async `permissions`.
 - `work_table_id` — **один столбец** (`id`/`content_id`). Для
