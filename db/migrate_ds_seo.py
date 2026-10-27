@@ -27,7 +27,13 @@ import asyncio
 
 from config import config
 from db.freshdb import FreshDB
-from configs.svcmsmanager.ds_const.events import CONST_FIELDS
+
+# В репозитории конфиги лежат в configs/svcmsmanager/, в рантайме на проде —
+# в conf/ (config_folder у config.py). Импортируем то, что есть.
+try:
+    from configs.svcmsmanager.ds_const.events import CONST_FIELDS
+except ImportError:  # рантайм-раскладка (conf/)
+    from conf.ds_const.events import CONST_FIELDS
 
 TABLES = ('ds_news', 'ds_article', 'ds_good', 'ds_service', 'ds_catalog')
 
