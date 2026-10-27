@@ -127,6 +127,13 @@ def get_search_where(form,query):
 
 
 
+      elif f['type']=='in_ext_url':
+        # ЧПУ живёт в отдельной таблице (JOIN in_ext_url из get_search_tables).
+        v=values
+        if v:
+          WHERE.append('(in_ext_url.ext_url LIKE %s)')
+          VALUES.append('%'+str(v)+'%')
+
       elif f['type'] in ('text','textarea','email','filter_extend_text'):
 
         v=values

@@ -68,6 +68,24 @@ font-awesome, file, codelist`.
 | `project_sitemap` | `ProjectSitemap.vue` | карта сайта проекта |
 | `domain_sync` | `DomainSync.vue` | перенос/копирование настроек конструктора на другой домен |
 | `page_blocks` | редактор блоков | блоки страницы (конфиги DS) |
+| `in_ext_url` | `fields/in_ext_url.vue` | ЧПУ записи (текст) — читается/пишется в `in_ext_url` |
+
+### `in_ext_url` — ЧПУ в карточке
+
+Поле не колонка `wt`: значение читается из `in_ext_url` по шаблону `in_url`
+(`lib/CRM/form/get_values.py::get_in_ext_url`) и переопределяет авто-slug.
+
+```python
+{'description':'URL (ЧПУ)','type':'in_ext_url','name':'in_ext_url','in_url':'/news/<%id%>'},
+```
+
+Правила записи (`lib/CRM/chpu.py::save_chpu_for_form`, только для конфигов с
+`chpu_*`): ввели новое значение → сохраняем его (транслит + дедуп); очистили →
+генерируем из `chpu_dependence_field`; url ещё нет (новая запись) → генерируем;
+url есть и не менялся → **не трогаем** (переименование заголовка не ломает
+проиндексированный адрес). В списках/фильтрах поле работает через
+`LEFT JOIN in_ext_url` (`get_search_tables.py` подмешивает join, если в
+`fields` есть такое поле) — иначе колонка `in_ext_url__ext_url` была бы пустой.
 
 Цепочка: `form.fields[].type` → `EditForm/FormBlock.vue` (`case '<type>'` →
 `field-<type>`) → `src/dynamic_component_loader.js`

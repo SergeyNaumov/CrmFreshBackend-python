@@ -186,7 +186,10 @@ async def save_form(form,arg):
     #elif f['type']=='1_to_1_text':
     #
     elif f['type']=='in_ext_url':
-        save_in_ext_url(form,f,value)
+        # Конфиги с chpu_* управляют ЧПУ централизованно (lib/CRM/chpu.py):
+        # поле только показывает url, запись делает save_chpu_for_form выше.
+        if not getattr(form,'chpu_in_url',None):
+          await save_in_ext_url(form,f,value)
 
   # события после сохранения формы
   if form.success():

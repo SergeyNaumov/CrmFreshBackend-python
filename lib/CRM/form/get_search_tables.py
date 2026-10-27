@@ -19,14 +19,35 @@ def adding_select_fields_in_desc(form,db_field,t):
 
 async def get_search_tables(form,query):
   TABLES=[]
-  #if not form.QUERY_SEARCH and len(form.QUERY_SEARCH_TABLES):
-    # for f in form.fields:
-    #   if 0 and f.type == 'in_ext_url':
-    #      in_ext_url=f['in_url']
   if not len(form.QUERY_SEARCH_TABLES):
     form.QUERY_SEARCH_TABLES=[
       {'t':form.work_table,'a':'wt'}
     ]
+
+  # Поле ЧПУ (type=in_ext_url) участвует и в списке, и в фильтрах: подмешиваем
+  # LEFT JOIN in_ext_url, чтобы отдать колонку in_ext_url__ext_url
+  # (process_result_list) и дать фильтр по ext_url (get_search_where).
+  if not any((t.get('a') or t.get('alias'))=='in_ext_url'
+             for t in form.QUERY_SEARCH_TABLES):
+    chpu_field=next((f for f in (form.fields or [])
+                     if f.get('type')=='in_ext_url' and f.get('in_url')),None)
+    if chpu_field:
+      # '<%id%>' в шаблоне заменяем на wt.id через CONCAT (без литерала '%':
+      # строка запроса потом проходит через python-форматирование).
+      pre,_,post=str(chpu_field['in_url']).partition('<%id%>')
+      pre=pre.replace("'","''").replace('%','%%')
+      post=post.replace("'","''").replace('%','%%')
+      if post:
+        in_url_expr="CONCAT('%s', wt.id, '%s')" % (pre,post)
+      else:
+        in_url_expr="CONCAT('%s', wt.id)" % pre
+      form.QUERY_SEARCH_TABLES.append({
+        't':'in_ext_url','a':'in_ext_url','lj':1,
+        'l':("in_ext_url.project_id=wt.project_id AND "
+             "in_ext_url.in_url="+in_url_expr),
+        'select_fields':['ext_url'],
+      })
+
   aliases_on={'wt':1}
   for t in form.QUERY_SEARCH_TABLES:
     t_str=''

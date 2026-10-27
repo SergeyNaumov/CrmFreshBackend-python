@@ -65,12 +65,33 @@ async def generate_ext_url(form, header, prefix='', project_id=None, exclude_in_
     url = make_slug(header, prefix)
     if not url:
         return ''
+    return await unique_ext_url(form, url, project_id, exclude_in_url)
+
+
+async def unique_ext_url(form, url, project_id=None, exclude_in_url=''):
+    """Дедуп готового внешнего url: коллизия в проекте → -1/-2/-3."""
     if await check_exists(form, url, project_id, exclude_in_url):
         n = 1
         while await check_exists(form, url + '-' + str(n), project_id, exclude_in_url):
             n += 1
         url = url + '-' + str(n)
     return url
+
+
+def normalize_ext_url(value, prefix=''):
+    """Ручной ввод ЧПУ → канонический вид '/news/moj-slug'.
+
+    Принимает 'slug', 'moj slug', '/news/moj-slug', '/news/мой-заголовок'.
+    Каждый сегмент прогоняется через ту же транслитерацию, что и авто-slug.
+    """
+    text = str(value or '').strip()
+    if not text:
+        return ''
+    if not text.startswith('/'):
+        text = (prefix or '/') + text
+    segments = [make_slug(seg) for seg in text.strip('/').split('/')]
+    segments = [seg for seg in segments if seg]
+    return '/' + '/'.join(segments) if segments else ''
 
 
 async def save_chpu(form, in_url, ext_url, project_id):
@@ -94,7 +115,17 @@ async def save_chpu(form, in_url, ext_url, project_id):
 
 
 async def save_chpu_for_form(form):
-    """Вызывается из save_form: пишет ЧПУ по атрибутам конфига chpu_*."""
+    """Вызывается из save_form: пишет ЧПУ по атрибутам конфига chpu_*.
+
+    Правила:
+      * поле `type=in_ext_url` есть и пользователь изменил значение →
+        сохраняем введённый url (транслит/санитайз + дедуп);
+      * поле очистили → возвращаем авто-slug из `chpu_dependence_field`;
+      * url ещё нет (новая запись) → генерируем из `chpu_dependence_field`;
+      * url уже есть и не менялся → НЕ трогаем: переименование заголовка не
+        должно молча ломать проиндексированный адрес (меняется только руками
+        или очисткой поля).
+    """
     in_url_tpl = getattr(form, 'chpu_in_url', '') or ''
     if not in_url_tpl or not getattr(form, 'id', None):
         return
@@ -102,10 +133,39 @@ async def save_chpu_for_form(form):
     dep = getattr(form, 'chpu_dependence_field', 'header') or 'header'
     project_id = getattr(form, 'foreign_key_value', None)
 
-    header = None
-    new_values = getattr(form, 'new_values', None)
-    if isinstance(new_values, dict):
-        header = new_values.get(dep)
+    in_url = in_url_tpl.replace('<%id%>', str(form.id))
+    new_values = getattr(form, 'new_values', None) or {}
+    if not isinstance(new_values, dict):
+        new_values = {}
+
+    has_project = project_id not in (None, '', 0, '0')
+    stored = await form.db.query(
+        query='SELECT ext_url FROM in_ext_url WHERE in_url=%s'
+              + (' AND project_id=%s' if has_project else ''),
+        values=[in_url] + ([project_id] if has_project else []),
+        onevalue=1, errors=[],
+    )
+
+    submitted = None
+    for f in (getattr(form, 'fields', None) or []):
+        if f.get('type') == 'in_ext_url' and f.get('name') in new_values:
+            value = new_values.get(f.get('name'))
+            submitted = '' if value is None else str(value).strip()
+            break
+
+    # Изменили url вручную — сохраняем как ввели.
+    if submitted and submitted != (stored or ''):
+        ext_url = normalize_ext_url(submitted, prefix)
+        if ext_url:
+            ext_url = await unique_ext_url(form, ext_url, project_id, in_url)
+            await save_chpu(form, in_url, ext_url, project_id)
+        return
+
+    # Есть url и его не меняли (в т.ч. просто переименовали заголовок) — не трогаем.
+    if stored and submitted is not None and submitted == stored:
+        return
+
+    header = new_values.get(dep)
     if not header and getattr(form, 'db', None) and getattr(form, 'work_table', ''):
         header = await form.db.query(
             query=f'SELECT {dep} FROM {form.work_table} WHERE {form.work_table_id}=%s',
@@ -114,7 +174,6 @@ async def save_chpu_for_form(form):
     if not header:
         return
 
-    in_url = in_url_tpl.replace('<%id%>', str(form.id))
     ext_url = await generate_ext_url(
         form, header, prefix=prefix, project_id=project_id, exclude_in_url=in_url)
     await save_chpu(form, in_url, ext_url, project_id)

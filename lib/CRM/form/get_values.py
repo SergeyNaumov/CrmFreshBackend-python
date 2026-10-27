@@ -5,7 +5,27 @@ from .multiconnect_old import parse_extended
 
 
 async def get_in_ext_url(form,f):
-  print('get_in_ext_url не готова')
+  """Текущее ЧПУ записи из in_ext_url для поля type=in_ext_url (edit-форма).
+
+  Конфиг поля задаёт `in_url` с плейсхолдером `<%id%>` (напр. '/news/<%id%>'),
+  значение берём по (project_id, in_url). Новых записей ещё нет — вернётся ''.
+  """
+  f['value']=''
+  in_url_tpl=f.get('in_url') or ''
+  if not (form.id and in_url_tpl):
+    return
+  in_url=str(in_url_tpl).replace('<%id%>',str(form.id))
+  project_id=f.get('foreign_key_value')
+  if project_id in (None,'',0,'0'):
+    project_id=getattr(form,'foreign_key_value',None)
+  where='in_url=%s'
+  values=[in_url]
+  if project_id not in (None,'',0,'0'):
+    where+=' AND project_id=%s'
+    values.append(project_id)
+  f['value']=await form.db.query(
+    query=f'SELECT ext_url FROM in_ext_url WHERE {where}',
+    values=values, onevalue=1, errors=[]) or ''
 
 
 async def field_default(form, f):
@@ -142,7 +162,7 @@ async def func_get_values(form):
           f['value']=''
 
 
-      if f['type']=='get_in_ext_url':
+      if f['type'] in ('in_ext_url','get_in_ext_url'):
         await get_in_ext_url(form,f)
         #values[name]=f['value']
 
@@ -169,7 +189,7 @@ async def func_get_fields_values(form):
     if f['type'] == '1_to_m':
       await get_1_to_m_data(form,f)
 
-    elif f['type']=='get_in_ext_url':
+    elif f['type'] in ('in_ext_url','get_in_ext_url'):
       await get_in_ext_url(form,f)
     elif exists_arg('orig_type',f) in ['select_from_table','filter_extend_select_from_table']:
       #print(f"name: {f['name']}")
