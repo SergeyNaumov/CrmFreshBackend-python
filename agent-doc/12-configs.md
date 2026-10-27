@@ -193,6 +193,43 @@ async def permissions(form):
 - Названия конфигов соответствуют таблицам: `ds_news`, `ds_article`, `ds_brands`
   и т.д. (в отличие от старых `content`, `top_menu_tree`).
 
+## ЧПУ (`in_ext_url`) в конфигах `ds_*`
+
+У всех пяти «страничных» сущностей DS-сайта — `ds_catalog`, `ds_good`,
+`ds_service`, `ds_news`, `ds_article` — в конфиге заданы три атрибута верхнего
+уровня (`form`-dict), по которым `lib/CRM/chpu.py` пишет slug в
+`in_ext_url(project_id, in_url, ext_url)` при сохранении и при добавлении в
+админ-дереве:
+
+```python
+'chpu_in_url':'/news/<%id%>',        # внутренний url (как его знает движок)
+'chpu_prefix':'/news/',              # префикс внешнего url
+'chpu_dependence_field':'header',    # из какого поля брать текст для slug
+```
+
+| Конфиг | `chpu_in_url` | `chpu_prefix` |
+|---|---|---|
+| `ds_catalog` | `/catalog/<%id%>` | `/catalog/` |
+| `ds_good` | `/good/<%id%>` | `/good/` |
+| `ds_service` | `/service/<%id%>` | `/service/` |
+| `ds_news` | `/news/<%id%>` | `/news/` |
+| `ds_article` | `/article/<%id%>` | `/article/` |
+
+Вызовы: `lib/CRM/form/save_form.py` (`save_chpu_for_form`, после save) и
+`routes/admin_tree/admin_tree_run.py` (после insert в дереве). Без этих
+атрибутов запись сохраняется, но ЧПУ не обновляется — на сайте остаётся
+цифровой адрес (`/news/17`), хотя движок умеет отдавать slug, если строка в
+`in_ext_url` есть.
+
+Транслитерация в `chpu.py` — **зеркало** `tools/export_to_mysql.py::TRANSLIT_MAP`
+(репозиторий `svcms-templates`: `dump_from_json.py --aux`, `gen_chpu.py`).
+Менять только синхронно в обоих местах, иначе правка заголовка в админке
+перегенерирует slug по другим правилам (`ч→cz` вместо `ch`) и уже
+проиндексированные адреса начнут 404.
+
+Массовая (пере)сборка ЧПУ из БД (для проектов, залитых до появления ключей, или
+после импорта) — `python3 tools/gen_chpu.py --project <id>` в `svcms-templates`.
+
 ## Инструменты-парсеры xlsx (`parser-excel`)
 
 Конфиг такого инструмента — папка с **async `get_parser(arg)`**, возвращающей
