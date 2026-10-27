@@ -7,6 +7,7 @@ CONST_FIELDS = [
     ('main',   'orgname',       'Название компании',              'text'),
     ('main',   'slogan',        'Слоган',                         'text'),
     ('main',   'logo',          'Логотип',                        'file'),
+    ('main',   'favicon',       'Favicon (иконка сайта, .svg/.png/.ico)', 'file'),
     ('main',   'phone',         'Телефон',                        'text'),
     ('main',   'phone_raw',     'Телефон (для ссылки tel:)',      'text'),
     ('main',   'email',         'E-mail',                         'text'),

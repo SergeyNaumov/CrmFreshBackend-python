@@ -145,7 +145,7 @@ config={
   },
   'wysiwyg':config_wysiwyg,
   'debug':{ # для отладки
-    'manager_host':'demo8.digitalstrateg.ru',
+    'manager_host':'demo7.digitalstrateg.ru',
     'hosts':['sv-home','sv-digital'],
     'manager_id': 5520, # Менеджер, под которым логинимся в том случае, если мы работаем в режиме дебага  
   }

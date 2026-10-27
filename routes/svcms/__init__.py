@@ -6,6 +6,8 @@ from fastapi import APIRouter, Request
 
 from .left_menu import left_menu
 from .startpage import router as router_startpage
+from .data_transfer import router as router_data_transfer
+from .api_keys import router as router_api
 
 
 
@@ -24,6 +26,12 @@ async def controller_left_menu(request: Request):
 
 # Стартовая страница клиентской админки (карточка хостинга/домена + заявки)
 router.include_router(router_startpage)
+
+# Импорт/экспорт данных проекта (/svcms/data/...)
+router.include_router(router_data_transfer)
+
+# API и интеграции: ключ, настройки, статистика (/svcms/api/...)
+router.include_router(router_api)
 
 
 

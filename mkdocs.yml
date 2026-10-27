@@ -125,4 +125,6 @@ nav:
       - Контракт с фронтендом: 17-frontend-contract.md
       - Панель svcms-admin: 18-svcms-admin.md
       - Импорт/экспорт Excel: 20-excel-import.md
+      - Импорт/экспорт данных проекта: 21-ds-data-transfer.md
+      - API управления контентом DS: 22-ds-api.md
       - Известные расхождения: 19-known-gaps.md

@@ -635,7 +635,7 @@ async def project_create_init(request: Request):
     )
 
   ds_options = await db.query(
-    query='SELECT id, header, name, sort, is_menu FROM ds_options ORDER BY sort, id',
+    query='SELECT id, header, name, sort, is_menu, parent_id, note FROM ds_options ORDER BY sort, id',
     errors=errors,
   )
 

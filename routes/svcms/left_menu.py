@@ -39,6 +39,20 @@ async def left_menu(request: Request):
       
     },
     {
+      'header':'Импорт / экспорт данных',
+      'value':'ds-data',
+      'type':'vue',
+      'child':[],
+      'icon':'fa fa-exchange-alt',
+    },
+    {
+      'header':'API и интеграции',
+      'value':'ds-api',
+      'type':'vue',
+      'child':[],
+      'icon':'fa fa-plug',
+    },
+    {
       'header':'Перейти на сайт',
       'value':f'http://{manager["host"]}',
       'type':'newtab',
@@ -72,17 +86,39 @@ async def left_menu(request: Request):
     except SyntaxError as e:
       errors.append(f'Ошибка синтаксиса в {path_to_menu}')
   else: # Формируем меню из опций проекта (ds_options + ds_options_project)
-      opts=await s.db.query(
-        query='''
-          SELECT o.header,o.icon,o.tool,o.type,o.config
-          FROM ds_options o
-          JOIN ds_options_project op ON op.option_id=o.id
-          WHERE op.project_id=%s and o.is_menu=1 and o.config<>'ds_params_good'
-          ORDER BY o.sort,o.id
-        ''',
+      # Иерархия: выключенный родитель (например «Товары») скрывает своих
+      # потомков (каталог, характеристики, бренды, корзину и заказы).
+      # См. db/migrate_ds_options_tree.py и lib/dsengine/options.py.
+      all_opts=await s.db.query(
+        query='SELECT id,header,icon,tool,type,config,is_menu,parent_id '
+              'FROM ds_options ORDER BY sort,id',
+        errors=errors,
+      ) or []
+      proj_opts=await s.db.query(
+        query='SELECT option_id FROM ds_options_project WHERE project_id=%s',
         values=[project_id],
         errors=errors,
-      )
+      ) or []
+      enabled={int(r['option_id']) for r in proj_opts}
+      by_id={int(o['id']): o for o in all_opts}
+
+      def _option_on(option_id):
+        seen=set()
+        cur=by_id.get(option_id)
+        while cur is not None:
+          oid=int(cur['id'])
+          if oid in seen: # защита от цикла
+            break
+          seen.add(oid)
+          if oid not in enabled:
+            return False
+          pid=cur.get('parent_id')
+          cur=by_id.get(int(pid)) if pid else None
+        return True
+
+      opts=[o for o in all_opts
+            if o.get('is_menu') and o.get('config')!='ds_params_good'
+            and _option_on(int(o['id']))]
       if opts:
         for o in opts:
           item={
