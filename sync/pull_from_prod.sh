@@ -6,8 +6,9 @@
 # svcms@localhost -- иметь на неё права (см. plan/README).
 set -euo pipefail
 
-REMOTE="ssh -o BatchMode=yes -p7725 naumov@178.57.220.192"
-DUMP="mysqldump --no-tablespaces --single-transaction --skip-triggers --default-character-set=utf8mb4 -usvcms -h127.0.0.1"
+REMOTE="ssh -o BatchMode=yes -p7725 naumov@185.76.252.12"
+# База на прод-хосте локальная (2026-10), поэтому дамп идёт по сокету: без -h.
+DUMP="mysqldump --no-tablespaces --single-transaction --skip-triggers --default-character-set=utf8mb4 -usvcms"
 
 # Карта хостинга (svcms)
 $REMOTE "$DUMP svcms project_hosting" | mysql -u svcms svcms

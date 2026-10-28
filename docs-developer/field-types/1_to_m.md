@@ -34,7 +34,7 @@
 ```python
 {'description': 'Адрес', 'type': 'text', 'name': 'value',
  'values': [
-   {'v': '178.57.220.192', 'd': 'w01'},
+   {'v': '185.76.252.12', 'd': 'w01'},
    {'v': '185.76.252.13', 'd': 'w02_n'},
  ]},
 ```
@@ -49,7 +49,7 @@
  'presets': [
    {'label': 'spf для stg_w01',
     'values': {'domain': '<%domain%>',
-               'value': 'v=spf1 ip4:178.57.220.192 ~all'}},
+               'value': 'v=spf1 ip4:185.76.252.12 ~all'}},
    {'label': 'spf для stg_w02',
     'values': {'domain': '<%domain%>',
                'value': 'v=spf1 ip4:185.87.194.51 ~all'}},

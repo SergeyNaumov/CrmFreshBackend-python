@@ -134,11 +134,11 @@ DS-сайтов — к `project_id` (systemd `svcms.sites<id>`); домен за
 ## Таблицы
 
 Часть legacy-таблиц пришлось дампить с прод-стенда
-(`ssh -p7725 naumov@178.57.220.192 ... | mysql -u svcms svcms`). Список и
+(`ssh -p7725 naumov@185.76.252.12 ... | mysql -u svcms svcms`). Список и
 команда — `docs-developer/18-svcms-admin.md`. На проде отсутствуют `adm_*`,
 `design`, `project_1_comp`, `struct_42_comp`, `for_robots` — их конфиги не
-задействованы. На прод-хосте обязателен `-h 185.76.252.12`: локальный mysqld
-держит устаревшую копию базы (см. `09-svcms-manager.md`).
+задействованы. На прод-хосте база локальная (`mysql -u svcms svcms`, без `-h`),
+см. `09-svcms-manager.md`.
 
 Дев-БД **неполная** относительно прода: 106 «общих» таблиц есть на проде и нет
 локально (мультитенантные `struct_<pid>_*` не считаем). Для инструментов клона
@@ -148,9 +148,9 @@ DS-сайтов — к `project_id` (systemd `svcms.sites<id>`); домен за
 
 ```bash
 # 1) DDL с прода (структура, без данных)
-ssh -p 7725 naumov@178.57.220.192 \
+ssh -p 7725 naumov@185.76.252.12 \
   'for t in portfolio service_rubricator left_menu_tree; do
-     mysql -h 185.76.252.12 -u svcms -N -e "SHOW CREATE TABLE $t\G" svcms; done' \
+     mysql -u svcms -N -e "SHOW CREATE TABLE $t\G" svcms; done' \
   > /tmp/missing_ddl.sql
 # 2) применить локально (в MySQL 8 у text/longtext снять DEFAULT NULL,
 #    AUTO_INCREMENT — с 1)
@@ -162,7 +162,7 @@ mysql -u svcms svcms < /tmp/missing_ddl.sql
 
 ## Деплой (прод)
 
-Админка живёт на web-хосте `naumov@178.57.220.192:7725` (там же движок сайтов и
+Админка живёт на web-хосте `naumov@185.76.252.12:7725` (там же движок сайтов и
 менеджер); фронт — `admin3.design-b2b.com`:
 
 | Слой | Локально | Прод |
@@ -188,7 +188,7 @@ curl -m 8 -k -s -o /dev/null -w '%{http_code}\n' \
 Особенности:
 
 - `sync/svcmsadmin.py` **не** синкает `config.py` (серверный: на проде
-  `connects.*.host=185.76.252.12`) и не трогает `files` (на проде это симлинк);
+  `connects.*.host=localhost`) и не трогает `files` (на проде это симлинк);
   перед прогоном полезно смотреть dry-run: `rsync -avzn --delete …`.
 - Зависимости бэкенда — `requirements.txt`; при появлении нового импорта его
   нужно поставить в прод-venv (`.venv3.11`), иначе воркер падает и порт не

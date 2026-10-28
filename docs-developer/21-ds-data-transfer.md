@@ -68,6 +68,12 @@ files/<путь>           # содержимое files/project_<src> БЕЗ с�
 `FILE_COLS` (там же) — колонки файла → папка внутри `files/project_<id>`
 (нужна для сверки/счётчика файлов; сами файлы копируются целиком).
 
+Отдельно в реестре есть не-`ds_*` таблица `files` («Файлы для поисковиков»,
+`order=185`, `natural_key=['url']`): произвольные файлы домена (`/robots.txt`,
+`/sitemap.xml`, `/AGENTS.md`, …), которые движок отдаёт из БД. Содержимое
+хранится в БД, поэтому переносится вместе с проектом; файлы на диске
+(`files/project_<id>/`) тут не при чём.
+
 Порядок, `natural_key` и `refs` выведены из реальной схемы БД
 (`SHOW CREATE TABLE`) и конфигов `configs/svcmsmanager/ds_*`:
 `ds_good.rubricator_id → ds_catalog.id`, `ds_good.brand → ds_brands.id`,

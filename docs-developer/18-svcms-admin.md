@@ -148,7 +148,7 @@ sudo -n systemctl is-active svcms.admin
 прод-стенда и импортируют:
 
 ```bash
-ssh -p7725 naumov@178.57.220.192 'mysqldump -u svcms --no-tablespaces --force --single-transaction svcms \
+ssh -p7725 naumov@185.76.252.12 'mysqldump -u svcms --no-tablespaces --force --single-transaction svcms \
   adm_client adm_client_add_balance adm_client_service adm_money adm_purse adm_service \
   adm_task adm_task_attach bot bot_rules bot_rules_webapp buzy_dns capture_setting \
   content design design_img domain_dns_records_a domain_dns_records_cname \
@@ -172,9 +172,9 @@ ssh -p7725 naumov@178.57.220.192 'mysqldump -u svcms --no-tablespaces --force --
 `SHOW COLUMNS` сыпет ошибками). Структуру с прода берут так:
 
 ```bash
-ssh -p 7725 naumov@178.57.220.192 \
+ssh -p 7725 naumov@185.76.252.12 \
   'for t in portfolio service_rubricator left_menu_tree; do
-     mysql -h 185.76.252.12 -u svcms -N -e "SHOW CREATE TABLE $t\G" svcms; done' \
+     mysql -u svcms -N -e "SHOW CREATE TABLE $t\G" svcms; done' \
   > /tmp/missing_ddl.sql
 # в MySQL 8 у text/longtext снять DEFAULT NULL, AUTO_INCREMENT — с 1
 mysql -u svcms svcms < /tmp/missing_ddl.sql

@@ -3,7 +3,7 @@ set -euo pipefail
 
 DB="svcms"
 # alias stg_w01 не раскрывается в неинтерактивном скрипте -> хост явным ssh
-REMOTE="ssh -p7725 naumov@178.57.220.192"
+REMOTE="ssh -p7725 naumov@185.76.252.12"
 
 TABLES=(
     admin_menu_new
@@ -53,7 +53,7 @@ mysqldump -u svcms \
     --default-character-set=utf8mb4 \
     "$DB" "${TABLES[@]}" "${CONSTRUCTOR_TABLES[@]}" \
 | sed 's/utf8mb4_0900_ai_ci/utf8mb4_unicode_ci/g' \
-| $REMOTE 'mysql -usvcms -h127.0.0.1 svcms'
+| $REMOTE 'mysql -usvcms svcms'
 
 # ---------------------------------------------------------------------------
 # Константы проекта 5837 -> серверный прод (upsert, без удаления).
@@ -73,4 +73,4 @@ PROJECT_CONSTS=5837
         )
         FROM \`const\` WHERE \`project_id\`=${PROJECT_CONSTS};"
     echo "COMMIT;"
-) | $REMOTE 'mysql -usvcms -h127.0.0.1 --default-character-set=utf8mb4 svcms'
+) | $REMOTE 'mysql -usvcms --default-character-set=utf8mb4 svcms'
