@@ -148,6 +148,9 @@ form = {
   SEO-шаблон из констант (`seo_<сущность>_title|description|keywords`,
   плейсхолдеры `{header}`, `{orgname}` и др.), затем генерирует из заголовка
   (`sites/lib/dsengine/process_page.py::_set_seo`).
+  У `ds_text` («Статичные страницы») есть только `promo_*` (без `h1`): движок
+  кладёт их в `promo` в `sites/lib/dsengine/__init__.py::get_text_page`,
+  пусто → `header` страницы.
 - **Шапка — глобальная настройка проекта.** Вид шапки и строка поиска задаются
   не на странице, а константами «Настройки сайта» (`ds_const`, вкладка
   «Основное»): `header_layout` (select: `search-row` — по умолчанию,

@@ -45,6 +45,14 @@ COLUMNS = [
     ('promo_keywords', "varchar(512) NOT NULL DEFAULT ''"),
 ]
 
+# Статичные страницы (ds_text): promo-поля без h1 — заголовок H1 там header
+# (страница выводит его через page_head_title), мета — promo_*.
+TEXT_TABLES = {
+    'ds_text': [('promo_title', "varchar(255) NOT NULL DEFAULT ''"),
+                ('promo_description', "varchar(512) NOT NULL DEFAULT ''"),
+                ('promo_keywords', "varchar(512) NOT NULL DEFAULT ''")],
+}
+
 
 def add_column_sql(table, existing, name, ddl):
     """ALTER для отсутствующей колонки (без IF NOT EXISTS — нет в MySQL)."""
@@ -88,14 +96,18 @@ async def seed_template_const(db):
 async def main():
   db = FreshDB(config['connects']['crm_write'])
   await db.create_pool()
-  for table in TABLES:
+  # Карточки сущностей (h1 + promo_*).
+  plan = [(table, COLUMNS) for table in TABLES]
+  # Статичные страницы (только promo_*).
+  plan += list(TEXT_TABLES.items())
+  for table, columns in plan:
     rows = await db.query(
       query='SELECT column_name AS col FROM information_schema.columns '
             'WHERE table_schema=DATABASE() AND table_name=%s',
       values=[table], errors=[],
     ) or []
     existing = {str(r['col']).lower() for r in rows}
-    for name, ddl in COLUMNS:
+    for name, ddl in columns:
       statement = add_column_sql(table, existing, name, ddl)
       if statement:
         await db.query(query=statement, values=[], errors=[])
@@ -103,7 +115,8 @@ async def main():
   await db.close_pool()
   if db.error_str:
     raise SystemExit(f'ds_seo: {db.error_str}')
-  print('ds_seo: ' + ', '.join(TABLES) + ': ok; template_const: +%s' % inserted)
+  print('ds_seo: ' + ', '.join(list(TABLES) + list(TEXT_TABLES)) +
+        ': ok; template_const: +%s' % inserted)
 
 
 if __name__ == '__main__':
