@@ -13,6 +13,7 @@ from .password import router as router_password
 from .ajax import router as router_ajax
 from .background import router as router_background
 from .autocomplete import router as router_autocomplete
+from .ds_services_icons import router as router_ds_services_icons
 from .stat_tool import router as stat_tool
 from .documentation_routes import router as router_documentation
 from .page_routes import router as router_page
@@ -70,6 +71,7 @@ router.include_router(router_table,prefix='/table')
 router.include_router(router_video,prefix='/VideoList')
 router.include_router(router_news,prefix='/NewsList')
 router.include_router(router_autocomplete,prefix='/autocomplete')
+router.include_router(router_ds_services_icons,prefix='/ds-services-icons')
 router.include_router(stat_tool,prefix='/stat-tool')
 router.include_router(router_ajax) # /ajax
 router.include_router(router_background, prefix='/background') # /background/...

@@ -18,6 +18,10 @@ CONST_FIELDS = [
     # header; страницы читают эти значения (sites/lib/dsengine/page.py).
     ('main',   'header_layout', 'Вид шапки',                      'select'),
     ('main',   'header_search', 'Строка поиска в шапке',          'select'),
+    # Строка-ссылка в топбаре (например «Бесплатная доставка от 5 000 ₽»).
+    # Текст и адрес редактируются здесь; пустой текст — строка не выводится.
+    ('main',   'topbar_note',     'Текст в топбаре',               'text'),
+    ('main',   'topbar_note_url', 'Ссылка для текста в топбаре',   'text'),
 
     ('addr',   'address',       'Адрес',                          'textarea'),
     ('addr',   'map_lat',       'Широта',                         'text'),
