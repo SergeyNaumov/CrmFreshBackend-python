@@ -92,21 +92,49 @@ HEADER_SEARCH_VALUES = [
     {'v': '0', 'd': 'Скрыть'},
 ]
 
+# --- Подсказки к SEO-шаблонам ------------------------------------------------
+# Движок подставляет значения из записи (sites/lib/dsengine/process_page.py::
+# _seo_context). Набор переменных зависит от раздела; под каждым полем
+# показываем только его переменные, общую расшифровку — под вкладкой.
+SEO_VARS_DOC = (
+    '{header} — заголовок записи; {h1} — H1 страницы (если пусто — заголовок); '
+    '{anons} — анонс; {orgname} — название компании; {price} — цена; '
+    '{brand} — бренд; {rubric} — рубрика каталога; {date} — дата публикации; '
+    '{id} — код записи. Набор зависит от раздела; незаполненные поля '
+    'подставляются пустыми.'
+)
+
+SEO_VAR_LIST = {
+    'good':    '{header}, {h1}, {anons}, {price}, {brand}, {rubric}, {orgname}, {id}',
+    'service': '{header}, {h1}, {anons}, {price}, {orgname}, {id}',
+    'news':    '{header}, {h1}, {anons}, {date}, {orgname}, {id}',
+    'article': '{header}, {h1}, {anons}, {date}, {orgname}, {id}',
+    'catalog': '{header}, {h1}, {anons}, {orgname}, {id}',
+}
+
 # Дополнительные параметры полей по имени константы.
 FIELD_EXTRA = {
     'header_layout': {'values': HEADER_LAYOUT_VALUES},
     'header_search': {'values': HEADER_SEARCH_VALUES},
 }
+# Подсказка под каждым полем SEO-шаблона (title/description/keywords).
+FIELD_EXTRA.update({
+    f'seo_{kind}_{field}': {
+        'add_description': f'Плейсхолдеры: {vars_list}',
+    }
+    for kind, vars_list in SEO_VAR_LIST.items()
+    for field in ('title', 'description', 'keywords')
+})
 
-# Порядок табов.
+# Порядок табов: (имя, заголовок, подсказка под вкладкой).
 CONST_TABS = [
-    ('main',   'Основное'),
-    ('addr',   'Адрес и карта'),
-    ('social', 'Соцсети'),
-    ('seo',    'Счётчики и SEO'),
-    ('shop',   'Магазин (Яндекс.Маркет)'),
-    ('req',    'Реквизиты'),
-    ('tpl',    'SEO-шаблоны'),
+    ('main',   'Основное', ''),
+    ('addr',   'Адрес и карта', ''),
+    ('social', 'Соцсети', ''),
+    ('seo',    'Счётчики и SEO', ''),
+    ('shop',   'Магазин (Яндекс.Маркет)', ''),
+    ('req',    'Реквизиты', ''),
+    ('tpl',    'SEO-шаблоны', SEO_VARS_DOC),
 ]
 
 
@@ -119,7 +147,10 @@ async def permissions(form):
         field = {'name': name, 'description': desc, 'type': ftype, 'tab': tab}
         field.update(FIELD_EXTRA.get(name) or {})
         form.fields.append(field)
-    form.tabs = [{'name': name, 'description': desc} for name, desc in CONST_TABS]
+    form.tabs = [
+        {'name': name, 'description': desc, 'add_description': hint}
+        for name, desc, hint in CONST_TABS
+    ]
 
     form.filedir = f"./files/project_{project_id}"
     form.filedir_http = f"/files/project_{project_id}"

@@ -182,6 +182,34 @@ robots/sitemap: `/robots.txt` и `/sitemap.xml`, заданные в `files`,
 попадёт ими в `cnst`, `lib/dsengine/__init__.py::get_const` фильтрует по
 `template_const`), поэтому для шаблона `2026/ds-constructor` они заведены там же.
 
+## SEO-шаблоны: подсказки по плейсхолдерам
+
+Вкладка **«SEO-шаблоны»** сервиса «Настройки сайта» (`ds_const`) применяется
+движком, когда SEO-поля карточки пустые
+(`sites/lib/dsengine/process_page.py::promo_from_templates`). Поля и подсказки —
+в `configs/svcmsmanager/ds_const/events.py`:
+
+- `SEO_VARS_DOC` — общая справка, выводится под вкладкой «SEO-шаблоны»;
+- `SEO_VAR_LIST` — набор переменных для каждого раздела; из него собирается
+  `add_description` под каждым полем (`FIELD_EXTRA`).
+
+Фронт (`CrmFreshFront/src/components/Const.vue`) показывает `add_description`
+под полем (для `select` его рисует `fields/select.vue`) и
+`tabs[cur_tab].add_description` под вкладками. Роут `/const/get` уже передаёт
+`add_description` и `tabs`, менять его не нужно.
+
+Плейсхолдеры и разделы:
+
+| Раздел | Переменные |
+|---|---|
+| Товары | `{header}`, `{h1}`, `{anons}`, `{price}`, `{brand}`, `{rubric}`, `{orgname}`, `{id}` |
+| Услуги | `{header}`, `{h1}`, `{anons}`, `{price}`, `{orgname}`, `{id}` |
+| Новости / Статьи | `{header}`, `{h1}`, `{anons}`, `{date}`, `{orgname}`, `{id}` |
+| Рубрики каталога | `{header}`, `{h1}`, `{anons}`, `{orgname}`, `{id}` |
+
+`{h1}` при пустом H1 заменяется заголовком; незаполненные поля подставляются
+пустыми, неизвестные плейсхолдеры вырезаются.
+
 ## Импорт / экспорт данных проекта
 
 Инструмент в меню manager: **«Импорт / экспорт данных»** (`value='ds-data'`,
