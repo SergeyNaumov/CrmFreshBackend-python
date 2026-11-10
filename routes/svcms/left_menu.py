@@ -22,19 +22,22 @@ import json
 # «Файлы для поисковиков»: произвольные файлы домена из таблицы files
 # (/robots.txt, /sitemap.xml, /AGENTS.md, /rrrxxx …). Общий пункт для всех
 # проектов svcmsmanager — конфиг `files` (как в легаси-менеджере), записи
-# считаются по текущему project_id (conf/files/events.py).
+# считаются по текущему project_id (conf/robot_files/events.py).
+# Имя конфига — robot_files: URL /manager/edit_form/files/... пересекается
+# со статикой у nginx, легаси-имя `files` больше не используем (таблица
+# данных при этом остаётся `files`).
 FILES_MENU_ITEM={
   'header':'Файлы для поисковиков',
   'value':'admin-table',
   'type':'vue',
   'child':[],
   'icon':'fa fa-file-code',
-  'params':{'config':'files'},
+  'params':{'config':'robot_files'},
 }
 
 # Имена конфигов того же сервиса у старых проектов (left_menu.py):
-# `robot_files` (5794) и `find_files` (5759) — встроенный пункт не дублируем.
-FILES_CONFIG_NAMES=('files','robot_files','find_files')
+# `files` и `find_files` (5759) — встроенный пункт не дублируем.
+FILES_CONFIG_NAMES=('robot_files','files','find_files')
 
 
 def _menu_configs(items):

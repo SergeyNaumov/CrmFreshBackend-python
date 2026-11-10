@@ -46,7 +46,7 @@ OPTIONS = {
   'article':         (None, None, 'Статьи', None),
   'service':         (None, None, 'Услуги', None),
   'slider':          (None, None,
-                      'Слайдер (карусель) на главной странице', None),
+                      'Промо-слайдер (карусель) на главной странице', None),
   'certificates':    (None, None, 'Сертификаты и дипломы', None),
   'employee':        (None, None, 'Команда (сотрудники)', None),
   'galery':          (None, None, 'Фотогалерея', None),

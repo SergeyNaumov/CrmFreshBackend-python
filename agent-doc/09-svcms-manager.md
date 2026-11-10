@@ -78,11 +78,11 @@ Engine — в `02-engine.md`.
   `owner`, ...). Загружаются `read_config` через
   `load_form_from_dir('./conf_projects/project_<id>', ...)`.
 - `configs/svcmsmanager/**` (bottom_menu, top_menu_tree, bot_rules, content,
-  promo, `files`/`robot_files`, find_files, wysiwyg_template) — **общие** конфиги
+  promo, `robot_files`, find_files, wysiwyg_template) — **общие** конфиги
   инструментов (`config_folder: 'configs/svcmsmanager'` в
   `config_svcms_manager.py`). Загружаются, если у проекта нет своей папки
   `conf_projects/project_<id>/<config>/`. Часть из них (`ds_*`, `promo`,
-  `files`, `robot_files`) — симлинки на канон в движке
+  `robot_files`) — симлинки на канон в движке
   `svcms-async/manager/backend/conf/` (дев-путь). На проде `config_folder` в
   `config.py` не задан → читается `conf` рабочего каталога
   `/var/www/svcms/manager/backend/conf/` — общий конфиг заливать туда.
@@ -90,21 +90,23 @@ Engine — в `02-engine.md`.
 ## Файлы для поисковиков (таблица `files`)
 
 Сервис в меню manager: **«Файлы для поисковиков»** — пункт встроен в базовое
-левое меню (`routes/svcms/left_menu.py`, `FILES_MENU_ITEM`) для всех проектов;
-конфиг называется **`files`** — как в легаси-менеджере
-(`admin_table.pl?config=files`, «Файлы на сайте»). Таблица `files`:
-`id, url, body, project_id, type`), записи фильтруются по текущему
-`project_id` (`conf/files/events.py: permissions`).
+левое меню (`routes/svcms/left_menu.py`, `FILES_MENU_ITEM`) для всех проектов.
+Конфиг канонически называется **`robot_files`** — URL вида
+`/manager/edit_form/files/...` пересекается со статикой у nginx, поэтому
+легаси-имя `files` больше не используем. Таблица данных при этом остаётся
+`files`: `id, url, body, project_id, type` (от неё зависит движок,
+`sites/lib/server_files.py`); записи фильтруются по текущему `project_id`
+(`conf/robot_files/events.py: permissions`). Импорт/экспорт данных проекта:
+ключ реестра `robot_files` (`lib/svcmsmanager/ds_data_transfer.py`).
 
-Имена-синонимы: `robot_files` (его использует проект 5794) — **симлинк** на
-каталог `files`; `find_files` (5759) — свой legacy-конфиг, не трогаем.
+Имя-синоним: `find_files` (5759) — свой legacy-конфиг, не трогаем.
 
-Канон конфига — в движке: `svcms-async/manager/backend/conf/files/`
+Канон конфига — в движке: `svcms-async/manager/backend/conf/robot_files/`
 (как `ds_*` и `promo`), в этом репозитории
-`configs/svcmsmanager/files` и `configs/svcmsmanager/robot_files` — **симлинки**
-на него. На проде рантайм менеджера — `/var/www/svcms/manager/backend`
-(`WorkingDirectory` юнита `svcms.manager`), поэтому общий конфиг заливается в
-`/var/www/svcms/manager/backend/conf/files/` (`config_folder` на проде
+`configs/svcmsmanager/robot_files` — **симлинк** на него. На проде рантайм
+менеджера — `/var/www/svcms/manager/backend` (`WorkingDirectory` юнита
+`svcms.manager`), поэтому общий конфиг заливается в
+`/var/www/svcms/manager/backend/conf/robot_files/` (`config_folder` на проде
 не задан → по умолчанию `conf`).
 
 Зачем: администратор размещает **произвольный контент файлов домена** —

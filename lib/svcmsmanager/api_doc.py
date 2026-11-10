@@ -31,7 +31,7 @@ ENTITIES = [
   ('article', 'ds_article', 'Статьи', 'header', '/article/', '—', False),
   ('service', 'ds_service', 'Услуги', 'header', '/service/', '—', False),
   ('text', 'ds_text', 'Текстовые страницы', 'url', '—', '—', False),
-  ('slider', 'ds_slider', 'Слайдер', '—', '—', '—', False),
+  ('slider', 'ds_slider', 'Промо-слайдер', '—', '—', '—', False),
   ('advantages', 'ds_advantages', 'Преимущества', '—', '—', '—', False),
   ('employee', 'ds_employee', 'Сотрудники', '—', '—', '—', False),
   ('clients', 'ds_clients', 'Клиенты', '—', '—', '—', False),
