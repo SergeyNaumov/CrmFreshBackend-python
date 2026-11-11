@@ -40,6 +40,95 @@ FILES_MENU_ITEM={
 FILES_CONFIG_NAMES=('robot_files','files','find_files')
 
 
+# Порядок и группы левого меню для DS-сайтов (меню из ds_options).
+# Свёрнутый список: (заголовок группы, иконка, [(config|value, новый заголовок)]).
+# Пункты, которых нет в проекте (выключены в ds_options_project), пропускаются;
+# неизвестные пункты добавляются в конец группы «Контент».
+DS_MENU_LAYOUT=[
+  ('Общие настройки','fa fa-cogs',[
+    ('ds_const','Настройки'),
+    (FILES_CONFIG_NAMES,'Файлы для поисковиков'),
+    ('ds-api',None),
+    ('ds-data',None),
+  ]),
+  ('Меню','fa fa-bars',[
+    ('ds_top_menu',None),
+    ('ds_bottom_menu',None),
+  ]),
+  ('Контент','fa fa-folder-open',[
+    ('ds_text',None),
+    ('ds_catalog','Каталог'),
+    ('ds_good',None),
+    ('ds_params',None),
+    ('ds_brands',None),
+    ('ds_news',None),
+    ('ds_article',None),
+    ('ds_service',None),
+    ('ds_slider',None),
+    ('ds_certificates',None),
+    ('ds_employee',None),
+    ('ds_galery',None),
+    ('ds_video',None),
+    ('ds_reviews',None),
+    ('ds_advantages',None),
+    ('ds_clients',None),
+    ('ds_doc',None),
+    ('ds_filials','Филиалы/адреса'),
+  ]),
+  ('Заявки/заказы','fa fa-shopping-cart',[
+    ('ds_form_submit',None),
+    ('ds_zakaz','Заказы'),
+  ]),
+]
+
+def _item_key(m):
+  """Ключ пункта меню: config из params либо value."""
+  return (m.get('params') or {}).get('config') or m.get('value')
+
+def _match(m, key):
+  """key: строка или кортеж имён (config|value)."""
+  if isinstance(key, tuple):
+    return _item_key(m) in key
+  return _item_key(m) == key
+
+def _group_ds_menu(items):
+  """Группировка плоского меню ds_options по DS_MENU_LAYOUT.
+
+  Сверху остаются «Главная» и «Перейти на сайт»; «Филиалы» переименовываются
+  в «Филиалы/адреса», «Рубрики товаров» → «Каталог», «Корзина и заказы» →
+  «Заказы» (новые заголовки только если пункт найден по своему config)."""
+  top=[m for m in items if m.get('value')=='mainpage'
+       or m.get('type')=='newtab']
+  used=set(id(m) for m in top)
+  rest=[m for m in items if id(m) not in used]
+  result=list(top)
+  for header, icon, keys in DS_MENU_LAYOUT:
+    child=[]
+    for key, title in keys:
+      for m in list(rest):
+        if _match(m, key) and id(m) not in used:
+          used.add(id(m))
+          if title:
+            m=dict(m); m['header']=title
+          child.append(m)
+          break
+    if child:
+      result.append({
+        'header':header, 'value':'', 'type':'src',
+        'icon':icon, 'show':False, 'child':child,
+      })
+  # нераспознанные пункты — в конец последней группы (Контент), если она есть
+  leftover=[m for m in rest if id(m) not in used]
+  if leftover:
+    target=next((g for g in result if g.get('header')=='Контент'), None)
+    if target is not None:
+      target['child'].extend(leftover)
+    else:
+      result.extend(leftover)
+  return result
+
+
+
 def _menu_configs(items):
   """Все config в пунктах меню (рекурсивно по child)."""
   found=set()
@@ -103,6 +192,7 @@ async def left_menu(request: Request):
     #extended_service
   ]
   project_id=request.state.project['project_id']
+  menu_from_options=False # меню собрано из ds_options (а не из project left_menu.py)
   path_to_menu=f'./conf_projects/project_{project_id}/left_menu.py'
   if os.path.isfile(path_to_menu): # Загружаем меню из файла
     #return {'file':'exists'}
@@ -118,6 +208,7 @@ async def left_menu(request: Request):
     except SyntaxError as e:
       errors.append(f'Ошибка синтаксиса в {path_to_menu}')
   else: # Формируем меню из опций проекта (ds_options + ds_options_project)
+      menu_from_options=True
       # Иерархия: выключенный родитель (например «Товары») скрывает своих
       # потомков (каталог, характеристики, бренды, корзину и заказы).
       # См. db/migrate_ds_options_tree.py и lib/dsengine/options.py.
@@ -176,6 +267,9 @@ async def left_menu(request: Request):
     idx=next((i+1 for i,m in enumerate(left_menu_data)
               if m.get('value')=='ds-api'), len(left_menu_data))
     left_menu_data.insert(idx, dict(FILES_MENU_ITEM))
+
+  if menu_from_options:
+    left_menu_data=_group_ds_menu(left_menu_data)
 
   manager= await s.db.query(
     query='select manager_id id,login from manager where login=%s',

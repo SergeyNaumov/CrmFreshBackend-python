@@ -160,13 +160,17 @@ async def startpage(request: Request):
     manager['out_manager_card_link']=True
   if exists_arg('left_menu',config['controllers']):
     left_menu_controller=config['controllers']['left_menu']
+  # URL сайта текущего проекта — для ссылки «перейти на сайт» в шапке
+  # админки (фронт: App.vue).
+  _site_host=(getattr(request.state, 'manager', None) or {}).get('host') or ''
   response={
     'title':config['title'],
     'copyright':config['copyright'].replace('{{cur_year}}',CY),
     'left_menu_controller':left_menu_controller,
     'errors':errors,
     'success': not len(errors),
-    'manager':manager
+    'manager':manager,
+    'site':f'http://{_site_host}',
   }
 
   if 'app_components' in config:
