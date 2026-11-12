@@ -58,13 +58,14 @@ DS_MENU_LAYOUT=[
   ('Контент','fa fa-folder-open',[
     ('ds_text',None),
     ('ds_catalog','Каталог'),
+    ('ds_params_catalog',None),
     ('ds_good',None),
     ('ds_params',None),
     ('ds_brands',None),
     ('ds_news',None),
     ('ds_article',None),
     ('ds_service',None),
-    ('ds_slider',None),
+    ('ds_slider','Слайдер'),
     ('ds_certificates',None),
     ('ds_employee',None),
     ('ds_galery',None),
@@ -96,7 +97,8 @@ def _group_ds_menu(items):
 
   Сверху остаются «Главная» и «Перейти на сайт»; «Филиалы» переименовываются
   в «Филиалы/адреса», «Рубрики товаров» → «Каталог», «Корзина и заказы» →
-  «Заказы» (новые заголовки только если пункт найден по своему config)."""
+  «Заказы», «Промо-слайдер» → «Слайдер» (новые заголовки только если пункт
+  найден по своему config)."""
   top=[m for m in items if m.get('value')=='mainpage'
        or m.get('type')=='newtab']
   used=set(id(m) for m in top)
