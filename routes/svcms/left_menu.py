@@ -117,7 +117,10 @@ def _group_ds_menu(items):
     if child:
       result.append({
         'header':header, 'value':'', 'type':'src',
-        'icon':icon, 'show':False, 'child':child,
+        'icon':icon,
+        # «Контент» раскрыт по умолчанию (фронт: left_menu_item.vue is_open/show)
+        'show':header=='Контент',
+        'child':child,
       })
   # нераспознанные пункты — в конец последней группы (Контент), если она есть
   leftover=[m for m in rest if id(m) not in used]
