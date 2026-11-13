@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `ds_text_block` (
 OPTION = dict(
   header='Текстовые блоки', name='text_block', sort=211,
   tool='admin-table', type='vue', config='ds_text_block',
+  icon='fa fa-align-left',
 )
 
 
@@ -58,12 +59,17 @@ async def main():
   )
   if opt:
     option_id = int(opt['id'])
+    # иконку/сорт дочиниваем и у существующей опции
+    await db.query(
+      query='UPDATE ds_options SET icon=%s, sort=%s WHERE id=%s',
+      values=[OPTION['icon'], OPTION['sort'], option_id], errors=[],
+    )
   else:
     await db.query(
-      query='INSERT INTO ds_options(header,name,sort,tool,type,config,is_menu) '
-            'VALUES(%s,%s,%s,%s,%s,%s,1)',
+      query='INSERT INTO ds_options(header,name,sort,tool,type,config,is_menu,icon) '
+            'VALUES(%s,%s,%s,%s,%s,%s,1,%s)',
       values=[OPTION['header'], OPTION['name'], OPTION['sort'],
-              OPTION['tool'], OPTION['type'], OPTION['config']],
+              OPTION['tool'], OPTION['type'], OPTION['config'], OPTION['icon']],
       errors=[],
     )
     option_id = int(await db.query(
