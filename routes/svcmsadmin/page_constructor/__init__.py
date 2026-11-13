@@ -7,6 +7,7 @@ from fastapi import APIRouter, Request, Response, File, Form, UploadFile
 from pydantic import BaseModel
 
 from config import config as sysconfig
+from lib.svcmsmanager import text_blocks
 
 
 router = APIRouter()
@@ -577,6 +578,15 @@ async def page_save(request: Request, r: PageSaveIn):
         return {'success': False, 'errors': ['некорректный JSON блоков']}
     doc = await _apply_structure(db, r.domain_id, doc)
     blocks = json.dumps(doc, ensure_ascii=False)
+
+    # Сервис «Текстовые блоки»: тексты блоков (about, contact_form, …)
+    # upsert'им в ds_text_block — дальше их можно править и в /manager
+    # (lib/svcmsmanager/text_blocks.py).
+    project_id = await db.query(
+        query='SELECT project_id FROM domain WHERE domain_id=%s',
+        values=[r.domain_id], onevalue=1, errors=[],
+    )
+    await text_blocks.upsert_from_doc(db, project_id, doc)
 
     if r.id:
         await db.query(

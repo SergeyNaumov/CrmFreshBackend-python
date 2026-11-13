@@ -79,6 +79,9 @@ TABLES = {
   'ds_news': dict(order=160, title='Новости', natural_key=None),
   'ds_reviews': dict(order=170, title='Отзывы', natural_key=None),
   'ds_text': dict(order=180, title='Текстовые страницы', natural_key=['url']),
+  # Сервис «Текстовые блоки»: тексты блоков конструктора (about, contact_form)
+  # в разрезе проекта; ключ — код блока внутри проекта.
+  'ds_text_block': dict(order=182, title='Текстовые блоки', natural_key=['code']),
   # Произвольные файлы домена (сервис «Файлы для поисковиков»): robots.txt,
   # sitemap.xml, AGENTS.md и прочее. Содержимое живёт в БД, поэтому переносится
   # вместе с проектом; ключ — url внутри проекта.

@@ -57,6 +57,7 @@ DS_MENU_LAYOUT=[
   ]),
   ('Контент','fa fa-folder-open',[
     ('ds_text',None),
+    ('ds_text_block','Текстовые блоки'),
     ('ds_catalog','Каталог'),
     ('ds_params_catalog',None),
     ('ds_good',None),
