@@ -109,6 +109,13 @@ Engine — в `02-engine.md`.
 `/var/www/svcms/manager/backend/conf/robot_files/` (`config_folder` на проде
 не задан → по умолчанию `conf`).
 
+> **Файловое хранилище на проде** — `/var/www/sv-cms/htdocs/files`; upload-поля
+> пишут в `./files/...` относительно cwd менеджера, и `manager/backend/files`
+> — симлинк на это хранилище. Подробная раскладка (все три симлинка, чем
+> деплоить, чего не трогать) — в движке, `agent-doc/18_prod_runtime.md`, §1b.
+> Деплой фронта админки — `./build/svcms.manager` в репо CrmFreshFront
+> (исключает `files`/`/favicon*`, страхует от не того vite-base).
+
 Зачем: администратор размещает **произвольный контент файлов домена** —
 `/robots.txt`, `/sitemap.xml`, `/AGENTS.md`, `/ads.txt`, `/rrrxxx` и т.п.
 Движок (`svcms-async`, `sites/lib/server_files.py`) отдаёт их **раньше** штатных
@@ -136,6 +143,55 @@ robots/sitemap: `/robots.txt` и `/sitemap.xml`, заданные в `files`,
 проставляется), дубль и пустой url отклоняются, edit/delete работают; движок
 отдаёт запись из БД для `/robots.txt`, `/sitemap.xml`, `/AGENTS.md`, `/rrrxxx`,
 а без записи — прежний ответ (`Disallow: /` для demo-поддомена, 404 для прочих).
+
+## Левое меню DS-сайтов (группы и порядок)
+
+Меню менеджера DS-проектов (5837+) собирается из `ds_options` +
+`ds_options_project`, а группировка/порядок зашиты в коде:
+`routes/svcms/left_menu.py::DS_MENU_LAYOUT` («Общие настройки» / «Меню» /
+«Контент» / «Заявки/заказы», «Статичные страницы» первыми в «Контент»).
+Группа **«Контент» отдаётся раскрытой** (`'show': header=='Контент'`; фронт
+`left_menu_item.vue` понимает `show`/`open`). Новый раздел = строка в
+`ds_options` + ключ в `DS_MENU_LAYOUT` (иначе уедет в конец «Контента»).
+
+⚠️ **Антизомби:** если на сервере есть `conf_projects/project_<id>/left_menu.py`
+(не `.example`) — меню строится из файла, вся группировка и новые пункты
+игнорируются. Для демо-проектов (5837–5851) такие файлы переименовываются в
+`.bak`; шаг есть в `tools/sync_engine_to_prod.sh` (движок), данные — в
+`db/migrate_ds_options_tree.py`.
+
+## Текстовые блоки (`ds_text_block`)
+
+Сервис «Текстовые блоки» (меню «Контент», иконка `fa-align-left`) — правка
+текстов помеченных блоков конструктора из /manager. Модель v2 (точечная):
+
+- У блока в JSON страницы — галка `params.tb_admin` (чекбокс в конструкторе,
+  типы `about`/`contact_form`/`text`) и стабильный `params.tb_id`
+  (проставляет `page_save` → `ensure_tb_ids`).
+- Запись `ds_text_block` ключуется `(project_id, tb_key=tb_id)` — каждый
+  помеченный экземпляр отдельной строкой.
+- Синхронизация (`lib/svcmsmanager/text_blocks.py`, реестр `TEXT_BLOCK_MAP`):
+  конструктор → таблица (`upsert_from_doc` после записи страницы, **после** —
+  чтобы GC видел свежий JSON; GC удаляет строки со снятой галкой/удалённым
+  блоком); таблица → страницы (`sync_row_to_pages` по `tb_id`, из
+  `conf/ds_text_block/events.py::after_save`). Рендер сайта — всегда JSON,
+  таблицу движок не читает.
+- Миграции: `db/migrate_ds_text_block.py` (таблица, опция, backfill),
+  `db/migrate_ds_text_block_v2.py` (tb_key, перевод legacy-строк).
+- Добавить новый тип: `TEXT_BLOCK_MAP` + `tb_admin` в `schema.json` типа
+  (+ `tb_admin`,`tb_id` в `_shared/contract/blocks.json`) + селект в
+  `conf/ds_text_block/__init__.py`.
+
+## Характеристики товара: автоподтягивание в форму
+
+`configs/svcmsmanager/ds_good`: селект параметров в `params_values` скоуплен
+по `project_id` (`events.py`, как в `ds_catalog`). Поле «Рубрика» имеет
+`frontend.ajax` → `prefill_params` (`conf/ds_good/params_prefill.py`): при
+открытии формы и смене рубрики досоздаёт в `ds_params_good` недостающие
+строки по цепочке рубрик (как `sites/lib/dsengine/params.py::rubric_chain`)
+и обновляет слайды 1_to_m событием `1_to_m:upload_values:params_values`
+(jscode-ветка `frontend.ajax`, шина `bus`). Пустые значения сайт не выводит
+(`good_params` пропускает `''/NULL`).
 
 ## Стартовая страница svcmsmanager (StartPage)
 
