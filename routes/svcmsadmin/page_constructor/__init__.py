@@ -577,16 +577,20 @@ async def page_save(request: Request, r: PageSaveIn):
     except Exception:
         return {'success': False, 'errors': ['некорректный JSON блоков']}
     doc = await _apply_structure(db, r.domain_id, doc)
+    # Сервис «Текстовые блоки»: помеченным галкой tb_admin блокам без id
+    # проставляем стабильный tb_id ДО сериализации (lib/svcmsmanager/text_blocks.py).
+    doc, _ = text_blocks.ensure_tb_ids(doc)
     blocks = json.dumps(doc, ensure_ascii=False)
 
-    # Сервис «Текстовые блоки»: тексты блоков (about, contact_form, …)
-    # upsert'им в ds_text_block — дальше их можно править и в /manager
-    # (lib/svcmsmanager/text_blocks.py).
-    project_id = await db.query(
-        query='SELECT project_id FROM domain WHERE domain_id=%s',
-        values=[r.domain_id], onevalue=1, errors=[],
-    )
-    await text_blocks.upsert_from_doc(db, project_id, doc)
+    # Сервис «Текстовые блоки»: upsert текстов помеченных блоков в
+    # ds_text_block (+GC снятых/удалённых) — вызываем ПОСЛЕ записи страницы,
+    # чтобы GC сканировал уже свежий JSON (lib/svcmsmanager/text_blocks.py).
+    async def _sync_text_blocks():
+        project_id = await db.query(
+            query='SELECT project_id FROM domain WHERE domain_id=%s',
+            values=[r.domain_id], onevalue=1, errors=[],
+        )
+        await text_blocks.upsert_from_doc(db, project_id, doc)
 
     if r.id:
         await db.query(
@@ -594,6 +598,7 @@ async def page_save(request: Request, r: PageSaveIn):
             values=[url, r.header, blocks, r.id],
             errors=[],
         )
+        await _sync_text_blocks()
         return {'success': True, 'errors': [], 'id': r.id}
 
     dup = await db.query(
@@ -616,6 +621,7 @@ async def page_save(request: Request, r: PageSaveIn):
         onerow=1,
         errors=[],
     )
+    await _sync_text_blocks()
     return {'success': True, 'errors': [], 'id': row['id'] if row else None}
 
 
