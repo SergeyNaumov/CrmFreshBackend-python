@@ -216,8 +216,13 @@ def get_search_where(form,query):
       elif f['type']=='multiselect':
         # Фильтр «пары характеристик» (admin_table/search_results): conditions =
         # [{param_id,type,value}|{param_id,type,from,to}, ...], между условиями AND.
-        # Каждое условие -> EXISTS по ds_params_good (без join/дублей товаров).
-        g_table=f.get('values_table','ds_params_good')
+        # Каждое условие -> EXISTS по values_table (без join/дублей товаров).
+        # Таблица ОБЯЗАТЕЛЬНА в конфиге — без values_table ветка невозможна;
+        # дефолт с DS-именем убран, чтобы generic-тенанты не получали битый SQL
+        # (ds_params_good — в conf/ds_good/__init__.py).
+        if not f.get('values_table'):
+          continue
+        g_table=f['values_table']
         g_good=f.get('values_good_field','good_id')
         g_param=f.get('values_param_field','param_id')
         g_value=f.get('values_value_field','value')

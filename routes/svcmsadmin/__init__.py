@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Request
 
+# Тенант-специфика DS: фоновый обработчик фото товаров после xlsx-импорта
+# (crm_background). Регистрируется при старте процесса — здесь, а не в
+# generic-роутере parser_excel, чтобы не тащить DS в другие тенанты.
+from lib.svcmsmanager import ds_good_photos  # noqa: F401
+
 from .left_menu_admin import left_menu_admin
 from .project_sitemap import router as router_project_sitemap
 from .project_struct import router as router_project_struct
@@ -9,6 +14,7 @@ from .project_create import router as router_project_create
 from .domain import router as router_domain
 from .domain_sync import router as router_domain_sync
 from .page_constructor import router as router_page_constructor
+from .ds_services_icons import router as router_ds_services_icons
 
 
 router = APIRouter()
@@ -20,6 +26,7 @@ router.include_router(router_project_create)
 router.include_router(router_domain)
 router.include_router(router_domain_sync)
 router.include_router(router_page_constructor, prefix='/page-constructor')
+router.include_router(router_ds_services_icons, prefix='/ds-services-icons')
 
 
 @router.get('/left-menu-admin')

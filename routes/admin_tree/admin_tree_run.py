@@ -314,11 +314,8 @@ async def admin_tree_run(**arg):
         await form.run_event('before_delete')
         if form.success():
           # Каскад: файлы потомков дерева/детей 1_to_m + их строки (нет «хвостов»).
-          try:
-            from lib.svcmsmanager import ds_files
-            await ds_files.cascade_delete(form, form.id)
-          except Exception as e:
-            form.errors.append(f'ошибка удаления связанных данных: {e}')
+          from lib.CRM.form.cascade_delete import cascade_delete
+          await cascade_delete(form, form.id)
         if form.success():
           await form.run_event('after_delete')
           await form.db.query(query=query,errors=form.errors)

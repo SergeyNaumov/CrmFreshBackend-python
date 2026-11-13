@@ -29,6 +29,36 @@ Vue 3 + Vuetify (`../CrmFreshFront-v3`), бэкенд отдаёт только 
 | `daemons/`, `dbd_creator/`, `dbf_daemon/` | фоновые задачи и выгрузка в XBase |
 | `start/*.sh` | скрипты запуска под конкретные деплои |
 
+## Универсальный конструктор CRM (мультитенантность)
+
+Репо — **платформа CRM «конструктор»**, обслуживающая много тенантов:
+`config_svcms_manager.py` (менеджер DS-сайтов), `config_svcms_admin.py`
+(админка svcms), `config_beyeezy/crimea/teleweb/trade/test` и др. Общих
+дефолтов нет: каждый деплой — свой `config_*.py` (БД, `config_folder`,
+фичи).
+
+**Правило изоляции тенантов.** Специфика тенанта — только в его неймспейсах:
+- роуты: `routes/svcms/`, `routes/svcmsadmin/` (generic: `routes/edit_form*`,
+  `ajax.py`, `admin_tree*`, `parser_excel/`, `documentation_routes.py` —
+  тенант-нейтральны);
+- либы: `lib/svcmsmanager/`; общее ядро — `lib/CRM/**`, `lib/engine.py`,
+  `db/`, `main.py`;
+- конфиги инструментов: `configs/<config_folder>/` (для svcms —
+  `configs/svcmsmanager/`, для DS-конфигов — симлинки на канон в движке);
+  пер-проектные переопределения — `conf_projects/project_<id>/`;
+- миграции тенанта: `db/migrate_ds_*`.
+
+В общем ядре нельзя: имён таблиц тенанта (`ds_*`), хардкодов проектов
+(`5837`, доменов) и `if`-веток по тенанту. Тенант-специфику — через
+конфиг/field-атрибуты (`params_table`, `values_table`, `foreign_key`…)
+или через механизмы ядра (`frontend.ajax`, `events`, `plugins`).
+
+Примеры правильного использования: меню DS — `routes/svcms/left_menu.py`;
+текстовые блоки — `lib/svcmsmanager/text_blocks.py` + `configs/svcmsmanager/ds_text_block`;
+prefill характеристик — конфиг `ds_good` + общий `frontend.ajax`.
+Вопрос перед правкой: «это фича тенанта или платформы?» — платформа обязана
+работать у всех тенантов.
+
 ## Мёртвый / пустой код
 
 - `models/` — нерабочий Peewee, нигде не импортируется, `peewee` нет в зависимостях.

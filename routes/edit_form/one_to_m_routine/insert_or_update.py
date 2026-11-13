@@ -42,9 +42,10 @@ async def insert_or_update(form,field,arg):
               )
               data[sort_field]=1 if not cur_sort else int(cur_sort)+1
 
-          # Таблицы слайдов конструкторных проектов имеют project_id (FK на project):
-          # без него INSERT падает с нарушением внешнего ключа. Проверяем наличие
-          # колонки один раз (кэш на поле) и заполняем из контекста проекта.
+          # Таблицы слайдов могут иметь project_id (FK на project):
+          # без него INSERT падает с нарушением внешнего ключа. Проверяем
+          # наличие колонки один раз (кэш на поле) и заполняем из контекста
+          # проекта, если он известен (form.project есть не у всех тенантов).
           if 'project_id' not in data and 'project_id' not in (field.get('_cols') or ()):
             if field.get('_cols') is None:
               cols=await form.db.query(
@@ -53,7 +54,9 @@ async def insert_or_update(form,field,arg):
               ) or []
               field['_cols']=[str(r.get('Field', '')).lower() for r in cols]
             if 'project_id' in field['_cols']:
-              pid=(form.project or {}).get('project_id')
+              pid=(getattr(form, 'project', None) or {}).get('project_id')
+              if not pid:
+                pid=getattr(form, 'foreign_key_value', None)
               if pid:
                 data['project_id']=pid
 

@@ -11,7 +11,7 @@
 import re
 
 from .go_parse import go_parse, build_hash_fields
-from lib.svcmsmanager.refs import RefResolver
+from lib.CRM.xlsx.refs import RefResolver
 
 # защита от заливки огромного списка значений на создание
 MAX_CREATE = 500

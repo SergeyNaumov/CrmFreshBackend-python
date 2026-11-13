@@ -28,6 +28,9 @@ config = importlib.import_module(conf_file).config
 - Без env `config` модуль печатает инструкцию и делает `quit()` на импорте.
 - Модули: `config_test`, `config_beyeezy`, `config_crimea`, `config_teleweb`,
   `config_trade`, `config_svcms_manager`, `config_svcms_admin`.
+  Каждый модуль = **тенант** платформы «конструктор CRM»; правило изоляции
+  тенантов (неймспейсы роутов/либ/конфигов, нейтральное ядро) —
+  `agent-doc/00-overview.md` § «Универсальный конструктор CRM».
 - Все настройки деплоя живут в `config_*.py`, общих значений по умолчанию нет.
 - Конфиг импортируется очень рано (`main.py` → `routes` → `lib.engine` →
   `config`), поэтому модули конфига **не должны** импортировать `routes` или
