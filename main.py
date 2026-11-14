@@ -1,15 +1,34 @@
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from inspect import signature
+import traceback as _traceback
 
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse, PlainTextResponse, Response
 from routes import router
 from lib.engine import Engine
 from config import config
 from db import get_db, get_strateg_db
 
 # uvicorn main:app --reload --port=5000
-app = FastAPI(debug=True)
+# debug включает отдачу трейсбеков клиенту — по умолчанию False; подробные
+# ошибки возвращает наш exception_handler только в debug_mode движка.
+app = FastAPI(debug=False)
+
+
+@app.exception_handler(PermissionError)
+async def _permission_error(request: Request, exc: PermissionError):
+    return JSONResponse({'detail': str(exc) or 'Недостаточно прав'}, status_code=403)
+
+
+@app.exception_handler(Exception)
+async def _unhandled_error(request: Request, exc: Exception):
+    # Раньше debug=True отдавал стектрейс клиенту всем тенантам.
+    # Теперь: прод — аккуратный 500; debug-режим (hostname из config debug
+    # hosts) — подробный стек для разработки.
+    engine = getattr(request.state, 'engine', None)
+    if engine is not None and getattr(engine, 'debug_mode', False):
+        return PlainTextResponse(_traceback.format_exc(), status_code=500)
+    return JSONResponse({'detail': 'Internal Server Error'}, status_code=500)
 
 # Локальная отладка: фронт (vite/webpack dev-server) живёт на 127.0.0.1:8081 или
 # localhost:8081, поэтому перечислять порты списком бессмысленно -- vite меняет
@@ -112,7 +131,9 @@ async def for_all_requests(request: Request,call_next): # , response=Response
 # вместо 401.
 cors_kwargs = {
     'allow_origins': origins,
-    'allow_origin_regex': dev_origin_regex,
+    # Локальный dev-фронт (vite :8081) — только если конфиг разрешил
+    # (cors_allow_local); на проде петлевые origin не пускаем.
+    'allow_origin_regex': dev_origin_regex if config.get('cors_allow_local') else None,
     'allow_credentials': True,
     'allow_methods': ["*"],
     'allow_headers': ["*"],

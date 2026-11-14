@@ -63,7 +63,20 @@ prefill характеристик — конфиг `ds_good` + общий `fron
 только если `config['features']['ds']` истинно (флаг тенанта; прод-конфиг
 `/var/www/svcms/manager/backend/config.py` тоже). Плюс scope-проверки уже
 внутри: `page_constructor` сверяет `domain_id` с проектом менеджерской
-сессии (`_project_scope_error`) — чужой домен = отказ.
+сессии (`_project_scope_error`) — чужой домен = отказ (и на GET тоже).
+
+## Безопасность (пентест 2026-11)
+
+- Права админа — `lib/authz.py` (`require_permission('admin_main')`);
+  применяется в `routes/svcmsadmin/*` и `/password`. Продеты таблиц
+  `admin_permissions`/`permissions` — иначе гейт даёт 403.
+- 500 без трейсбека: `main.py` — `FastAPI(debug=False)` + обработчики
+  `Exception`/`PermissionError`; стек — только в `debug_mode` движка.
+- CORS: петлевые origin (dev vite) — только при `config['cors_allow_local']`.
+- В SQL значения — параметрами; идентификаторы (parent_id/id в
+  `admin_tree`, values в `autocomplete`, multiconnect) — только числа.
+- Загрузки: имя файла — `os.path.basename` (wysiwyg), путь — только внутри
+  `files_dir` (normpath/chroot).
 
 ## Мёртвый / пустой код
 

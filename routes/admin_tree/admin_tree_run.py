@@ -281,7 +281,9 @@ async def admin_tree_run(**arg):
     if form.sort:
       where=[f'{form.work_table_id}=%s']
       add_where_foreign_key(form,where)
-      if parent_id:
+      # parent_id — только число (интерполяция в WHERE была SQLi,
+      # подтверждено write-инъекцией «846 OR SLEEP(5)»)
+      if parent_id and parent_id.isnumeric():
         where.append('parent_id='+parent_id)
 
       query=add_where_to_query(f'UPDATE {form.work_table} SET sort=%s',where)
@@ -300,7 +302,7 @@ async def admin_tree_run(**arg):
 
   elif form.action == 'delete_branch':
     if form.make_delete:
-      if form.id:
+      if form.id and str(id).isdigit():
         where = [f'{form.work_table_id}={id}']
         values=[]
         add_where_foreign_key(form,where)
@@ -378,6 +380,9 @@ async def admin_tree_run(**arg):
       if photo_field_name and form.header_field and photo_field_name==form.header_field:
         photo_field_name=None
       for id in obj_list:
+        if not str(id).isdigit():
+            data_result[str(id)]=None
+            continue
         sort=''
         order=''
         extra=''

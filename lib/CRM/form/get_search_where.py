@@ -281,9 +281,11 @@ def get_search_where(form,query):
         if not exists_arg('tablename',f):
           form.errors.append('не указано tablename для '+f['name'])
         else:
-          # my @values = grep /^\d+$/, @{$values};
-          if len(values):
-            WHERE.append(f'''({f['tablename']}.{f['relation_table_id']} IN ({','.join(values)}) )''')
+          # only numeric ids (в старом Perl был grep /^\d+$/; прямая
+          # интерполяция values давала SQLi)
+          nums=[str(v) for v in (values or []) if str(v).isdigit()]
+          if nums:
+            WHERE.append(f'''({f['tablename']}.{f['relation_table_id']} IN ({','.join(nums)}) )''')
       elif f['type']=='file':
           if values==1: # файл существует
             WHERE.append(f'''(wt.{f['name']}<>"") ''')

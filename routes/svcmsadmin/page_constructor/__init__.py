@@ -579,6 +579,9 @@ async def page_get(request: Request, page_id: int):
     )
     if not p:
         return {'success': False, 'errors': ['страница не найдена']}
+    scope_errs = await _project_scope_error(db, request, p.get('domain_id') or 0)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     raw_blocks = p.get('blocks')
     err = _blocks_error(raw_blocks)
     p['blocks'] = _parse_blocks(raw_blocks)
@@ -668,6 +671,9 @@ async def page_delete(request: Request, page_id: int):
 @router.get('/structure/{domain_id}')
 async def structure_get(request: Request, domain_id: int):
     db = request.state.engine.db_read
+    scope_errs = await _project_scope_error(db, request, domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     return {'success': True, 'errors': [], 'structure': await _structure_get(db, domain_id)}
 
 
@@ -917,6 +923,9 @@ async def base_set_delete(request: Request, r: BaseSetIdIn):
 @router.get('/theme/{domain_id}')
 async def theme_get(request: Request, domain_id: int):
     db = request.state.engine.db_read
+    scope_errs = await _project_scope_error(db, request, domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     row = await _theme_row(db, domain_id)
     return {'success': True, 'errors': [], 'theme': await _theme_json_db(db, row, domain_id)}
 
@@ -959,6 +968,9 @@ async def theme_save(request: Request, r: ThemeSaveIn):
 @router.get('/theme/{domain_id}/styles.css')
 async def theme_css(request: Request, domain_id: int):
     db = request.state.engine.db_read
+    scope_errs = await _project_scope_error(db, request, domain_id)
+    if scope_errs:
+        return Response(content='/* доступ запрещён */', media_type='text/css')
     row = await _theme_row(db, domain_id)
     parts = []
     for axis in THEME_ORDER:
@@ -976,6 +988,9 @@ async def theme_css(request: Request, domain_id: int):
 async def block_images_list(request: Request, domain_id: int = 0, folder: str = ''):
     """Список картинок проекта из /files/project_<id>/block-images[/<folder>]/."""
     db = request.state.engine.db_read
+    scope_errs = await _project_scope_error(db, request, domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs, 'files': []}
     pid = await _project_id_for_domain(db, domain_id)
     if not pid:
         return {'success': False, 'errors': ['проект не найден'], 'files': []}
@@ -1073,6 +1088,9 @@ async def schemes_list(request: Request, axis: str, domain_id: int = 0):
     tbl = THEME_TABLES[axis]
     scope = int(domain_id or 0)
     if scope > 0:
+        scope_errs = await _project_scope_error(db, request, scope)
+        if scope_errs:
+            return {'success': False, 'errors': scope_errs}
         # общие + индивидуальные домена; одноимённая индивидуальная перекрывает общую
         rows = await db.query(
             query=(
@@ -1101,7 +1119,12 @@ async def scheme_get(request: Request, axis: str, name: str, domain_id: int = 0)
     if axis not in THEME_TABLES:
         return {'success': False, 'errors': ['неизвестная ось темы']}
     db = request.state.engine.db_read
-    row = await _scheme_find(db, axis, int(domain_id or 0), name)
+    scope = int(domain_id or 0)
+    if scope > 0:
+        scope_errs = await _project_scope_error(db, request, scope)
+        if scope_errs:
+            return {'success': False, 'errors': scope_errs}
+    row = await _scheme_find(db, axis, scope, name)
     if not row:
         return {'success': False, 'errors': ['схема не найдена']}
     return {'success': True, 'errors': [], 'scheme': row}
@@ -1112,7 +1135,12 @@ async def scheme_css(request: Request, axis: str, name: str, domain_id: int = 0)
     if axis not in THEME_TABLES:
         return Response(content='/* неизвестная ось */\n', media_type='text/css')
     db = request.state.engine.db_read
-    row = await _scheme_find(db, axis, int(domain_id or 0), name)
+    scope = int(domain_id or 0)
+    if scope > 0:
+        scope_errs = await _project_scope_error(db, request, scope)
+        if scope_errs:
+            return Response(content='/* доступ запрещён */', media_type='text/css')
+    row = await _scheme_find(db, axis, scope, name)
     body = (row or {}).get('css') or '/* схема не найдена */\n'
     return Response(content=body, media_type='text/css')
 

@@ -153,12 +153,22 @@ async def wysiwyg_process(**arg):
 
     elif action=='upload':
         file=arg['file']
-        
-        
-        full_path=f"{manager['files_dir']}/{file.filename}"
+
+        # Имя файла от клиента — только basename (traversal через
+        # `filename="../..."` давал запись вне files_dir, подтверждено).
+        safe_name=os.path.basename(str(file.filename or '')).lstrip('.')
+        if not safe_name:
+            errors.append('некорректное имя файла')
+            return {'success':0,'errors':errors}
+        full_path=f"{manager['files_dir']}/{safe_name}"
         if arg['path']:
             P= path[:0] + path[(0+1):] # удаляем начальный слэш
-            full_path=f"{manager['files_dir']}/{P}{file.filename}"
+            # path — только внутри files_dir: без traversal после normpath
+            base=os.path.realpath(manager['files_dir'])
+            full_path=os.path.normpath(os.path.join(base, P, safe_name))
+            if os.path.commonpath([base, full_path]) != base:
+                errors.append('недопустимый путь')
+                return {'success':0,'errors':errors}
         #print('upload_to:',full_path)
         with open(full_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)

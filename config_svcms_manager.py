@@ -226,3 +226,6 @@ config['alter_all_change_action']=alter_all_change_action
 
 # Тенант-флаг: деплой обслуживает DS-конструктор (роуты /svcms*, /svcmsadmin*).
 config['features']={'ds':True}
+
+# Локальный dev-фронт (vite :8081) в CORS — только для этого dev-конфига.
+config['cors_allow_local']=True

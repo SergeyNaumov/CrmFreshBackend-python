@@ -5,6 +5,7 @@ from lib.password import hash_password
 #import re
 from lib.send_mes import send_mes
 from lib.all_configs import read_config
+from lib.authz import require_permission
 
 
 #valid_email=re.compile(r"^[a-zA-Z0-9\-_\.]+@[a-zA-Z0-9\-_\.]+\.[a-zA-Z0-9\-_\.]+$")
@@ -18,6 +19,10 @@ async def password(config:str,field_name:str,id:int,R: dict, request: Request):
   response={'success':1,'errors':errors}
 
   if R['action'] == 'change':
+      # Смена пароля чужого менеджера — только с правом admin_main
+      # (раньше не проверялось ничего: любой залогиненный мог сменить
+      # пароль по id).
+      await require_permission(request, 'admin_main')
       form = await read_config(
         request=request,
         script='password', config=config,
@@ -45,7 +50,11 @@ async def password(config:str,field_name:str,id:int,R: dict, request: Request):
         response['success']=0
         response['errors']=errors
       
-      field['methods_send'][R['method_send']]['method_send'](form,field,R['new_password'])
+      # methods_send есть не во всех конфигах — отсутствие не должно
+      # давать KeyError 500 после успешного UPDATE.
+      ms=field.get('methods_send') or {}
+      if R.get('method_send') in ms:
+        ms[R['method_send']]['method_send'](form,field,R['new_password'])
       
 
 

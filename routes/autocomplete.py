@@ -191,7 +191,10 @@ async def get_list(**arg):
         
         if len(values_array):
           if where: where+=' OR '
-          where+=element['value_field']+' IN ('+','.join(values_array)+')'
+          # значения — ПАРАМЕТРАМИ (было объединение строкой = SQLi,
+          # подтверждено time-based инъекцией через values)
+          where+=element['value_field']+' IN ('+','.join(['%s']*len(values_array))+')'
+          like_values.extend(values_array)
 
     
 
