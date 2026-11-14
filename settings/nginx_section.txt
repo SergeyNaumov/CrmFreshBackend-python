@@ -77,4 +77,15 @@ server {
         #}
 
         #error_log /home/sv/projects/CrmFreshBackend-python/dev-crm.test.errors.log;
+
+        # --- Рекомендуемые заголовки безопасности для прод-вхоста (2026-11) ---
+        # Применять на проде (root), после nginx -t + reload. CSP не добавлять
+        # без тестирования сайта (inline-скрипты в шаблоне) — начать с
+        # Content-Security-Policy-Report-Only.
+        #add_header X-Frame-Options SAMEORIGIN always;
+        #add_header X-Content-Type-Options nosniff always;
+        #add_header Referrer-Policy strict-origin-when-cross-origin always;
+        #add_header Permissions-Policy geolocation=(), microphone=(), camera=() always;
+        # В /etc/nginx/nginx.conf (http): server_tokens off; — убирает версию
+        # nginx из заголовка Server.
 }
