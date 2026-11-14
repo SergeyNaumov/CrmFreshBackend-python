@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-#from config import config
+from config import config as sysconfig
 from .core_routes import router as router_core
 from .mainpage import router as router_mainpage
 from .register import router as router_register
@@ -75,8 +75,13 @@ router.include_router(router_ajax) # /ajax
 router.include_router(router_background, prefix='/background') # /background/...
 router.include_router(router_gptassist,prefix='/gpt-assist')
 router.include_router(router_filenavigator,prefix='/filenavigator')
-router.include_router(router_svcms,prefix='/svcms')
-router.include_router(router_svcmsadmin,prefix='/svcmsadmin')
+
+# Тенант-гейт: DS-роуты (/svcms*, /svcmsadmin*) — только если конфиг деплоя
+# декларирует features.ds. Остальные тенанты (trade, beyeezy, crimea, test…)
+# не получают эту поверхность вовсе (404 вместо доступа к чужим проектам).
+if (sysconfig or {}).get('features', {}).get('ds'):
+    router.include_router(router_svcms,prefix='/svcms')
+    router.include_router(router_svcmsadmin,prefix='/svcmsadmin')
 
 
 

@@ -223,3 +223,6 @@ def alter_all_change_action(form):
 config['after_create_engine']=after_create_engine
 config['after_read_form_config']=after_read_form_config
 config['alter_all_change_action']=alter_all_change_action
+
+# Тенант-флаг: деплой обслуживает DS-конструктор (роуты /svcms*, /svcmsadmin*).
+config['features']={'ds':True}

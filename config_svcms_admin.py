@@ -150,4 +150,6 @@ config={
     'source_project_id':5837,
   },
 
+  # Тенант-флаг: деплой обслуживает DS-админку (роуты /svcmsadmin*).
+  'features': {'ds': True},
 }

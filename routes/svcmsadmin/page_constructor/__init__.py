@@ -113,6 +113,24 @@ async def _project_id_for_domain(db, domain_id):
     return (row or {}).get('project_id')
 
 
+async def _project_scope_error(db, request, domain_id):
+    """Scope-проверка: домен — проект текущей менеджерской сессии.
+
+    У менеджерских сессий (request.state.project задан) чужой domain_id
+    запрещён — иначе менеджер проекта A писал бы по domain_id проекта B.
+    У svcms.admin (state.project отсутствует) проверка не применяется.
+    Возвращает список ошибок (пустой = можно продолжать)."""
+    if not domain_id:
+        return ['не указан domain_id']
+    pid = await _project_id_for_domain(db, domain_id)
+    if not pid:
+        return ['домен не найден']
+    project = getattr(request.state, 'project', None)
+    if project and str(project.get('project_id')) != str(pid):
+        return ['домен принадлежит другому проекту']
+    return []
+
+
 async def _block_types_for_project(db, project_id):
     """Разрешённые типы блоков конструктора для проекта.
 
@@ -496,6 +514,9 @@ async def _theme_json_db(db, row, domain_id):
 @router.post('/init')
 async def page_constructor_init(request: Request, r: InitIn):
     db = request.state.engine.db_read
+    scope_errs = await _project_scope_error(db, request, r.domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     d = await db.query(
         query=(
             'SELECT d.domain_id, d.domain, d.template_id, d.project_id, t.header, t.folder'
@@ -569,6 +590,9 @@ async def page_get(request: Request, page_id: int):
 @router.post('/page/save')
 async def page_save(request: Request, r: PageSaveIn):
     db = request.state.engine.db_write
+    scope_errs = await _project_scope_error(db, request, r.domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     url = (r.url or '').strip()
     if not url:
         return {'success': False, 'errors': ['укажите url страницы']}
@@ -628,6 +652,13 @@ async def page_save(request: Request, r: PageSaveIn):
 @router.post('/page/{page_id}/delete')
 async def page_delete(request: Request, page_id: int):
     db = request.state.engine.db_write
+    p = await db.query(
+        query='SELECT domain_id FROM domain_page WHERE id=%s',
+        values=[page_id], onerow=1, errors=[],
+    )
+    scope_errs = await _project_scope_error(db, request, (p or {}).get('domain_id') or 0)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     await db.query(query='DELETE FROM domain_page WHERE id=%s', values=[page_id], errors=[])
     return {'success': True, 'errors': []}
 
@@ -643,6 +674,9 @@ async def structure_get(request: Request, domain_id: int):
 @router.post('/structure/save')
 async def structure_save(request: Request, r: StructureSaveIn):
     db = request.state.engine.db_write
+    scope_errs = await _project_scope_error(db, request, r.domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     header = _structure_payload(r.header, 'header')
     footer = _structure_payload(r.footer, 'footer')
     await _structure_store(db, r.domain_id, header, footer)
@@ -705,6 +739,9 @@ async def _copy_domain_pages_to_set(db, domain_id, set_id):
 @router.post('/base-pages')
 async def base_pages(request: Request, r: BasePagesIn):
     db = request.state.engine.db_write
+    scope_errs = await _project_scope_error(db, request, r.domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     set_id = r.set_id or await _default_set_id(db)
     if not set_id:
         return {'success': False, 'errors': ['не найдено ни одного набора страниц']}
@@ -779,6 +816,10 @@ async def base_sets_list(request: Request):
 @router.post('/base-sets/create')
 async def base_set_create(request: Request, r: BaseSetCreateIn):
     db = request.state.engine.db_write
+    if r.domain_id:
+        scope_errs = await _project_scope_error(db, request, r.domain_id)
+        if scope_errs:
+            return {'success': False, 'errors': scope_errs}
     name = (r.name or '').strip()
     if not name:
         return {'success': False, 'errors': ['укажите имя набора']}
@@ -823,6 +864,9 @@ async def base_set_rename(request: Request, r: BaseSetRenameIn):
 @router.post('/base-sets/update-from-domain')
 async def base_set_update_from_domain(request: Request, r: BaseSetDomainIn):
     db = request.state.engine.db_write
+    scope_errs = await _project_scope_error(db, request, r.domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     st = await db.query(
         query='SELECT id, name FROM base_pages_set WHERE id=%s',
         values=[r.set_id],
@@ -882,6 +926,9 @@ async def theme_save(request: Request, r: ThemeSaveIn):
     if r.axis not in THEME_AXES:
         return {'success': False, 'errors': ['неизвестная ось темы']}
     db = request.state.engine.db_write
+    scope_errs = await _project_scope_error(db, request, r.domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     name = (r.name or '').strip() or THEME_DEFAULTS[r.axis]
     css = r.css or ''
     col = r.axis
@@ -961,6 +1008,9 @@ async def block_images_upload(request: Request,
     svg сохраняется как есть. Имя — транслит.
     """
     db = request.state.engine.db_read
+    scope_errs = await _project_scope_error(db, request, domain_id)
+    if scope_errs:
+        return {'success': False, 'errors': scope_errs}
     pid = await _project_id_for_domain(db, domain_id)
     if not pid:
         return {'success': False, 'errors': ['проект не найден']}
@@ -1104,6 +1154,10 @@ async def scheme_delete(request: Request, axis: str, name: str, domain_id: int =
         return {'success': False, 'errors': ['неизвестная ось темы']}
     scope = int(domain_id or 0)
     db = request.state.engine.db_write
+    if scope:
+        scope_errs = await _project_scope_error(db, request, scope)
+        if scope_errs:
+            return {'success': False, 'errors': scope_errs}
     tbl = THEME_TABLES[axis]
     row = await db.query(
         query=f'SELECT header, label, is_custom FROM {tbl} WHERE domain_id=%s AND header=%s',
