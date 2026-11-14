@@ -77,6 +77,10 @@ prefill характеристик — конфиг `ds_good` + общий `fron
   `admin_tree`, values в `autocomplete`, multiconnect) — только числа.
 - Загрузки: имя файла — `os.path.basename` (wysiwyg), путь — только внутри
   `files_dir` (normpath/chroot).
+- Rate-limit логина: `session_create` пишет неудачи в `session_fails_table`
+  (`manager_session_fails`/`admin_session_fails`), порог — из аргументов
+  `/login` (3/час на логин, 20/час на IP); старые метки чистятся. TTL сессии —
+  `auth['session_ttl']` (в конфигах 30 суток).
 
 ## Мёртвый / пустой код
 
