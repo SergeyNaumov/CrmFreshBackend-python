@@ -46,28 +46,63 @@ async def session_create(s,**arg):
   if exists_arg('where',arg):
       add_where += ' AND '+arg['where']
 
-  if exists_arg('max_fails_login',auth) and exists_arg('max_fails_login_interval',auth):
+  # Лимиты неудачных входов: приоритет у аргументов роута /login
+  # (3/час на логин, 20/час на IP), фолбэк — конфиг auth.
+  max_fails_login = arg.get('max_fails_login') or auth.get('max_fails_login')
+  interval_login = arg.get('max_fails_login_interval') or auth.get('max_fails_login_interval')
+  max_fails_ip = arg.get('max_fails_ip') or auth.get('max_fails_ip')
+  interval_ip = arg.get('max_fails_ip_interval') or auth.get('max_fails_ip_interval')
+
+  fails_table = auth.get('session_fails_table')
+  # чистим старые метки, чтобы таблица не росла (безопасно: таблицы может не быть)
+  if fails_table and interval_login:
+      try:
+          await s.db.query(
+            query=f'DELETE FROM {fails_table} WHERE registered < NOW() - INTERVAL %s SECOND',
+            values=[int(interval_login)], errors=[]
+          )
+      except Exception:
+          pass
+
+  if fails_table and max_fails_login and interval_login:
       fails=await s.db.query(
-        query=f'select count(*) from {auth["session_fails_table"]} where login=%s and registered>=now() - interval %s second',
-        values=[arg['login'],auth['max_fails_login_interval']],
+        query=f'select count(*) from {fails_table} where login=%s and registered>=now() - interval %s second',
+        values=[arg['login'],int(interval_login)],
         onevalue=True,
         errors=errors
       )
-      if fails and fails > auth['max_fails_login'] :
+      if fails and fails >= max_fails_login :
         return 'Ошибка безопасности: превышено максимальное количество входа по логину'
-  
+
   # проверяем, сколько было попыток зайти с данного ip под данным паролем
-  if exists_arg('max_fails_ip',auth) and exists_arg('max_fails_login_interval',auth):
+  if fails_table and max_fails_ip and interval_ip:
       fails=await s.db.query(
-        query=f'select count(*) from {auth["session_fails_table"]} where ip=%s and registered>=now() - interval %s second',
-        values=[arg['ip'],auth['max_fails_ip_interval']],
+        query=f'select count(*) from {fails_table} where ip=%s and registered>=now() - interval %s second',
+        values=[arg.get('ip') or '',int(interval_ip)],
         onevalue=True,
         errors=errors
       )
 
-      if fails and fails > auth['max_fails_ip'] :
+      if fails and fails >= max_fails_ip :
           return 'Ошибка безопасности: превышено максимальное количество входа по IP'
-  
+
+  # Неудачная попытка — записываем (раньше счётчик только читался,
+  # поэтому лимит фактически не работал).
+  async def _record_fail():
+      if not fails_table:
+          return
+      try:
+          import datetime
+          await s.db.save(
+            table=fails_table,
+            data={'login': str(arg.get('login') or '')[:200],
+                  'ip': str(arg.get('ip') or '')[:20],
+                  'registered': datetime.datetime.now()},
+            errors=[]
+          )
+      except Exception:
+          pass
+
 
   auth_id=None
   #print('auth:',auth)
@@ -133,6 +168,7 @@ async def session_create(s,**arg):
     s.set_cookie(name='auth_key',value=key)
   else:
     errors.append('авторизационные данные неверны')
+    await _record_fail()
 
 
   return{
@@ -191,6 +227,22 @@ async def session_start(s,**arg):
         errors=errors
       )
       #print('ok:',ok)
+      if ok:
+          # Опциональный TTL сессии (auth['session_ttl'] в секундах):
+          # просроченная сессия удаляется и считается неавторизованной.
+          ttl=int(auth.get('session_ttl') or 0)
+          if ttl:
+              age=await s.db.query(
+                query=f'SELECT TIMESTAMPDIFF(SECOND, registered, NOW()) age '
+                      f'FROM {auth["session_table"]} WHERE auth_id=%s AND session_key=%s',
+                values=[user_id, key], onerow=1, errors=[],
+              )
+              if not age or int(age.get('age') or 0) > ttl:
+                  await s.db.query(
+                    query=f'DELETE FROM {auth["session_table"]} WHERE auth_id=%s AND session_key=%s',
+                    values=[user_id, key], errors=[],
+                  )
+                  ok=0
       if ok:
           manager=await s.db.query(
             query=f'select *,{auth["manager_table_id"]} id from {auth["manager_table"]} where {auth["manager_table_id"]}=%s',

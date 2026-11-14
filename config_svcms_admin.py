@@ -56,6 +56,8 @@ config={
     'max_fails_login_interval':3600,
     'max_fails_ip':20,
     'max_fails_ip_interval':3600,
+    # Срок жизни сессии, секунд (0 — без ограничения).
+    'session_ttl': 2592000,
     'use_roles':False,
     'use_permissions':False
   },
