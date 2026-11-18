@@ -222,16 +222,29 @@ robots/sitemap: `/robots.txt` и `/sitemap.xml`, заданные в `files`,
 5. фронт менеджера — `build/svcms.manager` (имена чанков с хэшем обязательны,
    rsync без `--delete`).
 
-## Характеристики товара: автоподтягивание в форму
+## Характеристики товара: таблица в карточке (view_type inline_params)
 
-`configs/svcmsmanager/ds_good`: селект параметров в `params_values` скоуплен
-по `project_id` (`events.py`, как в `ds_catalog`). Поле «Рубрика» имеет
-`frontend.ajax` → `prefill_params` (`conf/ds_good/params_prefill.py`): при
-открытии формы и смене рубрики досоздаёт в `ds_params_good` недостающие
-строки по цепочке рубрик (как `sites/lib/dsengine/params.py::rubric_chain`)
-и обновляет слайды 1_to_m событием `1_to_m:upload_values:params_values`
-(jscode-ветка `frontend.ajax`, шина `bus`). Пустые значения сайт не выводит
-(`good_params` пропускает `''/NULL`).
+`configs/svcmsmanager/ds_good`: поле `params_values` (`1_to_m` по `ds_params_good`)
+показывается таблицей «Характеристика | Значение» — `view_type: 'inline_params'`,
+`not_create: 1`, у дочернего `value` — `change_in_slide: 1` (инлайн-ввод с
+автосохранением через `POST /1_to_m/update_field/ds_good/params_values/value/<good_id>`).
+Ветка рендера — `fields/1_to_m/slide.vue` (`change_in_slide` прячет лейбл инпута,
+подсказка уходит в placeholder).
+
+- Состав строк — только цепочка рубрик товара: `events.py::permissions`
+  выставляет `params_values['where'] = 'param_id IN (…)'` (при пустой цепочке —
+  `1=0`). Строки от прошлых рубрик не удаляются, скрыты фильтром и вернутся
+  при обратном переключении рубрики.
+- Досоздание строк-заготовок: у поля «Рубрика» `frontend.ajax` → `prefill_params`
+  (`conf/ds_good/params_prefill.py`) — при открытии формы и смене рубрики добавляет
+  недостающие строки по цепочке (`sites/lib/dsengine/params.py::rubric_chain`),
+  обновляет таблицу событием `1_to_m:upload_values:params_values` (jscode-ветка
+  `frontend.ajax`, шина `bus`) и отдаёт только строки текущей цепочки.
+- Пустые значения сайт не выводит: `good_params`/`attach_specs` пропускают
+  `''/NULL`. Селект параметра в `params_values` скоуплен по `project_id`
+  (`events.py`, как в `ds_catalog`), но в таблице не выводится — название
+  показывается как текст.
+
 
 ## Стартовая страница svcmsmanager (StartPage)
 
