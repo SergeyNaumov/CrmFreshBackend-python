@@ -8,6 +8,7 @@ from .left_menu import left_menu
 from .startpage import router as router_startpage
 from .data_transfer import router as router_data_transfer
 from .api_keys import router as router_api
+from .text_blocks import router as router_text_blocks
 
 
 
@@ -32,6 +33,10 @@ router.include_router(router_data_transfer)
 
 # API и интеграции: ключ, настройки, статистика (/svcms/api/...)
 router.include_router(router_api)
+
+# Режим блоков «Текстовых блоков»: картинки блоков проекта
+# (/svcms/text-block/block-images...)
+router.include_router(router_text_blocks)
 
 
 
