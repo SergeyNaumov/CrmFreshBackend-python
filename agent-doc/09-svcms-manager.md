@@ -244,6 +244,10 @@ robots/sitemap: `/robots.txt` и `/sitemap.xml`, заданные в `files`,
   `''/NULL`. Селект параметра в `params_values` скоуплен по `project_id`
   (`events.py`, как в `ds_catalog`), но в таблице не выводится — название
   показывается как текст.
+- Если у товаров есть значения, а связей «рубрика → параметры» нет (сайт и
+  карточка ничего не покажут), их восстанавливают по фактам заполнения:
+  `db/restore_ds_params_catalog.py <project_id> [--dry-run]` (идемпотентна,
+  бэкап — `mysqldump ... ds_params_catalog --where="project_id=<id>"`).
 
 
 ## Стартовая страница svcmsmanager (StartPage)
