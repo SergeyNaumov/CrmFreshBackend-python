@@ -68,6 +68,7 @@ font-awesome, file, codelist`.
 | `project_sitemap` | `ProjectSitemap.vue` | карта сайта проекта |
 | `domain_sync` | `DomainSync.vue` | перенос/копирование настроек конструктора на другой домен |
 | `page_blocks` | редактор блоков | блоки страницы (конфиги DS) |
+| `tb_block` | `TextBlockEditor.vue` | один блок конструктора (режим блоков «Текстовых блоков»: заголовок, фото, текст, кнопки) |
 | `in_ext_url` | `fields/in_ext_url.vue` | ЧПУ записи (текст) — читается/пишется в `in_ext_url` |
 
 ### `in_ext_url` — ЧПУ в карточке

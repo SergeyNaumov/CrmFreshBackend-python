@@ -163,24 +163,64 @@ robots/sitemap: `/robots.txt` и `/sitemap.xml`, заданные в `files`,
 ## Текстовые блоки (`ds_text_block`)
 
 Сервис «Текстовые блоки» (меню «Контент», иконка `fa-align-left`) — правка
-текстов помеченных блоков конструктора из /manager. Модель v2 (точечная):
+помеченных блоков конструктора из /manager. Модель v3 (точечная + режимы):
 
 - У блока в JSON страницы — галка `params.tb_admin` (чекбокс в конструкторе,
   типы `about`/`contact_form`/`text`) и стабильный `params.tb_id`
   (проставляет `page_save` → `ensure_tb_ids`).
 - Запись `ds_text_block` ключуется `(project_id, tb_key=tb_id)` — каждый
-  помеченный экземпляр отдельной строкой.
+  помеченный экземпляр отдельной строкой. Код блока (`code`) у существующей
+  записи read-only, «Добавить» отключено (`not_create`): строки создаёт
+  конструктор.
+- Два режима (`mode`, по аналогии с `ds_text`): `text` — только заголовок и
+  текст (колонки `header`/`body`); `blocks` — редактор блока, JSON одного
+  блока в колонке `blocks` (конверт `svcms.page_blocks` v2, тот же, что у
+  конструктора). `header`/`body` в режиме блоков — зеркала для списка/поиска
+  и пересчитываются из `blocks` (`refresh_mirrors`).
+- Режим `blocks` есть только у типов с `blocks_mode` в реестре (сейчас
+  `about`: title, text, image, badgeNum/badgeText, btn1*/btn2*, items[]).
+  `params`/`items` из реестра — «свои» для сервиса, `locked`
+  (`page_head`, `show_title`, `tb_admin`, `tb_id`) не перезаписываются.
 - Синхронизация (`lib/svcmsmanager/text_blocks.py`, реестр `TEXT_BLOCK_MAP`):
   конструктор → таблица (`upsert_from_doc` после записи страницы, **после** —
-  чтобы GC видел свежий JSON; GC удаляет строки со снятой галкой/удалённым
-  блоком); таблица → страницы (`sync_row_to_pages` по `tb_id`, из
-  `conf/ds_text_block/events.py::after_save`). Рендер сайта — всегда JSON,
-  таблицу движок не читает.
+  чтобы GC видел свежий JSON; пишет и зеркала, и `blocks`, поэтому док в
+  таблице всегда актуален; GC удаляет строки со снятой галкой/удалённым
+  блоком); таблица → страницы (`sync_row_to_pages` по `tb_key`, из
+  `conf/ds_text_block/events.py::after_save`). Рендер сайта — всегда JSON
+  страницы, таблицу движок не читает.
+- Фото блока правится пикером менеджера: `routes/svcms/text_blocks.py`
+  (`/svcms/text-block/block-images[/upload]`, проект — из сессии,
+  `lib/svcmsmanager/block_images.py`) кладёт файлы в ту же
+  `files/project_<id>/block-images`, что и конструктор (webp-оптимизация,
+  транслит имён), а в JSON остаётся путь `block-images/…`.
 - Миграции: `db/migrate_ds_text_block.py` (таблица, опция, backfill),
-  `db/migrate_ds_text_block_v2.py` (tb_key, перевод legacy-строк).
-- Добавить новый тип: `TEXT_BLOCK_MAP` + `tb_admin` в `schema.json` типа
-  (+ `tb_admin`,`tb_id` в `_shared/contract/blocks.json`) + селект в
-  `conf/ds_text_block/__init__.py`.
+  `db/migrate_ds_text_block_v2.py` (tb_key, перевод legacy-строк),
+  `db/migrate_ds_text_block_v3.py` (`mode`/`blocks` + бэкфилл: `tb_id`,
+  `mode='blocks'` и `blocks` для about). Прогон обеих сторон —
+  `db/check_text_blocks_v3.py` (локальная БД, с откатом).
+- Добавить новый тип: `TEXT_BLOCK_MAP` (+ `blocks_mode`/`params`/`items`,
+  если нужен режим блоков) + `tb_admin` в `schema.json` типа (+
+  `tb_admin`,`tb_id` в `_shared/contract/blocks.json`) + селект в
+  `conf/ds_text_block/__init__.py` + фронт-поле `tb_block`
+  (`src/features/ds-text`, `TextBlockEditor.vue`).
+
+### Выкатка режима блоков (порядок)
+
+Новый код читает колонки `mode`/`blocks`, старый после миграции работает как
+раньше, поэтому порядок такой (сервис не перезапускается, пока не залито всё):
+
+1. бэкап на прод-хосте: `mysqldump -usvcms svcms ds_text_block` и `domain_page`
+   по доменам затронутых проектов;
+2. залить код: `tools/syncsvcmsmanager.py` из этого репозитория (lib/ + routes/),
+   конфиг — `manager/backend/conf/ds_text_block` (в `svcms-async` его копирует
+   `tools/sync_engine_to_prod.sh`, без `--delete`). Запущенные воркеры работают
+   на старом коде — ок, `--reload` в юните нет;
+3. миграция: `db/migrate_ds_text_block_v3.py` скопировать на прод и запустить
+   `/var/www/svcms/.venv/bin/python` с `PYTHONPATH=/var/www/svcms/manager/backend`
+   (идемпотентна; страницы не переписывает, `tb_id` уже проставлены);
+4. `systemctl restart svcms.manager`;
+5. фронт менеджера — `build/svcms.manager` (имена чанков с хэшем обязательны,
+   rsync без `--delete`).
 
 ## Характеристики товара: автоподтягивание в форму
 
