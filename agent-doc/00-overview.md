@@ -52,6 +52,13 @@ Vue 3 + Vuetify (`../CrmFreshFront-v3`), бэкенд отдаёт только 
 (`5837`, доменов) и `if`-веток по тенанту. Тенант-специфику — через
 конфиг/field-атрибуты (`params_table`, `values_table`, `foreign_key`…)
 или через механизмы ядра (`frontend.ajax`, `events`, `plugins`).
+Сюда же относятся и **комментарии/примеры** generic-модулей: они не должны
+выдавать DS-сущности (`ds_good`, `ds_catalog`, `ds_params_good`, `ds_text_block`
+и т.п.) за поведение по умолчанию — конкретные таблицы/поля приходят только из
+конфига сущности, а DS-специфика живёт в `configs/svcms*`/`conf_projects`/
+`routes/svcms*`/`lib/svcmsmanager`/`db/migrate_ds_*`. Новые DS-таблицы
+создаём миграциями тенанта и включаем только в проекты svcms
+(`project_create`/опции), никогда — в чужие проекты/БД по умолчанию.
 
 Примеры правильного использования: меню DS — `routes/svcms/left_menu.py`;
 текстовые блоки — `lib/svcmsmanager/text_blocks.py` + `configs/svcmsmanager/ds_text_block`;

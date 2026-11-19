@@ -66,9 +66,9 @@ async def get_filters_controller(config: str, R:dict, request: Request):
       # Фильтр «пары характеристик»: отдаём фронту project-scoped список
       # параметров, а для текстовых — ещё и их значения (список + поиск).
       # Таблицы ОБЯЗАТЕЛЬНЫ в конфиге (params_table/values_table) — без них
-      # ветка невозможна; дефолты с DS-именами убраны, чтобы generic-тенанты
-      # не падали на несуществующих таблицах (ds_params/ds_params_good — в
-      # conf/ds_good/__init__.py).
+      # ветка невозможна; дефолтных имён таблиц здесь нет, чтобы generic-
+      # тенанты не падали на несуществующих таблицах (конкретные таблицы
+      # прописываются в конфигах сущностей).
       if not (f.get('params_table') and f.get('values_table')):
         f['params']=[]
       else:

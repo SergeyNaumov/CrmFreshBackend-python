@@ -218,8 +218,9 @@ def get_search_where(form,query):
         # [{param_id,type,value}|{param_id,type,from,to}, ...], между условиями AND.
         # Каждое условие -> EXISTS по values_table (без join/дублей товаров).
         # Таблица ОБЯЗАТЕЛЬНА в конфиге — без values_table ветка невозможна;
-        # дефолт с DS-именем убран, чтобы generic-тенанты не получали битый SQL
-        # (ds_params_good — в conf/ds_good/__init__.py).
+        # дефолтного имени таблицы здесь нет, чтобы generic-тенанты не получали
+        # битый SQL (конкретные таблицы и поля берутся только из конфига
+        # текущей сущности).
         if not f.get('values_table'):
           continue
         g_table=f['values_table']
@@ -233,7 +234,7 @@ def get_search_where(form,query):
           if not pid: continue
           cond_sql=[]; cond_vals=[]
           if str(cond.get('type'))=='1':
-            # число (в ds_params_good может быть с единицами: "0.20 кг")
+            # число (в значении может быть единица измерения: "0.20 кг")
             num=f"(REPLACE(SUBSTRING_INDEX(pg.{g_value},' ',1),',','.')+0)"
             frm=cond.get('from'); to=cond.get('to')
             if frm not in (None,''):

@@ -15,9 +15,9 @@ async def get_branch(**arg):
   if parent_id: # Если находимся не в корне, то собираем $branch->{path} (путь ветки)
     # Путь ветки собираем подъёмом по parent_id, а НЕ разбором столбца path:
     # в БД его значения могут не соответствовать соглашению "цепочка id предков"
-    # (например, в ds_catalog лежит '/catalog/<id>' -- литеральный сегмент 'catalog'
-    # попадал в SQL как w.id=catalog и ронял запрос). В условие попадает только
-    # то, что прошло isnumeric().
+    # (например, '/catalog/<id>' -- литеральный сегмент 'catalog' попадал в SQL
+    # как w.id=catalog и ронял запрос). В условие попадает только то, что
+    # прошло isnumeric().
     cur_id=str(parent_id)
     visited=set()
     while cur_id and cur_id not in visited:
@@ -175,9 +175,9 @@ async def admin_tree_run(**arg):
     }
   if not form.sort_field: form.sort_field='sort'
 
-  # Составной первичный ключ (напр. "param_id,good_id" у ds_params_good):
-  # строка результата не содержит такого поля, item[work_table_id] падал бы с
-  # KeyError -> 500. admin-tree для таких конфигов неприменим, отдаём ошибку.
+  # Составной первичный ключ (напр. "param_id,good_id"): строка результата
+  # не содержит такого поля, item[work_table_id] упал бы с KeyError -> 500.
+  # admin-tree для таких конфигов неприменим, отдаём ошибку.
   if ',' in str(form.work_table_id):
     return {
       'success':0,

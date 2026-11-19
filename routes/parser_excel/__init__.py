@@ -7,9 +7,9 @@ import os, re
 from .preload import preload
 from .load import load
 from .refs import check_refs, create_refs
-# NB: регистрация фонового обработчика фото товаров DS (ds_good_photos)
-# живёт в routes/svcmsadmin/__init__.py — это тенант-специфика, generic-
-# роутер её не тянет.
+# NB: регистрация фонового обработчика фото товаров живёт в
+# routes/svcmsadmin/__init__.py — это тенант-специфика, generic-роутер её
+# не тянет.
 router = APIRouter()
 
 
